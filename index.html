@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plano 3D Oficial - Departamento 01-01 (Distribución Real)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Plano 3D Oficial & Editor de Muebles - Depto 01-01</title>
     <!-- Three.js and OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: #080c14;
@@ -20,6 +20,7 @@
             overflow: hidden;
             width: 100vw;
             height: 100vh;
+            touch-action: none;
         }
         #webgl-container { width: 100%; height: 100%; display: block; }
 
@@ -32,84 +33,91 @@
             box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
         }
 
+        /* Header Card */
         #header-card {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            padding: 16px 22px;
+            top: 16px;
+            left: 16px;
+            padding: 14px 18px;
             z-index: 10;
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            max-width: 420px;
+            gap: 5px;
+            max-width: 410px;
         }
         .header-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
         }
         .badge {
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 700;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.6px;
             text-transform: uppercase;
-            padding: 4px 10px;
+            padding: 3px 9px;
             border-radius: 20px;
             background: linear-gradient(135deg, #10b981, #059669);
             color: #fff;
         }
-        .share-badge {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 20px;
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .icon-btn {
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid rgba(56, 189, 248, 0.35);
             color: #38bdf8;
+            padding: 5px 9px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 4px;
             transition: all 0.2s;
         }
-        .share-badge:hover { background: rgba(56, 189, 248, 0.3); }
-        h1 { font-size: 19px; font-weight: 700; color: #ffffff; }
-        .subtitle { font-size: 12px; color: #94a3b8; line-height: 1.45; }
+        .icon-btn:hover { background: rgba(56, 189, 248, 0.3); }
+        h1 { font-size: 17px; font-weight: 700; color: #ffffff; }
+        .subtitle { font-size: 11.5px; color: #94a3b8; line-height: 1.4; }
         .metrics-row {
             display: flex;
-            gap: 16px;
-            margin-top: 8px;
-            padding-top: 10px;
+            gap: 14px;
+            margin-top: 6px;
+            padding-top: 8px;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
         .metric { display: flex; flex-direction: column; }
-        .metric-val { font-size: 15px; font-weight: 700; color: #38bdf8; }
-        .metric-lbl { font-size: 10px; color: #64748b; text-transform: uppercase; }
+        .metric-val { font-size: 13.5px; font-weight: 700; color: #38bdf8; }
+        .metric-lbl { font-size: 9.5px; color: #64748b; text-transform: uppercase; }
 
-        /* Selector de Ambientes */
-        #proposals-panel {
+        /* Top Proposals Toolbar */
+        #top-toolbar {
             position: absolute;
-            top: 20px;
-            left: 450px;
-            padding: 10px 16px;
+            top: 16px;
+            left: 440px;
+            padding: 8px 14px;
             z-index: 10;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .proposal-btn {
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.12);
             color: #cbd5e1;
-            padding: 7px 12px;
+            padding: 6px 11px;
             border-radius: 8px;
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
         .proposal-btn:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
         .proposal-btn.active {
@@ -119,64 +127,66 @@
             box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
         }
 
-        /* Toolbar Right */
-        #toolbar {
+        /* Right Floating Sidebar (Layers & Settings) */
+        #sidebar-right {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 16px;
+            right: 16px;
             padding: 14px;
             z-index: 10;
             display: flex;
             flex-direction: column;
-            gap: 11px;
-            width: 235px;
+            gap: 10px;
+            width: 240px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
         }
         .panel-title {
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 700;
             text-transform: uppercase;
             color: #94a3b8;
             letter-spacing: 0.6px;
         }
-        .btn-group { display: flex; flex-direction: column; gap: 6px; }
+        .btn-group { display: flex; flex-direction: column; gap: 5px; }
         .ui-btn {
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #e2e8f0;
-            padding: 8px 12px;
+            padding: 7px 11px;
             border-radius: 8px;
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
         }
         .ui-btn:hover {
             background: rgba(255, 255, 255, 0.12);
             border-color: rgba(255, 255, 255, 0.25);
             color: #fff;
-            transform: translateY(-1px);
         }
         .ui-btn.active {
             background: #2563eb;
             border-color: #3b82f6;
             color: #fff;
-            box-shadow: 0 0 14px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
         }
+
         .toggle-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 11.5px;
-            padding: 4px 2px;
+            font-size: 11px;
+            padding: 3px 2px;
             cursor: pointer;
         }
         .toggle-switch {
             position: relative;
-            width: 34px;
-            height: 19px;
+            width: 32px;
+            height: 18px;
             background: rgba(255, 255, 255, 0.15);
             border-radius: 20px;
             transition: 0.3s;
@@ -186,69 +196,222 @@
             position: absolute;
             top: 2px;
             left: 2px;
-            width: 15px;
-            height: 15px;
+            width: 14px;
+            height: 14px;
             background: #fff;
             border-radius: 50%;
             transition: 0.3s;
         }
         input[type="checkbox"] { display: none; }
         input[type="checkbox"]:checked + .toggle-switch { background: #3b82f6; }
-        input[type="checkbox"]:checked + .toggle-switch::after { transform: translateX(15px); }
+        input[type="checkbox"]:checked + .toggle-switch::after { transform: translateX(14px); }
+
+        /* Floating Furniture Management Panel */
+        #furniture-editor {
+            position: absolute;
+            left: 16px;
+            bottom: 74px;
+            width: 380px;
+            padding: 16px;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: calc(100vh - 220px);
+            overflow-y: auto;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+        #furniture-editor.minimized {
+            height: 52px;
+            overflow: hidden;
+            padding: 10px 16px;
+        }
+        .editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .editor-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .furniture-select {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #f8fafc;
+            padding: 7px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+        .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .control-box {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .control-lbl {
+            font-size: 10px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+        }
+        .control-lbl span.val { color: #38bdf8; font-family: monospace; font-size: 11px; }
+        .stepper-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .step-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s;
+        }
+        .step-btn:hover { background: #0284c7; }
+        .step-input {
+            flex: 1;
+            background: #090e17;
+            border: 1px solid #334155;
+            color: #38bdf8;
+            text-align: center;
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: 600;
+            height: 28px;
+            border-radius: 6px;
+            outline: none;
+        }
+        .slider-row {
+            width: 100%;
+            margin-top: 2px;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            background: #334155;
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+            accent-color: #38bdf8;
+        }
+        .action-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .act-btn {
+            flex: 1;
+            padding: 7px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        .btn-add { background: #059669; color: white; }
+        .btn-add:hover { background: #10b981; }
+        .btn-del { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; }
+        .btn-del:hover { background: #ef4444; color: white; }
+        .btn-export { background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; }
+        .btn-export:hover { background: #0284c7; color: white; }
 
         /* Bottom Views Bar */
         #views-bar {
             position: absolute;
-            bottom: 24px;
+            bottom: 16px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 8px 14px;
+            padding: 6px 12px;
             z-index: 10;
             display: flex;
-            gap: 8px;
+            gap: 6px;
+            max-width: calc(100% - 32px);
+            overflow-x: auto;
         }
         .view-chip {
-            padding: 7px 13px;
+            padding: 6px 11px;
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.09);
             color: #cbd5e1;
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
+            white-space: nowrap;
         }
         .view-chip:hover, .view-chip.active {
-            background: rgba(59, 130, 246, 0.2);
-            border-color: #3b82f6;
-            color: #60a5fa;
+            background: rgba(59, 130, 246, 0.25);
+            border-color: #38bdf8;
+            color: #38bdf8;
         }
 
-        /* Modal Compartir Link */
-        #share-modal {
+        /* Modal Styles */
+        .modal {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(15, 23, 42, 0.96);
             border: 1px solid #38bdf8;
             border-radius: 14px;
-            padding: 24px 28px;
-            max-width: 480px;
+            padding: 22px 26px;
+            max-width: 490px;
             width: 90%;
-            z-index: 200;
+            z-index: 300;
             display: none;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 20px 45px rgba(0,0,0,0.7);
+            backdrop-filter: blur(25px);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.8);
         }
-        #share-modal h2 { font-size: 18px; color: #38bdf8; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        #share-modal p { font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 14px; }
-        .url-box {
-            display: flex; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 6px 10px; margin-bottom: 16px; align-items: center;
+        .modal h2 { font-size: 17px; color: #38bdf8; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .modal p { font-size: 12.5px; color: #cbd5e1; line-height: 1.45; margin-bottom: 12px; }
+        .close-btn { position: absolute; top: 12px; right: 14px; color: #94a3b8; cursor: pointer; font-size: 18px; font-weight: bold; }
+        .code-box {
+            width: 100%;
+            height: 140px;
+            background: #090e17;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #38bdf8;
+            font-family: monospace;
+            font-size: 11px;
+            padding: 8px;
+            outline: none;
+            resize: none;
+            margin-bottom: 12px;
         }
-        .url-text { flex: 1; font-size: 12px; font-family: monospace; color: #38bdf8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .btn-copy { background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; }
-        .close-btn { position: absolute; top: 14px; right: 14px; color: #94a3b8; cursor: pointer; font-size: 18px; font-weight: bold; }
 
         .dim-label {
             position: absolute;
@@ -257,11 +420,38 @@
             color: #38bdf8;
             padding: 2px 6px;
             border-radius: 4px;
-            font-size: 10.5px;
+            font-size: 10px;
             font-weight: 700;
             pointer-events: none;
             transform: translate(-50%, -50%);
             transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 820px) {
+            #header-card { top: 10px; left: 10px; right: 10px; max-width: none; padding: 10px 14px; }
+            #header-card h1 { font-size: 14.5px; }
+            #header-card .subtitle { display: none; }
+            #header-card .metrics-row { gap: 10px; margin-top: 4px; padding-top: 4px; }
+            #top-toolbar { display: none; }
+            #sidebar-right {
+                top: auto;
+                bottom: 60px;
+                right: 10px;
+                width: 220px;
+                max-height: 48vh;
+                display: none;
+            }
+            #sidebar-right.show-mobile { display: flex; }
+            #furniture-editor {
+                left: 10px;
+                right: 10px;
+                width: auto;
+                bottom: 60px;
+                max-height: 55vh;
+            }
+            #views-bar { bottom: 10px; }
         }
     </style>
 </head>
@@ -272,81 +462,72 @@
     <!-- Header Panel -->
     <div id="header-card" class="glass-panel">
         <div class="header-top">
-            <div class="badge">Escritura Oficial: 54,16 m²</div>
-            <div class="share-badge" id="btn-open-share">
-                <span>🔗</span> Compartir Link
+            <div class="badge">Escritura: 54,16 m²</div>
+            <div class="header-actions">
+                <button class="icon-btn" id="btn-toggle-layers">⚙️ Capas</button>
+                <button class="icon-btn" id="btn-open-share">🔗 Link</button>
             </div>
         </div>
         <h1>Edificio Glaciares II - Depto 01-01</h1>
-        <div class="subtitle">Calle Günter Plüschow 235, El Calafate | UF N° 6 - Depto "A" (Polígono 01-01). Geometría exacta según escritura y plano catastral, con distribución interior según croquis y videos reales.</div>
+        <div class="subtitle">Calle Günter Plüschow 235, El Calafate (1° Piso +2.75m). Geometría exacta con editor interactivo de muebles.</div>
         <div class="metrics-row">
-            <div class="metric">
-                <span class="metric-val">54,16 m²</span>
-                <span class="metric-lbl">Sup. Cubierta Escritura</span>
-            </div>
-            <div class="metric">
-                <span class="metric-val">10,03 %</span>
-                <span class="metric-lbl">Porcentual Dominio</span>
-            </div>
-            <div class="metric">
-                <span class="metric-val">3 Ambientes</span>
-                <span class="metric-lbl">Tipología</span>
-            </div>
-            <div class="metric">
-                <span class="metric-val">2.65 a 3.85 m</span>
-                <span class="metric-lbl">Techo Madera</span>
-            </div>
+            <div class="metric"><span class="metric-val">54,16 m²</span><span class="metric-lbl">Cubierta</span></div>
+            <div class="metric"><span class="metric-val">10,03 %</span><span class="metric-lbl">Dominio</span></div>
+            <div class="metric"><span class="metric-val">3 Amb.</span><span class="metric-lbl">Tipología</span></div>
+            <div class="metric"><span class="metric-val">2.65 a 3.85m</span><span class="metric-lbl">Techo Propio</span></div>
         </div>
     </div>
 
-    <!-- Selector de Propuestas de Modificación -->
-    <div id="proposals-panel" class="glass-panel">
+    <!-- Top Proposals Selector -->
+    <div id="top-toolbar" class="glass-panel">
         <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Diseño:</span>
-        <button class="proposal-btn active" id="btn-prop-actual">
-            <span>📌</span> Estado Real Actual
-        </button>
-        <button class="proposal-btn" id="btn-prop-isla">
-            <span>💡</span> Modif. 1: Cocina Integrada con Isla
-        </button>
-        <button class="proposal-btn" id="btn-prop-loft">
-            <span>💡</span> Modif. 2: Entrepiso en Estudio (3.85m)
-        </button>
+        <button class="proposal-btn active" id="btn-prop-actual"><span>📌</span> Estado Real</button>
+        <button class="proposal-btn" id="btn-prop-isla"><span>💡</span> Cocina con Isla</button>
+        <button class="proposal-btn" id="btn-prop-loft"><span>💡</span> Entrepiso Estudio</button>
     </div>
 
-    <!-- Toolbar Right -->
-    <div id="toolbar" class="glass-panel">
+    <!-- Right Sidebar (Layers & View Modes) -->
+    <div id="sidebar-right" class="glass-panel">
         <div class="panel-title">Modo de Cámara</div>
         <div class="btn-group">
-            <button class="ui-btn active" id="btn-orbit">
-                <span>🔄</span> Órbita 3D
-            </button>
-            <button class="ui-btn" id="btn-top">
-                <span>📐</span> Planta 2D (Cotas)
-            </button>
-            <button class="ui-btn" id="btn-fps">
-                <span>🚶</span> Recorrido Interior
-            </button>
+            <button class="ui-btn active" id="btn-orbit"><span>🔄</span> Órbita 3D</button>
+            <button class="ui-btn" id="btn-top"><span>📐</span> Planta 2D (Cotas)</button>
         </div>
 
-        <div class="panel-title" style="margin-top: 6px;">Capas / Visibilidad</div>
+        <div class="panel-title" style="margin-top: 6px;">Paredes & Visibilidad</div>
+        <label class="toggle-row">
+            <span>Paredes Exteriores</span>
+            <input type="checkbox" id="chk-ext-walls" checked>
+            <div class="toggle-switch"></div>
+        </label>
+        <label class="toggle-row">
+            <span>Tabiques Interiores</span>
+            <input type="checkbox" id="chk-int-walls" checked>
+            <div class="toggle-switch"></div>
+        </label>
+        <label class="toggle-row">
+            <span>Modo Maqueta (Paredes Bajas)</span>
+            <input type="checkbox" id="chk-wall-cut">
+            <div class="toggle-switch"></div>
+        </label>
+        <label class="toggle-row">
+            <span>Paredes Transparentes</span>
+            <input type="checkbox" id="chk-transparent">
+            <div class="toggle-switch"></div>
+        </label>
         <label class="toggle-row">
             <span>Techo de Madera</span>
             <input type="checkbox" id="chk-roof" checked>
             <div class="toggle-switch"></div>
         </label>
         <label class="toggle-row">
-            <span>Mobiliario Real</span>
+            <span>Mobiliario 3D</span>
             <input type="checkbox" id="chk-furniture" checked>
             <div class="toggle-switch"></div>
         </label>
         <label class="toggle-row">
             <span>Cotas de Medidas</span>
             <input type="checkbox" id="chk-dimensions" checked>
-            <div class="toggle-switch"></div>
-        </label>
-        <label class="toggle-row">
-            <span>Paredes Transparentes</span>
-            <input type="checkbox" id="chk-transparent">
             <div class="toggle-switch"></div>
         </label>
 
@@ -356,10 +537,101 @@
         </button>
     </div>
 
+    <!-- Floating Furniture Editor Panel -->
+    <div id="furniture-editor" class="glass-panel">
+        <div class="editor-header">
+            <div class="editor-title">
+                <span>🛋️</span> Editor de Mueble
+            </div>
+            <div style="display: flex; gap: 4px;">
+                <button class="icon-btn" id="btn-min-editor" title="Minimizar">▼</button>
+                <button class="icon-btn" id="btn-add-modal" style="background:#059669; border-color:#10b981; color:#fff;">+ Añadir</button>
+            </div>
+        </div>
+
+        <select id="furniture-select" class="furniture-select">
+            <!-- Options populated dynamically -->
+        </select>
+
+        <div id="editor-controls">
+            <!-- Dimension Controls -->
+            <div class="control-grid">
+                <div class="control-box">
+                    <div class="control-lbl">Ancho (X) <span class="val" id="lbl-dim-w">1.40 m</span></div>
+                    <div class="stepper-row">
+                        <div class="step-btn" data-field="w" data-delta="-0.05">-</div>
+                        <input type="number" step="0.01" class="step-input" id="inp-w">
+                        <div class="step-btn" data-field="w" data-delta="0.05">+</div>
+                    </div>
+                    <input type="range" min="0.2" max="4.0" step="0.02" id="rng-w">
+                </div>
+
+                <div class="control-box">
+                    <div class="control-lbl">Largo / Prof. (Z) <span class="val" id="lbl-dim-d">1.90 m</span></div>
+                    <div class="stepper-row">
+                        <div class="step-btn" data-field="d" data-delta="-0.05">-</div>
+                        <input type="number" step="0.01" class="step-input" id="inp-d">
+                        <div class="step-btn" data-field="d" data-delta="0.05">+</div>
+                    </div>
+                    <input type="range" min="0.2" max="4.0" step="0.02" id="rng-d">
+                </div>
+            </div>
+
+            <div class="control-grid" style="margin-top: 6px;">
+                <div class="control-box">
+                    <div class="control-lbl">Altura (Y) <span class="val" id="lbl-dim-h">0.45 m</span></div>
+                    <div class="stepper-row">
+                        <div class="step-btn" data-field="h" data-delta="-0.05">-</div>
+                        <input type="number" step="0.01" class="step-input" id="inp-h">
+                        <div class="step-btn" data-field="h" data-delta="0.05">+</div>
+                    </div>
+                    <input type="range" min="0.1" max="2.8" step="0.02" id="rng-h">
+                </div>
+
+                <div class="control-box">
+                    <div class="control-lbl">Rotación <span class="val" id="lbl-rot">0°</span></div>
+                    <div class="stepper-row">
+                        <div class="step-btn" id="btn-rot-left">⟲</div>
+                        <input type="number" class="step-input" id="inp-rot">
+                        <div class="step-btn" id="btn-rot-right">⟳</div>
+                    </div>
+                    <input type="range" min="0" max="360" step="5" id="rng-rot">
+                </div>
+            </div>
+
+            <!-- Position Controls -->
+            <div class="control-grid" style="margin-top: 6px;">
+                <div class="control-box">
+                    <div class="control-lbl">Posición X <span class="val" id="lbl-pos-x">1.20 m</span></div>
+                    <div class="stepper-row">
+                        <div class="step-btn" data-field="x" data-delta="-0.05">◀</div>
+                        <input type="number" step="0.01" class="step-input" id="inp-x">
+                        <div class="step-btn" data-field="x" data-delta="0.05">▶</div>
+                    </div>
+                    <input type="range" min="0.0" max="9.3" step="0.05" id="rng-x">
+                </div>
+
+                <div class="control-box">
+                    <div class="control-lbl">Posición Z <span class="val" id="lbl-pos-z">5.30 m</span></div>
+                    <div class="stepper-row">
+                        <div class="step-btn" data-field="z" data-delta="-0.05">▲</div>
+                        <input type="number" step="0.01" class="step-input" id="inp-z">
+                        <div class="step-btn" data-field="z" data-delta="0.05">▼</div>
+                    </div>
+                    <input type="range" min="0.0" max="6.2" step="0.05" id="rng-z">
+                </div>
+            </div>
+
+            <div class="action-row">
+                <button class="act-btn btn-export" id="btn-copy-json">📋 Copiar Medidas</button>
+                <button class="act-btn btn-del" id="btn-del-furniture">🗑️ Eliminar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Bottom Views Bar -->
     <div id="views-bar" class="glass-panel">
         <div class="view-chip active" data-view="isom">Perspectiva General</div>
-        <div class="view-chip" data-view="entrada">Entrada Principal</div>
         <div class="view-chip" data-view="living">Living-Comedor</div>
         <div class="view-chip" data-view="cocina">Cocina</div>
         <div class="view-chip" data-view="cuarto">Cuarto (Dormitorio)</div>
@@ -367,158 +639,125 @@
         <div class="view-chip" data-view="estudio">Estudio Gamer</div>
     </div>
 
-    <!-- Modal Compartir por Link -->
-    <div id="share-modal">
+    <!-- Modal Añadir Mueble -->
+    <div id="add-modal" class="modal">
+        <span class="close-btn" id="btn-close-add">&times;</span>
+        <h2><span>🛋️</span> Añadir Mueble Nuevo</h2>
+        <p>Elegí una tipología predeterminada para agregar al departamento y luego ajustá sus medidas exactas:</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+            <button class="ui-btn add-preset-btn" data-type="cama">🛏️ Cama Matrimonial</button>
+            <button class="ui-btn add-preset-btn" data-type="cama_simple">🛏️ Cama 1 Plaza</button>
+            <button class="ui-btn add-preset-btn" data-type="sillon">🛋️ Sillón Living</button>
+            <button class="ui-btn add-preset-btn" data-type="mesa">🍽️ Mesa Comedor</button>
+            <button class="ui-btn add-preset-btn" data-type="escritorio">💻 Escritorio</button>
+            <button class="ui-btn add-preset-btn" data-type="placard">🚪 Placard a Medida</button>
+            <button class="ui-btn add-preset-btn" data-type="heladera">🧊 Heladera</button>
+            <button class="ui-btn add-preset-btn" data-type="cubo">📦 Mueble / Caja</button>
+        </div>
+    </div>
+
+    <!-- Modal Copiar / Compartir JSON de Medidas -->
+    <div id="json-modal" class="modal">
+        <span class="close-btn" id="btn-close-json">&times;</span>
+        <h2><span>📋</span> Medidas Exactas del Mobiliario</h2>
+        <p>Copiá este texto JSON y pegalo en el chat de Antigravity para sincronizar y guardar tus medidas exactas:</p>
+        <textarea id="json-text" class="code-box" readonly></textarea>
+        <div style="display: flex; gap: 8px;">
+            <button class="act-btn btn-add" id="btn-copy-clipboard">Copiar al Portapapeles</button>
+            <button class="act-btn" id="btn-reset-default" style="background:#334155; color:#cbd5e1;">Restablecer Iniciales</button>
+        </div>
+    </div>
+
+    <!-- Modal Compartir Link -->
+    <div id="share-modal" class="modal">
         <span class="close-btn" id="btn-close-share">&times;</span>
         <h2><span>🌐</span> Compartir Plano 3D por Link</h2>
-        <p>Este visor 3D web está publicado en tiempo real en GitHub Pages para que cualquier persona pueda explorarlo en su celular o PC.</p>
-        <div class="url-box">
-            <span class="url-text" id="share-url-text">https://totoarg.github.io/departamento-01-01/</span>
-            <button class="btn-copy" id="btn-copy-url">Copiar Link</button>
+        <p>Este visor 3D web está publicado en GitHub Pages para que cualquier persona pueda explorarlo y gestionar muebles en su celular o PC.</p>
+        <div style="display: flex; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 6px 10px; margin-bottom: 14px; align-items: center;">
+            <span style="flex:1; font-size:11.5px; font-family:monospace; color:#38bdf8; overflow:hidden; text-overflow:ellipsis;" id="share-url-text">https://totoarg.github.io/departamento-01-01/</span>
+            <button class="icon-btn" id="btn-copy-share">Copiar</button>
         </div>
-        <p style="font-size: 11.5px; color: #94a3b8; margin-bottom: 0;">
-            ✓ Totalmente interactivo en iOS, Android, Windows y Mac.<br>
-            ✓ Refleja con exactitud el croquis y los videos reales.
-        </p>
     </div>
 
     <div id="labels-container"></div>
 
     <script>
-        // --- 1. CONFIGURACIÓN GENERAL ---
+        // --- 1. CONFIGURACIÓN GENERAL THREE.JS ---
         const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x080c14);
-        scene.fog = new THREE.FogExp2(0x080c14, 0.022);
 
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(4.5, 14, 11);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(4.65, 13.5, 11);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.15;
         container.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
-        controls.maxPolarAngle = Math.PI / 2 + 0.05;
-        controls.target.set(4.0, 1.5, 3.5);
+        controls.maxPolarAngle = Math.PI / 2 - 0.02;
+        controls.minDistance = 2.0;
+        controls.maxDistance = 35.0;
+        controls.target.set(4.65, 1.2, 3.10);
 
-        // --- 2. ILUMINACIÓN ---
-        const ambientLight = new THREE.AmbientLight(0xfff5ea, 0.75);
-        scene.add(ambientLight);
+        // Iluminación
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.75);
+        scene.add(hemiLight);
 
-        const sunLight = new THREE.DirectionalLight(0xfffaed, 1.35);
-        sunLight.position.set(10, 22, 14);
+        const sunLight = new THREE.DirectionalLight(0xfff7ed, 1.25);
+        sunLight.position.set(12, 22, 10);
         sunLight.castShadow = true;
         sunLight.shadow.mapSize.width = 2048;
         sunLight.shadow.mapSize.height = 2048;
         sunLight.shadow.bias = -0.0005;
         scene.add(sunLight);
 
-        const fillLight = new THREE.DirectionalLight(0xb0c4de, 0.45);
-        fillLight.position.set(-10, 10, -10);
-        scene.add(fillLight);
-
-        // --- 3. TEXTURAS PROCEDURALES HD ---
+        // Materiales
         function createTileTexture() {
             const canvas = document.createElement('canvas');
             canvas.width = 512; canvas.height = 512;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#ddd3c4';
-            ctx.fillRect(0, 0, 512, 512);
-            for (let i = 0; i < 4000; i++) {
-                ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)';
-                ctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
-            }
-            ctx.strokeStyle = '#b8ab99'; ctx.lineWidth = 4;
-            for (let x = 0; x <= 512; x += 128) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke(); }
-            for (let y = 0; y <= 512; y += 128) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke(); }
+            ctx.fillStyle = '#d6cbbe'; ctx.fillRect(0, 0, 512, 512);
+            ctx.strokeStyle = '#baa695'; ctx.lineWidth = 4; ctx.strokeRect(0, 0, 512, 512);
             const tex = new THREE.CanvasTexture(canvas);
             tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
-            tex.repeat.set(7, 6);
+            tex.repeat.set(9.3, 6.2);
             return tex;
         }
 
-        function createWoodTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1024; canvas.height = 1024;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#9c592b';
-            ctx.fillRect(0, 0, 1024, 1024);
-            for (let i = 0; i < 400; i++) {
-                ctx.fillStyle = Math.random() > 0.5 ? 'rgba(125, 62, 22, 0.35)' : 'rgba(196, 126, 70, 0.25)';
-                ctx.fillRect(0, Math.random() * 1024, 1024, Math.random() * 6 + 1);
-            }
-            ctx.strokeStyle = '#4e230b'; ctx.lineWidth = 3;
-            for (let x = 0; x <= 1024; x += 1024/12) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1024); ctx.stroke(); }
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
-            tex.repeat.set(4, 4);
-            return tex;
-        }
-
-        function createGraniteTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 256; canvas.height = 256;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#c7988a';
-            ctx.fillRect(0, 0, 256, 256);
-            for (let i = 0; i < 2000; i++) {
-                const r = Math.random();
-                ctx.fillStyle = r < 0.4 ? '#222' : (r < 0.7 ? '#fff' : '#e8a598');
-                ctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
-            }
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
-            return tex;
-        }
-
-        // Materiales
         const floorMat = new THREE.MeshStandardMaterial({ map: createTileTexture(), roughness: 0.35 });
         const wallMat = new THREE.MeshStandardMaterial({ color: 0xf3f4f6, roughness: 0.85 });
-        const woodCeilingMat = new THREE.MeshStandardMaterial({ map: createWoodTexture(), roughness: 0.5 });
+        const woodDoorMat = new THREE.MeshStandardMaterial({ color: 0xb46b38, roughness: 0.4 });
         const beamMat = new THREE.MeshStandardMaterial({ color: 0x6e3b19, roughness: 0.6 });
         const windowGlassMat = new THREE.MeshPhysicalMaterial({ color: 0x88bbdd, transmission: 0.9, opacity: 0.35, transparent: true, roughness: 0.1 });
         const blackFrameMat = new THREE.MeshStandardMaterial({ color: 0x1f242b, roughness: 0.4 });
-        const doorGreyMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.5 });
-        const woodDoorMat = new THREE.MeshStandardMaterial({ color: 0xb46b38, roughness: 0.4 });
-        const graniteMat = new THREE.MeshStandardMaterial({ map: createGraniteTexture(), roughness: 0.25 });
+        const graniteMat = new THREE.MeshStandardMaterial({ color: 0xc7988a, roughness: 0.25 });
         const ironMat = new THREE.MeshStandardMaterial({ color: 0x222225, roughness: 0.3, metalness: 0.85 });
 
-        // Grupos
+        // Grupos de Organización
         const apartmentGroup = new THREE.Group();
-        const wallsGroup = new THREE.Group();
+        const floorGroup = new THREE.Group();
+        const exteriorWallsGroup = new THREE.Group();
+        const interiorWallsGroup = new THREE.Group();
         const roofGroup = new THREE.Group();
         const furnitureGroup = new THREE.Group();
         const dimensionsGroup = new THREE.Group();
 
-        const groupActual = new THREE.Group();
         const groupPropIsla = new THREE.Group();
         const groupPropLoft = new THREE.Group();
 
-        apartmentGroup.add(wallsGroup, roofGroup, furnitureGroup, dimensionsGroup, groupActual, groupPropIsla, groupPropLoft);
+        apartmentGroup.add(floorGroup, exteriorWallsGroup, interiorWallsGroup, roofGroup, furnitureGroup, dimensionsGroup, groupPropIsla, groupPropLoft);
         scene.add(apartmentGroup);
 
         groupPropIsla.visible = false;
         groupPropLoft.visible = false;
 
-        // --- 4. GEOMETRÍA OFICIAL EXACTA SEGÚN ESCRITURA Y PLANO CATASTRAL ---
-        // Edificio "Glaciares II" - UF N° 6, Depto "A", Polígono 01-01
-        // Superficie oficial cubierta: 54,16 m²
-        // - Lateral Oeste: Calle Günter Plüschow (6.20 m)
-        // - Lateral Norte: Medianera con UF 01-02 (7.00 m)
-        // - Quiebre Nordeste: Cubierta Común / Palier de acceso (1.40 m x 2.30 m)
-        // - Lateral Este: Fondo Living Comedor (4.80 m)
-        // - Lateral Sur: Muro exterior (3.80 m + Ducto 0.40x0.70 m + 5.10 m = 9.30 m)
-        // Cálculo geométrico exacto: (9.30 x 6.20) - (2.30 x 1.40) - (0.40 x 0.70) = 54,16 m²
-
-        // Piso general con la silueta exacta de 54,16 m²
+        // --- 2. ENVOLVENTE OFICIAL 54,16 m² ---
         const floorShape = new THREE.Shape();
         floorShape.moveTo(0.00, 0.00);
         floorShape.lineTo(0.00, 6.20);
@@ -537,17 +776,15 @@
         const floorMesh = new THREE.Mesh(floorGeo, floorMat);
         floorMesh.position.set(0, 0, 0);
         floorMesh.receiveShadow = true;
-        wallsGroup.add(floorMesh);
+        floorGroup.add(floorMesh);
 
         function getRoofHeight(x, z) {
-            // Techo de madera en pendiente: más alto en la cumbrera/living (3.85m), desciende a 2.65m en los muros laterales
             const t = Math.max(0, Math.min(1, x / 9.30));
             return 2.65 + 1.20 * Math.sin((1 - t * 0.5) * Math.PI * 0.6);
         }
 
         function createWall(p1, p2, thickness, parent, winConfig = null, doorConfig = null) {
-            const dx = p2.x - p1.x;
-            const dz = p2.z - p1.z;
+            const dx = p2.x - p1.x, dz = p2.z - p1.z;
             const length = Math.hypot(dx, dz);
             const angle = Math.atan2(dz, dx);
 
@@ -585,7 +822,6 @@
                 const frame = new THREE.Mesh(new THREE.BoxGeometry(width, height, thickness * 0.8), blackFrameMat);
                 frame.position.set(start + width / 2, sill + height / 2, 0);
                 wallGroup.add(glass, frame);
-
             } else if (doorConfig) {
                 const { start, width, height, type } = doorConfig;
                 if (start > 0) {
@@ -606,8 +842,8 @@
                     wallGroup.add(mRight);
                 }
                 if (type !== 'open') {
-                    const doorMat = type === 'grey' ? doorGreyMat : woodDoorMat;
-                    const doorLeaf = new THREE.Mesh(new THREE.BoxGeometry(width - 0.04, height - 0.04, 0.04), doorMat);
+                    const dMat = type === 'grey' ? blackFrameMat : woodDoorMat;
+                    const doorLeaf = new THREE.Mesh(new THREE.BoxGeometry(width - 0.04, height - 0.04, 0.04), dMat);
                     doorLeaf.position.set(start + width / 2, height / 2, 0);
                     wallGroup.add(doorLeaf);
                 }
@@ -622,124 +858,387 @@
             return wallGroup;
         }
 
-        // --- MUROS PERIMETRALES EXTERIORES (Espesor 0.20m) ---
-        // 1. Muro Norte: Medianera con Depto 01-02 (7.00 m)
-        createWall({ x: 0.00, z: 0.00 }, { x: 7.00, z: 0.00 }, 0.20, wallsGroup);
+        // --- 3. MUROS EXTERIORES (exteriorWallsGroup) ---
+        createWall({ x: 0.00, z: 0.00 }, { x: 7.00, z: 0.00 }, 0.20, exteriorWallsGroup); // Norte Medianera
+        createWall({ x: 7.00, z: 0.00 }, { x: 7.00, z: 1.40 }, 0.20, exteriorWallsGroup); // Saliente Palier
+        createWall({ x: 7.00, z: 1.40 }, { x: 9.30, z: 1.40 }, 0.20, exteriorWallsGroup, null, { start: 0.60, width: 0.90, height: 2.10, type: 'grey' }); // Puerta Acceso
+        createWall({ x: 9.30, z: 1.40 }, { x: 9.30, z: 6.20 }, 0.20, exteriorWallsGroup, { start: 1.50, width: 1.80, sill: 1.00, height: 1.25 }); // Este Living
+        createWall({ x: 9.30, z: 6.20 }, { x: 5.50, z: 6.20 }, 0.20, exteriorWallsGroup, { start: 1.00, width: 1.60, sill: 1.00, height: 1.25 }); // Sur Living
+        createWall({ x: 5.50, z: 6.20 }, { x: 5.50, z: 5.50 }, 0.10, exteriorWallsGroup); // Ducto E
+        createWall({ x: 5.50, z: 5.50 }, { x: 5.10, z: 5.50 }, 0.10, exteriorWallsGroup); // Ducto Fondo
+        createWall({ x: 5.10, z: 5.50 }, { x: 5.10, z: 6.20 }, 0.10, exteriorWallsGroup); // Ducto O
+        createWall({ x: 5.10, z: 6.20 }, { x: 0.00, z: 6.20 }, 0.20, exteriorWallsGroup, { start: 1.20, width: 1.50, sill: 1.00, height: 1.20 }); // Sur Cuarto
+        createWall({ x: 0.00, z: 6.20 }, { x: 0.00, z: 0.00 }, 0.20, exteriorWallsGroup, { start: 4.60, width: 1.40, sill: 1.00, height: 1.20 }); // Calle Günter Plüschow
 
-        // 2. Saliente a Cubierta Común / Palier (1.40 m)
-        createWall({ x: 7.00, z: 0.00 }, { x: 7.00, z: 1.40 }, 0.20, wallsGroup);
+        // --- 4. TABIQUES INTERIORES (interiorWallsGroup) ---
+        // Cuarto
+        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, interiorWallsGroup);
+        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.90 }, 0.12, interiorWallsGroup);
+        createWall({ x: 0.10, z: 4.90 }, { x: 2.30, z: 4.90 }, 0.06, interiorWallsGroup, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
+        createWall({ x: 2.40, z: 4.90 }, { x: 3.50, z: 4.90 }, 0.12, interiorWallsGroup, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
+        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 6.20 }, 0.12, interiorWallsGroup);
 
-        // 3. Acceso Palier Común (2.30 m) - Puerta de Entrada Principal al Depto
-        createWall({ x: 7.00, z: 1.40 }, { x: 9.30, z: 1.40 }, 0.20, wallsGroup, null, { start: 0.60, width: 0.90, height: 2.10, type: 'grey' });
+        // Baño
+        createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, interiorWallsGroup, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' });
 
-        // 4. Muro Este: Lateral Living Comedor (4.80 m) - Ventanal y calefactor
-        createWall({ x: 9.30, z: 1.40 }, { x: 9.30, z: 6.20 }, 0.20, wallsGroup, { start: 1.50, width: 1.80, sill: 1.00, height: 1.25 });
+        // Estudio
+        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, interiorWallsGroup);
+        createWall({ x: 2.40, z: 2.10 }, { x: 2.40, z: 2.70 }, 0.12, interiorWallsGroup);
+        createWall({ x: 0.10, z: 2.10 }, { x: 2.30, z: 2.10 }, 0.06, interiorWallsGroup, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
+        createWall({ x: 2.40, z: 2.10 }, { x: 3.50, z: 2.10 }, 0.12, interiorWallsGroup, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
 
-        // 5. Muro Sur: Sector Living Comedor (3.80 m) - Ventana exterior
-        createWall({ x: 9.30, z: 6.20 }, { x: 5.50, z: 6.20 }, 0.20, wallsGroup, { start: 1.00, width: 1.60, sill: 1.00, height: 1.25 });
+        // Pasillo y Living
+        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 2.10 }, 0.12, interiorWallsGroup);
+        createWall({ x: 3.50, z: 2.10 }, { x: 3.50, z: 4.90 }, 0.12, interiorWallsGroup, null, { start: 1.50, width: 1.10, height: 2.10, type: 'open' });
 
-        // 6. Ducto de Ventilación e Instalaciones (0.40m x 0.70m)
-        createWall({ x: 5.50, z: 6.20 }, { x: 5.50, z: 5.50 }, 0.10, wallsGroup);
-        createWall({ x: 5.50, z: 5.50 }, { x: 5.10, z: 5.50 }, 0.10, wallsGroup);
-        createWall({ x: 5.10, z: 5.50 }, { x: 5.10, z: 6.20 }, 0.10, wallsGroup);
+        // Cocina
+        createWall({ x: 3.50, z: 4.90 }, { x: 4.80, z: 4.90 }, 0.12, interiorWallsGroup, null, { start: 0.10, width: 0.95, height: 2.10, type: 'open' });
+        createWall({ x: 4.80, z: 4.90 }, { x: 4.80, z: 6.20 }, 0.12, interiorWallsGroup);
 
-        // 7. Muro Sur: Sector Cocina y Cuarto (5.10 m) - Ventana Cuarto
-        createWall({ x: 5.10, z: 6.20 }, { x: 0.00, z: 6.20 }, 0.20, wallsGroup, { start: 1.20, width: 1.50, sill: 1.00, height: 1.20 });
-
-        // 8. Muro Oeste: Fachada sobre Calle Günter Plüschow (6.20 m) - Ventanas Cuarto, Baño y Estudio
-        createWall({ x: 0.00, z: 6.20 }, { x: 0.00, z: 0.00 }, 0.20, wallsGroup, { start: 4.60, width: 1.40, sill: 1.00, height: 1.20 });
-
-        // --- TABIQUES INTERIORES SEGÚN EL PLANO OFICIAL Y DIAGRAMA DEL USUARIO ---
-        // A) ESTADO REAL ACTUAL:
-        // 1. CUARTO PRINCIPAL (Frente / Sudoeste)
-        // Muro ciego divisorio entre Baño y Placard del Cuarto
-        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupActual);
-        // Lateral ciego del placard del Cuarto hacia el Pasillo
-        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.90 }, 0.12, groupActual);
-        // Frente de Placard que abre HACIA EL INTERIOR del Cuarto
-        createWall({ x: 0.10, z: 4.90 }, { x: 2.30, z: 4.90 }, 0.06, groupActual, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
-        // Puerta de acceso al Cuarto desde el Pasillo (en el umbral horizontal)
-        createWall({ x: 2.40, z: 4.90 }, { x: 3.50, z: 4.90 }, 0.12, groupActual, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
-        // Muro divisorio entre Cuarto y Cocina
-        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 6.20 }, 0.12, groupActual);
-
-        // 2. BAÑO COMPLETO (Centro - entre ambos placards)
-        createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupActual, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' }); // Puerta Baño hacia Pasillo
-
-        // 3. ESTUDIO GAMER (Fondo / Noroeste)
-        // Muro ciego divisorio entre Baño y Placard del Estudio
-        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupActual);
-        // Lateral ciego del placard del Estudio hacia el Pasillo
-        createWall({ x: 2.40, z: 2.10 }, { x: 2.40, z: 2.70 }, 0.12, groupActual);
-        // Frente de Placard que abre HACIA EL INTERIOR del Estudio
-        createWall({ x: 0.10, z: 2.10 }, { x: 2.30, z: 2.10 }, 0.06, groupActual, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
-        // Puerta de acceso al Estudio desde el Pasillo (en el umbral horizontal)
-        createWall({ x: 2.40, z: 2.10 }, { x: 3.50, z: 2.10 }, 0.12, groupActual, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
-
-        // 4. PASILLO Y PASO AL LIVING
-        // Tabique divisorio entre Estudio y Living (X = 3.50, de Z=0 a 2.10)
-        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 2.10 }, 0.12, groupActual);
-        // Tabique divisorio entre Pasillo y Living (X = 3.50, de Z=2.10 a 4.90) con vano de paso abierto
-        createWall({ x: 3.50, z: 2.10 }, { x: 3.50, z: 4.90 }, 0.12, groupActual, null, { start: 1.50, width: 1.10, height: 2.10, type: 'open' });
-
-        // 5. COCINA
-        // Acceso a la Cocina desde la circulación (en umbral horizontal Z=4.90)
-        createWall({ x: 3.50, z: 4.90 }, { x: 4.80, z: 4.90 }, 0.12, groupActual, null, { start: 0.10, width: 0.95, height: 2.10, type: 'open' });
-        // Tabique divisorio entre Cocina y Living
-        createWall({ x: 4.80, z: 4.90 }, { x: 4.80, z: 6.20 }, 0.12, groupActual);
-
-        // B) PROPUESTA 1: COCINA ABIERTA CON ISLA
-        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupPropIsla);
-        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.90 }, 0.12, groupPropIsla);
-        createWall({ x: 0.10, z: 4.90 }, { x: 2.30, z: 4.90 }, 0.06, groupPropIsla, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
-        createWall({ x: 2.40, z: 4.90 }, { x: 3.50, z: 4.90 }, 0.12, groupPropIsla, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
-        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 6.20 }, 0.12, groupPropIsla);
-
-        createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupPropIsla, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' });
-        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupPropIsla);
-        createWall({ x: 2.40, z: 2.10 }, { x: 2.40, z: 2.70 }, 0.12, groupPropIsla);
-        createWall({ x: 0.10, z: 2.10 }, { x: 2.30, z: 2.10 }, 0.06, groupPropIsla, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
-        createWall({ x: 2.40, z: 2.10 }, { x: 3.50, z: 2.10 }, 0.12, groupPropIsla, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
-        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 2.10 }, 0.12, groupPropIsla);
-        createWall({ x: 3.50, z: 2.10 }, { x: 3.50, z: 4.90 }, 0.12, groupPropIsla, null, { start: 1.50, width: 1.10, height: 2.10, type: 'open' });
-
-        // Barra Isla Desayunadora moderna en lugar de tabique ciego de cocina
+        // Barra Isla (Propuesta 1)
         const island = new THREE.Mesh(new THREE.BoxGeometry(0.80, 0.90, 1.80), woodDoorMat);
         island.position.set(4.80, 0.45, 5.55);
         const islandTop = new THREE.Mesh(new THREE.BoxGeometry(1.00, 0.05, 1.90), graniteMat);
         islandTop.position.set(4.80, 0.925, 5.55);
         groupPropIsla.add(island, islandTop);
 
-        // C) PROPUESTA 2: ENTREPISO / MEZZANINE EN EL ESTUDIO (Aprovechando los 3.85m)
+        // Entrepiso (Propuesta 2)
         groupPropLoft.add(island.clone(), islandTop.clone());
-        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupPropLoft);
-        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.90 }, 0.12, groupPropLoft);
-        createWall({ x: 0.10, z: 4.90 }, { x: 2.30, z: 4.90 }, 0.06, groupPropLoft, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
-        createWall({ x: 2.40, z: 4.90 }, { x: 3.50, z: 4.90 }, 0.12, groupPropLoft, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
-        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 6.20 }, 0.12, groupPropLoft);
-
-        createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupPropLoft, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' });
-        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupPropLoft);
-        createWall({ x: 2.40, z: 2.10 }, { x: 2.40, z: 2.70 }, 0.12, groupPropLoft);
-        createWall({ x: 0.10, z: 2.10 }, { x: 2.30, z: 2.10 }, 0.06, groupPropLoft, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
-        createWall({ x: 2.40, z: 2.10 }, { x: 3.50, z: 2.10 }, 0.12, groupPropLoft, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
-        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 2.10 }, 0.12, groupPropLoft);
-        createWall({ x: 3.50, z: 2.10 }, { x: 3.50, z: 4.90 }, 0.12, groupPropLoft, null, { start: 1.50, width: 1.10, height: 2.10, type: 'open' });
-
-        const loftPlat = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.12, 1.80), woodCeilingMat);
+        const loftPlat = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.12, 1.80), woodDoorMat);
         loftPlat.position.set(1.20, 2.25, 1.00);
         const loftRail = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.05, 0.05), ironMat);
         loftRail.position.set(1.20, 3.15, 1.90);
         groupPropLoft.add(loftPlat, loftRail);
 
-        const loftPlat = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.12, 1.80), woodCeilingMat);
-        loftPlat.position.set(1.20, 2.25, 1.00);
-        const loftRail = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.05, 0.05), ironMat);
-        loftRail.position.set(1.20, 3.15, 1.90);
-        groupPropLoft.add(loftPlat, loftRail);
+        // Techo
+        const roofGeo = new THREE.PlaneGeometry(9.90, 6.80, 24, 20);
+        roofGeo.rotateX(Math.PI / 2);
+        const pos = roofGeo.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+            const vx = pos.getX(i) + 4.65, vz = pos.getZ(i) + 3.10;
+            pos.setY(i, getRoofHeight(vx, vz));
+        }
+        roofGeo.computeVertexNormals();
+        const roofMesh = new THREE.Mesh(roofGeo, new THREE.MeshStandardMaterial({ color: 0x9c592b, roughness: 0.5 }));
+        roofMesh.position.set(4.65, 0, 3.10);
+        roofGroup.add(roofMesh);
 
+        for (let i = 0; i <= 10; i++) {
+            const z = (i / 10) * 6.20;
+            const beam = new THREE.Mesh(new THREE.BoxGeometry(9.60, 0.14, 0.07), beamMat);
+            beam.position.set(4.65, getRoofHeight(4.65, z) - 0.07, z);
+            beam.rotation.z = -0.04;
+            roofGroup.add(beam);
+        }
+
+        // --- 5. GESTOR DINÁMICO DE MUEBLES INTERACTIVOS ---
+        const DEFAULT_FURNITURE = [
+            // Dormitorio
+            { id: "cama_matrimonial", name: "Cama Matrimonial", room: "Cuarto", x: 1.20, z: 5.30, y: 0.225, w: 1.40, d: 1.90, h: 0.45, rot: 0, color: 0x475569 },
+            { id: "respaldo_cama", name: "Respaldo Cama", room: "Cuarto", x: 1.20, z: 6.15, y: 0.45, w: 1.50, d: 0.06, h: 0.90, rot: 0, color: 0xb46b38 },
+            { id: "mesa_luz", name: "Mesa de Luz", room: "Cuarto", x: 2.05, z: 5.95, y: 0.25, w: 0.45, d: 0.40, h: 0.50, rot: 0, color: 0xb46b38 },
+            { id: "placard_cuarto", name: "Placard Cuarto (Abre a Cuarto)", room: "Cuarto", x: 1.20, z: 4.60, y: 1.225, w: 2.15, d: 0.55, h: 2.45, rot: 0, color: 0xb46b38 },
+
+            // Estudio Gamer
+            { id: "escritorio_gamer", name: "Escritorio Gamer L", room: "Estudio", x: 0.85, z: 0.45, y: 0.375, w: 1.50, d: 0.70, h: 0.75, rot: 0, color: 0x1f242b },
+            { id: "retorno_escritorio", name: "Retorno Escritorio", room: "Estudio", x: 1.75, z: 1.05, y: 0.375, w: 0.65, d: 1.00, h: 0.75, rot: 0, color: 0x1f242b },
+            { id: "monitor_gamer", name: "Monitor Gamer", room: "Estudio", x: 0.85, z: 0.20, y: 0.95, w: 0.70, d: 0.05, h: 0.40, rot: 0, color: 0x111827 },
+            { id: "silla_gamer", name: "Silla Gamer", room: "Estudio", x: 0.85, z: 1.00, y: 0.50, w: 0.48, d: 0.48, h: 0.95, rot: 0, color: 0x2563eb },
+            { id: "placard_estudio", name: "Placard Estudio (Abre a Estudio)", room: "Estudio", x: 1.20, z: 2.40, y: 1.225, w: 2.15, d: 0.55, h: 2.45, rot: 0, color: 0xb46b38 },
+
+            // Baño
+            { id: "banera", name: "Bañera Completa", room: "Baño", x: 0.45, z: 3.50, y: 0.225, w: 0.70, d: 1.40, h: 0.45, rot: 0, color: 0xffffff },
+            { id: "inodoro", name: "Inodoro", room: "Baño", x: 1.60, z: 3.10, y: 0.21, w: 0.40, d: 0.55, h: 0.42, rot: 0, color: 0xffffff },
+            { id: "bidet", name: "Bidet", room: "Baño", x: 2.05, z: 3.10, y: 0.20, w: 0.38, d: 0.55, h: 0.40, rot: 0, color: 0xffffff },
+            { id: "vanitory", name: "Vanitory con Espejo", room: "Baño", x: 1.60, z: 3.90, y: 0.41, w: 0.55, d: 0.45, h: 0.82, rot: 0, color: 0xb46b38 },
+
+            // Cocina
+            { id: "mesada_cocina", name: "Mesada con Bacha", room: "Cocina", x: 4.10, z: 5.85, y: 0.43, w: 1.35, d: 0.55, h: 0.86, rot: 0, color: 0xc7988a },
+            { id: "cocina_gas", name: "Cocina a Gas 4H", room: "Cocina", x: 3.35, z: 5.85, y: 0.43, w: 0.55, d: 0.55, h: 0.86, rot: 0, color: 0xf8fafc },
+            { id: "termotanque", name: "Termotanque Sherman", room: "Cocina", x: 4.80, z: 5.70, y: 1.45, w: 0.40, d: 0.40, h: 0.95, rot: 0, color: 0xf1f5f9 },
+
+            // Living
+            { id: "sillon_living", name: "Sillón 3 Cuerpos", room: "Living", x: 5.60, z: 4.00, y: 0.375, w: 2.10, d: 0.90, h: 0.75, rot: 0, color: 0x1e3a5f },
+            { id: "mesa_comedor", name: "Mesa Comedor", room: "Living", x: 6.80, z: 2.00, y: 0.38, w: 1.35, d: 0.85, h: 0.76, rot: 0, color: 0xb46b38 },
+            { id: "calefactor_gas", name: "Calefactor Tiro Balanceado", room: "Living", x: 9.15, z: 2.80, y: 0.35, w: 0.20, d: 0.55, h: 0.65, rot: 0, color: 0x3b4a3f },
+            { id: "rack_tv", name: "Mueble Rack TV", room: "Living", x: 8.95, z: 4.00, y: 0.30, w: 0.45, d: 1.80, h: 0.60, rot: 0, color: 0xb46b38 }
+        ];
+
+        let furnitureList = [];
+        const savedData = localStorage.getItem('depto_0101_furniture');
+        if (savedData) {
+            try { furnitureList = JSON.parse(savedData); } catch (e) { furnitureList = [...DEFAULT_FURNITURE]; }
+        } else {
+            furnitureList = [...DEFAULT_FURNITURE];
+        }
+
+        let selectedId = furnitureList[0] ? furnitureList[0].id : null;
+        let furnitureMeshes = [];
+        let selectionBox = null;
+
+        function renderFurniture3D() {
+            // Limpiar muebles actuales
+            while (furnitureGroup.children.length > 0) {
+                furnitureGroup.remove(furnitureGroup.children[0]);
+            }
+            furnitureMeshes = [];
+
+            furnitureList.forEach(item => {
+                const geo = new THREE.BoxGeometry(item.w, item.h, item.d);
+                const mat = new THREE.MeshStandardMaterial({
+                    color: item.color || 0x38bdf8,
+                    roughness: 0.4
+                });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.set(item.x, item.y, item.z);
+                mesh.rotation.y = (item.rot || 0) * (Math.PI / 180);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                mesh.userData = { id: item.id };
+
+                furnitureGroup.add(mesh);
+                furnitureMeshes.push(mesh);
+            });
+
+            updateSelectionVisual();
+            populateSelectOptions();
+            syncFormWithSelected();
+            localStorage.setItem('depto_0101_furniture', JSON.stringify(furnitureList));
+        }
+
+        function updateSelectionVisual() {
+            if (selectionBox) scene.remove(selectionBox);
+            const selMesh = furnitureMeshes.find(m => m.userData.id === selectedId);
+            if (selMesh && document.getElementById('chk-furniture').checked) {
+                selectionBox = new THREE.BoxHelper(selMesh, 0x38bdf8);
+                scene.add(selectionBox);
+            }
+        }
+
+        function populateSelectOptions() {
+            const sel = document.getElementById('furniture-select');
+            sel.innerHTML = '';
+            furnitureList.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.innerText = `[${item.room || 'General'}] ${item.name}`;
+                if (item.id === selectedId) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        }
+
+        function syncFormWithSelected() {
+            const item = furnitureList.find(f => f.id === selectedId);
+            if (!item) return;
+
+            document.getElementById('lbl-dim-w').innerText = `${item.w.toFixed(2)} m`;
+            document.getElementById('inp-w').value = item.w;
+            document.getElementById('rng-w').value = item.w;
+
+            document.getElementById('lbl-dim-d').innerText = `${item.d.toFixed(2)} m`;
+            document.getElementById('inp-d').value = item.d;
+            document.getElementById('rng-d').value = item.d;
+
+            document.getElementById('lbl-dim-h').innerText = `${item.h.toFixed(2)} m`;
+            document.getElementById('inp-h').value = item.h;
+            document.getElementById('rng-h').value = item.h;
+
+            document.getElementById('lbl-pos-x').innerText = `${item.x.toFixed(2)} m`;
+            document.getElementById('inp-x').value = item.x;
+            document.getElementById('rng-x').value = item.x;
+
+            document.getElementById('lbl-pos-z').innerText = `${item.z.toFixed(2)} m`;
+            document.getElementById('inp-z').value = item.z;
+            document.getElementById('rng-z').value = item.z;
+
+            document.getElementById('lbl-rot').innerText = `${Math.round(item.rot || 0)}°`;
+            document.getElementById('inp-rot').value = Math.round(item.rot || 0);
+            document.getElementById('rng-rot').value = Math.round(item.rot || 0);
+        }
+
+        function updateSelectedItem(field, val) {
+            const item = furnitureList.find(f => f.id === selectedId);
+            if (!item) return;
+
+            if (field === 'w') item.w = Math.max(0.1, parseFloat(val));
+            if (field === 'd') item.d = Math.max(0.1, parseFloat(val));
+            if (field === 'h') {
+                const oldH = item.h;
+                item.h = Math.max(0.05, parseFloat(val));
+                item.y += (item.h - oldH) / 2; // Mantener base en el suelo
+            }
+            if (field === 'x') item.x = parseFloat(val);
+            if (field === 'z') item.z = parseFloat(val);
+            if (field === 'rot') item.rot = (parseFloat(val) % 360 + 360) % 360;
+
+            renderFurniture3D();
+        }
+
+        // Steppers y sliders listeners
+        document.querySelectorAll('.step-btn[data-field]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const field = btn.dataset.field;
+                const delta = parseFloat(btn.dataset.delta);
+                const item = furnitureList.find(f => f.id === selectedId);
+                if (item) updateSelectedItem(field, item[field] + delta);
+            });
+        });
+
+        ['w', 'd', 'h', 'x', 'z', 'rot'].forEach(f => {
+            const inp = document.getElementById(`inp-${f}`);
+            const rng = document.getElementById(`rng-${f}`);
+            inp.addEventListener('input', (e) => updateSelectedItem(f, e.target.value));
+            rng.addEventListener('input', (e) => updateSelectedItem(f, e.target.value));
+        });
+
+        document.getElementById('btn-rot-left').addEventListener('click', () => {
+            const item = furnitureList.find(f => f.id === selectedId);
+            if (item) updateSelectedItem('rot', (item.rot || 0) - 90);
+        });
+        document.getElementById('btn-rot-right').addEventListener('click', () => {
+            const item = furnitureList.find(f => f.id === selectedId);
+            if (item) updateSelectedItem('rot', (item.rot || 0) + 90);
+        });
+
+        document.getElementById('furniture-select').addEventListener('change', (e) => {
+            selectedId = e.target.value;
+            renderFurniture3D();
+        });
+
+        // Eliminar Mueble
+        document.getElementById('btn-del-furniture').addEventListener('click', () => {
+            if (furnitureList.length <= 1) return alert("Debe quedar al menos un mueble.");
+            furnitureList = furnitureList.filter(f => f.id !== selectedId);
+            selectedId = furnitureList[0].id;
+            renderFurniture3D();
+        });
+
+        // Raycasting para seleccionar mueble tocándolo en el 3D
+        const raycaster = new THREE.Raycaster();
+        const pointer = new THREE.Vector2();
+        let pointerDownTime = 0;
+
+        window.addEventListener('pointerdown', (e) => {
+            if (e.target === renderer.domElement) pointerDownTime = Date.now();
+        });
+
+        window.addEventListener('pointerup', (e) => {
+            if (e.target !== renderer.domElement || Date.now() - pointerDownTime > 250) return;
+            const rect = renderer.domElement.getBoundingClientRect();
+            pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(pointer, camera);
+
+            const intersects = raycaster.intersectObjects(furnitureMeshes, false);
+            if (intersects.length > 0) {
+                selectedId = intersects[0].object.userData.id;
+                renderFurniture3D();
+                document.getElementById('furniture-editor').classList.remove('minimized');
+            }
+        });
+
+        // Modal Añadir Presets
+        const addModal = document.getElementById('add-modal');
+        document.getElementById('btn-add-modal').addEventListener('click', () => addModal.style.display = 'block');
+        document.getElementById('btn-close-add').addEventListener('click', () => addModal.style.display = 'none');
+
+        const PRESET_TEMPLATES = {
+            cama: { name: "Cama Doble", room: "Cuarto", w: 1.40, d: 1.90, h: 0.45, color: 0x475569 },
+            cama_simple: { name: "Cama 1 Plaza", room: "Cuarto", w: 0.90, d: 1.90, h: 0.45, color: 0x475569 },
+            sillon: { name: "Sillón", room: "Living", w: 1.80, d: 0.85, h: 0.75, color: 0x1e3a5f },
+            mesa: { name: "Mesa Comedor", room: "Living", w: 1.20, d: 0.80, h: 0.76, color: 0xb46b38 },
+            escritorio: { name: "Escritorio", room: "Estudio", w: 1.30, d: 0.65, h: 0.75, color: 0x1f242b },
+            placard: { name: "Placard a Medida", room: "Dormitorio", w: 1.60, d: 0.60, h: 2.40, color: 0xb46b38 },
+            heladera: { name: "Heladera", room: "Cocina", w: 0.65, d: 0.65, h: 1.75, color: 0xf8fafc },
+            cubo: { name: "Mueble a Medida", room: "General", w: 1.00, d: 1.00, h: 1.00, color: 0x0284c7 }
+        };
+
+        document.querySelectorAll('.add-preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const t = PRESET_TEMPLATES[btn.dataset.type] || PRESET_TEMPLATES.cubo;
+                const newId = `mueble_${Date.now()}`;
+                const newObj = {
+                    id: newId,
+                    name: t.name,
+                    room: t.room,
+                    x: 4.65,
+                    z: 3.10,
+                    y: t.h / 2,
+                    w: t.w,
+                    d: t.d,
+                    h: t.h,
+                    rot: 0,
+                    color: t.color
+                };
+                furnitureList.push(newObj);
+                selectedId = newId;
+                renderFurniture3D();
+                addModal.style.display = 'none';
+            });
+        });
+
+        // JSON Modal y Exportación
+        const jsonModal = document.getElementById('json-modal');
+        document.getElementById('btn-copy-json').addEventListener('click', () => {
+            document.getElementById('json-text').value = JSON.stringify(furnitureList, null, 2);
+            jsonModal.style.display = 'block';
+        });
+        document.getElementById('btn-close-json').addEventListener('click', () => jsonModal.style.display = 'none');
+        document.getElementById('btn-copy-clipboard').addEventListener('click', () => {
+            navigator.clipboard.writeText(document.getElementById('json-text').value);
+            alert("¡Medidas copiadas al portapapeles! Pegalas en el chat.");
+            jsonModal.style.display = 'none';
+        });
+        document.getElementById('btn-reset-default').addEventListener('click', () => {
+            if (confirm("¿Restablecer los muebles a las medidas iniciales de los videos?")) {
+                furnitureList = [...DEFAULT_FURNITURE];
+                selectedId = furnitureList[0].id;
+                renderFurniture3D();
+                jsonModal.style.display = 'none';
+            }
+        });
+
+        // Minimizar editor
+        document.getElementById('btn-min-editor').addEventListener('click', (e) => {
+            const ed = document.getElementById('furniture-editor');
+            ed.classList.toggle('minimized');
+            e.target.innerText = ed.classList.contains('minimized') ? '▲' : '▼';
+        });
+
+        // --- 6. CONTROLES DE PAREDES Y VISIBILIDAD ---
+        document.getElementById('chk-ext-walls').addEventListener('change', (e) => exteriorWallsGroup.visible = e.target.checked);
+        document.getElementById('chk-int-walls').addEventListener('change', (e) => interiorWallsGroup.visible = e.target.checked);
+        document.getElementById('chk-roof').addEventListener('change', (e) => roofGroup.visible = e.target.checked);
+        document.getElementById('chk-furniture').addEventListener('change', (e) => {
+            furnitureGroup.visible = e.target.checked;
+            updateSelectionVisual();
+        });
+        document.getElementById('chk-dimensions').addEventListener('change', (e) => dimensionsGroup.visible = e.target.checked);
+
+        // Modo Maqueta / Paredes Bajas (Corte a 1.10 m)
+        document.getElementById('chk-wall-cut').addEventListener('change', (e) => {
+            const isCut = e.target.checked;
+            const scaleY = isCut ? 0.35 : 1.0;
+            exteriorWallsGroup.scale.y = scaleY;
+            interiorWallsGroup.scale.y = scaleY;
+            groupPropIsla.scale.y = scaleY;
+            groupPropLoft.scale.y = scaleY;
+            if (isCut) {
+                roofGroup.visible = false;
+                document.getElementById('chk-roof').checked = false;
+            }
+        });
+
+        // Paredes Transparentes
+        document.getElementById('chk-transparent').addEventListener('change', (e) => {
+            wallMat.transparent = e.target.checked;
+            wallMat.opacity = e.target.checked ? 0.35 : 1.0;
+            wallMat.needsUpdate = true;
+        });
+
+        // Propuestas de Diseño
         function setProposal(ver) {
-            groupActual.visible = (ver === 'actual');
+            interiorWallsGroup.visible = (ver === 'actual');
             groupPropIsla.visible = (ver === 'isla');
             groupPropLoft.visible = (ver === 'loft');
             document.querySelectorAll('.proposal-btn').forEach(b => b.classList.remove('active'));
@@ -751,110 +1250,16 @@
         document.getElementById('btn-prop-isla').addEventListener('click', () => setProposal('isla'));
         document.getElementById('btn-prop-loft').addEventListener('click', () => setProposal('loft'));
 
-        // --- 5. TECHO DE MADERA EN PENDIENTE CON VIGAS ---
-        function buildRoof() {
-            const roofGeo = new THREE.PlaneGeometry(9.90, 6.80, 24, 20);
-            roofGeo.rotateX(Math.PI / 2);
-            const pos = roofGeo.attributes.position;
-            for (let i = 0; i < pos.count; i++) {
-                const vx = pos.getX(i) + 4.65;
-                const vz = pos.getZ(i) + 3.10;
-                pos.setY(i, getRoofHeight(vx, vz));
-            }
-            roofGeo.computeVertexNormals();
-
-            const roofMesh = new THREE.Mesh(roofGeo, woodCeilingMat);
-            roofMesh.position.set(4.65, 0, 3.10);
-            roofGroup.add(roofMesh);
-
-            for (let i = 0; i <= 10; i++) {
-                const z = (i / 10) * 6.20;
-                const beam = new THREE.Mesh(new THREE.BoxGeometry(9.60, 0.14, 0.07), beamMat);
-                beam.position.set(4.65, getRoofHeight(4.65, z) - 0.07, z);
-                beam.rotation.z = -0.04;
-                roofGroup.add(beam);
-            }
-        }
-        buildRoof();
-
-        // --- 6. EQUIPAMIENTO REAL SEGÚN LOS VIDEOS ---
-        // A) Cocina (contigua al ducto de ventilación y cañerías)
-        function buildKitchen() {
-            const kg = new THREE.Group();
-            const counter = new THREE.Mesh(new THREE.BoxGeometry(1.40, 0.85, 0.55), woodDoorMat); counter.position.set(4.20, 0.425, 5.85);
-            const counterTop = new THREE.Mesh(new THREE.BoxGeometry(1.44, 0.04, 0.59), graniteMat); counterTop.position.set(4.20, 0.87, 5.85);
-            const stove = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.86, 0.55), new THREE.MeshStandardMaterial({ color: 0xffffff })); stove.position.set(3.40, 0.43, 5.85);
-            const heater = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.20, 0.95, 20), new THREE.MeshStandardMaterial({ color: 0xf5f5f5 })); heater.position.set(4.85, 1.45, 5.70);
-            kg.add(counter, counterTop, stove, heater);
-            furnitureGroup.add(kg);
-        }
-        buildKitchen();
-
-        // B) Cuarto Principal (Dormitorio sobre Calle Günter Plüschow)
-        function buildBedroom() {
-            const bg = new THREE.Group();
-            const bedHead = new THREE.Mesh(new THREE.BoxGeometry(1.50, 0.90, 0.06), woodDoorMat); bedHead.position.set(1.20, 0.45, 6.15);
-            const bed = new THREE.Mesh(new THREE.BoxGeometry(1.40, 0.45, 1.90), new THREE.MeshStandardMaterial({ color: 0x475569 })); bed.position.set(1.20, 0.225, 5.30);
-            const nightstand = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.50, 0.40), woodDoorMat); nightstand.position.set(2.05, 0.25, 5.95);
-            // Placard embutido interior perteneciente al dormitorio principal
-            const closetCuarto = new THREE.Mesh(new THREE.BoxGeometry(2.15, 2.45, 0.55), woodDoorMat); closetCuarto.position.set(1.20, 1.225, 4.60);
-            bg.add(bedHead, bed, nightstand, closetCuarto);
-            furnitureGroup.add(bg);
-        }
-        buildBedroom();
-
-        // C) Baño Completo con Bañera
-        function buildBathroom() {
-            const bg = new THREE.Group();
-            const tub = new THREE.Mesh(new THREE.BoxGeometry(0.70, 0.45, 1.40), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })); tub.position.set(0.45, 0.225, 3.50);
-            const toilet = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.42, 0.55), new THREE.MeshStandardMaterial({ color: 0xffffff })); toilet.position.set(1.60, 0.21, 3.10);
-            const bidet = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.40, 0.55), new THREE.MeshStandardMaterial({ color: 0xffffff })); bidet.position.set(2.05, 0.20, 3.10);
-            const vanity = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.82, 0.45), woodDoorMat); vanity.position.set(1.60, 0.41, 3.90);
-            bg.add(tub, toilet, bidet, vanity);
-            furnitureGroup.add(bg);
-        }
-        buildBathroom();
-
-        // D) Estudio Gamer (Fondo sobre Calle Günter Plüschow)
-        function buildStudy() {
-            const sg = new THREE.Group();
-            const desk1 = new THREE.Mesh(new THREE.BoxGeometry(1.50, 0.04, 0.70), woodDoorMat); desk1.position.set(0.85, 0.75, 0.45);
-            const desk2 = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.04, 1.00), woodDoorMat); desk2.position.set(1.75, 0.75, 1.05);
-            const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.70, 0.40, 0.03), blackFrameMat); monitor.position.set(0.85, 1.05, 0.20);
-            const chair = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.85, 0.48), new THREE.MeshStandardMaterial({ color: 0x111827 })); chair.position.set(0.85, 0.50, 1.00);
-            // Placard embutido interior perteneciente al estudio gamer
-            const closetEstudio = new THREE.Mesh(new THREE.BoxGeometry(2.15, 2.45, 0.55), woodDoorMat); closetEstudio.position.set(1.20, 1.225, 2.40);
-            sg.add(desk1, desk2, monitor, chair, closetEstudio);
-            furnitureGroup.add(sg);
-        }
-        buildStudy();
-
-        // E) Living-Comedor Longitudinal
-        function buildLiving() {
-            const lg = new THREE.Group();
-            const heater = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.65, 0.55), new THREE.MeshStandardMaterial({ color: 0x3b4a3f })); heater.position.set(9.15, 0.35, 2.80);
-            const flue = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 2.8, 16), new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.8 })); flue.position.set(9.15, 1.8, 2.80);
-            const table = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.04, 24), woodDoorMat); table.position.set(6.80, 0.75, 2.20);
-            const tableLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.75, 12), woodDoorMat); tableLeg.position.set(6.80, 0.375, 2.20);
-            const sofa = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.55, 2.10), new THREE.MeshStandardMaterial({ color: 0x1e3a5f })); sofa.position.set(5.60, 0.35, 4.20);
-            const coffeeTable = new THREE.Mesh(new THREE.BoxGeometry(0.50, 0.38, 0.95), woodDoorMat); coffeeTable.position.set(6.60, 0.19, 4.20);
-            const tvRack = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.60, 1.80), woodDoorMat); tvRack.position.set(9.00, 0.30, 4.20);
-            const tv = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.72, 1.25), blackFrameMat); tv.position.set(9.00, 0.95, 4.20);
-            lg.add(heater, flue, table, tableLeg, sofa, coffeeTable, tvRack, tv);
-            furnitureGroup.add(lg);
-        }
-        buildLiving();
-
-        // --- 7. COTAS DE MEDIDAS OFICIALES CATASTRALES ---
+        // Cotas
         const labelElements = [];
         function addDim(p1, p2, text, offsetDir, dist = 0.5) {
             const normal = offsetDir.clone().normalize().multiplyScalar(dist);
-            const o1 = p1.clone().add(normal);
-            const o2 = p2.clone().add(normal);
-            const points = [p1, o1, o1, o2, p2, o2];
-            const line = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(points), new THREE.LineBasicMaterial({ color: 0x38bdf8 }));
+            const o1 = p1.clone().add(normal), o2 = p2.clone().add(normal);
+            const line = new THREE.LineSegments(
+                new THREE.BufferGeometry().setFromPoints([p1, o1, o1, o2, p2, o2]),
+                new THREE.LineBasicMaterial({ color: 0x38bdf8 })
+            );
             dimensionsGroup.add(line);
-
             const mid = new THREE.Vector3().addVectors(o1, o2).multiplyScalar(0.5);
             const label = document.createElement('div');
             label.className = 'dim-label';
@@ -863,16 +1268,13 @@
             labelElements.push({ el: label, pos: mid });
         }
 
-        addDim(new THREE.Vector3(0, 0.05, 0.0), new THREE.Vector3(7.0, 0.05, 0.0), "7.00 m (Medianera 01-02)", new THREE.Vector3(0, 0, -1), 0.6);
-        addDim(new THREE.Vector3(7.0, 0.05, 0.0), new THREE.Vector3(7.0, 0.05, 1.4), "1.40 m", new THREE.Vector3(-1, 0, 0), 0.4);
-        addDim(new THREE.Vector3(7.0, 0.05, 1.4), new THREE.Vector3(9.3, 0.05, 1.4), "2.30 m (Acceso Palier)", new THREE.Vector3(0, 0, -1), 0.5);
-        addDim(new THREE.Vector3(9.3, 0.05, 1.4), new THREE.Vector3(9.3, 0.05, 6.2), "4.80 m (Lateral Living)", new THREE.Vector3(1, 0, 0), 0.6);
-        addDim(new THREE.Vector3(9.3, 0.05, 6.2), new THREE.Vector3(5.5, 0.05, 6.2), "3.80 m", new THREE.Vector3(0, 0, 1), 0.5);
-        addDim(new THREE.Vector3(5.5, 0.05, 6.2), new THREE.Vector3(5.1, 0.05, 6.2), "Ducto 0.40m", new THREE.Vector3(0, 0, 1), 0.8);
-        addDim(new THREE.Vector3(5.1, 0.05, 6.2), new THREE.Vector3(0.0, 0.05, 6.2), "5.10 m (Cuarto/Cocina)", new THREE.Vector3(0, 0, 1), 0.5);
-        addDim(new THREE.Vector3(0.0, 0.05, 6.2), new THREE.Vector3(0.0, 0.05, 0.0), "6.20 m (Calle Günter Plüschow)", new THREE.Vector3(-1, 0, 0), 0.7);
-        addDim(new THREE.Vector3(0.1, 0.05, 4.90), new THREE.Vector3(2.3, 0.05, 4.90), "Placard Cuarto (Abre a Dormitorio)", new THREE.Vector3(0, 0, 1), 0.35);
-        addDim(new THREE.Vector3(0.1, 0.05, 2.10), new THREE.Vector3(2.3, 0.05, 2.10), "Placard Estudio (Abre a Estudio)", new THREE.Vector3(0, 0, -1), 0.35);
+        addDim(new THREE.Vector3(0, 0.05, 0.0), new THREE.Vector3(7.0, 0.05, 0.0), "7.00 m (Norte)", new THREE.Vector3(0, 0, -1), 0.5);
+        addDim(new THREE.Vector3(7.0, 0.05, 1.4), new THREE.Vector3(9.3, 0.05, 1.4), "2.30 m (Acceso Palier)", new THREE.Vector3(0, 0, -1), 0.4);
+        addDim(new THREE.Vector3(9.3, 0.05, 1.4), new THREE.Vector3(9.3, 0.05, 6.2), "4.80 m (Lateral)", new THREE.Vector3(1, 0, 0), 0.5);
+        addDim(new THREE.Vector3(9.3, 0.05, 6.2), new THREE.Vector3(5.5, 0.05, 6.2), "3.80 m", new THREE.Vector3(0, 0, 1), 0.4);
+        addDim(new THREE.Vector3(5.5, 0.05, 6.2), new THREE.Vector3(5.1, 0.05, 6.2), "Ducto 0.40m", new THREE.Vector3(0, 0, 1), 0.7);
+        addDim(new THREE.Vector3(5.1, 0.05, 6.2), new THREE.Vector3(0.0, 0.05, 6.2), "5.10 m", new THREE.Vector3(0, 0, 1), 0.4);
+        addDim(new THREE.Vector3(0.0, 0.05, 6.2), new THREE.Vector3(0.0, 0.05, 0.0), "6.20 m (Calle Günter Plüschow)", new THREE.Vector3(-1, 0, 0), 0.6);
 
         function updateLabels() {
             if (!document.getElementById('chk-dimensions').checked) {
@@ -890,11 +1292,9 @@
             }
         }
 
-        // --- 8. VISTAS Y CONTROLES ---
+        // Vistas
         const viewPresets = {
-            isom: { pos: [4.65, 14, 11], target: [4.65, 1.5, 3.10] },
-            entrada: { pos: [8.0, 1.8, 0.2], target: [8.0, 1.5, 2.5] },
-            palier: { pos: [8.0, 1.8, 0.2], target: [8.0, 1.5, 2.5] },
+            isom: { pos: [4.65, 13.5, 11], target: [4.65, 1.2, 3.10] },
             living: { pos: [6.5, 1.7, 5.5], target: [6.5, 1.4, 2.0] },
             cocina: { pos: [4.5, 1.7, 4.0], target: [4.2, 1.2, 5.8] },
             cuarto: { pos: [1.8, 1.6, 4.6], target: [1.2, 1.1, 5.6] },
@@ -913,17 +1313,8 @@
 
         document.querySelectorAll('.view-chip').forEach(chip => chip.addEventListener('click', () => setView(chip.dataset.view)));
 
-        document.getElementById('chk-roof').addEventListener('change', (e) => roofGroup.visible = e.target.checked);
-        document.getElementById('chk-furniture').addEventListener('change', (e) => furnitureGroup.visible = e.target.checked);
-        document.getElementById('chk-dimensions').addEventListener('change', (e) => dimensionsGroup.visible = e.target.checked);
-        document.getElementById('chk-transparent').addEventListener('change', (e) => {
-            wallMat.transparent = e.target.checked;
-            wallMat.opacity = e.target.checked ? 0.35 : 1.0;
-            wallMat.needsUpdate = true;
-        });
-
         document.getElementById('btn-top').addEventListener('click', () => {
-            camera.position.set(4.65, 18, 3.10);
+            camera.position.set(4.65, 17, 3.10);
             controls.target.set(4.65, 0, 3.10);
             controls.update();
             document.getElementById('chk-roof').checked = false;
@@ -932,39 +1323,45 @@
 
         document.getElementById('btn-orbit').addEventListener('click', () => setView('isom'));
 
-        // Exportar OBJ
+        // Toggle móvil para capas
+        document.getElementById('btn-toggle-layers').addEventListener('click', () => {
+            document.getElementById('sidebar-right').classList.toggle('show-mobile');
+        });
+
+        // Share modal
+        const shareModal = document.getElementById('share-modal');
+        document.getElementById('btn-open-share').addEventListener('click', () => shareModal.style.display = 'block');
+        document.getElementById('btn-close-share').addEventListener('click', () => shareModal.style.display = 'none');
+        document.getElementById('btn-copy-share').addEventListener('click', () => {
+            navigator.clipboard.writeText('https://totoarg.github.io/departamento-01-01/');
+            alert("¡Link copiado!");
+        });
+
+        // Export OBJ
         document.getElementById('btn-export-obj').addEventListener('click', () => {
             const exporter = new THREE.OBJExporter();
             const result = exporter.parse(apartmentGroup);
             const blob = new Blob([result], { type: 'text/plain' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'Departamento_01-01_Tomas.obj';
+            link.download = 'Departamento_01-01_Editado.obj';
             link.click();
         });
 
-        // Modal Compartir
-        const modal = document.getElementById('share-modal');
-        const shareUrl = window.location.protocol.startsWith('http') ? window.location.href : 'https://totoarg.github.io/departamento-01-01/';
-        document.getElementById('share-url-text').innerText = shareUrl;
-        document.getElementById('btn-open-share').addEventListener('click', () => modal.style.display = 'block');
-        document.getElementById('btn-close-share').addEventListener('click', () => modal.style.display = 'none');
-        document.getElementById('btn-copy-url').addEventListener('click', () => {
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                const btn = document.getElementById('btn-copy-url');
-                btn.innerText = '¡Copiado!';
-                setTimeout(() => btn.innerText = 'Copiar Link', 2000);
-            });
-        });
+        // Inicializar render de muebles
+        renderFurniture3D();
 
+        // Loop de Renderizado
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
             updateLabels();
+            if (selectionBox) selectionBox.update();
             renderer.render(scene, camera);
         }
         animate();
 
+        // Resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
