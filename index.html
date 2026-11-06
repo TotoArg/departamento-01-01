@@ -478,6 +478,11 @@
         <button class="mode-btn active" id="btn-mode-2d"><span>📐</span> Plano 2D Exacto</button>
         <button class="mode-btn" id="btn-mode-3d"><span>🧊</span> Vista 3D</button>
         <button class="mode-btn" id="btn-mode-cut"><span>✂️</span> Paredes Bajas (1.10m)</button>
+        <div style="display:flex; gap:4px; margin-left:6px; border-left:1px solid rgba(255,255,255,0.15); padding-left:8px;">
+            <button class="icon-btn" id="btn-zoom-in" title="Acercar plano" style="padding:5px 8px; font-size:12px; font-weight:700;">🔍 +</button>
+            <button class="icon-btn" id="btn-zoom-out" title="Alejar plano" style="padding:5px 8px; font-size:12px; font-weight:700;">🔍 −</button>
+            <button class="icon-btn" id="btn-zoom-reset" title="Restablecer vista" style="padding:5px 8px; font-size:11px;">⟲</button>
+        </div>
     </div>
 
     <!-- Right Sidebar (Visibility & Layers) -->
@@ -699,12 +704,23 @@
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(renderer.domElement);
 
-        const controls = new THREE.OrbitControls(perspCam, renderer.domElement);
-        controls.target.set(3.50, 0.3, 3.10);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.06;
-        controls.maxPolarAngle = Math.PI / 2 - 0.02;
-        controls.enabled = false; // En 2D fijo ortogonal al inicio
+        const controlsPersp = new THREE.OrbitControls(perspCam, renderer.domElement);
+        controlsPersp.target.set(3.50, 0.3, 3.10);
+        controlsPersp.enableDamping = true;
+        controlsPersp.dampingFactor = 0.06;
+        controlsPersp.maxPolarAngle = Math.PI / 2 - 0.02;
+        controlsPersp.enabled = false;
+
+        // Controles para 2D Ortográfico (Zoom con rueda / pellizco táctil y Pan / desplazamiento)
+        const controlsOrtho = new THREE.OrbitControls(orthoCam, renderer.domElement);
+        controlsOrtho.target.set(3.50, 0, 3.10);
+        controlsOrtho.enableDamping = true;
+        controlsOrtho.dampingFactor = 0.08;
+        controlsOrtho.enableRotate = false; // Solo zoom y pan en 2D plano
+        controlsOrtho.screenSpacePanning = true;
+        controlsOrtho.minZoom = 0.4;
+        controlsOrtho.maxZoom = 4.0;
+        controlsOrtho.enabled = true; // Activo para zoom y arrastre desde el inicio
 
         // Iluminación
         scene.add(new THREE.AmbientLight(0xffffff, 0.85));
@@ -1203,26 +1219,58 @@
 
         function switchTo2D() {
             activeCamera = orthoCam;
-            controls.enabled = false;
+            controlsPersp.enabled = false;
+            controlsOrtho.enabled = true;
             setActiveTopBtn('btn-mode-2d');
             document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === 'top2d'));
         }
 
         function switchTo3D(presetName = 'isom', cut = false) {
             activeCamera = perspCam;
-            controls.enabled = true;
+            controlsOrtho.enabled = false;
+            controlsPersp.enabled = true;
             setWallCut(cut);
             setActiveTopBtn(cut ? 'btn-mode-cut' : 'btn-mode-3d');
             const v = viewPresets[presetName] || viewPresets.isom;
             perspCam.position.set(v.pos[0], v.pos[1], v.pos[2]);
-            controls.target.set(v.target[0], v.target[1], v.target[2]);
-            controls.update();
+            controlsPersp.target.set(v.target[0], v.target[1], v.target[2]);
+            controlsPersp.update();
             document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === presetName));
         }
 
         document.getElementById('btn-mode-2d').addEventListener('click', () => switchTo2D());
         document.getElementById('btn-mode-3d').addEventListener('click', () => switchTo3D('isom', false));
         document.getElementById('btn-mode-cut').addEventListener('click', () => switchTo3D('isom', true));
+
+        // Botones de Zoom rápido (+ / - / Reset)
+        document.getElementById('btn-zoom-in').addEventListener('click', () => {
+            if (activeCamera === orthoCam) {
+                orthoCam.zoom = Math.min(orthoCam.zoom * 1.25, 4.0);
+                orthoCam.updateProjectionMatrix();
+            } else {
+                perspCam.position.lerp(controlsPersp.target, 0.2);
+            }
+        });
+        document.getElementById('btn-zoom-out').addEventListener('click', () => {
+            if (activeCamera === orthoCam) {
+                orthoCam.zoom = Math.max(orthoCam.zoom / 1.25, 0.35);
+                orthoCam.updateProjectionMatrix();
+            } else {
+                const dir = perspCam.position.clone().sub(controlsPersp.target).normalize();
+                perspCam.position.addScaledVector(dir, 1.5);
+            }
+        });
+        document.getElementById('btn-zoom-reset').addEventListener('click', () => {
+            if (activeCamera === orthoCam) {
+                orthoCam.zoom = 1.0;
+                orthoCam.position.set(3.50, 20, 3.10);
+                controlsOrtho.target.set(3.50, 0, 3.10);
+                orthoCam.updateProjectionMatrix();
+                controlsOrtho.update();
+            } else {
+                switchTo3D('isom', document.getElementById('chk-wall-cut').checked);
+            }
+        });
 
         document.querySelectorAll('.view-chip').forEach(chip => {
             chip.addEventListener('click', () => {
@@ -1253,7 +1301,8 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            if (controls.enabled) controls.update();
+            if (controlsPersp.enabled) controlsPersp.update();
+            if (controlsOrtho.enabled) controlsOrtho.update();
             updateLabels();
             if (selectionBox) selectionBox.update();
             renderer.render(scene, activeCamera);
