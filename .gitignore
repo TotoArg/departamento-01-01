@@ -7,6 +7,14 @@ __pycache__/
 videos/
 video_frames/
 walkthrough/
+sample_frames/
+fotos_nuevas/
 extract_frames.py
 extract_walkthrough.py
 download_videos.py
+fetch_album.py
+fetch_new_album.py
+check_*.py
+extract_samples.py
+analyze_frames.py
+inspect_items.py
