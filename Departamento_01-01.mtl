@@ -1,0 +1,17 @@
+newmtl Piso_Ceramico
+Kd 0.83 0.78 0.72
+
+newmtl Pared_Blanca
+Kd 0.94 0.94 0.95
+
+newmtl Granito_Rosa
+Kd 0.75 0.55 0.48
+
+newmtl Madera
+Kd 0.58 0.32 0.15
+
+newmtl Blanco_Sanitarios
+Kd 0.95 0.95 0.95
+
+newmtl Vigas_Madera
+Kd 0.42 0.22 0.10
