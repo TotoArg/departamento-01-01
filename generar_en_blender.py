@@ -2,24 +2,13 @@
 Script Python para Blender 3.x / 4.x
 Construye automáticamente la estructura 3D del Departamento 01-01 (1° Piso)
 Edificio Glaciares II - Calle Günter Plüschow 235, El Calafate
-Unidad Funcional N° 6, Depto "A", Polígono 01-01
-Superficie Escriturada Oficial: 54,16 m²
+Unidad Funcional N° 6, Depto "A", Polígono 01-01 (54,16 m² oficiales)
 
-Perímetro oficial catastral exacto:
-- Lateral Oeste: Calle Günter Plüschow (6.20 m)
-- Lateral Norte: Medianera con 01-02 (7.00 m)
-- Acceso: Cubierta Común / Palier (1.40 m x 2.30 m)
-- Lateral Este: Muro Living Comedor (4.80 m)
-- Lateral Sur: 3.80 m + Ducto ventilación/instalaciones (0.40 x 0.70 m) + 5.10 m = 9.30 m
-- Área exacta: (9.30 x 6.20) - (2.30 x 1.40) - (0.40 x 0.70) = 54,16 m²
-
-Incluye colecciones organizadas:
-- 01_Muros_Estructurales_Oficiales (54.16 m²)
-- 02_Tabiques_Distribucion_Actual (Living, Cocina, Pasillo, Cuarto, Baño, Estudio)
-- 03_Propuesta_Cocina_Abierta (Isla desayunadora moderna)
-- 04_Propuesta_Entrepiso_Loft (Aprovechamiento de la altura de 3.85m en el estudio)
-- 05_Techo_Madera_Vigas (Cielorraso en pendiente)
-- 06_Equipamiento_Real (Sanitarios, cocina, camas, escritorios, living)
+Distribución interior ajustada al croquis del usuario:
+- Los Placards son interiores a sus respectivas habitaciones:
+    * Placard de Cuarto: interior al dormitorio principal, abre hacia el sur (dentro de la habitación).
+    * Placard de Estudio: interior al estudio gamer, abre hacia el norte (dentro de la habitación).
+    * Baño completo: en el centro entre las espaldas ciegas de ambos placards, con acceso directo al pasillo.
 """
 
 import bpy
@@ -88,23 +77,15 @@ def build_real_apartment():
     add_box("Piso_Este_Living", 7.00, 1.40, -0.05, 2.30, 4.80, 0.05, col_muros, mat_floor)
 
     # --- 2. MUROS EXTERIORES (Espesor 0.20m) ---
-    # Norte: Medianera con 01-02 (7.00 m)
     add_box("Muro_Norte_Medianera", -0.20, -0.20, 0.0, 7.20, 0.20, 3.20, col_muros, mat_wall)
-    # Saliente Palier Común (1.40 m)
     add_box("Muro_Saliente_Palier", 7.00, -0.20, 0.0, 0.20, 1.60, 3.00, col_muros, mat_wall)
-    # Acceso Palier (2.30 m)
     add_box("Muro_Acceso_Palier", 7.00, 1.40, 0.0, 2.30, 0.20, 2.70, col_muros, mat_wall)
-    # Este: Lateral Living (4.80 m)
     add_box("Muro_Este_Living", 9.30, 1.40, 0.0, 0.20, 4.80, 2.70, col_muros, mat_wall)
-    # Sur: Sector Living (3.80 m)
     add_box("Muro_Sur_Living", 5.50, 6.20, 0.0, 4.00, 0.20, 2.80, col_muros, mat_wall)
-    # Ducto Ventilación / Instalaciones (0.40 x 0.70 m)
     add_box("Ducto_Este", 5.50, 5.50, 0.0, 0.10, 0.70, 3.20, col_muros, mat_wall)
     add_box("Ducto_Fondo", 5.10, 5.50, 0.0, 0.40, 0.10, 3.20, col_muros, mat_wall)
     add_box("Ducto_Oeste", 5.10, 5.50, 0.0, 0.10, 0.70, 3.20, col_muros, mat_wall)
-    # Sur: Cuarto y Cocina (5.10 m)
     add_box("Muro_Sur_Cuarto_Cocina", -0.20, 6.20, 0.0, 5.30, 0.20, 2.80, col_muros, mat_wall)
-    # Oeste: Calle Günter Plüschow (6.20 m)
     add_box("Muro_Oeste_Calle_Gunter", -0.20, 0.00, 0.0, 0.20, 6.20, 3.00, col_muros, mat_wall)
 
     # --- 3. TABIQUES INTERIORES - ESTADO ACTUAL (0.12m) ---
@@ -115,18 +96,23 @@ def build_real_apartment():
     add_box("Tabique_Cocina_Pasillo", 2.40, 4.20, 0.0, 1.10, 0.12, 2.80, col_tabiques, mat_wall)
     add_box("Tabique_Cocina_Cuarto", 2.40, 4.20, 0.0, 0.12, 2.00, 2.80, col_tabiques, mat_wall)
 
-    # Cuarto Principal
-    add_box("Tabique_Cuarto_Placard", 0.00, 4.80, 0.0, 2.40, 0.10, 2.80, col_tabiques, mat_wall)
-    add_box("Frente_Placard_Cuarto", 0.00, 4.30, 0.0, 2.40, 0.50, 2.50, col_tabiques, mat_wood)
-    add_box("Tabique_Acceso_Cuarto", 2.40, 4.30, 0.0, 0.12, 0.50, 2.80, col_tabiques, mat_wall)
+    # Cuarto Principal con su Placard interior (hacia el sur)
+    add_box("Tabique_Bano_Cuarto_Ciego", 0.00, 4.30, 0.0, 2.40, 0.10, 2.80, col_tabiques, mat_wall)
+    add_box("Tabique_Pasillo_Cuarto_Placard", 2.40, 4.30, 0.0, 0.12, 0.60, 2.80, col_tabiques, mat_wall)
+    add_box("Placard_Interior_Cuarto", 0.10, 4.35, 0.0, 2.20, 0.55, 2.45, col_muebles, mat_wood)
+    add_box("Dintel_Puerta_Cuarto", 2.40, 4.90, 2.10, 0.12, 0.80, 0.70, col_tabiques, mat_wall)
 
-    # Baño Completo
-    add_box("Tabique_Bano_Norte", 0.00, 2.70, 0.0, 2.40, 0.10, 3.00, col_tabiques, mat_wall)
-    add_box("Tabique_Acceso_Bano", 2.40, 2.70, 0.0, 0.12, 1.60, 3.00, col_tabiques, mat_wall)
+    # Baño Completo (Centro)
+    add_box("Tabique_Pasillo_Bano", 2.40, 2.70, 0.0, 0.12, 0.40, 3.00, col_tabiques, mat_wall)
+    add_box("Dintel_Puerta_Bano", 2.40, 3.10, 2.10, 0.12, 0.80, 0.90, col_tabiques, mat_wall)
+    add_box("Tabique_Pasillo_Bano_Sur", 2.40, 3.90, 0.0, 0.12, 0.40, 3.00, col_tabiques, mat_wall)
 
-    # Estudio Gamer
-    add_box("Frente_Placard_Estudio", 0.00, 2.20, 0.0, 2.40, 0.50, 2.50, col_tabiques, mat_wood)
-    add_box("Tabique_Acceso_Estudio", 2.40, 0.00, 0.0, 0.12, 2.20, 3.20, col_tabiques, mat_wall)
+    # Estudio Gamer con su Placard interior (hacia el norte)
+    add_box("Tabique_Bano_Estudio_Ciego", 0.00, 2.70, 0.0, 2.40, 0.10, 3.00, col_tabiques, mat_wall)
+    add_box("Tabique_Pasillo_Estudio_Placard", 2.40, 2.10, 0.0, 0.12, 0.60, 3.00, col_tabiques, mat_wall)
+    add_box("Placard_Interior_Estudio", 0.10, 2.15, 0.0, 2.20, 0.55, 2.45, col_muebles, mat_wood)
+    add_box("Dintel_Puerta_Estudio", 2.40, 1.30, 2.10, 0.12, 0.80, 0.90, col_tabiques, mat_wall)
+    add_box("Tabique_Pasillo_Estudio_Norte", 2.40, 0.00, 0.0, 0.12, 1.30, 3.20, col_tabiques, mat_wall)
 
     # --- 4. PROPUESTA 1: COCINA ABIERTA CON ISLA ---
     add_box("Prop1_Isla_Desayunadora", 3.20, 4.80, 0.0, 0.85, 1.80, 0.92, col_isla, mat_granite)
@@ -171,7 +157,7 @@ def build_real_apartment():
         y_beam = 0.25 + i * 0.52
         add_box(f"Viga_Madera_{i+1}", -0.20, y_beam, 2.70 + (i*0.03), 9.60, 0.08, 0.14, col_techo, mat_beam)
 
-    print("Modelo 3D de Departamento 01-01 (54.16 m2 oficiales) generado con éxito en Blender!")
+    print("Modelo 3D de Departamento 01-01 generado con éxito en Blender!")
 
 if __name__ == "__main__":
     build_real_apartment()

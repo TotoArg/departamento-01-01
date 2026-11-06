@@ -665,30 +665,45 @@
 
         // Sector Privado Izquierdo (Calle Günter Plüschow):
         // 1. CUARTO PRINCIPAL (Frente)
-        createWall({ x: 0.00, z: 4.80 }, { x: 2.40, z: 4.80 }, 0.10, groupActual);
-        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupActual, null, { start: 0.20, width: 1.90, height: 2.40, type: 'wood' }); // Placard Cuarto
-        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.80 }, 0.12, groupActual, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' }); // Puerta Cuarto
+        // Muro divisorio ciego entre Baño y Placard del Cuarto
+        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupActual);
+        // Lateral del placard hacia el Pasillo (Muro ciego)
+        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.90 }, 0.12, groupActual);
+        // Puerta de acceso al Cuarto desde el Pasillo
+        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 5.70 }, 0.12, groupActual, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
+        // Frente de Placard que abre HACIA EL INTERIOR del Cuarto (Orientación Sur)
+        createWall({ x: 0.10, z: 4.90 }, { x: 2.30, z: 4.90 }, 0.06, groupActual, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
 
-        // 2. BAÑO COMPLETO (Centro - entre ambos placards)
-        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupActual);
-        createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupActual, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' }); // Puerta Baño
+        // 2. BAÑO COMPLETO (Centro - entre las espaldas de ambos placards)
+        createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupActual, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' }); // Puerta Baño hacia Pasillo
 
         // 3. ESTUDIO GAMER (Fondo)
-        createWall({ x: 0.00, z: 2.20 }, { x: 2.40, z: 2.20 }, 0.10, groupActual); // Placard Estudio
-        createWall({ x: 2.40, z: 0.00 }, { x: 2.40, z: 2.20 }, 0.12, groupActual, null, { start: 0.60, width: 0.80, height: 2.10, type: 'wood' }); // Puerta Estudio
+        // Muro divisorio ciego entre Baño y Placard del Estudio
+        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupActual);
+        // Lateral del placard hacia el Pasillo (Muro ciego)
+        createWall({ x: 2.40, z: 2.10 }, { x: 2.40, z: 2.70 }, 0.12, groupActual);
+        // Puerta de acceso al Estudio desde el Pasillo
+        createWall({ x: 2.40, z: 1.30 }, { x: 2.40, z: 2.10 }, 0.12, groupActual, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
+        // Muro restante del Estudio hacia el Pasillo
+        createWall({ x: 2.40, z: 0.00 }, { x: 2.40, z: 1.30 }, 0.12, groupActual);
+        // Frente de Placard que abre HACIA EL INTERIOR del Estudio (Orientación Norte)
+        createWall({ x: 0.10, z: 2.10 }, { x: 2.30, z: 2.10 }, 0.06, groupActual, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
 
         // B) PROPUESTA 1: COCINA ABIERTA CON ISLA
         // Se demuele el tabique ciego entre Cocina y Living para ganar luminosidad y amplitud
         createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 4.20 }, 0.12, groupPropIsla, null, { start: 2.20, width: 1.10, height: 2.10, type: 'open' });
         createWall({ x: 2.40, z: 4.20 }, { x: 2.40, z: 6.20 }, 0.12, groupPropIsla);
-        // Preserva privacidad de los dormitorios y baño
-        createWall({ x: 0.00, z: 4.80 }, { x: 2.40, z: 4.80 }, 0.10, groupPropIsla);
-        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupPropIsla, null, { start: 0.20, width: 1.90, height: 2.40, type: 'wood' });
-        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.80 }, 0.12, groupPropIsla, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
-        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupPropIsla);
+        // Preserva la distribución privada de los dormitorios con sus placards interiores
+        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupPropIsla);
+        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.90 }, 0.12, groupPropIsla);
+        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 5.70 }, 0.12, groupPropIsla, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
+        createWall({ x: 0.10, z: 4.90 }, { x: 2.30, z: 4.90 }, 0.06, groupPropIsla, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
         createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupPropIsla, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' });
-        createWall({ x: 0.00, z: 2.20 }, { x: 2.40, z: 2.20 }, 0.10, groupPropIsla);
-        createWall({ x: 2.40, z: 0.00 }, { x: 2.40, z: 2.20 }, 0.12, groupPropIsla, null, { start: 0.60, width: 0.80, height: 2.10, type: 'wood' });
+        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupPropIsla);
+        createWall({ x: 2.40, z: 2.10 }, { x: 2.40, z: 2.70 }, 0.12, groupPropIsla);
+        createWall({ x: 2.40, z: 1.30 }, { x: 2.40, z: 2.10 }, 0.12, groupPropIsla, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
+        createWall({ x: 2.40, z: 0.00 }, { x: 2.40, z: 1.30 }, 0.12, groupPropIsla);
+        createWall({ x: 0.10, z: 2.10 }, { x: 2.30, z: 2.10 }, 0.06, groupPropIsla, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
 
         // Barra Isla Desayunadora moderna
         const island = new THREE.Mesh(new THREE.BoxGeometry(0.80, 0.90, 1.80), woodDoorMat);
@@ -701,13 +716,16 @@
         groupPropLoft.add(island.clone(), islandTop.clone());
         createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 4.20 }, 0.12, groupPropLoft, null, { start: 2.20, width: 1.10, height: 2.10, type: 'open' });
         createWall({ x: 2.40, z: 4.20 }, { x: 2.40, z: 6.20 }, 0.12, groupPropLoft);
-        createWall({ x: 0.00, z: 4.80 }, { x: 2.40, z: 4.80 }, 0.10, groupPropLoft);
-        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupPropLoft, null, { start: 0.20, width: 1.90, height: 2.40, type: 'wood' });
-        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.80 }, 0.12, groupPropLoft, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
-        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupPropLoft);
+        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupPropLoft);
+        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.90 }, 0.12, groupPropLoft);
+        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 5.70 }, 0.12, groupPropLoft, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
+        createWall({ x: 0.10, z: 4.90 }, { x: 2.30, z: 4.90 }, 0.06, groupPropLoft, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
         createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupPropLoft, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' });
-        createWall({ x: 0.00, z: 2.20 }, { x: 2.40, z: 2.20 }, 0.10, groupPropLoft);
-        createWall({ x: 2.40, z: 0.00 }, { x: 2.40, z: 2.20 }, 0.12, groupPropLoft, null, { start: 0.60, width: 0.80, height: 2.10, type: 'wood' });
+        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupPropLoft);
+        createWall({ x: 2.40, z: 2.10 }, { x: 2.40, z: 2.70 }, 0.12, groupPropLoft);
+        createWall({ x: 2.40, z: 1.30 }, { x: 2.40, z: 2.10 }, 0.12, groupPropLoft, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
+        createWall({ x: 2.40, z: 0.00 }, { x: 2.40, z: 1.30 }, 0.12, groupPropLoft);
+        createWall({ x: 0.10, z: 2.10 }, { x: 2.30, z: 2.10 }, 0.06, groupPropLoft, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
 
         const loftPlat = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.12, 1.80), woodCeilingMat);
         loftPlat.position.set(1.20, 2.25, 1.00);
@@ -771,9 +789,11 @@
         function buildBedroom() {
             const bg = new THREE.Group();
             const bedHead = new THREE.Mesh(new THREE.BoxGeometry(1.50, 0.90, 0.06), woodDoorMat); bedHead.position.set(1.20, 0.45, 6.15);
-            const bed = new THREE.Mesh(new THREE.BoxGeometry(1.40, 0.45, 1.90), new THREE.MeshStandardMaterial({ color: 0x475569 })); bed.position.set(1.20, 0.225, 5.20);
-            const nightstand = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.50, 0.40), woodDoorMat); nightstand.position.set(2.05, 0.25, 5.90);
-            bg.add(bedHead, bed, nightstand);
+            const bed = new THREE.Mesh(new THREE.BoxGeometry(1.40, 0.45, 1.90), new THREE.MeshStandardMaterial({ color: 0x475569 })); bed.position.set(1.20, 0.225, 5.30);
+            const nightstand = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.50, 0.40), woodDoorMat); nightstand.position.set(2.05, 0.25, 5.95);
+            // Placard embutido interior perteneciente al dormitorio principal
+            const closetCuarto = new THREE.Mesh(new THREE.BoxGeometry(2.15, 2.45, 0.55), woodDoorMat); closetCuarto.position.set(1.20, 1.225, 4.60);
+            bg.add(bedHead, bed, nightstand, closetCuarto);
             furnitureGroup.add(bg);
         }
         buildBedroom();
@@ -797,7 +817,9 @@
             const desk2 = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.04, 1.00), woodDoorMat); desk2.position.set(1.75, 0.75, 1.05);
             const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.70, 0.40, 0.03), blackFrameMat); monitor.position.set(0.85, 1.05, 0.20);
             const chair = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.85, 0.48), new THREE.MeshStandardMaterial({ color: 0x111827 })); chair.position.set(0.85, 0.50, 1.00);
-            sg.add(desk1, desk2, monitor, chair);
+            // Placard embutido interior perteneciente al estudio gamer
+            const closetEstudio = new THREE.Mesh(new THREE.BoxGeometry(2.15, 2.45, 0.55), woodDoorMat); closetEstudio.position.set(1.20, 1.225, 2.40);
+            sg.add(desk1, desk2, monitor, chair, closetEstudio);
             furnitureGroup.add(sg);
         }
         buildStudy();
@@ -844,6 +866,8 @@
         addDim(new THREE.Vector3(5.5, 0.05, 6.2), new THREE.Vector3(5.1, 0.05, 6.2), "Ducto 0.40m", new THREE.Vector3(0, 0, 1), 0.8);
         addDim(new THREE.Vector3(5.1, 0.05, 6.2), new THREE.Vector3(0.0, 0.05, 6.2), "5.10 m (Cuarto/Cocina)", new THREE.Vector3(0, 0, 1), 0.5);
         addDim(new THREE.Vector3(0.0, 0.05, 6.2), new THREE.Vector3(0.0, 0.05, 0.0), "6.20 m (Calle Günter Plüschow)", new THREE.Vector3(-1, 0, 0), 0.7);
+        addDim(new THREE.Vector3(0.1, 0.05, 4.90), new THREE.Vector3(2.3, 0.05, 4.90), "Placard Cuarto (Abre a Dormitorio)", new THREE.Vector3(0, 0, 1), 0.35);
+        addDim(new THREE.Vector3(0.1, 0.05, 2.10), new THREE.Vector3(2.3, 0.05, 2.10), "Placard Estudio (Abre a Estudio)", new THREE.Vector3(0, 0, -1), 0.35);
 
         function updateLabels() {
             if (!document.getElementById('chk-dimensions').checked) {
