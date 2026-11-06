@@ -470,7 +470,7 @@
             </div>
         </div>
         <h1>Plano Arquitectónico Exacto (2D y 3D)</h1>
-        <div class="subtitle">Sin tabiques ni desniveles extra. Ejes X=[0, 1.70, 3.00, 4.60, 7.00] | Y=[0, 2.30, 2.80, 4.00, 4.60, 6.20].</div>
+        <div class="subtitle">Simetría Estudio = Cuarto (3.00×2.00m). Ejes X=[0, 1.70, 3.00, 4.60, 7.00] | Y=[0, 2.00, 2.50, 3.70, 4.20, 6.20].</div>
     </div>
 
     <!-- Top Mode Switcher -->
@@ -816,51 +816,51 @@
         // ============================================================================
         // 4. REGLA 2: EJES VERTICALES PRINCIPALES
         // ============================================================================
-        // X = 1.70: Cerramiento de Baño y Placards (desde Y = 2.30 hasta Y = 4.60)
-        // Puerta de acceso al Baño en el centro (entre Y = 3.10 y Y = 3.70)
-        addWallSegment(1.70, 2.30, 1.70, 3.10, INT_T, interiorWallsGroup, false);
-        addWallSegment(1.70, 3.70, 1.70, 4.60, INT_T, interiorWallsGroup, false);
+        // X = 1.70: Cerramiento de Baño y Placards (desde Y = 2.00 hasta Y = 4.20)
+        // Puerta de acceso al Baño en el centro (entre Y = 2.80 y Y = 3.40)
+        addWallSegment(1.70, 2.00, 1.70, 2.80, INT_T, interiorWallsGroup, false);
+        addWallSegment(1.70, 3.40, 1.70, 4.20, INT_T, interiorWallsGroup, false);
 
         // X = 3.00: Eje central divisorio
-        // 1) Separa Estudio y Pasillo del Living (desde Y = 0.00 hasta Y = 3.90)
-        addWallSegment(3.00, 0.00, 3.00, 3.90, INT_T, interiorWallsGroup, false);
-        addWallSegment(2.91, 3.90, 3.09, 3.90, 0.05, interiorWallsGroup, false);
-        // Entre Y = 3.90 y Y = 4.60: Paso totalmente abierto de 0.70 m en X = 3.00
-        addDashedLine(3.00, 3.90, 3.00, 4.60);
-        // 2) Separa el Cuarto de la Cocina (desde Y = 4.60 hasta Y = 6.20)
-        addWallSegment(3.00, 4.60, 3.00, 6.20, INT_T, interiorWallsGroup, false);
+        // 1) Separa Estudio y Pasillo del Living (desde Y = 0.00 hasta Y = 3.50)
+        addWallSegment(3.00, 0.00, 3.00, 3.50, INT_T, interiorWallsGroup, false);
+        addWallSegment(2.91, 3.50, 3.09, 3.50, 0.05, interiorWallsGroup, false);
+        // Entre Y = 3.50 y Y = 4.20: Paso totalmente abierto de 0.70 m en X = 3.00
+        addDashedLine(3.00, 3.50, 3.00, 4.20);
+        // 2) Separa el Cuarto de la Cocina (desde Y = 4.20 hasta Y = 6.20)
+        addWallSegment(3.00, 4.20, 3.00, 6.20, INT_T, interiorWallsGroup, false);
 
-        // X = 4.60: Pared derecha de la Cocina (desde Y = 4.60 hasta Y = 6.20)
-        addWallSegment(4.60, 4.60, 4.60, 6.20, INT_T, interiorWallsGroup, false);
+        // X = 4.60: Pared derecha de la Cocina (desde Y = 4.20 hasta Y = 6.20)
+        addWallSegment(4.60, 4.20, 4.60, 6.20, INT_T, interiorWallsGroup, false);
 
         // ============================================================================
-        // 5. REGLA 3: LÍNEAS HORIZONTALES Y ALINEACIONES CRÍTICAS
+        // 5. REGLA 3: LÍNEAS HORIZONTALES Y ALINEACIONES CRÍTICAS (SIMETRÍA ESTUDIO = CUARTO)
         // ============================================================================
-        // Y = 2.30: Línea de cierre del Estudio
+        // Y = 2.00: Línea de cierre del Estudio (2.00 m de alto)
         // De X = 0.00 a X = 1.70: Muro cerrado que divide el Estudio del Placard 1
-        addWallSegment(0.00, 2.30, 1.70, 2.30, INT_T, interiorWallsGroup, false);
+        addWallSegment(0.00, 2.00, 1.70, 2.00, INT_T, interiorWallsGroup, false);
         // De X = 1.70 a X = 3.00: Vano/puerta de entrada al Estudio (remate superior del Pasillo)
-        addWallSegment(1.70, 2.30, 1.86, 2.30, INT_T, interiorWallsGroup, false);
-        addDashedLine(1.86, 2.30, 2.82, 2.30);
-        addWallSegment(2.82, 2.30, 3.00, 2.30, INT_T, interiorWallsGroup, false);
+        addWallSegment(1.70, 2.00, 1.86, 2.00, INT_T, interiorWallsGroup, false);
+        addDashedLine(1.86, 2.00, 2.82, 2.00);
+        addWallSegment(2.82, 2.00, 3.00, 2.00, INT_T, interiorWallsGroup, false);
 
-        // Y = 2.80: Muro horizontal que divide el Placard 1 del Baño (de X = 0.00 a X = 1.70)
-        addWallSegment(0.00, 2.80, 1.70, 2.80, INT_T, interiorWallsGroup, false);
+        // Y = 2.50: Muro horizontal que divide el Placard 1 (0.50 m de alto) del Baño (de X = 0.00 a X = 1.70)
+        addWallSegment(0.00, 2.50, 1.70, 2.50, INT_T, interiorWallsGroup, false);
 
-        // Y = 4.00: Muro horizontal que divide el Baño del Placard 2 (de X = 0.00 a X = 1.70)
-        addWallSegment(0.00, 4.00, 1.70, 4.00, INT_T, interiorWallsGroup, false);
+        // Y = 3.70: Muro horizontal que divide el Baño (1.20 m de alto) del Placard 2 (de X = 0.00 a X = 1.70)
+        addWallSegment(0.00, 3.70, 1.70, 3.70, INT_T, interiorWallsGroup, false);
 
-        // Y = 4.60: Línea horizontal unificada de Cuarto y Cocina (Regla crítica)
-        // 1) Muro inferior del Placard 2 (de X = 0.00 a X = 1.70)
-        addWallSegment(0.00, 4.60, 1.70, 4.60, INT_T, interiorWallsGroup, false);
+        // Y = 4.20: Línea horizontal unificada de Cuarto y Cocina (2.00 m desde la base)
+        // 1) Muro inferior del Placard 2 (0.50 m de alto, de X = 0.00 a X = 1.70)
+        addWallSegment(0.00, 4.20, 1.70, 4.20, INT_T, interiorWallsGroup, false);
         // 2) Vano/puerta de entrada al Cuarto (de X = 1.70 a X = 3.00, cerrando el pasillo por abajo)
-        addWallSegment(1.70, 4.60, 1.86, 4.60, INT_T, interiorWallsGroup, false);
-        addDashedLine(1.86, 4.60, 2.82, 4.60);
-        addWallSegment(2.82, 4.60, 3.00, 4.60, INT_T, interiorWallsGroup, false);
+        addWallSegment(1.70, 4.20, 1.86, 4.20, INT_T, interiorWallsGroup, false);
+        addDashedLine(1.86, 4.20, 2.82, 4.20);
+        addWallSegment(2.82, 4.20, 3.00, 4.20, INT_T, interiorWallsGroup, false);
         // 3) Frente superior de la Cocina con su abertura de acceso (de X = 3.00 a X = 4.60)
-        addWallSegment(3.00, 4.60, 3.18, 4.60, INT_T, interiorWallsGroup, false);
-        addDashedLine(3.18, 4.60, 4.38, 4.60);
-        addWallSegment(4.38, 4.60, 4.60, 4.60, INT_T, interiorWallsGroup, false);
+        addWallSegment(3.00, 4.20, 3.18, 4.20, INT_T, interiorWallsGroup, false);
+        addDashedLine(3.18, 4.20, 4.38, 4.20);
+        addWallSegment(4.38, 4.20, 4.60, 4.20, INT_T, interiorWallsGroup, false);
 
         // ============================================================================
         // 6. ETIQUETAS DE AMBIENTES EN COORDENADAS EXACTAS
@@ -874,22 +874,22 @@
             labelElements.push({ el, pos: new THREE.Vector3(x, 0.1, z) });
         }
 
-        // Estudio: [0.00, 0.00] a [3.00, 2.30]
-        addPlanLabel(1.50, 1.15, "ESTUDIO");
-        // Placard 1: [0.00, 2.30] a [1.70, 2.80]
-        addPlanLabel(0.85, 2.55, "PLACARD", "arch-label sm");
-        // Baño: [0.00, 2.80] a [1.70, 4.00]
-        addPlanLabel(0.85, 3.40, "BAÑO");
-        // Placard 2: [0.00, 4.00] a [1.70, 4.60]
-        addPlanLabel(0.85, 4.30, "PLACARD", "arch-label sm");
-        // Pasillo: [1.70, 2.30] a [3.00, 4.60]
-        addPlanLabel(2.35, 3.45, "PASILLO", "arch-label vertical");
-        // Cuarto: [0.00, 4.60] a [3.00, 6.20]
-        addPlanLabel(1.50, 5.40, "CUARTO");
-        // Cocina: [3.00, 4.60] a [4.60, 6.20]
-        addPlanLabel(3.80, 5.45, "COCINA");
-        // Living: [3.00, 0.00] a [7.00, 4.60] + [4.60, 4.60] a [7.00, 6.20]
-        addPlanLabel(5.00, 2.35, "LIVING");
+        // Estudio: [0.00, 0.00] a [3.00, 2.00] (3.00 m × 2.00 m)
+        addPlanLabel(1.50, 1.00, "ESTUDIO");
+        // Placard 1: [0.00, 2.00] a [1.70, 2.50] (1.70 m × 0.50 m)
+        addPlanLabel(0.85, 2.25, "PLACARD", "arch-label sm");
+        // Baño: [0.00, 2.50] a [1.70, 3.70] (1.70 m × 1.20 m)
+        addPlanLabel(0.85, 3.10, "BAÑO");
+        // Placard 2: [0.00, 3.70] a [1.70, 4.20] (1.70 m × 0.50 m)
+        addPlanLabel(0.85, 3.95, "PLACARD", "arch-label sm");
+        // Pasillo: [1.70, 2.00] a [3.00, 4.20] (1.30 m × 2.20 m)
+        addPlanLabel(2.35, 3.10, "PASILLO", "arch-label vertical");
+        // Cuarto: [0.00, 4.20] a [3.00, 6.20] (3.00 m × 2.00 m — idéntico al Estudio)
+        addPlanLabel(1.50, 5.20, "CUARTO");
+        // Cocina: [3.00, 4.20] a [4.60, 6.20] (1.60 m × 2.00 m)
+        addPlanLabel(3.80, 5.20, "COCINA");
+        // Living: [3.00, 0.00] a [7.00, 4.20] + [4.60, 4.20] a [7.00, 6.20]
+        addPlanLabel(5.00, 2.15, "LIVING");
         // Entrada: X = 5.40 a 6.20 sobre Y = 6.20
         addPlanLabel(5.80, 6.55, "ENTRADA", "arch-label sm");
 

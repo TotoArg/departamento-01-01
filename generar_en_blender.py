@@ -74,25 +74,25 @@ def build_exact_apartment():
     add_box("Muro_Inf_Der_Y620", 6.20, 6.20 - EXT/2, 0.00, 0.80, EXT, H, mat_ext, col_ext)
 
     # 3. Ejes verticales internos
-    add_box("Muro_V_X170_Sup", 1.70 - INT/2, 2.30, 0.00, INT, 0.80, H, mat_int, col_int)
-    add_box("Muro_V_X170_Inf", 1.70 - INT/2, 3.70, 0.00, INT, 0.90, H, mat_int, col_int)
-    add_box("Muro_V_X300_Sup", 3.00 - INT/2, 0.00, 0.00, INT, 3.90, H, mat_int, col_int)
-    add_box("Muro_V_X300_Inf", 3.00 - INT/2, 4.60, 0.00, INT, 1.60, H, mat_int, col_int)
-    add_box("Muro_V_X460_Cocina", 4.60 - INT/2, 4.60, 0.00, INT, 1.60, H, mat_int, col_int)
+    add_box("Muro_V_X170_Sup", 1.70 - INT/2, 2.00, 0.00, INT, 0.80, H, mat_int, col_int)
+    add_box("Muro_V_X170_Inf", 1.70 - INT/2, 3.40, 0.00, INT, 0.80, H, mat_int, col_int)
+    add_box("Muro_V_X300_Sup", 3.00 - INT/2, 0.00, 0.00, INT, 3.50, H, mat_int, col_int)
+    add_box("Muro_V_X300_Inf", 3.00 - INT/2, 4.20, 0.00, INT, 2.00, H, mat_int, col_int)
+    add_box("Muro_V_X460_Cocina", 4.60 - INT/2, 4.20, 0.00, INT, 2.00, H, mat_int, col_int)
 
-    # 4. Líneas horizontales internas
-    add_box("Muro_H_Y230_Placard1", 0.00, 2.30 - INT/2, 0.00, 1.70, INT, H, mat_int, col_int)
-    add_box("Muro_H_Y230_Mocheta_Izq", 1.70, 2.30 - INT/2, 0.00, 0.20, INT, H, mat_int, col_int)
-    add_box("Muro_H_Y230_Mocheta_Der", 2.80, 2.30 - INT/2, 0.00, 0.20, INT, H, mat_int, col_int)
+    # 4. Líneas horizontales internas (Simetría Estudio = Cuarto = 3.00 x 2.00)
+    add_box("Muro_H_Y200_Placard1", 0.00, 2.00 - INT/2, 0.00, 1.70, INT, H, mat_int, col_int)
+    add_box("Muro_H_Y200_Mocheta_Izq", 1.70, 2.00 - INT/2, 0.00, 0.16, INT, H, mat_int, col_int)
+    add_box("Muro_H_Y200_Mocheta_Der", 2.82, 2.00 - INT/2, 0.00, 0.18, INT, H, mat_int, col_int)
 
-    add_box("Muro_H_Y280_Placard1_Bano", 0.00, 2.80 - INT/2, 0.00, 1.70, INT, H, mat_int, col_int)
-    add_box("Muro_H_Y400_Bano_Placard2", 0.00, 4.00 - INT/2, 0.00, 1.70, INT, H, mat_int, col_int)
+    add_box("Muro_H_Y250_Placard1_Bano", 0.00, 2.50 - INT/2, 0.00, 1.70, INT, H, mat_int, col_int)
+    add_box("Muro_H_Y370_Bano_Placard2", 0.00, 3.70 - INT/2, 0.00, 1.70, INT, H, mat_int, col_int)
 
-    add_box("Muro_H_Y460_Placard2_Cuarto", 0.00, 4.60 - INT/2, 0.00, 1.70, INT, H, mat_int, col_int)
-    add_box("Muro_H_Y460_Cuarto_Mocheta_Izq", 1.70, 4.60 - INT/2, 0.00, 0.20, INT, H, mat_int, col_int)
-    add_box("Muro_H_Y460_Cuarto_Mocheta_Der", 2.80, 4.60 - INT/2, 0.00, 0.20, INT, H, mat_int, col_int)
-    add_box("Muro_H_Y460_Cocina_Mocheta_Izq", 3.00, 4.60 - INT/2, 0.00, 0.20, INT, H, mat_int, col_int)
-    add_box("Muro_H_Y460_Cocina_Mocheta_Der", 4.35, 4.60 - INT/2, 0.00, 0.25, INT, H, mat_int, col_int)
+    add_box("Muro_H_Y420_Placard2_Cuarto", 0.00, 4.20 - INT/2, 0.00, 1.70, INT, H, mat_int, col_int)
+    add_box("Muro_H_Y420_Cuarto_Mocheta_Izq", 1.70, 4.20 - INT/2, 0.00, 0.16, INT, H, mat_int, col_int)
+    add_box("Muro_H_Y420_Cuarto_Mocheta_Der", 2.82, 4.20 - INT/2, 0.00, 0.18, INT, H, mat_int, col_int)
+    add_box("Muro_H_Y420_Cocina_Mocheta_Izq", 3.00, 4.20 - INT/2, 0.00, 0.18, INT, H, mat_int, col_int)
+    add_box("Muro_H_Y420_Cocina_Mocheta_Der", 4.38, 4.20 - INT/2, 0.00, 0.22, INT, H, mat_int, col_int)
 
     print("Departamento 7.00m x 6.20m generado con éxito en Blender.")
 

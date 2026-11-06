@@ -83,35 +83,35 @@ def generate_obj_mtl():
     add_box("Muro_Ext_Inferior_Der_Y620", 6.20, 6.20 - EXT/2, 0.00, 0.80, EXT, H, "Muro_Exterior")
 
     # 3. Ejes verticales internos
-    # X = 1.70 (Y = 2.30 a 4.60, con vano Baño entre 3.10 y 3.70)
-    add_box("Muro_V_X170_Sup", 1.70 - INT/2, 2.30, 0.00, INT, 0.80, H, "Muro_Interior")
-    add_box("Muro_V_X170_Inf", 1.70 - INT/2, 3.70, 0.00, INT, 0.90, H, "Muro_Interior")
+    # X = 1.70 (Y = 2.00 a 4.20, con vano Baño entre 2.80 y 3.40)
+    add_box("Muro_V_X170_Sup", 1.70 - INT/2, 2.00, 0.00, INT, 0.80, H, "Muro_Interior")
+    add_box("Muro_V_X170_Inf", 1.70 - INT/2, 3.40, 0.00, INT, 0.80, H, "Muro_Interior")
 
-    # X = 3.00 (Y = 0.00 a 3.90, paso abierto 3.90 a 4.60, y muro Y = 4.60 a 6.20)
-    add_box("Muro_V_X300_Living_Estudio_Pasillo", 3.00 - INT/2, 0.00, 0.00, INT, 3.90, H, "Muro_Interior")
-    add_box("Muro_V_X300_Cuarto_Cocina", 3.00 - INT/2, 4.60, 0.00, INT, 1.60, H, "Muro_Interior")
+    # X = 3.00 (Y = 0.00 a 3.50, paso abierto 3.50 a 4.20, y muro Y = 4.20 a 6.20)
+    add_box("Muro_V_X300_Living_Estudio_Pasillo", 3.00 - INT/2, 0.00, 0.00, INT, 3.50, H, "Muro_Interior")
+    add_box("Muro_V_X300_Cuarto_Cocina", 3.00 - INT/2, 4.20, 0.00, INT, 2.00, H, "Muro_Interior")
 
-    # X = 4.60 (Y = 4.60 a 6.20: pared derecha de la Cocina)
-    add_box("Muro_V_X460_Cocina_Living", 4.60 - INT/2, 4.60, 0.00, INT, 1.60, H, "Muro_Interior")
+    # X = 4.60 (Y = 4.20 a 6.20: pared derecha de la Cocina)
+    add_box("Muro_V_X460_Cocina_Living", 4.60 - INT/2, 4.20, 0.00, INT, 2.00, H, "Muro_Interior")
 
-    # 4. Líneas horizontales internas
-    # Y = 2.30 (X = 0.00 a 1.70 cerrado + mochetas de entrada a Estudio en 1.70..1.90 y 2.80..3.00)
-    add_box("Muro_H_Y230_Estudio_Placard1", 0.00, 2.30 - INT/2, 0.00, 1.70, INT, H, "Muro_Interior")
-    add_box("Muro_H_Y230_Mocheta_Izq", 1.70, 2.30 - INT/2, 0.00, 0.20, INT, H, "Muro_Interior")
-    add_box("Muro_H_Y230_Mocheta_Der", 2.80, 2.30 - INT/2, 0.00, 0.20, INT, H, "Muro_Interior")
+    # 4. Líneas horizontales internas (Simetría Estudio = Cuarto = 3.00 x 2.00)
+    # Y = 2.00 (X = 0.00 a 1.70 cerrado + mochetas de entrada a Estudio en 1.70..1.86 y 2.82..3.00)
+    add_box("Muro_H_Y200_Estudio_Placard1", 0.00, 2.00 - INT/2, 0.00, 1.70, INT, H, "Muro_Interior")
+    add_box("Muro_H_Y200_Mocheta_Izq", 1.70, 2.00 - INT/2, 0.00, 0.16, INT, H, "Muro_Interior")
+    add_box("Muro_H_Y200_Mocheta_Der", 2.82, 2.00 - INT/2, 0.00, 0.18, INT, H, "Muro_Interior")
 
-    # Y = 2.80 (X = 0.00 a 1.70: Placard 1 / Baño)
-    add_box("Muro_H_Y280_Placard1_Bano", 0.00, 2.80 - INT/2, 0.00, 1.70, INT, H, "Muro_Interior")
+    # Y = 2.50 (X = 0.00 a 1.70: Placard 1 / Baño)
+    add_box("Muro_H_Y250_Placard1_Bano", 0.00, 2.50 - INT/2, 0.00, 1.70, INT, H, "Muro_Interior")
 
-    # Y = 4.00 (X = 0.00 a 1.70: Baño / Placard 2)
-    add_box("Muro_H_Y400_Bano_Placard2", 0.00, 4.00 - INT/2, 0.00, 1.70, INT, H, "Muro_Interior")
+    # Y = 3.70 (X = 0.00 a 1.70: Baño / Placard 2)
+    add_box("Muro_H_Y370_Bano_Placard2", 0.00, 3.70 - INT/2, 0.00, 1.70, INT, H, "Muro_Interior")
 
-    # Y = 4.60 (Línea unificada: Placard 2 [0..1.70], vano Cuarto [1.70..3.00], frente Cocina [3.00..4.60])
-    add_box("Muro_H_Y460_Placard2_Cuarto", 0.00, 4.60 - INT/2, 0.00, 1.70, INT, H, "Muro_Interior")
-    add_box("Muro_H_Y460_Cuarto_Mocheta_Izq", 1.70, 4.60 - INT/2, 0.00, 0.20, INT, H, "Muro_Interior")
-    add_box("Muro_H_Y460_Cuarto_Mocheta_Der", 2.80, 4.60 - INT/2, 0.00, 0.20, INT, H, "Muro_Interior")
-    add_box("Muro_H_Y460_Cocina_Mocheta_Izq", 3.00, 4.60 - INT/2, 0.00, 0.20, INT, H, "Muro_Interior")
-    add_box("Muro_H_Y460_Cocina_Mocheta_Der", 4.35, 4.60 - INT/2, 0.00, 0.25, INT, H, "Muro_Interior")
+    # Y = 4.20 (Línea unificada: Placard 2 [0..1.70], vano Cuarto [1.70..3.00], frente Cocina [3.00..4.60])
+    add_box("Muro_H_Y420_Placard2_Cuarto", 0.00, 4.20 - INT/2, 0.00, 1.70, INT, H, "Muro_Interior")
+    add_box("Muro_H_Y420_Cuarto_Mocheta_Izq", 1.70, 4.20 - INT/2, 0.00, 0.16, INT, H, "Muro_Interior")
+    add_box("Muro_H_Y420_Cuarto_Mocheta_Der", 2.82, 4.20 - INT/2, 0.00, 0.18, INT, H, "Muro_Interior")
+    add_box("Muro_H_Y420_Cocina_Mocheta_Izq", 3.00, 4.20 - INT/2, 0.00, 0.18, INT, H, "Muro_Interior")
+    add_box("Muro_H_Y420_Cocina_Mocheta_Der", 4.38, 4.20 - INT/2, 0.00, 0.22, INT, H, "Muro_Interior")
 
     with open("Departamento_01-01.obj", "w", encoding="utf-8") as f:
         f.write("\n".join(obj_lines))

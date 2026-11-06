@@ -62,54 +62,54 @@ def generate_2d_plan(output_path="plano_arquitectonico_2d.png"):
     # ---------------------------------------------------------
     # 2. EJES VERTICALES PRINCIPALES
     # ---------------------------------------------------------
-    # X = 1.70: Cerramiento de Baño y Placards (Y = 2.30 a Y = 4.60)
-    # Puerta de acceso al Baño en el centro (entre Y = 3.10 y Y = 3.70)
-    draw_wall(1.70, 2.30, 1.70, 3.10, INT_W)
-    draw_wall(1.70, 3.70, 1.70, 4.60, INT_W)
+    # X = 1.70: Cerramiento de Baño y Placards (desde Y = 2.00 hasta Y = 4.20)
+    # Puerta de acceso al Baño en el centro (entre Y = 2.80 y Y = 3.40)
+    draw_wall(1.70, 2.00, 1.70, 2.80, INT_W)
+    draw_wall(1.70, 3.40, 1.70, 4.20, INT_W)
 
     # X = 3.00: Eje central divisorio
-    # Separa Estudio y Pasillo del Living (desde Y = 0.00 hasta Y = 3.90)
-    draw_wall(3.00, 0.00, 3.00, 3.90, INT_W)
-    draw_wall(2.91, 3.90, 3.09, 3.90, 5)
-    # Paso totalmente abierto de 0.70 m en X = 3.00 (entre Y = 3.90 y Y = 4.60)
-    draw_dashed(3.00, 3.90, 3.00, 4.60)
-    # Separa el Cuarto de la Cocina (desde Y = 4.60 hasta Y = 6.20)
-    draw_wall(3.00, 4.60, 3.00, 6.20, INT_W)
+    # Separa Estudio y Pasillo del Living (desde Y = 0.00 hasta Y = 3.50)
+    draw_wall(3.00, 0.00, 3.00, 3.50, INT_W)
+    draw_wall(2.91, 3.50, 3.09, 3.50, 5)
+    # Paso totalmente abierto de 0.70 m en X = 3.00 (entre Y = 3.50 y Y = 4.20)
+    draw_dashed(3.00, 3.50, 3.00, 4.20)
+    # Separa el Cuarto de la Cocina (desde Y = 4.20 hasta Y = 6.20)
+    draw_wall(3.00, 4.20, 3.00, 6.20, INT_W)
 
-    # X = 4.60: Pared derecha de la Cocina (desde Y = 4.60 hasta Y = 6.20)
-    draw_wall(4.60, 4.60, 4.60, 6.20, INT_W)
+    # X = 4.60: Pared derecha de la Cocina (desde Y = 4.20 hasta Y = 6.20)
+    draw_wall(4.60, 4.20, 4.60, 6.20, INT_W)
 
     # ---------------------------------------------------------
-    # 3. LÍNEAS HORIZONTALES Y ALINEACIONES CRÍTICAS
+    # 3. LÍNEAS HORIZONTALES Y ALINEACIONES CRÍTICAS (SIMETRÍA ESTUDIO = CUARTO)
     # ---------------------------------------------------------
-    # Y = 2.30: Línea de cierre del Estudio
+    # Y = 2.00: Línea de cierre del Estudio (2.00 m de alto)
     # De X = 0.00 a X = 1.70: Muro cerrado que divide el Estudio del Placard 1
-    draw_wall(0.00, 2.30, 1.70, 2.30, INT_W)
+    draw_wall(0.00, 2.00, 1.70, 2.00, INT_W)
     # De X = 1.70 a X = 3.00: Vano/puerta de entrada al Estudio (remate superior del Pasillo)
-    draw_wall(1.70, 2.30, 1.86, 2.30, INT_W)
-    draw_dashed(1.86, 2.30, 2.82, 2.30)
-    draw_wall(2.82, 2.30, 3.00, 2.30, INT_W)
+    draw_wall(1.70, 2.00, 1.86, 2.00, INT_W)
+    draw_dashed(1.86, 2.00, 2.82, 2.00)
+    draw_wall(2.82, 2.00, 3.00, 2.00, INT_W)
 
-    # Y = 2.80: Muro horizontal que divide el Placard 1 del Baño (de X = 0.00 a X = 1.70)
-    draw_wall(0.00, 2.80, 1.70, 2.80, INT_W)
+    # Y = 2.50: Muro horizontal que divide el Placard 1 (0.50 m de alto) del Baño (de X = 0.00 a X = 1.70)
+    draw_wall(0.00, 2.50, 1.70, 2.50, INT_W)
 
-    # Y = 4.00: Muro horizontal que divide el Baño del Placard 2 (de X = 0.00 a X = 1.70)
-    draw_wall(0.00, 4.00, 1.70, 4.00, INT_W)
+    # Y = 3.70: Muro horizontal que divide el Baño (1.20 m de alto) del Placard 2 (de X = 0.00 a X = 1.70)
+    draw_wall(0.00, 3.70, 1.70, 3.70, INT_W)
 
-    # Y = 4.60: Línea horizontal unificada de Cuarto y Cocina (Regla crítica)
-    # 1) Muro inferior del Placard 2 (de X = 0.00 a X = 1.70)
-    draw_wall(0.00, 4.60, 1.70, 4.60, INT_W)
-    # 2) Vano/puerta de entrada al Cuarto (de X = 1.70 a X = 3.00)
-    draw_wall(1.70, 4.60, 1.86, 4.60, INT_W)
-    draw_dashed(1.86, 4.60, 2.82, 4.60)
-    draw_wall(2.82, 4.60, 3.00, 4.60, INT_W)
+    # Y = 4.20: Línea horizontal unificada de Cuarto y Cocina (2.00 m desde la base)
+    # 1) Muro inferior del Placard 2 (0.50 m de alto, de X = 0.00 a X = 1.70)
+    draw_wall(0.00, 4.20, 1.70, 4.20, INT_W)
+    # 2) Vano/puerta de entrada al Cuarto (de X = 1.70 a X = 3.00, cerrando el pasillo por abajo)
+    draw_wall(1.70, 4.20, 1.86, 4.20, INT_W)
+    draw_dashed(1.86, 4.20, 2.82, 4.20)
+    draw_wall(2.82, 4.20, 3.00, 4.20, INT_W)
     # 3) Frente superior de la Cocina con su abertura de acceso (de X = 3.00 a X = 4.60)
-    draw_wall(3.00, 4.60, 3.18, 4.60, INT_W)
-    draw_dashed(3.18, 4.60, 4.38, 4.60)
-    draw_wall(4.38, 4.60, 4.60, 4.60, INT_W)
+    draw_wall(3.00, 4.20, 3.18, 4.20, INT_W)
+    draw_dashed(3.18, 4.20, 4.38, 4.20)
+    draw_wall(4.38, 4.20, 4.60, 4.20, INT_W)
 
     # ---------------------------------------------------------
-    # 4. ETIQUETAS Y COTAS
+    # 4. ETIQUETAS Y COTAS (Centradas en cada caja simétrica)
     # ---------------------------------------------------------
     try:
         font_lg = ImageFont.truetype("consolab.ttf", 26)
@@ -135,22 +135,30 @@ def generate_2d_plan(output_path="plano_arquitectonico_2d.png"):
         th = bbox[3] - bbox[1]
         draw.text((px - tw / 2, py - th / 2), text, fill=color, font=font)
 
-    draw_centered_text(1.50, 1.15, "ESTUDIO", font_md)
-    draw_centered_text(0.85, 2.55, "PLACARD", font_sm)
-    draw_centered_text(0.85, 3.40, "BAÑO", font_md)
-    draw_centered_text(0.85, 4.30, "PLACARD", font_sm)
-    draw_centered_text(1.50, 5.40, "CUARTO", font_md)
-    draw_centered_text(3.80, 5.45, "COCINA", font_md)
-    draw_centered_text(5.00, 2.35, "LIVING", font_lg)
+    # Estudio: [0.00, 0.00] a [3.00, 2.00] -> centro (1.50, 1.00)
+    draw_centered_text(1.50, 1.00, "ESTUDIO", font_md)
+    # Placard 1: [0.00, 2.00] a [1.70, 2.50] -> centro (0.85, 2.25)
+    draw_centered_text(0.85, 2.25, "PLACARD", font_sm)
+    # Baño: [0.00, 2.50] a [1.70, 3.70] -> centro (0.85, 3.10)
+    draw_centered_text(0.85, 3.10, "BAÑO", font_md)
+    # Placard 2: [0.00, 3.70] a [1.70, 4.20] -> centro (0.85, 3.95)
+    draw_centered_text(0.85, 3.95, "PLACARD", font_sm)
+    # Cuarto: [0.00, 4.20] a [3.00, 6.20] -> centro (1.50, 5.20)
+    draw_centered_text(1.50, 5.20, "CUARTO", font_md)
+    # Cocina: [3.00, 4.20] a [4.60, 6.20] -> centro (3.80, 5.20)
+    draw_centered_text(3.80, 5.20, "COCINA", font_md)
+    # Living: [3.00, 0.00] a [7.00, 4.20] + [4.60, 4.20] a [7.00, 6.20]
+    draw_centered_text(5.00, 2.15, "LIVING", font_lg)
+    # Entrada: X = 5.40 a 6.20 en Y = 6.20
     draw_centered_text(5.80, 6.52, "ENTRADA", font_sm)
 
-    # PASILLO vertical
+    # PASILLO vertical: [1.70, 2.00] a [3.00, 4.20] -> centro (2.35, 3.10)
     pasillo_img = Image.new("RGBA", (180, 44), (255, 255, 255, 0))
     p_draw = ImageDraw.Draw(pasillo_img)
     bbox = p_draw.textbbox((0, 0), "PASILLO", font=font_sm)
     p_draw.text((90 - (bbox[2]-bbox[0])/2, 22 - (bbox[3]-bbox[1])/2), "PASILLO", fill="#222222", font=font_sm)
     pasillo_rot = pasillo_img.rotate(90, expand=True)
-    px_pas, py_pas = to_px(2.35, 3.45)
+    px_pas, py_pas = to_px(2.35, 3.10)
     img.paste(pasillo_rot, (int(px_pas - pasillo_rot.width / 2), int(py_pas - pasillo_rot.height / 2)), pasillo_rot)
 
     # Cotas exteriores
@@ -165,7 +173,7 @@ def generate_2d_plan(output_path="plano_arquitectonico_2d.png"):
     img.paste(dim_v_rot, (int(px_dv - dim_v_rot.width / 2), int(py_dv - dim_v_rot.height / 2)), dim_v_rot)
 
     img.save(output_path)
-    print(f"Plano 2D guardado en {output_path}")
+    print(f"Plano 2D simétrico guardado en {output_path}")
 
 if __name__ == "__main__":
     generate_2d_plan()
