@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Plano 2D & 3D Exacto (7.00m x 6.20m) - Editor de Muebles</title>
-    <!-- Three.js, OrbitControls y OBJExporter -->
+    <title>Plano Arquitectónico 2D y 3D (7.00m × 6.20m)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #0b111e;
-            color: #f1f5f9;
+            background-color: #f8fafc;
+            color: #0f172a;
             overflow: hidden;
             width: 100vw;
             height: 100vh;
@@ -25,12 +24,13 @@
         #webgl-container { width: 100%; height: 100%; display: block; }
 
         .glass-panel {
-            background: rgba(15, 23, 42, 0.90);
+            background: rgba(15, 23, 42, 0.92);
+            color: #f1f5f9;
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 14px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
         }
 
         /* Header Card */
@@ -42,8 +42,8 @@
             z-index: 10;
             display: flex;
             flex-direction: column;
-            gap: 5px;
-            max-width: 390px;
+            gap: 4px;
+            max-width: 380px;
         }
         .header-top {
             display: flex;
@@ -67,8 +67,8 @@
             gap: 6px;
         }
         .icon-btn {
-            background: rgba(56, 189, 248, 0.15);
-            border: 1px solid rgba(56, 189, 248, 0.35);
+            background: rgba(56, 189, 248, 0.16);
+            border: 1px solid rgba(56, 189, 248, 0.4);
             color: #38bdf8;
             padding: 5px 9px;
             border-radius: 8px;
@@ -79,26 +79,17 @@
             align-items: center;
             gap: 4px;
             transition: all 0.2s;
+            text-decoration: none;
         }
         .icon-btn:hover { background: rgba(56, 189, 248, 0.3); }
-        h1 { font-size: 16px; font-weight: 700; color: #ffffff; }
+        h1 { font-size: 15.5px; font-weight: 700; color: #ffffff; }
         .subtitle { font-size: 11px; color: #94a3b8; line-height: 1.35; }
-        .metrics-row {
-            display: flex;
-            gap: 14px;
-            margin-top: 4px;
-            padding-top: 6px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .metric { display: flex; flex-direction: column; }
-        .metric-val { font-size: 13px; font-weight: 700; color: #38bdf8; }
-        .metric-lbl { font-size: 9px; color: #64748b; text-transform: uppercase; }
 
         /* Top Mode Switcher */
         #top-toolbar {
             position: absolute;
             top: 14px;
-            left: 416px;
+            left: 406px;
             padding: 7px 12px;
             z-index: 10;
             display: flex;
@@ -106,12 +97,12 @@
             gap: 6px;
         }
         .mode-btn {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
             color: #cbd5e1;
-            padding: 6px 11px;
+            padding: 6px 12px;
             border-radius: 8px;
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -119,7 +110,7 @@
             align-items: center;
             gap: 5px;
         }
-        .mode-btn:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
+        .mode-btn:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
         .mode-btn.active {
             background: linear-gradient(135deg, #0284c7, #0369a1);
             border-color: #38bdf8;
@@ -127,7 +118,7 @@
             box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
         }
 
-        /* Right Sidebar (Layers & Visibility) */
+        /* Right Sidebar */
         #sidebar-right {
             position: absolute;
             top: 14px;
@@ -138,8 +129,6 @@
             flex-direction: column;
             gap: 9px;
             width: 235px;
-            max-height: calc(100vh - 110px);
-            overflow-y: auto;
         }
         .panel-title {
             font-size: 10px;
@@ -149,13 +138,13 @@
             letter-spacing: 0.6px;
         }
         .ui-btn {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
             color: #e2e8f0;
             padding: 7px 10px;
             border-radius: 8px;
             font-size: 11.5px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -164,7 +153,7 @@
             transition: all 0.2s;
             width: 100%;
         }
-        .ui-btn:hover { background: rgba(255, 255, 255, 0.14); }
+        .ui-btn:hover { background: rgba(255, 255, 255, 0.16); }
 
         .toggle-row {
             display: flex;
@@ -180,7 +169,7 @@
         .toggle-switch {
             width: 34px;
             height: 19px;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.18);
             border-radius: 20px;
             position: relative;
             transition: 0.25s;
@@ -203,23 +192,22 @@
         /* Furniture Editor Panel */
         #furniture-editor {
             position: absolute;
-            bottom: 68px;
+            bottom: 66px;
             left: 14px;
-            width: 350px;
-            padding: 13px;
+            width: 345px;
+            padding: 12px;
             z-index: 15;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            transition: transform 0.25s ease, opacity 0.25s ease;
         }
-        #furniture-editor.minimized #editor-controls { display: none; }
+        #furniture-editor.minimized #editor-body { display: none; }
         .editor-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 7px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         .editor-title {
             font-size: 12.5px;
@@ -239,6 +227,7 @@
             font-size: 12px;
             font-weight: 600;
             outline: none;
+            margin-bottom: 6px;
         }
         .control-grid {
             display: grid;
@@ -246,8 +235,8 @@
             gap: 7px;
         }
         .control-box {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 8px;
             padding: 6px 8px;
             display: flex;
@@ -269,8 +258,8 @@
             gap: 4px;
         }
         .step-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             color: #fff;
             width: 24px;
             height: 24px;
@@ -287,7 +276,7 @@
         .step-input {
             width: 100%;
             background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             color: #fff;
             text-align: center;
             font-size: 11.5px;
@@ -316,10 +305,10 @@
             border: 1px solid transparent;
             text-align: center;
         }
-        .btn-delete { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #f87171; }
+        .btn-delete { background: rgba(239, 68, 68, 0.18); border-color: rgba(239, 68, 68, 0.45); color: #f87171; }
         .btn-export { background: rgba(56, 189, 248, 0.18); border-color: rgba(56, 189, 248, 0.45); color: #38bdf8; }
 
-        /* Bottom Camera Bar */
+        /* Bottom Bar */
         #bottom-bar {
             position: absolute;
             bottom: 14px;
@@ -335,8 +324,8 @@
         }
         #bottom-bar::-webkit-scrollbar { display: none; }
         .view-chip {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             color: #cbd5e1;
             padding: 6px 12px;
             border-radius: 18px;
@@ -352,12 +341,50 @@
             color: #fff;
         }
 
-        /* 2D Plan Overlay Modal */
+        /* Architectural Labels on Plan */
+        #labels-container {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 5;
+        }
+        .arch-label {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            font-family: 'JetBrains Mono', monospace;
+            color: #111827;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            white-space: nowrap;
+            text-shadow: 0 0 4px #ffffff, 0 0 6px #ffffff;
+        }
+        .arch-label.sm {
+            font-size: 10.5px;
+        }
+        .arch-label.vertical {
+            transform: translate(-50%, -50%) rotate(-90deg);
+            font-size: 11px;
+        }
+        .arch-label.dim {
+            font-size: 12px;
+            color: #334155;
+            font-weight: 600;
+        }
+        .arch-label.dim-v {
+            transform: translate(-50%, -50%) rotate(-90deg);
+            font-size: 12px;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        /* Modals */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.78);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
             z-index: 100;
             display: none;
             align-items: center;
@@ -380,8 +407,8 @@
             gap: 8px;
         }
         .add-preset-btn {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.16);
             color: #f1f5f9;
             padding: 10px;
             border-radius: 8px;
@@ -391,64 +418,24 @@
             text-align: left;
             transition: 0.2s;
         }
-        .add-preset-btn:hover { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; }
+        .add-preset-btn:hover { background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; }
 
-        /* Labels 3D/2D */
-        #labels-container {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 5;
-        }
-        .room-label {
-            position: absolute;
-            transform: translate(-50%, -50%);
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            color: #f8fafc;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-        }
-        .room-label.small {
-            font-size: 9.5px;
-            padding: 2px 6px;
-            color: #cbd5e1;
-        }
-        .dim-label {
-            position: absolute;
-            transform: translate(-50%, -50%);
-            background: rgba(2, 132, 199, 0.9);
-            color: #ffffff;
-            padding: 2px 7px;
-            border-radius: 5px;
-            font-size: 10.5px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        /* Responsive Mobile / Tablet */
         @media (max-width: 900px) {
             #header-card {
                 top: 8px; left: 8px; right: 8px;
                 max-width: none;
                 padding: 10px 12px;
             }
-            .subtitle, .metrics-row { display: none; }
+            .subtitle { display: none; }
             #top-toolbar {
-                top: 76px;
+                top: 68px;
                 left: 8px;
                 right: 8px;
                 justify-content: space-around;
                 padding: 5px 8px;
             }
             #sidebar-right {
-                top: 122px;
+                top: 114px;
                 right: 8px;
                 display: none;
                 width: 225px;
@@ -456,12 +443,10 @@
             }
             #sidebar-right.show-mobile { display: flex; }
             #furniture-editor {
-                bottom: 58px;
+                bottom: 56px;
                 left: 8px;
                 right: 8px;
                 width: auto;
-                max-height: 46vh;
-                overflow-y: auto;
             }
             #bottom-bar {
                 bottom: 8px;
@@ -478,32 +463,26 @@
     <!-- Header Card -->
     <div id="header-card" class="glass-panel">
         <div class="header-top">
-            <div class="badge">Perímetro: 7.00 m × 6.20 m</div>
+            <div class="badge">Rectángulo 7.00 m × 6.20 m</div>
             <div class="header-actions">
-                <button class="icon-btn" id="btn-open-2d-modal">🖼️ Plano 2D</button>
+                <a href="plano_arquitectonico_2d.png" download="Plano_2D_7x62.png" class="icon-btn">⬇️ PNG 2D</a>
                 <button class="icon-btn" id="btn-toggle-layers">⚙️ Capas</button>
             </div>
         </div>
-        <h1>Plano Arquitectónico 2D/3D y Editor</h1>
-        <div class="subtitle">Rectángulo exacto 7.00m × 6.20m. Base continua (Y=6.20), pasillo central (X=1.70 a 3.00) con paso abierto al Living (Y=3.90 a 4.60).</div>
-        <div class="metrics-row">
-            <div class="metric"><span class="metric-val">7.00 m</span><span class="metric-lbl">Ancho (X)</span></div>
-            <div class="metric"><span class="metric-val">6.20 m</span><span class="metric-lbl">Alto (Y)</span></div>
-            <div class="metric"><span class="metric-val">1.30 m</span><span class="metric-lbl">Pasillo</span></div>
-            <div class="metric"><span class="metric-val">0.70 m</span><span class="metric-lbl">Paso Living</span></div>
-        </div>
+        <h1>Plano Arquitectónico Exacto (2D y 3D)</h1>
+        <div class="subtitle">Sin tabiques ni desniveles extra. Ejes X=[0, 1.70, 3.00, 4.60, 7.00] | Y=[0, 2.30, 2.80, 4.00, 4.60, 6.20].</div>
     </div>
 
     <!-- Top Mode Switcher -->
     <div id="top-toolbar" class="glass-panel">
-        <button class="mode-btn active" id="btn-mode-3d"><span>🧊</span> Maqueta 3D</button>
-        <button class="mode-btn" id="btn-mode-2d"><span>📐</span> Planta 2D Exacta</button>
+        <button class="mode-btn active" id="btn-mode-2d"><span>📐</span> Plano 2D Exacto</button>
+        <button class="mode-btn" id="btn-mode-3d"><span>🧊</span> Vista 3D</button>
         <button class="mode-btn" id="btn-mode-cut"><span>✂️</span> Paredes Bajas (1.10m)</button>
     </div>
 
     <!-- Right Sidebar (Visibility & Layers) -->
     <div id="sidebar-right" class="glass-panel">
-        <div class="panel-title">Paredes y Capas</div>
+        <div class="panel-title">Paredes y Visibilidad</div>
         <label class="toggle-row">
             <span>Paredes Exteriores</span>
             <input type="checkbox" id="chk-ext-walls" checked>
@@ -525,119 +504,120 @@
             <div class="toggle-switch"></div>
         </label>
         <label class="toggle-row">
-            <span>Techo (Oculto por defecto)</span>
-            <input type="checkbox" id="chk-roof">
-            <div class="toggle-switch"></div>
-        </label>
-        <label class="toggle-row">
             <span>Mobiliario 3D</span>
             <input type="checkbox" id="chk-furniture" checked>
             <div class="toggle-switch"></div>
         </label>
         <label class="toggle-row">
-            <span>Etiquetas y Cotas</span>
+            <span>Etiquetas de Ambientes</span>
             <input type="checkbox" id="chk-labels" checked>
             <div class="toggle-switch"></div>
         </label>
 
         <div class="panel-title" style="margin-top: 6px;">Exportar</div>
-        <button class="ui-btn" id="btn-export-obj" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: #34d399;">
+        <button class="ui-btn" id="btn-export-obj" style="background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.45); color: #34d399;">
             <span>💾</span> Descargar .OBJ (Blender)
         </button>
     </div>
 
     <!-- Furniture Editor Panel -->
-    <div id="furniture-editor" class="glass-panel">
+    <div id="furniture-editor" class="glass-panel minimized">
         <div class="editor-header">
             <div class="editor-title">
-                <span>🛋️</span> Editor de Muebles
+                <span>🛋️</span> Muebles (<span id="lbl-count">0</span>)
             </div>
-            <div style="display: flex; gap: 4px;">
-                <button class="icon-btn" id="btn-min-editor" title="Minimizar/Expandir">▼</button>
-                <button class="icon-btn" id="btn-add-modal" style="background:#059669; border-color:#10b981; color:#fff;">+ Añadir</button>
+            <div style="display: flex; gap: 5px;">
+                <button class="icon-btn" id="btn-add-modal" style="background:#059669; border-color:#10b981; color:#fff;">+ Añadir Mueble</button>
+                <button class="icon-btn" id="btn-min-editor" title="Expandir/Minimizar">▲</button>
             </div>
         </div>
 
-        <select id="furniture-select" class="furniture-select"></select>
-
-        <div id="editor-controls">
-            <div class="control-grid">
-                <div class="control-box">
-                    <div class="control-lbl">Ancho (X) <span class="val" id="lbl-dim-w">1.40 m</span></div>
-                    <div class="stepper-row">
-                        <div class="step-btn" data-field="w" data-delta="-0.05">-</div>
-                        <input type="number" step="0.01" class="step-input" id="inp-w">
-                        <div class="step-btn" data-field="w" data-delta="0.05">+</div>
-                    </div>
-                    <input type="range" min="0.2" max="4.0" step="0.02" id="rng-w">
-                </div>
-
-                <div class="control-box">
-                    <div class="control-lbl">Largo (Y) <span class="val" id="lbl-dim-d">1.90 m</span></div>
-                    <div class="stepper-row">
-                        <div class="step-btn" data-field="d" data-delta="-0.05">-</div>
-                        <input type="number" step="0.01" class="step-input" id="inp-d">
-                        <div class="step-btn" data-field="d" data-delta="0.05">+</div>
-                    </div>
-                    <input type="range" min="0.2" max="4.0" step="0.02" id="rng-d">
-                </div>
+        <div id="editor-body">
+            <div id="empty-furniture-msg" style="font-size:11.5px; color:#94a3b8; padding:8px 0; text-align:center;">
+                El plano está limpio (sin muebles). Tocá <b>"+ Añadir Mueble"</b> para ir agregando y midiendo tus muebles.
             </div>
 
-            <div class="control-grid" style="margin-top: 6px;">
-                <div class="control-box">
-                    <div class="control-lbl">Altura <span class="val" id="lbl-dim-h">0.45 m</span></div>
-                    <div class="stepper-row">
-                        <div class="step-btn" data-field="h" data-delta="-0.05">-</div>
-                        <input type="number" step="0.01" class="step-input" id="inp-h">
-                        <div class="step-btn" data-field="h" data-delta="0.05">+</div>
+            <div id="editor-controls" style="display:none;">
+                <select id="furniture-select" class="furniture-select"></select>
+
+                <div class="control-grid">
+                    <div class="control-box">
+                        <div class="control-lbl">Ancho (X) <span class="val" id="lbl-dim-w">1.40 m</span></div>
+                        <div class="stepper-row">
+                            <div class="step-btn" data-field="w" data-delta="-0.05">-</div>
+                            <input type="number" step="0.01" class="step-input" id="inp-w">
+                            <div class="step-btn" data-field="w" data-delta="0.05">+</div>
+                        </div>
+                        <input type="range" min="0.2" max="4.0" step="0.02" id="rng-w">
                     </div>
-                    <input type="range" min="0.1" max="2.6" step="0.02" id="rng-h">
+
+                    <div class="control-box">
+                        <div class="control-lbl">Largo (Y) <span class="val" id="lbl-dim-d">1.90 m</span></div>
+                        <div class="stepper-row">
+                            <div class="step-btn" data-field="d" data-delta="-0.05">-</div>
+                            <input type="number" step="0.01" class="step-input" id="inp-d">
+                            <div class="step-btn" data-field="d" data-delta="0.05">+</div>
+                        </div>
+                        <input type="range" min="0.2" max="4.0" step="0.02" id="rng-d">
+                    </div>
                 </div>
 
-                <div class="control-box">
-                    <div class="control-lbl">Rotación <span class="val" id="lbl-rot">0°</span></div>
-                    <div class="stepper-row">
-                        <div class="step-btn" id="btn-rot-left">⟲</div>
-                        <input type="number" class="step-input" id="inp-rot">
-                        <div class="step-btn" id="btn-rot-right">⟳</div>
+                <div class="control-grid" style="margin-top: 6px;">
+                    <div class="control-box">
+                        <div class="control-lbl">Altura <span class="val" id="lbl-dim-h">0.45 m</span></div>
+                        <div class="stepper-row">
+                            <div class="step-btn" data-field="h" data-delta="-0.05">-</div>
+                            <input type="number" step="0.01" class="step-input" id="inp-h">
+                            <div class="step-btn" data-field="h" data-delta="0.05">+</div>
+                        </div>
+                        <input type="range" min="0.1" max="2.6" step="0.02" id="rng-h">
                     </div>
-                    <input type="range" min="0" max="360" step="5" id="rng-rot">
-                </div>
-            </div>
 
-            <div class="control-grid" style="margin-top: 6px;">
-                <div class="control-box">
-                    <div class="control-lbl">Pos X (0-7m) <span class="val" id="lbl-pos-x">1.20 m</span></div>
-                    <div class="stepper-row">
-                        <div class="step-btn" data-field="x" data-delta="-0.05">◀</div>
-                        <input type="number" step="0.01" class="step-input" id="inp-x">
-                        <div class="step-btn" data-field="x" data-delta="0.05">▶</div>
+                    <div class="control-box">
+                        <div class="control-lbl">Rotación <span class="val" id="lbl-rot">0°</span></div>
+                        <div class="stepper-row">
+                            <div class="step-btn" id="btn-rot-left">⟲</div>
+                            <input type="number" class="step-input" id="inp-rot">
+                            <div class="step-btn" id="btn-rot-right">⟳</div>
+                        </div>
+                        <input type="range" min="0" max="360" step="5" id="rng-rot">
                     </div>
-                    <input type="range" min="0.1" max="6.9" step="0.05" id="rng-x">
                 </div>
 
-                <div class="control-box">
-                    <div class="control-lbl">Pos Y (0-6.2m) <span class="val" id="lbl-pos-z">5.30 m</span></div>
-                    <div class="stepper-row">
-                        <div class="step-btn" data-field="z" data-delta="-0.05">▲</div>
-                        <input type="number" step="0.01" class="step-input" id="inp-z">
-                        <div class="step-btn" data-field="z" data-delta="0.05">▼</div>
+                <div class="control-grid" style="margin-top: 6px;">
+                    <div class="control-box">
+                        <div class="control-lbl">Pos X (0-7m) <span class="val" id="lbl-pos-x">1.20 m</span></div>
+                        <div class="stepper-row">
+                            <div class="step-btn" data-field="x" data-delta="-0.05">◀</div>
+                            <input type="number" step="0.01" class="step-input" id="inp-x">
+                            <div class="step-btn" data-field="x" data-delta="0.05">▶</div>
+                        </div>
+                        <input type="range" min="0.1" max="6.9" step="0.05" id="rng-x">
                     </div>
-                    <input type="range" min="0.1" max="6.1" step="0.05" id="rng-z">
-                </div>
-            </div>
 
-            <div class="editor-actions">
-                <button class="action-btn btn-delete" id="btn-del-furniture">🗑️ Eliminar</button>
-                <button class="action-btn btn-export" id="btn-copy-json">📋 Copiar Medidas</button>
+                    <div class="control-box">
+                        <div class="control-lbl">Pos Y (0-6.2m) <span class="val" id="lbl-pos-z">5.30 m</span></div>
+                        <div class="stepper-row">
+                            <div class="step-btn" data-field="z" data-delta="-0.05">▲</div>
+                            <input type="number" step="0.01" class="step-input" id="inp-z">
+                            <div class="step-btn" data-field="z" data-delta="0.05">▼</div>
+                        </div>
+                        <input type="range" min="0.1" max="6.1" step="0.05" id="rng-z">
+                    </div>
+                </div>
+
+                <div class="editor-actions">
+                    <button class="action-btn btn-delete" id="btn-del-furniture">🗑️ Eliminar</button>
+                    <button class="action-btn btn-export" id="btn-copy-json">📋 Copiar Medidas</button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Bottom Quick Camera Views -->
     <div id="bottom-bar" class="glass-panel">
-        <div class="view-chip active" data-view="isom">🏠 Vista 3D General</div>
-        <div class="view-chip" data-view="top2d">📐 Planta 2D Superior</div>
+        <div class="view-chip active" data-view="top2d">📐 Plano 2D Exacto (Ortogonal)</div>
+        <div class="view-chip" data-view="isom">🧊 Maqueta 3D General</div>
         <div class="view-chip" data-view="living">🛋️ Living y Entrada</div>
         <div class="view-chip" data-view="cocina">🍳 Cocina</div>
         <div class="view-chip" data-view="cuarto">🛏️ Cuarto</div>
@@ -645,28 +625,11 @@
         <div class="view-chip" data-view="estudio">🖥️ Estudio</div>
     </div>
 
-    <!-- Modal Plano 2D Exacto -->
-    <div class="modal-overlay" id="modal-2d-image">
-        <div class="modal-box glass-panel">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="font-size:15px; color:#38bdf8;">📐 Plano Arquitectónico 2D Exacto (7.00 m × 6.20 m)</h3>
-                <button class="icon-btn" id="btn-close-2d-modal">✕ Cerrar</button>
-            </div>
-            <div style="background:#fff; border-radius:10px; padding:8px; text-align:center;">
-                <img src="plano_arquitectonico_2d.png" alt="Plano 2D Exacto" style="max-width:100%; max-height:68vh; object-fit:contain;">
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:#94a3b8;">
-                <span>Coordenadas exactas verificadas: X=[0.00, 1.70, 3.00, 4.60, 7.00] | Y=[0.00, 2.30, 2.80, 4.00, 4.60, 6.20]</span>
-                <a href="plano_arquitectonico_2d.png" download="Plano_2D_Departamento.png" class="icon-btn" style="text-decoration:none;">⬇️ Descargar PNG</a>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal Añadir Mueble -->
     <div class="modal-overlay" id="add-modal">
         <div class="modal-box glass-panel" style="max-width:420px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="font-size:14px; color:#38bdf8;">➕ Añadir Nuevo Mueble</h3>
+                <h3 style="font-size:14px; color:#38bdf8;">➕ Añadir Mueble al Plano</h3>
                 <button class="icon-btn" id="btn-close-add">✕</button>
             </div>
             <div class="preset-grid">
@@ -675,9 +638,9 @@
                 <button class="add-preset-btn" data-type="sillon">🛋️ Sillón 3 Cuerpos (2.00×0.85m)</button>
                 <button class="add-preset-btn" data-type="mesa">🍽️ Mesa Comedor (1.40×0.80m)</button>
                 <button class="add-preset-btn" data-type="escritorio">🖥️ Escritorio (1.40×0.65m)</button>
-                <button class="add-preset-btn" data-type="placard">🚪 Placard (1.65×0.50m)</button>
+                <button class="add-preset-btn" data-type="placard">🚪 Placard (1.60×0.50m)</button>
                 <button class="add-preset-btn" data-type="heladera">❄️ Heladera (0.60×0.60m)</button>
-                <button class="add-preset-btn" data-type="cubo">📦 Bloque a Medida (1.00×1.00m)</button>
+                <button class="add-preset-btn" data-type="cubo">📦 Mueble a Medida (1.00×1.00m)</button>
             </div>
         </div>
     </div>
@@ -689,25 +652,45 @@
                 <h3 style="font-size:14px; color:#38bdf8;">📋 Medidas de Muebles (JSON)</h3>
                 <button class="icon-btn" id="btn-close-json">✕</button>
             </div>
-            <p style="font-size:11.5px; color:#cbd5e1;">Copiá este listado con tus medidas actualizadas o restablecé los valores por defecto:</p>
             <textarea id="json-text" rows="9" style="width:100%; background:#060911; color:#38bdf8; border:1px solid rgba(56,189,248,0.3); border-radius:8px; padding:8px; font-family:monospace; font-size:11px;"></textarea>
             <div style="display:flex; gap:8px;">
                 <button class="action-btn btn-export" id="btn-copy-clipboard">📋 Copiar al Portapapeles</button>
-                <button class="action-btn btn-delete" id="btn-reset-default">🔄 Restablecer Iniciales</button>
+                <button class="action-btn btn-delete" id="btn-clear-all">🗑️ Vaciar Todos</button>
             </div>
         </div>
     </div>
 
     <script>
         // ============================================================================
-        // 1. INICIALIZACIÓN ESCENA THREE.JS
+        // 1. CÁMARA ORTOGRÁFICA (2D EXACTO SIN DEFORMACIÓN) + CÁMARA PERSPECTIVA (3D)
         // ============================================================================
         const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0b111e);
+        scene.background = new THREE.Color(0xffffff);
 
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.set(3.50, 11.5, 9.5);
+        const perspCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        perspCam.position.set(3.50, 10.5, 9.20);
+
+        function createOrthoCam() {
+            const aspect = window.innerWidth / window.innerHeight;
+            const viewSize = 8.4;
+            const cam = new THREE.OrthographicCamera(
+                -viewSize * aspect / 2,
+                viewSize * aspect / 2,
+                viewSize / 2,
+                -viewSize / 2,
+                0.1,
+                100
+            );
+            cam.position.set(3.50, 20, 3.10);
+            cam.up.set(0, 0, -1); // Norte (Y=0) arriba en pantalla, Sur (Y=6.20) abajo
+            cam.lookAt(3.50, 0, 3.10);
+            return cam;
+        }
+        const orthoCam = createOrthoCam();
+
+        // Arranca en modo Plano 2D Ortográfico Exacto para que coincida 1:1 con el plano 2D
+        let activeCamera = orthoCam;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -716,66 +699,54 @@
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(renderer.domElement);
 
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.target.set(3.50, 0.5, 3.10);
+        const controls = new THREE.OrbitControls(perspCam, renderer.domElement);
+        controls.target.set(3.50, 0.3, 3.10);
         controls.enableDamping = true;
         controls.dampingFactor = 0.06;
         controls.maxPolarAngle = Math.PI / 2 - 0.02;
-        controls.update();
+        controls.enabled = false; // En 2D fijo ortogonal al inicio
 
-        // Iluminación limpia de estudio arquitectónico
-        scene.add(new THREE.AmbientLight(0xffffff, 0.72));
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.65);
-        dirLight.position.set(8, 16, 10);
+        // Iluminación
+        scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.45);
+        dirLight.position.set(6, 15, 8);
         dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.height = 2048;
         scene.add(dirLight);
 
-        // Grilla de referencia sutil debajo del piso
-        const gridHelper = new THREE.GridHelper(14, 28, 0x1e293b, 0x151e2e);
-        gridHelper.position.set(3.50, -0.06, 3.10);
-        scene.add(gridHelper);
-
-        // Materiales
-        const floorMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.65 });
-        const extWallMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.45 });
+        // Materiales arquitectónicos limpios
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
+        const extWallMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.5 });
         const intWallMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.5 });
-        const topCapMat = new THREE.MeshBasicMaterial({ color: 0x0f172a }); // Remate negro superior tipo plano 2D
-        const roofMat = new THREE.MeshStandardMaterial({ color: 0x9c592b, roughness: 0.55, side: THREE.DoubleSide });
+        const topCapMat = new THREE.MeshBasicMaterial({ color: 0x111827 }); // Trazo negro arquitectónico
 
-        // Grupos de escena
         const apartmentGroup = new THREE.Group();
         const floorGroup = new THREE.Group();
         const exteriorWallsGroup = new THREE.Group();
         const interiorWallsGroup = new THREE.Group();
-        const roofGroup = new THREE.Group();
         const furnitureGroup = new THREE.Group();
         const lines2DGroup = new THREE.Group();
 
-        apartmentGroup.add(floorGroup, exteriorWallsGroup, interiorWallsGroup, roofGroup, furnitureGroup, lines2DGroup);
+        apartmentGroup.add(floorGroup, exteriorWallsGroup, interiorWallsGroup, furnitureGroup, lines2DGroup);
         scene.add(apartmentGroup);
-        roofGroup.visible = false; // Oculto por defecto para ver el interior limpio de entrada
 
         const WALL_H = 2.60;
-        const EXT_T = 0.14;
-        const INT_T = 0.10;
+        const EXT_T = 0.12;
+        const INT_T = 0.08;
 
         // ============================================================================
-        // 2. PISO RECTANGULAR SIMPLE: 7.00 m (X: 0 a 7.00) × 6.20 m (Y/Z: 0 a 6.20)
+        // 2. PISO RECTANGULAR SIMPLE: 7.00 m (X: 0.00 a 7.00) × 6.20 m (Y: 0.00 a 6.20)
         // ============================================================================
-        const floorGeo = new THREE.BoxGeometry(7.00, 0.08, 6.20);
+        const floorGeo = new THREE.BoxGeometry(7.00, 0.06, 6.20);
         const floorMesh = new THREE.Mesh(floorGeo, floorMat);
-        floorMesh.position.set(3.50, -0.04, 3.10);
+        floorMesh.position.set(3.50, -0.03, 3.10);
         floorMesh.receiveShadow = true;
         floorGroup.add(floorMesh);
 
-        // Función constructora de muro recto con remate superior oscuro (para lectura 2D/3D impecable)
         function addWallSegment(x1, z1, x2, z2, thickness, group, isExterior = false) {
             const dx = x2 - x1;
             const dz = z2 - z1;
             const len = Math.hypot(dx, dz);
-            if (len < 0.01) return;
+            if (len < 0.005) return;
             const angle = Math.atan2(dz, dx);
 
             const holder = new THREE.Group();
@@ -789,7 +760,6 @@
             bodyMesh.receiveShadow = true;
             holder.add(bodyMesh);
 
-            // Remate superior negro para que desde arriba se vea exactamente como el plano arquitectónico
             const capGeo = new THREE.BoxGeometry(len + 0.01, 0.02, thickness + 0.01);
             const capMesh = new THREE.Mesh(capGeo, topCapMat);
             capMesh.position.set(0, WALL_H + 0.01, 0);
@@ -798,137 +768,134 @@
             group.add(holder);
         }
 
-        // Función para líneas punteadas de vanos en el piso (Y = 0.01)
-        function addDashedThreshold(x1, z1, x2, z2) {
-            const points = [new THREE.Vector3(x1, 0.01, z1), new THREE.Vector3(x2, 0.01, z2)];
-            const geo = new THREE.BufferGeometry().setFromPoints(points);
-            const mat = new THREE.LineDashedMaterial({
-                color: 0x475569,
-                dashSize: 0.10,
-                gapSize: 0.08,
-                linewidth: 2
-            });
-            const line = new THREE.Line(geo, mat);
-            line.computeLineDistances();
-            lines2DGroup.add(line);
+        function addDashedLine(x1, z1, x2, z2) {
+            const dist = Math.hypot(x2 - x1, z2 - z1);
+            const dx = (x2 - x1) / dist;
+            const dz = (z2 - z1) / dist;
+            const dash = 0.07, gap = 0.06;
+            let curr = 0;
+            while (curr < dist) {
+                const end = Math.min(curr + dash, dist);
+                const len = end - curr;
+                if (len > 0.01) {
+                    const mx = x1 + dx * (curr + end) / 2;
+                    const mz = z1 + dz * (curr + end) / 2;
+                    const geo = new THREE.BoxGeometry(len, 0.01, 0.025);
+                    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x718096 }));
+                    mesh.position.set(mx, 0.01, mz);
+                    mesh.rotation.y = -Math.atan2(dz, dx);
+                    lines2DGroup.add(mesh);
+                }
+                curr += dash + gap;
+            }
         }
 
         // ============================================================================
-        // 3. PERÍMETRO EXTERIOR ESTRICTO (7.00 m × 6.20 m)
+        // 3. REGLA 1: PERÍMETRO EXTERIOR (Rectángulo simple 7.00 m × 6.20 m)
         // ============================================================================
-        // Muro superior continuo: Y=0.00, de X=0.00 a X=7.00
+        // Muro superior continuo: Y = 0.00 (X = 0.00 a 7.00)
         addWallSegment(0.00, 0.00, 7.00, 0.00, EXT_T, exteriorWallsGroup, true);
-
-        // Muro izquierdo continuo: X=0.00, de Y=0.00 a Y=6.20
+        // Muro izquierdo continuo: X = 0.00 (Y = 0.00 a 6.20)
         addWallSegment(0.00, 0.00, 0.00, 6.20, EXT_T, exteriorWallsGroup, true);
-
-        // Muro derecho continuo: X=7.00, de Y=0.00 a Y=6.20
+        // Muro derecho continuo: X = 7.00 (Y = 0.00 a 6.20)
         addWallSegment(7.00, 0.00, 7.00, 6.20, EXT_T, exteriorWallsGroup, true);
-
-        // Muro inferior continuo (Y=6.20): única línea recta horizontal de X=0.00 a X=7.00
-        // Con vano de Puerta de Entrada principal entre X=5.40 y X=6.20
+        // Muro inferior continuo: Y = 6.20 (X = 0.00 a 7.00) con Puerta de Entrada en X = 5.40 a 6.20
         addWallSegment(0.00, 6.20, 5.40, 6.20, EXT_T, exteriorWallsGroup, true);
         addWallSegment(6.20, 6.20, 7.00, 6.20, EXT_T, exteriorWallsGroup, true);
 
-        // Jambas de la Puerta de Entrada en X=5.40 y X=6.20 (sobre Y=6.20)
-        addWallSegment(5.40, 6.08, 5.40, 6.32, 0.04, exteriorWallsGroup, true);
-        addWallSegment(6.20, 6.08, 6.20, 6.32, 0.04, exteriorWallsGroup, true);
-        addDashedThreshold(5.40, 6.20, 6.20, 6.20);
+        // Jambas de Puerta de Entrada en X = 5.40 y X = 6.20 sobre Y = 6.20
+        addWallSegment(5.40, 6.07, 5.40, 6.33, 0.04, exteriorWallsGroup, true);
+        addWallSegment(6.20, 6.07, 6.20, 6.33, 0.04, exteriorWallsGroup, true);
+        const entranceThreshold = new THREE.Mesh(
+            new THREE.BoxGeometry(0.80, 0.01, 0.02),
+            new THREE.MeshBasicMaterial({ color: 0x94a3b8 })
+        );
+        entranceThreshold.position.set(5.80, 0.01, 6.20);
+        lines2DGroup.add(entranceThreshold);
 
         // ============================================================================
-        // 4. EJES VERTICALES INTERNOS (Sin tabiques ni puertas adicionales)
+        // 4. REGLA 2: EJES VERTICALES PRINCIPALES
         // ============================================================================
-        // X = 1.70: Cerramiento de Placard 1, Baño y Placard 2 (desde Y=2.30 hasta Y=4.60)
-        // Puerta de acceso al Baño en el centro (entre Y=3.10 y Y=3.70)
+        // X = 1.70: Cerramiento de Baño y Placards (desde Y = 2.30 hasta Y = 4.60)
+        // Puerta de acceso al Baño en el centro (entre Y = 3.10 y Y = 3.70)
         addWallSegment(1.70, 2.30, 1.70, 3.10, INT_T, interiorWallsGroup, false);
         addWallSegment(1.70, 3.70, 1.70, 4.60, INT_T, interiorWallsGroup, false);
 
         // X = 3.00: Eje central divisorio
-        // 1) Separa Estudio y Pasillo del Living: desde Y=0.00 hasta Y=3.90
+        // 1) Separa Estudio y Pasillo del Living (desde Y = 0.00 hasta Y = 3.90)
         addWallSegment(3.00, 0.00, 3.00, 3.90, INT_T, interiorWallsGroup, false);
-        // Pequeña mocheta transversal en Y=3.90 (fiel al plano 2D)
-        addWallSegment(2.91, 3.90, 3.09, 3.90, 0.06, interiorWallsGroup, false);
-        // Entre Y=3.90 y Y=4.60: Paso totalmente abierto de 0.70 m que conecta Living con Pasillo
-        addDashedThreshold(3.00, 3.90, 3.00, 4.60);
-        // 2) Separa el Cuarto de la Cocina: desde Y=4.60 hasta Y=6.20
+        addWallSegment(2.91, 3.90, 3.09, 3.90, 0.05, interiorWallsGroup, false);
+        // Entre Y = 3.90 y Y = 4.60: Paso totalmente abierto de 0.70 m en X = 3.00
+        addDashedLine(3.00, 3.90, 3.00, 4.60);
+        // 2) Separa el Cuarto de la Cocina (desde Y = 4.60 hasta Y = 6.20)
         addWallSegment(3.00, 4.60, 3.00, 6.20, INT_T, interiorWallsGroup, false);
 
-        // X = 4.60: Pared derecha de la Cocina (desde Y=4.60 hasta Y=6.20)
+        // X = 4.60: Pared derecha de la Cocina (desde Y = 4.60 hasta Y = 6.20)
         addWallSegment(4.60, 4.60, 4.60, 6.20, INT_T, interiorWallsGroup, false);
 
         // ============================================================================
-        // 5. LÍNEAS HORIZONTALES Y ALINEACIONES CRÍTICAS
+        // 5. REGLA 3: LÍNEAS HORIZONTALES Y ALINEACIONES CRÍTICAS
         // ============================================================================
         // Y = 2.30: Línea de cierre del Estudio
-        // De X=0.00 a X=1.70: Muro cerrado que divide el Estudio del Placard 1
+        // De X = 0.00 a X = 1.70: Muro cerrado que divide el Estudio del Placard 1
         addWallSegment(0.00, 2.30, 1.70, 2.30, INT_T, interiorWallsGroup, false);
-        // De X=1.70 a X=3.00: Vano/puerta de entrada al Estudio (remate superior del Pasillo)
-        addWallSegment(1.70, 2.30, 1.90, 2.30, INT_T, interiorWallsGroup, false);
-        addDashedThreshold(1.90, 2.30, 2.80, 2.30);
-        addWallSegment(2.80, 2.30, 3.00, 2.30, INT_T, interiorWallsGroup, false);
+        // De X = 1.70 a X = 3.00: Vano/puerta de entrada al Estudio (remate superior del Pasillo)
+        addWallSegment(1.70, 2.30, 1.86, 2.30, INT_T, interiorWallsGroup, false);
+        addDashedLine(1.86, 2.30, 2.82, 2.30);
+        addWallSegment(2.82, 2.30, 3.00, 2.30, INT_T, interiorWallsGroup, false);
 
-        // Y = 2.80: Muro horizontal que divide el Placard 1 del Baño (de X=0.00 a X=1.70)
+        // Y = 2.80: Muro horizontal que divide el Placard 1 del Baño (de X = 0.00 a X = 1.70)
         addWallSegment(0.00, 2.80, 1.70, 2.80, INT_T, interiorWallsGroup, false);
 
-        // Y = 4.00: Muro horizontal que divide el Baño del Placard 2 (de X=0.00 a X=1.70)
+        // Y = 4.00: Muro horizontal que divide el Baño del Placard 2 (de X = 0.00 a X = 1.70)
         addWallSegment(0.00, 4.00, 1.70, 4.00, INT_T, interiorWallsGroup, false);
 
         // Y = 4.60: Línea horizontal unificada de Cuarto y Cocina (Regla crítica)
-        // 1) Muro inferior del Placard 2 (de X=0.00 a X=1.70)
+        // 1) Muro inferior del Placard 2 (de X = 0.00 a X = 1.70)
         addWallSegment(0.00, 4.60, 1.70, 4.60, INT_T, interiorWallsGroup, false);
-        // 2) Vano/puerta de entrada al Cuarto (de X=1.70 a X=3.00, cerrando el pasillo por abajo)
-        addWallSegment(1.70, 4.60, 1.90, 4.60, INT_T, interiorWallsGroup, false);
-        addDashedThreshold(1.90, 4.60, 2.80, 4.60);
-        addWallSegment(2.80, 4.60, 3.00, 4.60, INT_T, interiorWallsGroup, false);
-        // 3) Frente superior de la Cocina con su abertura de acceso (de X=3.00 a X=4.60)
-        addWallSegment(3.00, 4.60, 3.20, 4.60, INT_T, interiorWallsGroup, false);
-        addDashedThreshold(3.20, 4.60, 4.35, 4.60);
-        addWallSegment(4.35, 4.60, 4.60, 4.60, INT_T, interiorWallsGroup, false);
+        // 2) Vano/puerta de entrada al Cuarto (de X = 1.70 a X = 3.00, cerrando el pasillo por abajo)
+        addWallSegment(1.70, 4.60, 1.86, 4.60, INT_T, interiorWallsGroup, false);
+        addDashedLine(1.86, 4.60, 2.82, 4.60);
+        addWallSegment(2.82, 4.60, 3.00, 4.60, INT_T, interiorWallsGroup, false);
+        // 3) Frente superior de la Cocina con su abertura de acceso (de X = 3.00 a X = 4.60)
+        addWallSegment(3.00, 4.60, 3.18, 4.60, INT_T, interiorWallsGroup, false);
+        addDashedLine(3.18, 4.60, 4.38, 4.60);
+        addWallSegment(4.38, 4.60, 4.60, 4.60, INT_T, interiorWallsGroup, false);
 
         // ============================================================================
-        // 6. TECHO DE MADERA (Opcional, activable desde Capas)
-        // ============================================================================
-        const roofGeo = new THREE.PlaneGeometry(7.20, 6.40);
-        roofGeo.rotateX(Math.PI / 2);
-        const roofMesh = new THREE.Mesh(roofGeo, roofMat);
-        roofMesh.position.set(3.50, WALL_H + 0.05, 3.10);
-        roofGroup.add(roofMesh);
-
-        // ============================================================================
-        // 7. ETIQUETAS DE AMBIENTES Y COTAS EXTERIORES (Coordenadas Exactas)
+        // 6. ETIQUETAS DE AMBIENTES EN COORDENADAS EXACTAS
         // ============================================================================
         const labelElements = [];
-        function createLabel(x, y, z, text, cssClass = 'room-label') {
+        function addPlanLabel(x, z, text, cls = 'arch-label') {
             const el = document.createElement('div');
-            el.className = cssClass;
+            el.className = cls;
             el.innerText = text;
             document.getElementById('labels-container').appendChild(el);
-            labelElements.push({ el, pos: new THREE.Vector3(x, y, z) });
+            labelElements.push({ el, pos: new THREE.Vector3(x, 0.1, z) });
         }
 
-        // Etiquetas centradas exactamente en cada caja definida por la especificación:
         // Estudio: [0.00, 0.00] a [3.00, 2.30]
-        createLabel(1.50, 0.15, 1.15, "ESTUDIO");
+        addPlanLabel(1.50, 1.15, "ESTUDIO");
         // Placard 1: [0.00, 2.30] a [1.70, 2.80]
-        createLabel(0.85, 0.15, 2.55, "PLACARD", "room-label small");
+        addPlanLabel(0.85, 2.55, "PLACARD", "arch-label sm");
         // Baño: [0.00, 2.80] a [1.70, 4.00]
-        createLabel(0.85, 0.15, 3.40, "BAÑO");
+        addPlanLabel(0.85, 3.40, "BAÑO");
         // Placard 2: [0.00, 4.00] a [1.70, 4.60]
-        createLabel(0.85, 0.15, 4.30, "PLACARD", "room-label small");
+        addPlanLabel(0.85, 4.30, "PLACARD", "arch-label sm");
         // Pasillo: [1.70, 2.30] a [3.00, 4.60]
-        createLabel(2.35, 0.15, 3.45, "PASILLO", "room-label small");
+        addPlanLabel(2.35, 3.45, "PASILLO", "arch-label vertical");
         // Cuarto: [0.00, 4.60] a [3.00, 6.20]
-        createLabel(1.50, 0.15, 5.40, "CUARTO");
+        addPlanLabel(1.50, 5.40, "CUARTO");
         // Cocina: [3.00, 4.60] a [4.60, 6.20]
-        createLabel(3.80, 0.15, 5.40, "COCINA");
+        addPlanLabel(3.80, 5.45, "COCINA");
         // Living: [3.00, 0.00] a [7.00, 4.60] + [4.60, 4.60] a [7.00, 6.20]
-        createLabel(5.00, 0.15, 2.30, "LIVING");
-        // Entrada: vano entre X=5.40 y X=6.20 en Y=6.20
-        createLabel(5.80, 0.15, 6.55, "ENTRADA", "dim-label");
+        addPlanLabel(5.00, 2.35, "LIVING");
+        // Entrada: X = 5.40 a 6.20 sobre Y = 6.20
+        addPlanLabel(5.80, 6.55, "ENTRADA", "arch-label sm");
 
-        // Cotas exteriores principales
-        createLabel(3.50, 0.15, -0.45, "7.00 m", "dim-label");
-        createLabel(-0.55, 0.15, 3.10, "6.20 m", "dim-label");
+        // Cotas Exteriores
+        addPlanLabel(3.50, -0.32, "7.00 m", "arch-label dim");
+        addPlanLabel(-0.32, 3.10, "6.20 m", "arch-label dim-v");
 
         function updateLabels() {
             const containerEl = document.getElementById('labels-container');
@@ -940,7 +907,7 @@
             const halfW = window.innerWidth / 2;
             const halfH = window.innerHeight / 2;
             for (const item of labelElements) {
-                const p = item.pos.clone().project(camera);
+                const p = item.pos.clone().project(activeCamera);
                 if (p.z > 1.0) {
                     item.el.style.display = 'none';
                     continue;
@@ -952,45 +919,13 @@
         }
 
         // ============================================================================
-        // 8. GESTOR INTERACTIVO DE MUEBLES (Ubicados dentro de las coordenadas exactas)
+        // 7. GESTOR DE MUEBLES (Inicia limpio sin bloques extra para respetar el plano)
         // ============================================================================
-        const DEFAULT_FURNITURE = [
-            // Estudio: [0.00, 0.00] a [3.00, 2.30]
-            { id: "escritorio_estudio", name: "Escritorio Gamer", room: "Estudio", x: 1.10, z: 0.45, y: 0.375, w: 1.50, d: 0.65, h: 0.75, rot: 0, color: 0x1e293b },
-            { id: "silla_estudio", name: "Silla de Estudio", room: "Estudio", x: 1.10, z: 1.05, y: 0.45, w: 0.50, d: 0.50, h: 0.90, rot: 0, color: 0x2563eb },
-
-            // Placard 1 (superior): [0.00, 2.30] a [1.70, 2.80]
-            { id: "placard_1", name: "Placard 1 (Estudio)", room: "Placard 1", x: 0.85, z: 2.55, y: 1.15, w: 1.55, d: 0.42, h: 2.30, rot: 0, color: 0xb46b38 },
-
-            // Baño: [0.00, 2.80] a [1.70, 4.00]
-            { id: "banera", name: "Bañera / Ducha", room: "Baño", x: 0.40, z: 3.40, y: 0.225, w: 0.60, d: 1.05, h: 0.45, rot: 0, color: 0xffffff },
-            { id: "inodoro", name: "Inodoro", room: "Baño", x: 1.15, z: 3.05, y: 0.21, w: 0.38, d: 0.45, h: 0.42, rot: 0, color: 0xf1f5f9 },
-            { id: "vanitory", name: "Vanitory", room: "Baño", x: 1.15, z: 3.75, y: 0.40, w: 0.50, d: 0.38, h: 0.80, rot: 0, color: 0xb46b38 },
-
-            // Placard 2 (inferior): [0.00, 4.00] a [1.70, 4.60]
-            { id: "placard_2", name: "Placard 2 (Cuarto)", room: "Placard 2", x: 0.85, z: 4.30, y: 1.15, w: 1.55, d: 0.48, h: 2.30, rot: 0, color: 0xb46b38 },
-
-            // Cuarto: [0.00, 4.60] a [3.00, 6.20]
-            { id: "cama_cuarto", name: "Cama Matrimonial", room: "Cuarto", x: 1.05, z: 5.45, y: 0.225, w: 1.35, d: 1.85, h: 0.45, rot: 90, color: 0x475569 },
-            { id: "mesa_luz", name: "Mesa de Luz", room: "Cuarto", x: 2.45, z: 5.90, y: 0.25, w: 0.42, d: 0.38, h: 0.50, rot: 0, color: 0xb46b38 },
-
-            // Cocina: [3.00, 4.60] a [4.60, 6.20]
-            { id: "mesada_cocina", name: "Mesada con Bacha", room: "Cocina", x: 3.60, z: 5.88, y: 0.425, w: 1.00, d: 0.52, h: 0.85, rot: 0, color: 0xc7988a },
-            { id: "cocina_gas", name: "Cocina 4 Hornallas", room: "Cocina", x: 4.30, z: 5.88, y: 0.425, w: 0.50, d: 0.52, h: 0.85, rot: 0, color: 0xf8fafc },
-
-            // Living: [3.00, 0.00] a [7.00, 4.60] + [4.60, 4.60] a [7.00, 6.20]
-            { id: "sillon_living", name: "Sillón 3 Cuerpos", room: "Living", x: 4.80, z: 0.65, y: 0.375, w: 2.00, d: 0.85, h: 0.75, rot: 0, color: 0x1e3a5f },
-            { id: "mesa_comedor", name: "Mesa Comedor", room: "Living", x: 5.20, z: 2.80, y: 0.38, w: 1.40, d: 0.80, h: 0.76, rot: 0, color: 0xb46b38 },
-            { id: "rack_tv", name: "Mueble TV", room: "Living", x: 6.68, z: 1.80, y: 0.275, w: 0.42, d: 1.50, h: 0.55, rot: 0, color: 0xb46b38 }
-        ];
-
-        const STORAGE_KEY = 'depto_700x620_exact_v3';
+        const STORAGE_KEY = 'depto_7x62_clean_v4';
         let furnitureList = [];
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
-            try { furnitureList = JSON.parse(saved); } catch (e) { furnitureList = [...DEFAULT_FURNITURE]; }
-        } else {
-            furnitureList = [...DEFAULT_FURNITURE];
+            try { furnitureList = JSON.parse(saved); } catch (e) { furnitureList = []; }
         }
 
         let selectedId = furnitureList[0] ? furnitureList[0].id : null;
@@ -1006,7 +941,7 @@
             furnitureList.forEach(item => {
                 const geo = new THREE.BoxGeometry(item.w, item.h, item.d);
                 const mat = new THREE.MeshStandardMaterial({
-                    color: item.color || 0x38bdf8,
+                    color: item.color || 0x0284c7,
                     roughness: 0.45
                 });
                 const mesh = new THREE.Mesh(geo, mat);
@@ -1020,6 +955,17 @@
                 furnitureMeshes.push(mesh);
             });
 
+            document.getElementById('lbl-count').innerText = furnitureList.length;
+            const emptyMsg = document.getElementById('empty-furniture-msg');
+            const ctrlBox = document.getElementById('editor-controls');
+            if (furnitureList.length === 0) {
+                emptyMsg.style.display = 'block';
+                ctrlBox.style.display = 'none';
+            } else {
+                emptyMsg.style.display = 'none';
+                ctrlBox.style.display = 'block';
+            }
+
             updateSelectionVisual();
             populateSelectOptions();
             syncFormWithSelected();
@@ -1030,7 +976,7 @@
             if (selectionBox) scene.remove(selectionBox);
             const selMesh = furnitureMeshes.find(m => m.userData.id === selectedId);
             if (selMesh && document.getElementById('chk-furniture').checked) {
-                selectionBox = new THREE.BoxHelper(selMesh, 0x38bdf8);
+                selectionBox = new THREE.BoxHelper(selMesh, 0x0284c7);
                 scene.add(selectionBox);
             }
         }
@@ -1041,7 +987,7 @@
             furnitureList.forEach(item => {
                 const opt = document.createElement('option');
                 opt.value = item.id;
-                opt.innerText = `[${item.room || 'Ambiente'}] ${item.name}`;
+                opt.innerText = `[${item.room || 'Mueble'}] ${item.name}`;
                 if (item.id === selectedId) opt.selected = true;
                 sel.appendChild(opt);
             });
@@ -1123,13 +1069,12 @@
         });
 
         document.getElementById('btn-del-furniture').addEventListener('click', () => {
-            if (furnitureList.length <= 1) return alert("Debe quedar al menos un mueble.");
             furnitureList = furnitureList.filter(f => f.id !== selectedId);
-            selectedId = furnitureList[0].id;
+            selectedId = furnitureList[0] ? furnitureList[0].id : null;
             renderFurniture3D();
         });
 
-        // Selección táctil / click en 3D
+        // Selección táctil / click
         const raycaster = new THREE.Raycaster();
         const pointer = new THREE.Vector2();
         let downTs = 0;
@@ -1142,13 +1087,15 @@
             const rect = renderer.domElement.getBoundingClientRect();
             pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-            raycaster.setFromCamera(pointer, camera);
+            raycaster.setFromCamera(pointer, activeCamera);
 
             const hits = raycaster.intersectObjects(furnitureMeshes, false);
             if (hits.length > 0) {
                 selectedId = hits[0].object.userData.id;
                 renderFurniture3D();
-                document.getElementById('furniture-editor').classList.remove('minimized');
+                const ed = document.getElementById('furniture-editor');
+                ed.classList.remove('minimized');
+                document.getElementById('btn-min-editor').innerText = '▼';
             }
         });
 
@@ -1158,14 +1105,14 @@
         document.getElementById('btn-close-add').addEventListener('click', () => addModal.style.display = 'none');
 
         const PRESETS = {
-            cama: { name: "Cama 2 Plazas", room: "Cuarto", w: 1.40, d: 1.90, h: 0.45, color: 0x475569 },
-            cama_simple: { name: "Cama 1 Plaza", room: "Estudio", w: 0.90, d: 1.90, h: 0.45, color: 0x475569 },
-            sillon: { name: "Sillón", room: "Living", w: 2.00, d: 0.85, h: 0.75, color: 0x1e3a5f },
-            mesa: { name: "Mesa Comedor", room: "Living", w: 1.40, d: 0.80, h: 0.76, color: 0xb46b38 },
-            escritorio: { name: "Escritorio", room: "Estudio", w: 1.40, d: 0.65, h: 0.75, color: 0x1e293b },
-            placard: { name: "Placard", room: "Placard", w: 1.60, d: 0.50, h: 2.30, color: 0xb46b38 },
-            heladera: { name: "Heladera", room: "Cocina", w: 0.60, d: 0.60, h: 1.70, color: 0xf8fafc },
-            cubo: { name: "Mueble a Medida", room: "General", w: 1.00, d: 1.00, h: 0.80, color: 0x0284c7 }
+            cama: { name: "Cama 2 Plazas", room: "Cuarto", x: 1.50, z: 5.40, w: 1.40, d: 1.90, h: 0.45, color: 0x475569 },
+            cama_simple: { name: "Cama 1 Plaza", room: "Estudio", x: 1.50, z: 1.15, w: 0.90, d: 1.90, h: 0.45, color: 0x475569 },
+            sillon: { name: "Sillón", room: "Living", x: 5.00, z: 1.20, w: 2.00, d: 0.85, h: 0.75, color: 0x1e3a5f },
+            mesa: { name: "Mesa Comedor", room: "Living", x: 5.00, z: 2.80, w: 1.40, d: 0.80, h: 0.76, color: 0xb46b38 },
+            escritorio: { name: "Escritorio", room: "Estudio", x: 1.50, z: 0.60, w: 1.40, d: 0.65, h: 0.75, color: 0x1e293b },
+            placard: { name: "Placard", room: "Placard", x: 0.85, z: 2.55, w: 1.60, d: 0.45, h: 2.30, color: 0xb46b38 },
+            heladera: { name: "Heladera", room: "Cocina", x: 3.45, z: 5.10, w: 0.60, d: 0.60, h: 1.70, color: 0x94a3b8 },
+            cubo: { name: "Mueble a Medida", room: "General", x: 5.00, z: 3.00, w: 1.00, d: 1.00, h: 0.80, color: 0x0284c7 }
         };
 
         document.querySelectorAll('.add-preset-btn').forEach(btn => {
@@ -1174,16 +1121,19 @@
                 const newId = `mueble_${Date.now()}`;
                 furnitureList.push({
                     id: newId, name: t.name, room: t.room,
-                    x: 4.80, z: 3.00, y: t.h / 2,
+                    x: t.x, z: t.z, y: t.h / 2,
                     w: t.w, d: t.d, h: t.h, rot: 0, color: t.color
                 });
                 selectedId = newId;
                 renderFurniture3D();
                 addModal.style.display = 'none';
+                const ed = document.getElementById('furniture-editor');
+                ed.classList.remove('minimized');
+                document.getElementById('btn-min-editor').innerText = '▼';
             });
         });
 
-        // Modal JSON
+        // JSON Modal
         const jsonModal = document.getElementById('json-modal');
         document.getElementById('btn-copy-json').addEventListener('click', () => {
             document.getElementById('json-text').value = JSON.stringify(furnitureList, null, 2);
@@ -1195,33 +1145,26 @@
             alert("¡Medidas copiadas al portapapeles!");
             jsonModal.style.display = 'none';
         });
-        document.getElementById('btn-reset-default').addEventListener('click', () => {
-            if (confirm("¿Restablecer los muebles a la posición inicial?")) {
-                furnitureList = JSON.parse(JSON.stringify(DEFAULT_FURNITURE));
-                selectedId = furnitureList[0].id;
+        document.getElementById('btn-clear-all').addEventListener('click', () => {
+            if (confirm("¿Vaciar todos los muebles agregados?")) {
+                furnitureList = [];
+                selectedId = null;
                 renderFurniture3D();
                 jsonModal.style.display = 'none';
             }
         });
 
-        // Minimizar editor
         document.getElementById('btn-min-editor').addEventListener('click', (e) => {
             const ed = document.getElementById('furniture-editor');
             ed.classList.toggle('minimized');
             e.target.innerText = ed.classList.contains('minimized') ? '▲' : '▼';
         });
 
-        // Modal Imagen 2D Exacta
-        const modal2D = document.getElementById('modal-2d-image');
-        document.getElementById('btn-open-2d-modal').addEventListener('click', () => modal2D.style.display = 'flex');
-        document.getElementById('btn-close-2d-modal').addEventListener('click', () => modal2D.style.display = 'none');
-
         // ============================================================================
-        // 9. VISIBILIDAD DE PAREDES Y MODOS DE VISTA
+        // 8. CONTROLES DE VISIBILIDAD Y CAMBIO 2D / 3D
         // ============================================================================
         document.getElementById('chk-ext-walls').addEventListener('change', (e) => exteriorWallsGroup.visible = e.target.checked);
         document.getElementById('chk-int-walls').addEventListener('change', (e) => interiorWallsGroup.visible = e.target.checked);
-        document.getElementById('chk-roof').addEventListener('change', (e) => roofGroup.visible = e.target.checked);
         document.getElementById('chk-furniture').addEventListener('change', (e) => {
             furnitureGroup.visible = e.target.checked;
             updateSelectionVisual();
@@ -1232,10 +1175,6 @@
             const scaleY = isCut ? 0.42 : 1.0;
             exteriorWallsGroup.scale.y = scaleY;
             interiorWallsGroup.scale.y = scaleY;
-            if (isCut) {
-                roofGroup.visible = false;
-                document.getElementById('chk-roof').checked = false;
-            }
         }
         document.getElementById('chk-wall-cut').addEventListener('change', (e) => setWallCut(e.target.checked));
 
@@ -1248,58 +1187,58 @@
             });
         });
 
-        // Botones superiores de modo
         function setActiveTopBtn(id) {
             document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
-        document.getElementById('btn-mode-3d').addEventListener('click', () => {
-            setActiveTopBtn('btn-mode-3d');
-            setWallCut(false);
-            setView('isom');
-        });
-
-        document.getElementById('btn-mode-2d').addEventListener('click', () => {
-            setActiveTopBtn('btn-mode-2d');
-            setView('top2d');
-        });
-
-        document.getElementById('btn-mode-cut').addEventListener('click', () => {
-            setActiveTopBtn('btn-mode-cut');
-            setWallCut(true);
-            setView('isom');
-        });
-
-        // Vistas de cámara
         const viewPresets = {
-            isom:   { pos: [3.50, 10.5, 9.20], target: [3.50, 0.4, 3.20] },
-            top2d:  { pos: [3.50, 12.8, 3.101], target: [3.50, 0.0, 3.10] },
-            living: { pos: [5.30, 3.20, 5.80], target: [5.00, 0.6, 2.00] },
-            cocina: { pos: [3.80, 3.20, 3.80], target: [3.80, 0.6, 5.50] },
-            cuarto: { pos: [2.40, 3.20, 4.30], target: [1.20, 0.5, 5.50] },
-            bano:   { pos: [2.60, 3.20, 3.40], target: [0.85, 0.5, 3.40] },
-            estudio:{ pos: [2.40, 3.20, 2.50], target: [1.20, 0.5, 0.90] }
+            isom:   { pos: [3.50, 9.8, 8.80], target: [3.50, 0.3, 3.10] },
+            living: { pos: [5.30, 3.4, 5.80], target: [5.00, 0.6, 2.00] },
+            cocina: { pos: [3.80, 3.4, 3.80], target: [3.80, 0.6, 5.50] },
+            cuarto: { pos: [2.40, 3.4, 4.30], target: [1.20, 0.5, 5.50] },
+            bano:   { pos: [2.60, 3.4, 3.40], target: [0.85, 0.5, 3.40] },
+            estudio:{ pos: [2.40, 3.4, 2.50], target: [1.20, 0.5, 0.90] }
         };
 
-        function setView(name) {
-            const v = viewPresets[name];
-            if (!v) return;
-            camera.position.set(v.pos[0], v.pos[1], v.pos[2]);
-            controls.target.set(v.target[0], v.target[1], v.target[2]);
-            controls.update();
-            document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === name));
+        function switchTo2D() {
+            activeCamera = orthoCam;
+            controls.enabled = false;
+            setActiveTopBtn('btn-mode-2d');
+            document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === 'top2d'));
         }
 
+        function switchTo3D(presetName = 'isom', cut = false) {
+            activeCamera = perspCam;
+            controls.enabled = true;
+            setWallCut(cut);
+            setActiveTopBtn(cut ? 'btn-mode-cut' : 'btn-mode-3d');
+            const v = viewPresets[presetName] || viewPresets.isom;
+            perspCam.position.set(v.pos[0], v.pos[1], v.pos[2]);
+            controls.target.set(v.target[0], v.target[1], v.target[2]);
+            controls.update();
+            document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === presetName));
+        }
+
+        document.getElementById('btn-mode-2d').addEventListener('click', () => switchTo2D());
+        document.getElementById('btn-mode-3d').addEventListener('click', () => switchTo3D('isom', false));
+        document.getElementById('btn-mode-cut').addEventListener('click', () => switchTo3D('isom', true));
+
         document.querySelectorAll('.view-chip').forEach(chip => {
-            chip.addEventListener('click', () => setView(chip.dataset.view));
+            chip.addEventListener('click', () => {
+                const v = chip.dataset.view;
+                if (v === 'top2d') {
+                    switchTo2D();
+                } else {
+                    switchTo3D(v, document.getElementById('chk-wall-cut').checked);
+                }
+            });
         });
 
         document.getElementById('btn-toggle-layers').addEventListener('click', () => {
             document.getElementById('sidebar-right').classList.toggle('show-mobile');
         });
 
-        // Exportar OBJ
         document.getElementById('btn-export-obj').addEventListener('click', () => {
             const exporter = new THREE.OBJExporter();
             const result = exporter.parse(apartmentGroup);
@@ -1310,21 +1249,29 @@
             link.click();
         });
 
-        // Inicializar muebles y loop
         renderFurniture3D();
 
         function animate() {
             requestAnimationFrame(animate);
-            controls.update();
+            if (controls.enabled) controls.update();
             updateLabels();
             if (selectionBox) selectionBox.update();
-            renderer.render(scene, camera);
+            renderer.render(scene, activeCamera);
         }
         animate();
 
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
+            const aspect = window.innerWidth / window.innerHeight;
+            perspCam.aspect = aspect;
+            perspCam.updateProjectionMatrix();
+
+            const viewSize = 8.4;
+            orthoCam.left = -viewSize * aspect / 2;
+            orthoCam.right = viewSize * aspect / 2;
+            orthoCam.top = viewSize / 2;
+            orthoCam.bottom = -viewSize / 2;
+            orthoCam.updateProjectionMatrix();
+
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
