@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plano 3D Real (Basado en Videos) - Departamento 01-01</title>
+    <title>Departamento 01-01 (1° Piso) - Modelo 3D Arquitectónico</title>
     <!-- Three.js and OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -15,7 +15,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #090d14;
+            background-color: #080c14;
             color: #f1f5f9;
             overflow: hidden;
             width: 100vw;
@@ -24,12 +24,12 @@
         #webgl-container { width: 100%; height: 100%; display: block; }
 
         .glass-panel {
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.88);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 14px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
         }
 
         #header-card {
@@ -41,7 +41,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            max-width: 420px;
+            max-width: 410px;
         }
         .header-top {
             display: flex;
@@ -55,7 +55,7 @@
             text-transform: uppercase;
             padding: 4px 10px;
             border-radius: 20px;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: #fff;
         }
         .share-badge {
@@ -73,7 +73,7 @@
             transition: all 0.2s;
         }
         .share-badge:hover { background: rgba(56, 189, 248, 0.3); }
-        h1 { font-size: 20px; font-weight: 700; color: #ffffff; }
+        h1 { font-size: 19px; font-weight: 700; color: #ffffff; }
         .subtitle { font-size: 12px; color: #94a3b8; line-height: 1.45; }
         .metrics-row {
             display: flex;
@@ -86,11 +86,11 @@
         .metric-val { font-size: 15px; font-weight: 700; color: #38bdf8; }
         .metric-lbl { font-size: 10px; color: #64748b; text-transform: uppercase; }
 
-        /* Selector de Vistas / Reformas */
+        /* Selector de Propuestas */
         #proposals-panel {
             position: absolute;
             top: 20px;
-            left: 460px;
+            left: 450px;
             padding: 10px 16px;
             z-index: 10;
             display: flex;
@@ -293,7 +293,6 @@
             font-weight: bold;
         }
 
-        /* 3D Label Overlays */
         .dim-label {
             position: absolute;
             background: rgba(15, 23, 42, 0.9);
@@ -316,40 +315,40 @@
     <!-- Header Panel -->
     <div id="header-card" class="glass-panel">
         <div class="header-top">
-            <div class="badge">Relevamiento Real 3D</div>
+            <div class="badge">Unidad Funcional 01-01</div>
             <div class="share-badge" id="btn-open-share">
                 <span>🔗</span> Compartir Link
             </div>
         </div>
-        <h1>Departamento 01-01</h1>
-        <div class="subtitle">Estructura real ajustada según los videos de recorrido y fotos. Living-Comedor, Cocina separada, Baño con bañera y Dormitorio con placard.</div>
+        <h1>Departamento 01-01 (1° Piso)</h1>
+        <div class="subtitle">Propiedad Horizontal. Envolvente oficial según plano de subdivisión, con distribución interior y detalles ajustados a los videos reales.</div>
         <div class="metrics-row">
             <div class="metric">
-                <span class="metric-val">~55 m²</span>
-                <span class="metric-lbl">Sup. Real</span>
+                <span class="metric-val">54.16 m²</span>
+                <span class="metric-lbl">Sup. Cubierta</span>
             </div>
             <div class="metric">
                 <span class="metric-val">2.60 a 3.85 m</span>
-                <span class="metric-lbl">Pendiente Techo</span>
+                <span class="metric-lbl">Altura Libre</span>
             </div>
             <div class="metric">
-                <span class="metric-val">2 Ambientes</span>
-                <span class="metric-lbl">Baño + Cocina</span>
+                <span class="metric-val">1° Piso</span>
+                <span class="metric-lbl">Nivel Edificio</span>
             </div>
         </div>
     </div>
 
-    <!-- Proposals Selector -->
+    <!-- Selector de Propuestas de Modificación -->
     <div id="proposals-panel" class="glass-panel">
-        <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Versión:</span>
+        <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Diseño:</span>
         <button class="proposal-btn active" id="btn-prop-actual">
-            <span>📌</span> Estado Real Actual
+            <span>📌</span> Estado Actual
         </button>
         <button class="proposal-btn" id="btn-prop-isla">
-            <span>💡</span> Propuesta: Cocina Abierta e Isla
+            <span>💡</span> Modif. 1: Cocina Integrada con Isla
         </button>
         <button class="proposal-btn" id="btn-prop-loft">
-            <span>💡</span> Propuesta: Entrepiso / Loft (3.85m)
+            <span>💡</span> Modif. 2: Entrepiso / Mezzanine (3.85m)
         </button>
     </div>
 
@@ -375,12 +374,17 @@
             <div class="toggle-switch"></div>
         </label>
         <label class="toggle-row">
-            <span>Mobiliario Real</span>
+            <span>Mobiliario Relevado</span>
             <input type="checkbox" id="chk-furniture" checked>
             <div class="toggle-switch"></div>
         </label>
         <label class="toggle-row">
-            <span>Cotas de Medidas</span>
+            <span>Pasillo Común del Edificio</span>
+            <input type="checkbox" id="chk-corridor" checked>
+            <div class="toggle-switch"></div>
+        </label>
+        <label class="toggle-row">
+            <span>Cotas del Plano</span>
             <input type="checkbox" id="chk-dimensions" checked>
             <div class="toggle-switch"></div>
         </label>
@@ -402,22 +406,22 @@
         <div class="view-chip" data-view="living">Living-Comedor</div>
         <div class="view-chip" data-view="cocina">Cocina</div>
         <div class="view-chip" data-view="bano">Baño</div>
-        <div class="view-chip" data-view="dormitorio">Dormitorio / Escritorio</div>
-        <div class="view-chip" data-view="acceso">Puerta de Acceso</div>
+        <div class="view-chip" data-view="dormitorio">Dormitorio</div>
+        <div class="view-chip" data-view="palier">Palier / Acceso Común</div>
     </div>
 
     <!-- Modal Compartir por Link -->
     <div id="share-modal">
         <span class="close-btn" id="btn-close-share">&times;</span>
         <h2><span>🌐</span> Compartir Plano 3D por Link</h2>
-        <p>Este visor interactivo está listo para ser compartido por enlace web para que cualquier persona pueda explorarlo en su celular o computadora sin instalar ningún programa.</p>
+        <p>Este visor 3D web está publicado en tiempo real en GitHub Pages para que cualquier persona pueda explorarlo en su celular o PC.</p>
         <div class="url-box">
             <span class="url-text" id="share-url-text">https://totoarg.github.io/departamento-01-01/</span>
             <button class="btn-copy" id="btn-copy-url">Copiar Link</button>
         </div>
         <p style="font-size: 11.5px; color: #94a3b8; margin-bottom: 0;">
-            ✓ Totalmente interactivo en iOS, Android, Windows y Mac.<br>
-            ✓ Permite comparar el estado real con las propuestas de remodelación.
+            ✓ Formato interactivo adaptado a departamentos en edificio.<br>
+            ✓ Se actualiza automáticamente con cada mejora.
         </p>
     </div>
 
@@ -427,8 +431,8 @@
         // --- 1. CONFIGURACIÓN GENERAL ---
         const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a0e17);
-        scene.fog = new THREE.FogExp2(0x0a0e17, 0.022);
+        scene.background = new THREE.Color(0x080c14);
+        scene.fog = new THREE.FogExp2(0x080c14, 0.022);
 
         const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(-8, 12, -9);
@@ -446,13 +450,13 @@
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
         controls.maxPolarAngle = Math.PI / 2 + 0.05;
-        controls.target.set(4.4, 1.5, 3.0);
+        controls.target.set(4.65, 1.5, 3.10);
 
         // --- 2. ILUMINACIÓN ---
         const ambientLight = new THREE.AmbientLight(0xfff5ea, 0.75);
         scene.add(ambientLight);
 
-        const sunLight = new THREE.DirectionalLight(0xfffaed, 1.3);
+        const sunLight = new THREE.DirectionalLight(0xfffaed, 1.35);
         sunLight.position.set(-14, 22, -10);
         sunLight.castShadow = true;
         sunLight.shadow.mapSize.width = 2048;
@@ -476,12 +480,8 @@
                 ctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
             }
             ctx.strokeStyle = '#b8ab99'; ctx.lineWidth = 4;
-            for (let x = 0; x <= 512; x += 128) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke();
-            }
-            for (let y = 0; y <= 512; y += 128) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
-            }
+            for (let x = 0; x <= 512; x += 128) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke(); }
+            for (let y = 0; y <= 512; y += 128) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke(); }
             const tex = new THREE.CanvasTexture(canvas);
             tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
             tex.repeat.set(7, 5);
@@ -499,9 +499,7 @@
                 ctx.fillRect(0, Math.random() * 1024, 1024, Math.random() * 6 + 1);
             }
             ctx.strokeStyle = '#4e230b'; ctx.lineWidth = 3;
-            for (let x = 0; x <= 1024; x += 1024/12) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1024); ctx.stroke();
-            }
+            for (let x = 0; x <= 1024; x += 1024/12) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1024); ctx.stroke(); }
             const tex = new THREE.CanvasTexture(canvas);
             tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
             tex.repeat.set(4, 4);
@@ -526,16 +524,18 @@
 
         // Materiales
         const floorMat = new THREE.MeshStandardMaterial({ map: createTileTexture(), roughness: 0.35 });
-        const bathroomTileMat = new THREE.MeshStandardMaterial({ color: 0xf5f7fa, roughness: 0.2 });
+        const corridorFloorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.6 });
         const wallMat = new THREE.MeshStandardMaterial({ color: 0xf3f4f6, roughness: 0.85 });
+        const medianeraMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.9 });
         const woodCeilingMat = new THREE.MeshStandardMaterial({ map: createWoodTexture(), roughness: 0.5 });
         const beamMat = new THREE.MeshStandardMaterial({ color: 0x6e3b19, roughness: 0.6 });
         const windowGlassMat = new THREE.MeshPhysicalMaterial({ color: 0x88bbdd, transmission: 0.9, opacity: 0.35, transparent: true, roughness: 0.1 });
         const blackFrameMat = new THREE.MeshStandardMaterial({ color: 0x1f242b, roughness: 0.4 });
-        const doorGreyMat = new THREE.MeshStandardMaterial({ color: 0x757d87, roughness: 0.5 });
+        const doorGreyMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.5 });
         const woodDoorMat = new THREE.MeshStandardMaterial({ color: 0xb46b38, roughness: 0.4 });
         const graniteMat = new THREE.MeshStandardMaterial({ map: createGraniteTexture(), roughness: 0.25 });
         const ironMat = new THREE.MeshStandardMaterial({ color: 0x222225, roughness: 0.3, metalness: 0.85 });
+        const ductMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.8 });
 
         // Grupos
         const apartmentGroup = new THREE.Group();
@@ -543,41 +543,74 @@
         const roofGroup = new THREE.Group();
         const furnitureGroup = new THREE.Group();
         const dimensionsGroup = new THREE.Group();
+        const corridorGroup = new THREE.Group();
 
         const groupActual = new THREE.Group();
         const groupPropIsla = new THREE.Group();
         const groupPropLoft = new THREE.Group();
 
-        apartmentGroup.add(wallsGroup, roofGroup, furnitureGroup, dimensionsGroup, groupActual, groupPropIsla, groupPropLoft);
+        apartmentGroup.add(wallsGroup, roofGroup, furnitureGroup, dimensionsGroup, corridorGroup, groupActual, groupPropIsla, groupPropLoft);
         scene.add(apartmentGroup);
 
         groupPropIsla.visible = false;
         groupPropLoft.visible = false;
 
-        // --- 4. GEOMETRÍA REAL Y MUROS SEGÚN LOS VIDEOS ---
-        // Distribución real comprobada:
-        // Sector Izquierdo (X: 0.00 a 4.20m, Z: 0.00 a 6.20m): LIVING-COMEDOR completo con techo alto en pendiente.
-        // Sector Derecho (X: 4.20 a 9.20m):
-        //   - Z: 0.00 a 2.40m: COCINA con mesada en L, bajo mesada, alacenas, lavarropas y ventana al jardín.
-        //   - Z: 2.40 a 4.10m: BAÑO COMPLETO con bañera, inodoro, bidet, vanitory y ventiluz.
-        //   - Z: 4.10 a 6.20m: DORMITORIO / ESTUDIO con placard embutido, ventana y escritorio gamer en L.
-        //   - Pasillo central de conexión (X: 3.80 a 4.60m) que vincula living, cocina, baño y dormitorio.
+        // --- 4. GEOMETRÍA OFICIAL DEL DEPARTAMENTO 01-01 (PROPIEDAD HORIZONTAL) ---
+        // Coordenadas exactas según el plano municipal y el polígono oficial:
+        // - Lado Oeste (calle/lateral): 6.20 m
+        // - Lado Norte (medianera con Depto 01-02): 7.00 m
+        // - Quiebre palier común: 1.40 m
+        // - Muro Norte palier (puerta de acceso): 2.30 m
+        // - Lado Este: 4.80 m
+        // - Lado Sur: 3.80 m + Ducto técnico instalaciones (0.40 x 0.70 m) + 5.10 m = 9.30 m total
+        // Total superficie cubierta interior: 54.16 m²
 
-        // Piso general
-        const floorGeo = new THREE.PlaneGeometry(9.20, 6.20);
+        const floorShape = new THREE.Shape();
+        floorShape.moveTo(0.00, 0.00);             // Esquina SO
+        floorShape.lineTo(5.10, 0.00);             // Lado sur living (5.10m)
+        floorShape.lineTo(5.10, 0.70);             // Quiebre ducto técnico edificio
+        floorShape.lineTo(5.50, 0.70);             // Ancho ducto técnico (0.40m)
+        floorShape.lineTo(5.50, 0.00);             // Salida ducto sur
+        floorShape.lineTo(9.30, 0.00);             // Esquina SE (3.80m tramo sur cocina/dormitorio)
+        floorShape.lineTo(9.30, 4.80);             // Lado Este (4.80m)
+        floorShape.lineTo(7.00, 4.80);             // Muro común palier (2.30m)
+        floorShape.lineTo(7.00, 6.20);             // Quiebre común (1.40m)
+        floorShape.lineTo(0.00, 6.20);             // Medianera Depto 01-02 (7.00m)
+        floorShape.closePath();
+
+        const floorGeo = new THREE.ShapeGeometry(floorShape);
         floorGeo.rotateX(Math.PI / 2);
+        floorGeo.scale(1, 1, -1);
         const floorMesh = new THREE.Mesh(floorGeo, floorMat);
-        floorMesh.position.set(4.60, 0, 3.10);
         floorMesh.receiveShadow = true;
         wallsGroup.add(floorMesh);
 
+        // Pasillo / Palier Común del Edificio (Cubierta Común - Ancho 1.20m según plano)
+        const corridorShape = new THREE.Shape();
+        corridorShape.moveTo(7.00, 4.80);
+        corridorShape.lineTo(7.00, 6.20);
+        corridorShape.lineTo(8.20, 6.20);
+        corridorShape.lineTo(8.20, 4.80);
+        corridorShape.closePath();
+        const corridorGeo = new THREE.ShapeGeometry(corridorShape);
+        corridorGeo.rotateX(Math.PI / 2);
+        corridorGeo.scale(1, 1, -1);
+        const corridorMesh = new THREE.Mesh(corridorGeo, corridorFloorMat);
+        corridorMesh.position.y = -0.01;
+        corridorGroup.add(corridorMesh);
+
+        // Ducto técnico de instalaciones del edificio (pleno común vertical)
+        const ductBox = new THREE.Mesh(new THREE.BoxGeometry(0.38, 3.20, 0.68), ductMat);
+        ductBox.position.set(5.30, 1.60, 0.35);
+        wallsGroup.add(ductBox);
+
         function getRoofHeight(x, z) {
-            // Techo con pendiente real que desciende hacia el muro Este
-            const t = Math.max(0, Math.min(1, x / 9.20));
+            // Techo de madera en pendiente del último piso
+            const t = Math.max(0, Math.min(1, x / 9.30));
             return 2.65 + 1.20 * Math.sin(t * Math.PI * 0.85);
         }
 
-        function createWall(p1, p2, thickness, parent, winConfig = null, doorConfig = null) {
+        function createWall(p1, p2, thickness, parent, winConfig = null, doorConfig = null, isMedianera = false) {
             const dx = p2.x - p1.x;
             const dz = p2.z - p1.z;
             const length = Math.hypot(dx, dz);
@@ -588,31 +621,31 @@
             wallGroup.rotation.y = -angle;
 
             const avgH = (getRoofHeight(p1.x, p1.z) + getRoofHeight(p2.x, p2.z)) / 2;
+            const usedMat = isMedianera ? medianeraMat : wallMat;
 
             if (winConfig) {
                 const { start, width, sill, height } = winConfig;
                 if (start > 0) {
-                    const mLeft = new THREE.Mesh(new THREE.BoxGeometry(start, avgH, thickness), wallMat);
+                    const mLeft = new THREE.Mesh(new THREE.BoxGeometry(start, avgH, thickness), usedMat);
                     mLeft.position.set(start / 2, avgH / 2, 0);
                     wallGroup.add(mLeft);
                 }
-                const mBottom = new THREE.Mesh(new THREE.BoxGeometry(width, sill, thickness), wallMat);
+                const mBottom = new THREE.Mesh(new THREE.BoxGeometry(width, sill, thickness), usedMat);
                 mBottom.position.set(start + width / 2, sill / 2, 0);
                 wallGroup.add(mBottom);
 
                 const lintelH = avgH - (sill + height);
                 if (lintelH > 0) {
-                    const mTop = new THREE.Mesh(new THREE.BoxGeometry(width, lintelH, thickness), wallMat);
+                    const mTop = new THREE.Mesh(new THREE.BoxGeometry(width, lintelH, thickness), usedMat);
                     mTop.position.set(start + width / 2, sill + height + lintelH / 2, 0);
                     wallGroup.add(mTop);
                 }
                 const rightW = length - (start + width);
                 if (rightW > 0) {
-                    const mRight = new THREE.Mesh(new THREE.BoxGeometry(rightW, avgH, thickness), wallMat);
+                    const mRight = new THREE.Mesh(new THREE.BoxGeometry(rightW, avgH, thickness), usedMat);
                     mRight.position.set(start + width + rightW / 2, avgH / 2, 0);
                     wallGroup.add(mRight);
                 }
-                // Ventana 3D
                 const glass = new THREE.Mesh(new THREE.BoxGeometry(width - 0.06, height - 0.06, 0.02), windowGlassMat);
                 glass.position.set(start + width / 2, sill + height / 2, 0);
                 const frame = new THREE.Mesh(new THREE.BoxGeometry(width, height, thickness * 0.8), blackFrameMat);
@@ -622,19 +655,19 @@
             } else if (doorConfig) {
                 const { start, width, height, type } = doorConfig;
                 if (start > 0) {
-                    const mLeft = new THREE.Mesh(new THREE.BoxGeometry(start, avgH, thickness), wallMat);
+                    const mLeft = new THREE.Mesh(new THREE.BoxGeometry(start, avgH, thickness), usedMat);
                     mLeft.position.set(start / 2, avgH / 2, 0);
                     wallGroup.add(mLeft);
                 }
                 const lintelH = avgH - height;
                 if (lintelH > 0) {
-                    const mTop = new THREE.Mesh(new THREE.BoxGeometry(width, lintelH, thickness), wallMat);
+                    const mTop = new THREE.Mesh(new THREE.BoxGeometry(width, lintelH, thickness), usedMat);
                     mTop.position.set(start + width / 2, height + lintelH / 2, 0);
                     wallGroup.add(mTop);
                 }
                 const rightW = length - (start + width);
                 if (rightW > 0) {
-                    const mRight = new THREE.Mesh(new THREE.BoxGeometry(rightW, avgH, thickness), wallMat);
+                    const mRight = new THREE.Mesh(new THREE.BoxGeometry(rightW, avgH, thickness), usedMat);
                     mRight.position.set(start + width + rightW / 2, avgH / 2, 0);
                     wallGroup.add(mRight);
                 }
@@ -645,7 +678,7 @@
                     wallGroup.add(doorLeaf);
                 }
             } else {
-                const wallMesh = new THREE.Mesh(new THREE.BoxGeometry(length, avgH, thickness), wallMat);
+                const wallMesh = new THREE.Mesh(new THREE.BoxGeometry(length, avgH, thickness), usedMat);
                 wallMesh.position.set(length / 2, avgH / 2, 0);
                 wallMesh.castShadow = true; wallMesh.receiveShadow = true;
                 wallGroup.add(wallMesh);
@@ -655,61 +688,63 @@
             return wallGroup;
         }
 
-        // --- MUROS PERIMETRALES REALES ---
-        // 1. Muro Sur (Frente a la calle con 2 ventanales grandes del living)
-        createWall({ x: 0.0, z: 0.0 }, { x: 4.2, z: 0.0 }, 0.20, wallsGroup, { start: 0.6, width: 3.0, sill: 1.0, height: 1.25 });
-        // Muro Sur Cocina (con ventana de cocina)
-        createWall({ x: 4.2, z: 0.0 }, { x: 9.2, z: 0.0 }, 0.20, wallsGroup, { start: 2.2, width: 1.4, sill: 1.1, height: 1.1 });
+        // --- MUROS PERIMETRALES DEL DEPARTAMENTO (Espesor 0.20 m) ---
+        // 1. Medianera Norte con Depto 01-02 (7.00 m - Pared ciega de separación entre unidades)
+        createWall({ x: 0.0, z: 6.30 }, { x: 7.0, z: 6.30 }, 0.20, wallsGroup, null, null, true);
 
-        // 2. Muro Oeste (Lateral living con ventanal y calefactor)
-        createWall({ x: 0.0, z: 0.0 }, { x: 0.0, z: 6.2 }, 0.20, wallsGroup, { start: 1.8, width: 1.6, sill: 1.0, height: 1.25 });
+        // 2. Límite con Palier Común del edificio (Quiebre 1.40 m)
+        createWall({ x: 6.90, z: 6.20 }, { x: 6.90, z: 4.80 }, 0.20, wallsGroup, null, null, true);
 
-        // 3. Muro Norte (Fondo - con puerta de acceso en pasillo y ventana en dormitorio)
-        createWall({ x: 0.0, z: 6.2 }, { x: 4.2, z: 6.2 }, 0.20, wallsGroup);
-        // Acceso principal
-        createWall({ x: 4.2, z: 6.2 }, { x: 6.2, z: 6.2 }, 0.20, wallsGroup, null, { start: 0.4, width: 0.9, height: 2.1, type: 'grey' });
-        // Ventana fondo dormitorio
-        createWall({ x: 6.2, z: 6.2 }, { x: 9.2, z: 6.2 }, 0.20, wallsGroup, { start: 0.8, width: 1.4, sill: 1.0, height: 1.25 });
+        // 3. Muro Norte Palier (2.30 m) - CON PUERTA PRINCIPAL DE ACCESO AL DEPARTAMENTO
+        createWall({ x: 7.00, z: 4.70 }, { x: 9.30, z: 4.70 }, 0.20, wallsGroup, null, { start: 0.35, width: 0.90, height: 2.10, type: 'grey' }, true);
 
-        // 4. Muro Este (Lateral dormitorio y baño)
-        createWall({ x: 9.2, z: 6.2 }, { x: 9.2, z: 0.0 }, 0.20, wallsGroup, { start: 2.8, width: 0.6, sill: 1.7, height: 0.5 }); // Ventiluz baño
+        // 4. Muro Este (4.80 m - Ventana dormitorio al exterior)
+        createWall({ x: 9.40, z: 4.80 }, { x: 9.40, z: 0.00 }, 0.20, wallsGroup, { start: 1.40, width: 1.40, sill: 1.00, height: 1.20 });
 
-        // --- TABIQUES INTERIORES REALES ---
+        // 5. Muro Sur (9.30 m total con nicho de instalaciones de 0.40 x 0.70 m)
+        // Tramo sur cocina/dormitorio (3.80 m)
+        createWall({ x: 9.30, z: -0.10 }, { x: 5.50, z: -0.10 }, 0.20, wallsGroup);
+        // Nicho/Ducto de ventilación e instalaciones sanitarias del edificio
+        createWall({ x: 5.45, z: 0.00 }, { x: 5.45, z: 0.70 }, 0.10, wallsGroup);
+        createWall({ x: 5.50, z: 0.75 }, { x: 5.10, z: 0.75 }, 0.10, wallsGroup);
+        createWall({ x: 5.15, z: 0.70 }, { x: 5.15, z: 0.00 }, 0.10, wallsGroup);
+        // Tramo sur living (5.10 m - Con gran ventanal al frente)
+        createWall({ x: 5.10, z: -0.10 }, { x: 0.00, z: -0.10 }, 0.20, wallsGroup, { start: 1.40, width: 1.80, sill: 1.00, height: 1.25 });
+
+        // 6. Muro Oeste (6.20 m - Fachada lateral con ventanal del living)
+        createWall({ x: -0.10, z: 0.00 }, { x: -0.10, z: 6.20 }, 0.20, wallsGroup, { start: 1.50, width: 1.60, sill: 1.00, height: 1.25 });
+
+        // --- TABIQUES INTERIORES SEGÚN VIDEOS ---
         // A) ESTADO REAL ACTUAL:
-        // Tabique divisorio entre Living y sector Cocina/Baño/Dormitorio con paso central
-        createWall({ x: 4.2, z: 0.0 }, { x: 4.2, z: 6.2 }, 0.12, groupActual, null, { start: 4.6, width: 1.0, height: 2.1, type: 'open' });
-        // Tabique divisorio entre Cocina y Baño
-        createWall({ x: 4.2, z: 2.4 }, { x: 9.2, z: 2.4 }, 0.12, groupActual, null, { start: 0.3, width: 0.8, height: 2.1, type: 'open' });
-        // Tabique divisorio entre Baño y Dormitorio
-        createWall({ x: 4.2, z: 4.1 }, { x: 9.2, z: 4.1 }, 0.12, groupActual, null, { start: 0.3, width: 0.8, height: 2.1, type: 'wood' });
+        // Tabique divisorio entre el Living-Comedor y el sector privado (Cocina/Baño/Dormitorio)
+        createWall({ x: 4.50, z: 0.70 }, { x: 4.50, z: 4.80 }, 0.12, groupActual, null, { start: 2.10, width: 0.85, height: 2.10, type: 'open' });
+        // Tabique entre Cocina y Baño (junto al ducto de instalaciones)
+        createWall({ x: 4.50, z: 2.30 }, { x: 7.20, z: 2.30 }, 0.12, groupActual, null, { start: 0.20, width: 0.75, height: 2.10, type: 'wood' });
+        // Tabique entre Baño y Dormitorio
+        createWall({ x: 4.50, z: 3.90 }, { x: 7.00, z: 3.90 }, 0.12, groupActual, null, { start: 0.30, width: 0.80, height: 2.10, type: 'wood' });
 
-        // B) PROPUESTA 1: COCINA ABIERTA CON ISLA DESAYUNADORA
-        // Se demuele el tabique del living hacia la cocina, unificando el espacio
-        createWall({ x: 4.2, z: 2.4 }, { x: 4.2, z: 6.2 }, 0.12, groupPropIsla, null, { start: 2.2, width: 1.0, height: 2.1, type: 'open' });
-        createWall({ x: 4.2, z: 2.4 }, { x: 9.2, z: 2.4 }, 0.12, groupPropIsla);
-        createWall({ x: 4.2, z: 4.1 }, { x: 9.2, z: 4.1 }, 0.12, groupPropIsla, null, { start: 0.3, width: 0.8, height: 2.1, type: 'wood' });
+        // B) PROPUESTA 1: COCINA ABIERTA CON ISLA DESAYUNADORA (Sin tocar medianeras)
+        createWall({ x: 4.50, z: 2.30 }, { x: 7.20, z: 2.30 }, 0.12, groupPropIsla, null, { start: 0.20, width: 0.75, height: 2.10, type: 'wood' });
+        createWall({ x: 4.50, z: 3.90 }, { x: 7.00, z: 3.90 }, 0.12, groupPropIsla, null, { start: 0.30, width: 0.80, height: 2.10, type: 'wood' });
+        const islandGroup = new THREE.Group();
+        const islandBase = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.90, 2.00), woodDoorMat);
+        islandBase.position.set(4.50, 0.45, 1.40);
+        const islandTop = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.05, 2.10), graniteMat);
+        islandTop.position.set(4.45, 0.925, 1.40);
+        islandGroup.add(islandBase, islandTop);
+        groupPropIsla.add(islandGroup);
 
-        // Isla moderna integrada
-        const islandMesh = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.90, 2.20), woodDoorMat);
-        islandMesh.position.set(4.20, 0.45, 1.20);
-        const islandTop = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.05, 2.30), graniteMat);
-        islandTop.position.set(4.15, 0.925, 1.20);
-        groupPropIsla.add(islandMesh, islandTop);
+        // C) PROPUESTA 2: ENTREPISO / MEZZANINE (Aprovechando los 3.85m)
+        groupPropLoft.add(islandGroup.clone());
+        createWall({ x: 4.50, z: 2.30 }, { x: 7.20, z: 2.30 }, 0.12, groupPropLoft, null, { start: 0.20, width: 0.75, height: 2.10, type: 'wood' });
+        createWall({ x: 4.50, z: 3.90 }, { x: 7.00, z: 3.90 }, 0.12, groupPropLoft, null, { start: 0.30, width: 0.80, height: 2.10, type: 'wood' });
+        const loftPlat = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.12, 2.60), woodCeilingMat);
+        loftPlat.position.set(8.15, 2.25, 3.10);
+        const col1 = new THREE.Mesh(new THREE.BoxGeometry(0.10, 2.25, 0.10), ironMat); col1.position.set(7.05, 1.125, 1.85);
+        const col2 = new THREE.Mesh(new THREE.BoxGeometry(0.10, 2.25, 0.10), ironMat); col2.position.set(7.05, 1.125, 4.35);
+        const railTop = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 2.60), ironMat); railTop.position.set(7.05, 3.20, 3.10);
+        groupPropLoft.add(loftPlat, col1, col2, railTop);
 
-        // C) PROPUESTA 2: ENTREPISO / MEZZANINE (Aprovechando los 3.85m de techo)
-        groupPropLoft.add(islandMesh.clone(), islandTop.clone());
-        createWall({ x: 4.2, z: 2.4 }, { x: 4.2, z: 6.2 }, 0.12, groupPropLoft, null, { start: 2.2, width: 1.0, height: 2.1, type: 'open' });
-        createWall({ x: 4.2, z: 2.4 }, { x: 9.2, z: 2.4 }, 0.12, groupPropLoft);
-        createWall({ x: 4.2, z: 4.1 }, { x: 9.2, z: 4.1 }, 0.12, groupPropLoft, null, { start: 0.3, width: 0.8, height: 2.1, type: 'wood' });
-
-        // Estructura de entrepiso en madera y hierro sobre el dormitorio
-        const loftPlat = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.12, 2.0), woodCeilingMat);
-        loftPlat.position.set(6.8, 2.2, 5.1);
-        const col1 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.2, 0.1), ironMat); col1.position.set(5.1, 1.1, 4.2);
-        const rail = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.05, 0.05), ironMat); rail.position.set(6.8, 3.1, 4.2);
-        groupPropLoft.add(loftPlat, col1, rail);
-
-        // Selector de versión
         function setProposal(ver) {
             groupActual.visible = (ver === 'actual');
             groupPropIsla.visible = (ver === 'isla');
@@ -723,140 +758,83 @@
         document.getElementById('btn-prop-isla').addEventListener('click', () => setProposal('isla'));
         document.getElementById('btn-prop-loft').addEventListener('click', () => setProposal('loft'));
 
-        // --- 5. TECHO DE MADERA EN PENDIENTE CON VIGAS REALES ---
+        // --- 5. TECHO DE MADERA EN PENDIENTE CON VIGAS ---
         function buildRoof() {
-            const roofGeo = new THREE.PlaneGeometry(10.0, 7.0, 20, 20);
+            const roofGeo = new THREE.PlaneGeometry(10.2, 7.2, 20, 20);
             roofGeo.rotateX(Math.PI / 2);
             const pos = roofGeo.attributes.position;
             for (let i = 0; i < pos.count; i++) {
-                const vx = pos.getX(i) + 4.6;
-                const vz = pos.getZ(i) + 3.1;
+                const vx = pos.getX(i) + 4.65;
+                const vz = pos.getZ(i) + 3.10;
                 pos.setY(i, getRoofHeight(vx, vz));
             }
             roofGeo.computeVertexNormals();
 
             const roofMesh = new THREE.Mesh(roofGeo, woodCeilingMat);
-            roofMesh.position.set(4.6, 0, 3.1);
+            roofMesh.position.set(4.65, 0, 3.10);
             roofGroup.add(roofMesh);
 
-            // Vigas de madera transversales vistas
-            for (let i = 0; i <= 10; i++) {
-                const z = (i / 10) * 6.2;
+            for (let i = 0; i <= 11; i++) {
+                const z = (i / 11) * 6.20;
                 const beam = new THREE.Mesh(new THREE.BoxGeometry(9.6, 0.14, 0.07), beamMat);
-                beam.position.set(4.6, getRoofHeight(4.6, z) - 0.07, z);
-                beam.rotation.z = -0.05;
+                beam.position.set(4.65, getRoofHeight(4.65, z) - 0.07, z);
+                beam.rotation.z = -0.06;
                 roofGroup.add(beam);
             }
         }
         buildRoof();
 
-        // --- 6. MOBILIARIO REAL RELEVADO DE LOS VIDEOS ---
-        // A) Cocina
+        // --- 6. EQUIPAMIENTO REAL SEGÚN VIDEOS ---
+        // Cocina
         function buildKitchen() {
             const kg = new THREE.Group();
-            // Mesada en L de granito rosa
-            const c1 = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.85, 0.60), woodDoorMat); c1.position.set(6.4, 0.425, 0.35);
-            const t1 = new THREE.Mesh(new THREE.BoxGeometry(2.44, 0.04, 0.64), graniteMat); t1.position.set(6.4, 0.87, 0.35);
-            const c2 = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.85, 1.40), woodDoorMat); c2.position.set(7.3, 0.425, 1.05);
-            const t2 = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.04, 1.44), graniteMat); t2.position.set(7.3, 0.87, 1.05);
-
-            // Lavarropas de carga frontal bajo mesada
-            const washer = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.82, 0.58), new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.2 }));
-            washer.position.set(8.5, 0.41, 0.35);
-
-            // Cocina a gas de 4 hornallas
-            const stove = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.86, 0.58), new THREE.MeshStandardMaterial({ color: 0xffffff }));
-            stove.position.set(5.5, 0.43, 0.35);
-
-            // Termotanque cilíndrico
-            const heater = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 1.05, 20), new THREE.MeshStandardMaterial({ color: 0xf5f5f5 }));
-            heater.position.set(4.6, 1.4, 0.35);
-
-            // Heladera
-            const fridge = new THREE.Mesh(new THREE.BoxGeometry(0.70, 1.80, 0.65), new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.3, roughness: 0.3 }));
-            fridge.position.set(4.6, 0.90, 1.8);
-
-            kg.add(c1, t1, c2, t2, washer, stove, heater, fridge);
+            const base1 = new THREE.Mesh(new THREE.BoxGeometry(1.80, 0.85, 0.60), woodDoorMat); base1.position.set(5.70, 0.425, 1.00);
+            const top1 = new THREE.Mesh(new THREE.BoxGeometry(1.84, 0.04, 0.62), graniteMat); top1.position.set(5.70, 0.87, 1.00);
+            const stove = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.86, 0.58), new THREE.MeshStandardMaterial({ color: 0xffffff })); stove.position.set(6.85, 0.43, 1.00);
+            const heater = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 1.05, 20), new THREE.MeshStandardMaterial({ color: 0xfafafa })); heater.position.set(7.35, 1.45, 1.00);
+            kg.add(base1, top1, stove, heater);
             furnitureGroup.add(kg);
         }
         buildKitchen();
 
-        // B) Baño Completo (Relevado en video_06)
+        // Baño con bañera
         function buildBathroom() {
             const bg = new THREE.Group();
-            // Bañera real
-            const tub = new THREE.Mesh(new THREE.BoxGeometry(0.70, 0.45, 1.50), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 }));
-            tub.position.set(8.75, 0.225, 3.25);
-            // Inodoro y Bidet
-            const toilet = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.42, 0.60), new THREE.MeshStandardMaterial({ color: 0xffffff }));
-            toilet.position.set(6.8, 0.21, 2.7);
-            const bidet = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.40, 0.55), new THREE.MeshStandardMaterial({ color: 0xffffff }));
-            bidet.position.set(6.0, 0.20, 2.7);
-            // Vanitory
-            const vanity = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.82, 0.48), woodDoorMat);
-            vanity.position.set(5.0, 0.41, 3.75);
-
-            bg.add(tub, toilet, bidet, vanity);
+            const tub = new THREE.Mesh(new THREE.BoxGeometry(0.70, 0.45, 1.50), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })); tub.position.set(6.80, 0.225, 3.10);
+            const toilet = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.42, 0.55), new THREE.MeshStandardMaterial({ color: 0xffffff })); toilet.position.set(5.20, 0.21, 2.70);
+            const vanity = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.82, 0.45), woodDoorMat); vanity.position.set(5.20, 0.41, 3.50);
+            bg.add(tub, toilet, vanity);
             furnitureGroup.add(bg);
         }
         buildBathroom();
 
-        // C) Living-Comedor
+        // Living-Comedor
         function buildLiving() {
             const lg = new THREE.Group();
-            // Calefactor tiro balanceado con chimenea vertical
-            const heater = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.65, 0.22), new THREE.MeshStandardMaterial({ color: 0x3b4a3f }));
-            heater.position.set(0.18, 0.35, 1.20);
-            const flue = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 2.8, 16), new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.8 }));
-            flue.position.set(0.18, 1.8, 1.20);
-
-            // Mesa redonda y sillas cerca del ventanal
-            const table = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.04, 24), woodDoorMat);
-            table.position.set(1.4, 0.75, 5.0);
-            const tableLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.75, 12), woodDoorMat);
-            tableLeg.position.set(1.4, 0.375, 5.0);
-
-            // Sillón azul y mesa ratona
-            const sofa = new THREE.Mesh(new THREE.BoxGeometry(1.90, 0.55, 0.85), new THREE.MeshStandardMaterial({ color: 0x1e3a5f }));
-            sofa.position.set(2.4, 0.35, 3.8);
-            const coffeeTable = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.38, 0.50), woodDoorMat);
-            coffeeTable.position.set(2.4, 0.19, 2.8);
-
-            // Rack de TV y TV
-            const tvRack = new THREE.Mesh(new THREE.BoxGeometry(1.80, 0.60, 0.42), woodDoorMat);
-            tvRack.position.set(2.4, 0.30, 1.4);
-            const tv = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.72, 0.04), blackFrameMat);
-            tv.position.set(2.4, 0.95, 1.4);
-
-            lg.add(heater, flue, table, tableLeg, sofa, coffeeTable, tvRack, tv);
+            const heater = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.65, 0.22), new THREE.MeshStandardMaterial({ color: 0x3b4a3f })); heater.position.set(0.18, 0.35, 1.20);
+            const flue = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 2.8, 16), new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.8 })); flue.position.set(0.18, 1.8, 1.20);
+            const table = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.04, 24), woodDoorMat); table.position.set(1.4, 0.75, 5.0);
+            const tableLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.75, 12), woodDoorMat); tableLeg.position.set(1.4, 0.375, 5.0);
+            const sofa = new THREE.Mesh(new THREE.BoxGeometry(1.90, 0.55, 0.85), new THREE.MeshStandardMaterial({ color: 0x1e3a5f })); sofa.position.set(2.4, 0.35, 3.8);
+            const tvRack = new THREE.Mesh(new THREE.BoxGeometry(1.80, 0.60, 0.42), woodDoorMat); tvRack.position.set(2.4, 0.30, 1.4);
+            const tv = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.72, 0.04), blackFrameMat); tv.position.set(2.4, 0.95, 1.4);
+            lg.add(heater, flue, table, tableLeg, sofa, tvRack, tv);
             furnitureGroup.add(lg);
         }
         buildLiving();
 
-        // D) Dormitorio / Estudio
+        // Dormitorio
         function buildBedroom() {
             const dg = new THREE.Group();
-            // Cama de dos plazas con respaldo de madera (video_34)
-            const bedHead = new THREE.Mesh(new THREE.BoxGeometry(1.60, 0.90, 0.06), woodDoorMat);
-            bedHead.position.set(5.5, 0.45, 6.15);
-            const bed = new THREE.Mesh(new THREE.BoxGeometry(1.50, 0.48, 1.95), new THREE.MeshStandardMaterial({ color: 0x475569 }));
-            bed.position.set(5.5, 0.24, 5.15);
-
-            // Placard embutido con baulera superior
-            const closet = new THREE.Mesh(new THREE.BoxGeometry(1.80, 2.50, 0.65), wallMat);
-            closet.position.set(8.2, 1.25, 4.45);
-
-            // Escritorio gamer en L y estantes flotantes (video_34)
-            const desk1 = new THREE.Mesh(new THREE.BoxGeometry(1.60, 0.04, 0.75), woodDoorMat); desk1.position.set(8.2, 0.75, 5.75);
-            const chair = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.85, 0.48), new THREE.MeshStandardMaterial({ color: 0x111827 }));
-            chair.position.set(8.2, 0.50, 5.2);
-
-            dg.add(bedHead, bed, closet, desk1, chair);
+            const bed = new THREE.Mesh(new THREE.BoxGeometry(1.50, 0.48, 1.95), new THREE.MeshStandardMaterial({ color: 0x475569 })); bed.position.set(8.2, 0.24, 2.5);
+            const closet = new THREE.Mesh(new THREE.BoxGeometry(2.10, 2.50, 0.65), wallMat); closet.position.set(8.15, 1.25, 4.375);
+            const desk = new THREE.Mesh(new THREE.BoxGeometry(1.60, 0.04, 0.75), woodDoorMat); desk.position.set(8.20, 0.75, 1.20);
+            dg.add(bed, closet, desk);
             furnitureGroup.add(dg);
         }
         buildBedroom();
 
-        // --- 7. COTAS DE MEDIDAS ---
+        // --- 7. COTAS DE MEDIDAS OFICIALES ---
         const labelElements = [];
         function addDim(p1, p2, text, offsetDir, dist = 0.5) {
             const normal = offsetDir.clone().normalize().multiplyScalar(dist);
@@ -874,12 +852,13 @@
             labelElements.push({ el: label, pos: mid });
         }
 
-        addDim(new THREE.Vector3(0, 0.05, 0), new THREE.Vector3(4.2, 0.05, 0), "Living: 4.20 m", new THREE.Vector3(0, 0, -1), 0.5);
-        addDim(new THREE.Vector3(4.2, 0.05, 0), new THREE.Vector3(9.2, 0.05, 0), "Cocina: 5.00 m", new THREE.Vector3(0, 0, -1), 0.5);
-        addDim(new THREE.Vector3(0, 0.05, 0), new THREE.Vector3(0, 0.05, 6.2), "Largo: 6.20 m", new THREE.Vector3(-1, 0, 0), 0.5);
-        addDim(new THREE.Vector3(9.2, 0.05, 0), new THREE.Vector3(9.2, 0.05, 2.4), "Cocina prof: 2.40 m", new THREE.Vector3(1, 0, 0), 0.5);
-        addDim(new THREE.Vector3(9.2, 0.05, 2.4), new THREE.Vector3(9.2, 0.05, 4.1), "Baño: 1.70 m", new THREE.Vector3(1, 0, 0), 0.5);
-        addDim(new THREE.Vector3(9.2, 0.05, 4.1), new THREE.Vector3(9.2, 0.05, 6.2), "Dormitorio: 2.10 m", new THREE.Vector3(1, 0, 0), 0.5);
+        addDim(new THREE.Vector3(0, 0.05, 6.20), new THREE.Vector3(7.00, 0.05, 6.20), "7.00 m (Medianera 01-02)", new THREE.Vector3(0, 0, 1), 0.6);
+        addDim(new THREE.Vector3(0, 0.05, 0.00), new THREE.Vector3(0, 0.05, 6.20), "6.20 m (Fachada Calle)", new THREE.Vector3(-1, 0, 0), 0.6);
+        addDim(new THREE.Vector3(7.00, 0.05, 6.20), new THREE.Vector3(7.00, 0.05, 4.80), "1.40 m", new THREE.Vector3(-1, 0, 0), 0.4);
+        addDim(new THREE.Vector3(7.00, 0.05, 4.80), new THREE.Vector3(9.30, 0.05, 4.80), "2.30 m (Acceso Palier)", new THREE.Vector3(0, 0, 1), 0.5);
+        addDim(new THREE.Vector3(9.30, 0.05, 4.80), new THREE.Vector3(9.30, 0.05, 0.00), "4.80 m", new THREE.Vector3(1, 0, 0), 0.6);
+        addDim(new THREE.Vector3(5.50, 0.05, 0.00), new THREE.Vector3(9.30, 0.05, 0.00), "3.80 m", new THREE.Vector3(0, 0, -1), 0.6);
+        addDim(new THREE.Vector3(0.00, 0.05, 0.00), new THREE.Vector3(5.10, 0.05, 0.00), "5.10 m", new THREE.Vector3(0, 0, -1), 0.6);
 
         function updateLabels() {
             if (!document.getElementById('chk-dimensions').checked) {
@@ -897,14 +876,14 @@
             }
         }
 
-        // --- 8. VISTAS Y TOGGLES ---
+        // --- 8. VISTAS Y CONTROLES ---
         const viewPresets = {
-            isom: { pos: [-8, 12, -8], target: [4.6, 1.5, 3.1] },
+            isom: { pos: [-8, 12, -8], target: [4.65, 1.5, 3.10] },
             living: { pos: [0.8, 1.7, 5.0], target: [2.5, 1.2, 2.5] },
-            cocina: { pos: [4.4, 1.7, 1.8], target: [7.0, 1.1, 0.9] },
-            bano: { pos: [4.5, 1.6, 3.2], target: [7.5, 1.1, 3.2] },
-            dormitorio: { pos: [4.5, 1.7, 5.2], target: [7.2, 1.2, 5.2] },
-            acceso: { pos: [4.4, 1.8, 6.0], target: [2.0, 1.4, 3.0] }
+            cocina: { pos: [4.8, 1.7, 1.6], target: [6.5, 1.1, 1.0] },
+            bano: { pos: [4.6, 1.6, 3.1], target: [6.2, 1.1, 3.1] },
+            dormitorio: { pos: [7.2, 1.7, 3.5], target: [8.5, 1.2, 2.0] },
+            palier: { pos: [8.8, 2.0, 5.8], target: [7.8, 1.4, 4.6] }
         };
 
         function setView(name) {
@@ -920,6 +899,7 @@
 
         document.getElementById('chk-roof').addEventListener('change', (e) => roofGroup.visible = e.target.checked);
         document.getElementById('chk-furniture').addEventListener('change', (e) => furnitureGroup.visible = e.target.checked);
+        document.getElementById('chk-corridor').addEventListener('change', (e) => corridorGroup.visible = e.target.checked);
         document.getElementById('chk-dimensions').addEventListener('change', (e) => dimensionsGroup.visible = e.target.checked);
         document.getElementById('chk-transparent').addEventListener('change', (e) => {
             wallMat.transparent = e.target.checked;
@@ -928,8 +908,8 @@
         });
 
         document.getElementById('btn-top').addEventListener('click', () => {
-            camera.position.set(4.6, 18, 3.1);
-            controls.target.set(4.6, 0, 3.1);
+            camera.position.set(4.65, 18, 3.10);
+            controls.target.set(4.65, 0, 3.10);
             controls.update();
             document.getElementById('chk-roof').checked = false;
             roofGroup.visible = false;
@@ -944,7 +924,7 @@
             const blob = new Blob([result], { type: 'text/plain' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'Departamento_01-01_Real_Tomas.obj';
+            link.download = 'Departamento_01-01_Tomas.obj';
             link.click();
         });
 
