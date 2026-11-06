@@ -420,37 +420,81 @@
         }
         .add-preset-btn:hover { background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; }
 
+        /* Mobile UI Optimization */
         @media (max-width: 900px) {
             #header-card {
                 top: 8px; left: 8px; right: 8px;
                 max-width: none;
-                padding: 10px 12px;
+                padding: 7px 10px;
+                border-radius: 10px;
+                gap: 2px;
             }
+            #header-card h1 { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .badge { font-size: 9px; padding: 2px 7px; }
             .subtitle { display: none; }
+            .icon-btn { font-size: 10px; padding: 4px 7px; }
+
             #top-toolbar {
-                top: 68px;
+                top: 50px;
                 left: 8px;
                 right: 8px;
-                justify-content: space-around;
-                padding: 5px 8px;
+                justify-content: space-between;
+                padding: 4px 6px;
+                border-radius: 10px;
+                gap: 4px;
             }
+            .mode-btn {
+                padding: 5px 8px;
+                font-size: 10.5px;
+                flex: 1;
+                justify-content: center;
+                gap: 3px;
+            }
+            #top-toolbar .icon-btn {
+                padding: 4px 6px !important;
+                font-size: 11px !important;
+            }
+
             #sidebar-right {
-                top: 114px;
+                top: 96px;
                 right: 8px;
                 display: none;
-                width: 225px;
+                width: 210px;
                 z-index: 30;
+                padding: 10px;
             }
             #sidebar-right.show-mobile { display: flex; }
+
             #furniture-editor {
-                bottom: 56px;
+                bottom: 48px;
                 left: 8px;
                 right: 8px;
                 width: auto;
+                padding: 8px 10px;
+                border-radius: 10px;
             }
+            .editor-title { font-size: 11.5px; }
+
             #bottom-bar {
-                bottom: 8px;
-                padding: 5px 8px;
+                bottom: 6px;
+                left: 8px;
+                right: 8px;
+                transform: none;
+                max-width: none;
+                padding: 4px 6px;
+                border-radius: 20px;
+                gap: 4px;
+            }
+            .view-chip {
+                padding: 4px 10px;
+                font-size: 10.5px;
+            }
+
+            .arch-label {
+                font-size: 11px;
+            }
+            .arch-label.sm {
+                font-size: 9px;
             }
         }
     </style>
@@ -676,9 +720,18 @@
         const perspCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
         perspCam.position.set(3.50, 10.5, 9.20);
 
+        function getOrthoViewSize() {
+            const aspect = window.innerWidth / window.innerHeight;
+            // En pantallas verticales móviles (aspect < 1.0), encuadramos por el ancho del departamento (7m + margen)
+            if (aspect < 1.0) {
+                return 7.8 / aspect;
+            }
+            return 8.6;
+        }
+
         function createOrthoCam() {
             const aspect = window.innerWidth / window.innerHeight;
-            const viewSize = 8.4;
+            const viewSize = getOrthoViewSize();
             const cam = new THREE.OrthographicCamera(
                 -viewSize * aspect / 2,
                 viewSize * aspect / 2,
@@ -1225,13 +1278,26 @@
             document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === 'top2d'));
         }
 
+        function get3DPreset(name) {
+            const v = viewPresets[name] || viewPresets.isom;
+            const aspect = window.innerWidth / window.innerHeight;
+            if (aspect < 1.0) {
+                // En móvil vertical, alejamos la cámara un 40% para que el depto entre entero sin recortarse
+                return {
+                    pos: [v.pos[0], v.pos[1] * 1.45, v.pos[2] * 1.35],
+                    target: v.target
+                };
+            }
+            return v;
+        }
+
         function switchTo3D(presetName = 'isom', cut = false) {
             activeCamera = perspCam;
             controlsOrtho.enabled = false;
             controlsPersp.enabled = true;
             setWallCut(cut);
             setActiveTopBtn(cut ? 'btn-mode-cut' : 'btn-mode-3d');
-            const v = viewPresets[presetName] || viewPresets.isom;
+            const v = get3DPreset(presetName);
             perspCam.position.set(v.pos[0], v.pos[1], v.pos[2]);
             controlsPersp.target.set(v.target[0], v.target[1], v.target[2]);
             controlsPersp.update();
@@ -1314,7 +1380,7 @@
             perspCam.aspect = aspect;
             perspCam.updateProjectionMatrix();
 
-            const viewSize = 8.4;
+            const viewSize = getOrthoViewSize();
             orthoCam.left = -viewSize * aspect / 2;
             orthoCam.right = viewSize * aspect / 2;
             orthoCam.top = viewSize / 2;
