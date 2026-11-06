@@ -1,6 +1,18 @@
-# 📐 Departamento 01-01 — Planos y Modelo 3D Arquitectónico
+# 📐 Edificio Glaciares II — Depto 01-01 (1° Piso)
 
-Proyecto de modelado 3D interactivo y planos digitales para la **Unidad 01-01** (Primer Piso), basado en el **Plano Municipal / Subdivisión en Propiedad Horizontal** y la documentación fotográfica / panorámica 360° del departamento real.
+Proyecto de modelado 3D interactivo y planos digitales para la **Unidad Funcional N° 6, Departamento "A", Polígono 01-01**, verificado con la **Escritura Oficial de Dominio**, el **Plano Catastral / Subdivisión en PH** y el relevamiento exhaustivo por fotos, croquis y videos reales.
+
+---
+
+## 📋 Datos Legales y Catastrales Oficiales (Escritura)
+
+- **Edificio**: Glaciares II
+- **Ubicación**: Calle Günter Plüschow 235 (entre Antoine de Saint Exupéry y Calle 508), El Calafate, Provincia de Santa Cruz.
+- **Unidad Funcional**: N° 6 (Seis) — Planta Primer Piso — Departamento "A"
+- **Polígono**: 01-01
+- **Superficie Cubierta Oficial**: **54,16 m²** *(Cincuenta y cuatro metros con dieciséis decímetros cuadrados)*
+- **Porcentual de Dominio**: **10,03 %** *(Diez coma cero tres por ciento)*
+- **Nomenclatura Catastral**: Manzana 193, Parcela 14 (Plano de Mensura M-8876)
 
 ---
 
@@ -8,17 +20,17 @@ Proyecto de modelado 3D interactivo y planos digitales para la **Unidad 01-01** 
 
 | Parámetro | Medida Oficial | Observaciones |
 | :--- | :--- | :--- |
-| **Superficie Cubierta Interior** | **~54.16 m²** | Excluyendo muros perimetrales |
-| **Lado Oeste (Frente/Lateral)** | **6.20 m** | Muro exterior de 0.20 m de espesor con ventanal |
-| **Lado Norte (Medianera)** | **7.00 m** | Muro divisorio ciego con depto 01-02 (0.20 m) |
-| **Quiebre de Acceso Pasillo** | **1.40 m** | Conexión con Cubierta Común / Palier |
-| **Lado Norte Sector Este** | **2.30 m** | Muro con Puerta Principal de Acceso (0.20 m) |
-| **Lado Este** | **4.80 m** | Muro exterior dormitorio con ventana (0.20 m) |
-| **Lado Sur Sector Este** | **3.80 m** | Muro exterior |
-| **Ducto / Nicho de Ventilación** | **0.40 m × 0.70 m** | Chimenea / ventilación de artefactos a gas |
-| **Lado Sur Sector Oeste** | **5.10 m** | Muro exterior living con ventanal |
-| **Ancho Total (Este-Oeste)** | **9.30 m** | `7.00m + 2.30m` = `5.10m + 0.40m + 3.80m` (cierre perfecto) |
-| **Altura Libre (Cielorraso)** | **2.60 m a 3.90 m** | Techo de madera en pendiente (machimbre y tirantes vistos) |
+| **Superficie Cubierta Total** | **54,16 m²** | Coincidencia matemática exacta: `(9.30 × 6.20) - (2.30 × 1.40) - (0.40 × 0.70) = 54,16 m²` |
+| **Lado Oeste (Fachada)** | **6.20 m** | Frente directo sobre Calle Günter Plüschow |
+| **Lado Norte (Medianera)** | **7.00 m** | Muro divisorio con Unidad 01-02 |
+| **Quiebre a Palier Común** | **1.40 m** | Saliente hacia la Cubierta Común |
+| **Acceso desde Palier** | **2.30 m** | Muro con Puerta de Acceso Principal al Departamento |
+| **Lado Este (Lateral)** | **4.80 m** | Muro exterior Living Comedor |
+| **Lado Sur (Sector Living)** | **3.80 m** | Muro exterior hacia patio posterior |
+| **Ducto de Ventilación e Instalaciones** | **0.40 m × 0.70 m** | Ventilación y bajada de cañerías cocina/termo |
+| **Lado Sur (Sector Cuarto y Cocina)** | **5.10 m** | Muro exterior dormitorio y cocina |
+| **Ancho Total (Este-Oeste)** | **9.30 m** | `7.00 m + 2.30 m` = `5.10 m + 0.40 m + 3.80 m` |
+| **Altura Libre (Cielorraso)** | **2.65 m a 3.85 m** | Techo de madera en pendiente (machimbre y vigas vistas) |
 
 ---
 

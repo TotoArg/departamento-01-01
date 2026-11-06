@@ -18,3 +18,4 @@ check_*.py
 extract_samples.py
 analyze_frames.py
 inspect_items.py
+test_area.py

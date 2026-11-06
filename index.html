@@ -272,25 +272,29 @@
     <!-- Header Panel -->
     <div id="header-card" class="glass-panel">
         <div class="header-top">
-            <div class="badge">Distribución Exacta</div>
+            <div class="badge">Escritura Oficial: 54,16 m²</div>
             <div class="share-badge" id="btn-open-share">
                 <span>🔗</span> Compartir Link
             </div>
         </div>
-        <h1>Departamento 01-01 (1° Piso)</h1>
-        <div class="subtitle">Estructura real verificada por croquis y videos: Living a lo largo a la derecha, Cocina, Pasillo central, Cuarto, Baño central y Estudio gamer.</div>
+        <h1>Edificio Glaciares II - Depto 01-01</h1>
+        <div class="subtitle">Calle Günter Plüschow 235, El Calafate | UF N° 6 - Depto "A" (Polígono 01-01). Geometría exacta según escritura y plano catastral, con distribución interior según croquis y videos reales.</div>
         <div class="metrics-row">
+            <div class="metric">
+                <span class="metric-val">54,16 m²</span>
+                <span class="metric-lbl">Sup. Cubierta Escritura</span>
+            </div>
+            <div class="metric">
+                <span class="metric-val">10,03 %</span>
+                <span class="metric-lbl">Porcentual Dominio</span>
+            </div>
             <div class="metric">
                 <span class="metric-val">3 Ambientes</span>
                 <span class="metric-lbl">Tipología</span>
             </div>
             <div class="metric">
-                <span class="metric-val">~55 m²</span>
-                <span class="metric-lbl">Sup. Real</span>
-            </div>
-            <div class="metric">
-                <span class="metric-val">2.60 a 3.85 m</span>
-                <span class="metric-lbl">Pendiente Techo</span>
+                <span class="metric-val">2.65 a 3.85 m</span>
+                <span class="metric-lbl">Techo Madera</span>
             </div>
         </div>
     </div>
@@ -504,35 +508,41 @@
         groupPropIsla.visible = false;
         groupPropLoft.visible = false;
 
-        // --- 4. GEOMETRÍA EXACTA SEGÚN CROQUIS DEL USUARIO Y VIDEOS ---
-        // Coordenadas:
-        // Eje X: 0.00 a 8.00m (Izquierda = Dormitorios/Baño, Derecha = Living)
-        // Eje Z: 0.00 a 7.20m (Z=0: Fondo/Norte, Z=7.20: Frente/Sur con la ENTRADA)
-        //
-        // Distribución:
-        // - ENTRADA: en Z = 7.20, X = 5.50 a 6.40 (acceso al Living)
-        // - LIVING: Todo el lateral derecho (X: 3.60 a 8.00, Z: 0.00 a 7.20)
-        // - COCINA: Contigua a la entrada (X: 2.20 a 3.60, Z: 5.20 a 7.20)
-        // - PASILLO CENTRAL: (X: 2.20 a 3.60, Z: 1.80 a 5.20) que conecta:
-        //     * CUARTO (Dormitorio Principal): (X: 0.00 a 2.20, Z: 5.00 a 7.20) con Placard
-        //     * BAÑO COMPLETO: (X: 0.00 a 2.20, Z: 2.80 a 4.40) entre los dos placards
-        //     * ESTUDIO GAMER: (X: 0.00 a 2.20, Z: 0.00 a 2.20) con Placard y gran escritorio
-        // - Placards:
-        //     * Placard de Cuarto: (X: 0.00 a 2.20, Z: 4.40 a 5.00)
-        //     * Placard de Estudio: (X: 0.00 a 2.20, Z: 2.20 a 2.80)
+        // --- 4. GEOMETRÍA OFICIAL EXACTA SEGÚN ESCRITURA Y PLANO CATASTRAL ---
+        // Edificio "Glaciares II" - UF N° 6, Depto "A", Polígono 01-01
+        // Superficie oficial cubierta: 54,16 m²
+        // - Lateral Oeste: Calle Günter Plüschow (6.20 m)
+        // - Lateral Norte: Medianera con UF 01-02 (7.00 m)
+        // - Quiebre Nordeste: Cubierta Común / Palier de acceso (1.40 m x 2.30 m)
+        // - Lateral Este: Fondo Living Comedor (4.80 m)
+        // - Lateral Sur: Muro exterior (3.80 m + Ducto 0.40x0.70 m + 5.10 m = 9.30 m)
+        // Cálculo geométrico exacto: (9.30 x 6.20) - (2.30 x 1.40) - (0.40 x 0.70) = 54,16 m²
 
-        // Piso general
-        const floorGeo = new THREE.PlaneGeometry(8.00, 7.20);
+        // Piso general con la silueta exacta de 54,16 m²
+        const floorShape = new THREE.Shape();
+        floorShape.moveTo(0.00, 0.00);
+        floorShape.lineTo(0.00, 6.20);
+        floorShape.lineTo(5.10, 6.20);
+        floorShape.lineTo(5.10, 5.50);
+        floorShape.lineTo(5.50, 5.50);
+        floorShape.lineTo(5.50, 6.20);
+        floorShape.lineTo(9.30, 6.20);
+        floorShape.lineTo(9.30, 1.40);
+        floorShape.lineTo(7.00, 1.40);
+        floorShape.lineTo(7.00, 0.00);
+        floorShape.closePath();
+
+        const floorGeo = new THREE.ShapeGeometry(floorShape);
         floorGeo.rotateX(Math.PI / 2);
         const floorMesh = new THREE.Mesh(floorGeo, floorMat);
-        floorMesh.position.set(4.00, 0, 3.60);
+        floorMesh.position.set(0, 0, 0);
         floorMesh.receiveShadow = true;
         wallsGroup.add(floorMesh);
 
         function getRoofHeight(x, z) {
-            // Techo de madera en pendiente: más alto en el centro/living (3.85m), desciende a 2.65m en el muro lateral derecho
-            const t = Math.max(0, Math.min(1, x / 8.00));
-            return 2.65 + 1.20 * Math.sin((1 - t * 0.6) * Math.PI * 0.6);
+            // Techo de madera en pendiente: más alto en la cumbrera/living (3.85m), desciende a 2.65m en los muros laterales
+            const t = Math.max(0, Math.min(1, x / 9.30));
+            return 2.65 + 1.20 * Math.sin((1 - t * 0.5) * Math.PI * 0.6);
         }
 
         function createWall(p1, p2, thickness, parent, winConfig = null, doorConfig = null) {
@@ -612,82 +622,97 @@
             return wallGroup;
         }
 
-        // --- MUROS PERIMETRALES ---
-        // 1. Muro Sur (Con la ENTRADA principal al living y ventana del cuarto)
-        createWall({ x: 0.0, z: 7.20 }, { x: 8.0, z: 7.20 }, 0.20, wallsGroup, null, { start: 5.60, width: 0.90, height: 2.10, type: 'grey' });
+        // --- MUROS PERIMETRALES EXTERIORES (Espesor 0.20m) ---
+        // 1. Muro Norte: Medianera con Depto 01-02 (7.00 m)
+        createWall({ x: 0.00, z: 0.00 }, { x: 7.00, z: 0.00 }, 0.20, wallsGroup);
 
-        // 2. Muro Norte (Fondo - con ventanales del living y ventana del estudio)
-        createWall({ x: 0.0, z: 0.00 }, { x: 8.0, z: 0.00 }, 0.20, wallsGroup, { start: 4.40, width: 2.80, sill: 1.00, height: 1.25 });
+        // 2. Saliente a Cubierta Común / Palier (1.40 m)
+        createWall({ x: 7.00, z: 0.00 }, { x: 7.00, z: 1.40 }, 0.20, wallsGroup);
 
-        // 3. Muro Oeste (Lateral izquierdo - Cuarto, Baño, Estudio con sus aberturas)
-        createWall({ x: 0.0, z: 7.20 }, { x: 0.0, z: 0.00 }, 0.20, wallsGroup, { start: 5.40, width: 1.40, sill: 1.00, height: 1.20 });
+        // 3. Acceso Palier Común (2.30 m) - Puerta de Entrada Principal al Depto
+        createWall({ x: 7.00, z: 1.40 }, { x: 9.30, z: 1.40 }, 0.20, wallsGroup, null, { start: 0.60, width: 0.90, height: 2.10, type: 'grey' });
 
-        // 4. Muro Este (Lateral derecho del Living - con ventana lateral y calefactor a gas)
-        createWall({ x: 8.0, z: 0.00 }, { x: 8.0, z: 7.20 }, 0.20, wallsGroup, { start: 1.60, width: 1.60, sill: 1.00, height: 1.25 });
+        // 4. Muro Este: Lateral Living Comedor (4.80 m) - Ventanal y calefactor
+        createWall({ x: 9.30, z: 1.40 }, { x: 9.30, z: 6.20 }, 0.20, wallsGroup, { start: 1.50, width: 1.80, sill: 1.00, height: 1.25 });
 
-        // --- TABIQUES INTERIORES SEGÚN EL CROQUIS ---
+        // 5. Muro Sur: Sector Living Comedor (3.80 m) - Ventana exterior
+        createWall({ x: 9.30, z: 6.20 }, { x: 5.50, z: 6.20 }, 0.20, wallsGroup, { start: 1.00, width: 1.60, sill: 1.00, height: 1.25 });
+
+        // 6. Ducto de Ventilación e Instalaciones (0.40m x 0.70m)
+        createWall({ x: 5.50, z: 6.20 }, { x: 5.50, z: 5.50 }, 0.10, wallsGroup);
+        createWall({ x: 5.50, z: 5.50 }, { x: 5.10, z: 5.50 }, 0.10, wallsGroup);
+        createWall({ x: 5.10, z: 5.50 }, { x: 5.10, z: 6.20 }, 0.10, wallsGroup);
+
+        // 7. Muro Sur: Sector Cocina y Cuarto (5.10 m) - Ventana Cuarto
+        createWall({ x: 5.10, z: 6.20 }, { x: 0.00, z: 6.20 }, 0.20, wallsGroup, { start: 1.20, width: 1.50, sill: 1.00, height: 1.20 });
+
+        // 8. Muro Oeste: Fachada sobre Calle Günter Plüschow (6.20 m) - Ventanas Cuarto, Baño y Estudio
+        createWall({ x: 0.00, z: 6.20 }, { x: 0.00, z: 0.00 }, 0.20, wallsGroup, { start: 4.60, width: 1.40, sill: 1.00, height: 1.20 });
+
+        // --- TABIQUES INTERIORES SEGÚN EL CROQUIS Y VIDEOS ---
         // A) ESTADO REAL ACTUAL:
-        // Gran tabique longitudinal divisorio entre Living y Pasillo/Dormitorios
-        createWall({ x: 3.60, z: 0.00 }, { x: 3.60, z: 7.20 }, 0.12, groupActual, null, { start: 3.60, width: 1.10, height: 2.10, type: 'open' });
+        // Gran tabique longitudinal divisorio entre Living y Pasillo/Habitaciones
+        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 4.20 }, 0.12, groupActual, null, { start: 2.20, width: 1.10, height: 2.10, type: 'open' });
 
-        // Muro de Cocina hacia el pasillo (caja entre Cuarto y Entrada)
-        createWall({ x: 2.20, z: 5.20 }, { x: 3.60, z: 5.20 }, 0.12, groupActual, null, { start: 0.20, width: 0.85, height: 2.10, type: 'open' });
-        createWall({ x: 2.20, z: 5.20 }, { x: 2.20, z: 7.20 }, 0.12, groupActual);
+        // Tabique Cocina hacia Living (0.12m)
+        createWall({ x: 3.50, z: 4.20 }, { x: 3.50, z: 6.20 }, 0.12, groupActual);
 
-        // Tabiques del lateral izquierdo:
-        // 1. Muro entre CUARTO y Placard
-        createWall({ x: 0.00, z: 5.00 }, { x: 2.20, z: 5.00 }, 0.10, groupActual);
-        // Frente de Placard Cuarto
-        createWall({ x: 0.00, z: 4.40 }, { x: 2.20, z: 4.40 }, 0.10, groupActual, null, { start: 0.20, width: 1.80, height: 2.40, type: 'wood' });
-        // Puerta de Cuarto hacia Pasillo
-        createWall({ x: 2.20, z: 4.40 }, { x: 2.20, z: 5.20 }, 0.12, groupActual, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
+        // Tabique Cocina hacia Pasillo (0.12m)
+        createWall({ x: 2.40, z: 4.20 }, { x: 3.50, z: 4.20 }, 0.12, groupActual, null, { start: 0.20, width: 0.85, height: 2.10, type: 'open' });
 
-        // 2. BAÑO (en el medio)
-        createWall({ x: 0.00, z: 2.80 }, { x: 2.20, z: 2.80 }, 0.10, groupActual);
-        // Puerta de Baño hacia Pasillo
-        createWall({ x: 2.20, z: 2.80 }, { x: 2.20, z: 4.40 }, 0.12, groupActual, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' });
+        // Tabique divisorio Cuarto / Cocina
+        createWall({ x: 2.40, z: 4.20 }, { x: 2.40, z: 6.20 }, 0.12, groupActual);
 
-        // 3. ESTUDIO GAMER y su Placard
-        createWall({ x: 0.00, z: 2.20 }, { x: 2.20, z: 2.20 }, 0.10, groupActual);
-        // Puerta de Estudio hacia Pasillo
-        createWall({ x: 2.20, z: 0.00 }, { x: 2.20, z: 2.20 }, 0.12, groupActual, null, { start: 0.60, width: 0.80, height: 2.10, type: 'wood' });
+        // Sector Privado Izquierdo (Calle Günter Plüschow):
+        // 1. CUARTO PRINCIPAL (Frente)
+        createWall({ x: 0.00, z: 4.80 }, { x: 2.40, z: 4.80 }, 0.10, groupActual);
+        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupActual, null, { start: 0.20, width: 1.90, height: 2.40, type: 'wood' }); // Placard Cuarto
+        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.80 }, 0.12, groupActual, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' }); // Puerta Cuarto
+
+        // 2. BAÑO COMPLETO (Centro - entre ambos placards)
+        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupActual);
+        createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupActual, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' }); // Puerta Baño
+
+        // 3. ESTUDIO GAMER (Fondo)
+        createWall({ x: 0.00, z: 2.20 }, { x: 2.40, z: 2.20 }, 0.10, groupActual); // Placard Estudio
+        createWall({ x: 2.40, z: 0.00 }, { x: 2.40, z: 2.20 }, 0.12, groupActual, null, { start: 0.60, width: 0.80, height: 2.10, type: 'wood' }); // Puerta Estudio
 
         // B) PROPUESTA 1: COCINA ABIERTA CON ISLA
-        // En esta propuesta se demuele el tabique ciego entre Cocina y Living
-        createWall({ x: 3.60, z: 0.00 }, { x: 3.60, z: 5.20 }, 0.12, groupPropIsla, null, { start: 3.60, width: 1.10, height: 2.10, type: 'open' });
-        createWall({ x: 2.20, z: 5.20 }, { x: 2.20, z: 7.20 }, 0.12, groupPropIsla);
-        // Paredes de Cuarto, Baño y Estudio preservadas
-        createWall({ x: 0.00, z: 5.00 }, { x: 2.20, z: 5.00 }, 0.10, groupPropIsla);
-        createWall({ x: 0.00, z: 4.40 }, { x: 2.20, z: 4.40 }, 0.10, groupPropIsla, null, { start: 0.20, width: 1.80, height: 2.40, type: 'wood' });
-        createWall({ x: 2.20, z: 4.40 }, { x: 2.20, z: 5.20 }, 0.12, groupPropIsla, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
-        createWall({ x: 0.00, z: 2.80 }, { x: 2.20, z: 2.80 }, 0.10, groupPropIsla);
-        createWall({ x: 2.20, z: 2.80 }, { x: 2.20, z: 4.40 }, 0.12, groupPropIsla, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' });
-        createWall({ x: 0.00, z: 2.20 }, { x: 2.20, z: 2.20 }, 0.10, groupPropIsla);
-        createWall({ x: 2.20, z: 0.00 }, { x: 2.20, z: 2.20 }, 0.12, groupPropIsla, null, { start: 0.60, width: 0.80, height: 2.10, type: 'wood' });
+        // Se demuele el tabique ciego entre Cocina y Living para ganar luminosidad y amplitud
+        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 4.20 }, 0.12, groupPropIsla, null, { start: 2.20, width: 1.10, height: 2.10, type: 'open' });
+        createWall({ x: 2.40, z: 4.20 }, { x: 2.40, z: 6.20 }, 0.12, groupPropIsla);
+        // Preserva privacidad de los dormitorios y baño
+        createWall({ x: 0.00, z: 4.80 }, { x: 2.40, z: 4.80 }, 0.10, groupPropIsla);
+        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupPropIsla, null, { start: 0.20, width: 1.90, height: 2.40, type: 'wood' });
+        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.80 }, 0.12, groupPropIsla, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
+        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupPropIsla);
+        createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupPropIsla, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' });
+        createWall({ x: 0.00, z: 2.20 }, { x: 2.40, z: 2.20 }, 0.10, groupPropIsla);
+        createWall({ x: 2.40, z: 0.00 }, { x: 2.40, z: 2.20 }, 0.12, groupPropIsla, null, { start: 0.60, width: 0.80, height: 2.10, type: 'wood' });
 
         // Barra Isla Desayunadora moderna
         const island = new THREE.Mesh(new THREE.BoxGeometry(0.80, 0.90, 1.80), woodDoorMat);
-        island.position.set(3.60, 0.45, 6.20);
+        island.position.set(3.50, 0.45, 5.20);
         const islandTop = new THREE.Mesh(new THREE.BoxGeometry(1.00, 0.05, 1.90), graniteMat);
-        islandTop.position.set(3.60, 0.925, 6.20);
+        islandTop.position.set(3.50, 0.925, 5.20);
         groupPropIsla.add(island, islandTop);
 
         // C) PROPUESTA 2: ENTREPISO / MEZZANINE EN EL ESTUDIO (Aprovechando los 3.85m)
         groupPropLoft.add(island.clone(), islandTop.clone());
-        createWall({ x: 3.60, z: 0.00 }, { x: 3.60, z: 5.20 }, 0.12, groupPropLoft, null, { start: 3.60, width: 1.10, height: 2.10, type: 'open' });
-        createWall({ x: 2.20, z: 5.20 }, { x: 2.20, z: 7.20 }, 0.12, groupPropLoft);
-        createWall({ x: 0.00, z: 5.00 }, { x: 2.20, z: 5.00 }, 0.10, groupPropLoft);
-        createWall({ x: 0.00, z: 4.40 }, { x: 2.20, z: 4.40 }, 0.10, groupPropLoft, null, { start: 0.20, width: 1.80, height: 2.40, type: 'wood' });
-        createWall({ x: 2.20, z: 4.40 }, { x: 2.20, z: 5.20 }, 0.12, groupPropLoft, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
-        createWall({ x: 0.00, z: 2.80 }, { x: 2.20, z: 2.80 }, 0.10, groupPropLoft);
-        createWall({ x: 2.20, z: 2.80 }, { x: 2.20, z: 4.40 }, 0.12, groupPropLoft, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' });
-        createWall({ x: 0.00, z: 2.20 }, { x: 2.20, z: 2.20 }, 0.10, groupPropLoft);
-        createWall({ x: 2.20, z: 0.00 }, { x: 2.20, z: 2.20 }, 0.12, groupPropLoft, null, { start: 0.60, width: 0.80, height: 2.10, type: 'wood' });
+        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 4.20 }, 0.12, groupPropLoft, null, { start: 2.20, width: 1.10, height: 2.10, type: 'open' });
+        createWall({ x: 2.40, z: 4.20 }, { x: 2.40, z: 6.20 }, 0.12, groupPropLoft);
+        createWall({ x: 0.00, z: 4.80 }, { x: 2.40, z: 4.80 }, 0.10, groupPropLoft);
+        createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupPropLoft, null, { start: 0.20, width: 1.90, height: 2.40, type: 'wood' });
+        createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.80 }, 0.12, groupPropLoft, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
+        createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupPropLoft);
+        createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupPropLoft, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' });
+        createWall({ x: 0.00, z: 2.20 }, { x: 2.40, z: 2.20 }, 0.10, groupPropLoft);
+        createWall({ x: 2.40, z: 0.00 }, { x: 2.40, z: 2.20 }, 0.12, groupPropLoft, null, { start: 0.60, width: 0.80, height: 2.10, type: 'wood' });
 
-        const loftPlat = new THREE.Mesh(new THREE.BoxGeometry(2.10, 0.12, 1.80), woodCeilingMat);
-        loftPlat.position.set(1.10, 2.25, 1.00);
-        const loftRail = new THREE.Mesh(new THREE.BoxGeometry(2.10, 0.05, 0.05), ironMat);
-        loftRail.position.set(1.10, 3.15, 1.90);
+        const loftPlat = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.12, 1.80), woodCeilingMat);
+        loftPlat.position.set(1.20, 2.25, 1.00);
+        const loftRail = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.05, 0.05), ironMat);
+        loftRail.position.set(1.20, 3.15, 1.90);
         groupPropLoft.add(loftPlat, loftRail);
 
         function setProposal(ver) {
@@ -705,49 +730,49 @@
 
         // --- 5. TECHO DE MADERA EN PENDIENTE CON VIGAS ---
         function buildRoof() {
-            const roofGeo = new THREE.PlaneGeometry(8.60, 7.60, 20, 20);
+            const roofGeo = new THREE.PlaneGeometry(9.90, 6.80, 24, 20);
             roofGeo.rotateX(Math.PI / 2);
             const pos = roofGeo.attributes.position;
             for (let i = 0; i < pos.count; i++) {
-                const vx = pos.getX(i) + 4.00;
-                const vz = pos.getZ(i) + 3.60;
+                const vx = pos.getX(i) + 4.65;
+                const vz = pos.getZ(i) + 3.10;
                 pos.setY(i, getRoofHeight(vx, vz));
             }
             roofGeo.computeVertexNormals();
 
             const roofMesh = new THREE.Mesh(roofGeo, woodCeilingMat);
-            roofMesh.position.set(4.00, 0, 3.60);
+            roofMesh.position.set(4.65, 0, 3.10);
             roofGroup.add(roofMesh);
 
             for (let i = 0; i <= 10; i++) {
-                const z = (i / 10) * 7.20;
-                const beam = new THREE.Mesh(new THREE.BoxGeometry(8.40, 0.14, 0.07), beamMat);
-                beam.position.set(4.00, getRoofHeight(4.00, z) - 0.07, z);
-                beam.rotation.z = -0.05;
+                const z = (i / 10) * 6.20;
+                const beam = new THREE.Mesh(new THREE.BoxGeometry(9.60, 0.14, 0.07), beamMat);
+                beam.position.set(4.65, getRoofHeight(4.65, z) - 0.07, z);
+                beam.rotation.z = -0.04;
                 roofGroup.add(beam);
             }
         }
         buildRoof();
 
         // --- 6. EQUIPAMIENTO REAL SEGÚN LOS VIDEOS ---
-        // A) Cocina
+        // A) Cocina (contigua al ducto de ventilación y cañerías)
         function buildKitchen() {
             const kg = new THREE.Group();
-            const counter = new THREE.Mesh(new THREE.BoxGeometry(1.30, 0.85, 0.55), woodDoorMat); counter.position.set(2.90, 0.425, 6.85);
-            const counterTop = new THREE.Mesh(new THREE.BoxGeometry(1.34, 0.04, 0.59), graniteMat); counterTop.position.set(2.90, 0.87, 6.85);
-            const stove = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.86, 0.55), new THREE.MeshStandardMaterial({ color: 0xffffff })); stove.position.set(2.90, 0.43, 6.10);
-            const heater = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 1.05, 20), new THREE.MeshStandardMaterial({ color: 0xf5f5f5 })); heater.position.set(2.55, 1.45, 5.50);
+            const counter = new THREE.Mesh(new THREE.BoxGeometry(1.40, 0.85, 0.55), woodDoorMat); counter.position.set(4.20, 0.425, 5.85);
+            const counterTop = new THREE.Mesh(new THREE.BoxGeometry(1.44, 0.04, 0.59), graniteMat); counterTop.position.set(4.20, 0.87, 5.85);
+            const stove = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.86, 0.55), new THREE.MeshStandardMaterial({ color: 0xffffff })); stove.position.set(3.40, 0.43, 5.85);
+            const heater = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.20, 0.95, 20), new THREE.MeshStandardMaterial({ color: 0xf5f5f5 })); heater.position.set(4.85, 1.45, 5.70);
             kg.add(counter, counterTop, stove, heater);
             furnitureGroup.add(kg);
         }
         buildKitchen();
 
-        // B) Cuarto (Dormitorio Principal)
+        // B) Cuarto Principal (Dormitorio sobre Calle Günter Plüschow)
         function buildBedroom() {
             const bg = new THREE.Group();
-            const bedHead = new THREE.Mesh(new THREE.BoxGeometry(1.50, 0.90, 0.06), woodDoorMat); bedHead.position.set(1.10, 0.45, 7.15);
-            const bed = new THREE.Mesh(new THREE.BoxGeometry(1.40, 0.45, 1.90), new THREE.MeshStandardMaterial({ color: 0x475569 })); bed.position.set(1.10, 0.225, 6.20);
-            const nightstand = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.50, 0.40), woodDoorMat); nightstand.position.set(1.95, 0.25, 6.90);
+            const bedHead = new THREE.Mesh(new THREE.BoxGeometry(1.50, 0.90, 0.06), woodDoorMat); bedHead.position.set(1.20, 0.45, 6.15);
+            const bed = new THREE.Mesh(new THREE.BoxGeometry(1.40, 0.45, 1.90), new THREE.MeshStandardMaterial({ color: 0x475569 })); bed.position.set(1.20, 0.225, 5.20);
+            const nightstand = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.50, 0.40), woodDoorMat); nightstand.position.set(2.05, 0.25, 5.90);
             bg.add(bedHead, bed, nightstand);
             furnitureGroup.add(bg);
         }
@@ -756,15 +781,16 @@
         // C) Baño Completo con Bañera
         function buildBathroom() {
             const bg = new THREE.Group();
-            const tub = new THREE.Mesh(new THREE.BoxGeometry(0.70, 0.45, 1.40), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })); tub.position.set(0.45, 0.225, 3.60);
-            const toilet = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.42, 0.55), new THREE.MeshStandardMaterial({ color: 0xffffff })); toilet.position.set(1.50, 0.21, 3.20);
-            const vanity = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.82, 0.45), woodDoorMat); vanity.position.set(1.50, 0.41, 4.00);
-            bg.add(tub, toilet, vanity);
+            const tub = new THREE.Mesh(new THREE.BoxGeometry(0.70, 0.45, 1.40), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })); tub.position.set(0.45, 0.225, 3.50);
+            const toilet = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.42, 0.55), new THREE.MeshStandardMaterial({ color: 0xffffff })); toilet.position.set(1.60, 0.21, 3.10);
+            const bidet = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.40, 0.55), new THREE.MeshStandardMaterial({ color: 0xffffff })); bidet.position.set(2.05, 0.20, 3.10);
+            const vanity = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.82, 0.45), woodDoorMat); vanity.position.set(1.60, 0.41, 3.90);
+            bg.add(tub, toilet, bidet, vanity);
             furnitureGroup.add(bg);
         }
         buildBathroom();
 
-        // D) Estudio Gamer
+        // D) Estudio Gamer (Fondo sobre Calle Günter Plüschow)
         function buildStudy() {
             const sg = new THREE.Group();
             const desk1 = new THREE.Mesh(new THREE.BoxGeometry(1.50, 0.04, 0.70), woodDoorMat); desk1.position.set(0.85, 0.75, 0.45);
@@ -776,23 +802,23 @@
         }
         buildStudy();
 
-        // E) Living-Comedor
+        // E) Living-Comedor Longitudinal
         function buildLiving() {
             const lg = new THREE.Group();
-            const heater = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.65, 0.55), new THREE.MeshStandardMaterial({ color: 0x3b4a3f })); heater.position.set(7.85, 0.35, 2.80);
-            const flue = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 2.8, 16), new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.8 })); flue.position.set(7.85, 1.8, 2.80);
-            const table = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.04, 24), woodDoorMat); table.position.set(6.20, 0.75, 1.20);
-            const tableLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.75, 12), woodDoorMat); tableLeg.position.set(6.20, 0.375, 1.20);
-            const sofa = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.55, 1.90), new THREE.MeshStandardMaterial({ color: 0x1e3a5f })); sofa.position.set(4.80, 0.35, 4.20);
-            const coffeeTable = new THREE.Mesh(new THREE.BoxGeometry(0.50, 0.38, 0.95), woodDoorMat); coffeeTable.position.set(5.70, 0.19, 4.20);
-            const tvRack = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.60, 1.80), woodDoorMat); tvRack.position.set(7.70, 0.30, 4.20);
-            const tv = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.72, 1.25), blackFrameMat); tv.position.set(7.70, 0.95, 4.20);
+            const heater = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.65, 0.55), new THREE.MeshStandardMaterial({ color: 0x3b4a3f })); heater.position.set(9.15, 0.35, 2.80);
+            const flue = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 2.8, 16), new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.8 })); flue.position.set(9.15, 1.8, 2.80);
+            const table = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.04, 24), woodDoorMat); table.position.set(6.80, 0.75, 2.20);
+            const tableLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.75, 12), woodDoorMat); tableLeg.position.set(6.80, 0.375, 2.20);
+            const sofa = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.55, 2.10), new THREE.MeshStandardMaterial({ color: 0x1e3a5f })); sofa.position.set(5.60, 0.35, 4.20);
+            const coffeeTable = new THREE.Mesh(new THREE.BoxGeometry(0.50, 0.38, 0.95), woodDoorMat); coffeeTable.position.set(6.60, 0.19, 4.20);
+            const tvRack = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.60, 1.80), woodDoorMat); tvRack.position.set(9.00, 0.30, 4.20);
+            const tv = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.72, 1.25), blackFrameMat); tv.position.set(9.00, 0.95, 4.20);
             lg.add(heater, flue, table, tableLeg, sofa, coffeeTable, tvRack, tv);
             furnitureGroup.add(lg);
         }
         buildLiving();
 
-        // --- 7. COTAS DE MEDIDAS ---
+        // --- 7. COTAS DE MEDIDAS OFICIALES CATASTRALES ---
         const labelElements = [];
         function addDim(p1, p2, text, offsetDir, dist = 0.5) {
             const normal = offsetDir.clone().normalize().multiplyScalar(dist);
@@ -810,11 +836,14 @@
             labelElements.push({ el: label, pos: mid });
         }
 
-        addDim(new THREE.Vector3(0, 0.05, 7.2), new THREE.Vector3(8.0, 0.05, 7.2), "Ancho Total: 8.00 m (Frente Sur)", new THREE.Vector3(0, 0, 1), 0.6);
-        addDim(new THREE.Vector3(8.0, 0.05, 7.2), new THREE.Vector3(8.0, 0.05, 0.0), "Largo Total: 7.20 m (Living)", new THREE.Vector3(1, 0, 0), 0.6);
-        addDim(new THREE.Vector3(0, 0.05, 7.2), new THREE.Vector3(0, 0.05, 5.0), "Cuarto: 2.20 m", new THREE.Vector3(-1, 0, 0), 0.5);
-        addDim(new THREE.Vector3(0, 0.05, 4.4), new THREE.Vector3(0, 0.05, 2.8), "Baño: 1.60 m", new THREE.Vector3(-1, 0, 0), 0.5);
-        addDim(new THREE.Vector3(0, 0.05, 2.2), new THREE.Vector3(0, 0.05, 0.0), "Estudio: 2.20 m", new THREE.Vector3(-1, 0, 0), 0.5);
+        addDim(new THREE.Vector3(0, 0.05, 0.0), new THREE.Vector3(7.0, 0.05, 0.0), "7.00 m (Medianera 01-02)", new THREE.Vector3(0, 0, -1), 0.6);
+        addDim(new THREE.Vector3(7.0, 0.05, 0.0), new THREE.Vector3(7.0, 0.05, 1.4), "1.40 m", new THREE.Vector3(-1, 0, 0), 0.4);
+        addDim(new THREE.Vector3(7.0, 0.05, 1.4), new THREE.Vector3(9.3, 0.05, 1.4), "2.30 m (Acceso Palier)", new THREE.Vector3(0, 0, -1), 0.5);
+        addDim(new THREE.Vector3(9.3, 0.05, 1.4), new THREE.Vector3(9.3, 0.05, 6.2), "4.80 m (Lateral Living)", new THREE.Vector3(1, 0, 0), 0.6);
+        addDim(new THREE.Vector3(9.3, 0.05, 6.2), new THREE.Vector3(5.5, 0.05, 6.2), "3.80 m", new THREE.Vector3(0, 0, 1), 0.5);
+        addDim(new THREE.Vector3(5.5, 0.05, 6.2), new THREE.Vector3(5.1, 0.05, 6.2), "Ducto 0.40m", new THREE.Vector3(0, 0, 1), 0.8);
+        addDim(new THREE.Vector3(5.1, 0.05, 6.2), new THREE.Vector3(0.0, 0.05, 6.2), "5.10 m (Cuarto/Cocina)", new THREE.Vector3(0, 0, 1), 0.5);
+        addDim(new THREE.Vector3(0.0, 0.05, 6.2), new THREE.Vector3(0.0, 0.05, 0.0), "6.20 m (Calle Günter Plüschow)", new THREE.Vector3(-1, 0, 0), 0.7);
 
         function updateLabels() {
             if (!document.getElementById('chk-dimensions').checked) {
@@ -834,13 +863,14 @@
 
         // --- 8. VISTAS Y CONTROLES ---
         const viewPresets = {
-            isom: { pos: [4.5, 14, 11], target: [4.0, 1.5, 3.5] },
-            entrada: { pos: [6.0, 1.8, 8.0], target: [6.0, 1.5, 3.5] },
-            living: { pos: [5.8, 1.7, 6.2], target: [5.8, 1.4, 2.0] },
-            cocina: { pos: [3.4, 1.7, 5.4], target: [2.8, 1.2, 6.5] },
-            cuarto: { pos: [2.0, 1.6, 5.5], target: [1.1, 1.1, 6.5] },
-            bano: { pos: [2.0, 1.6, 3.6], target: [0.8, 1.1, 3.6] },
-            estudio: { pos: [2.0, 1.7, 1.8], target: [1.0, 1.2, 0.8] }
+            isom: { pos: [4.65, 14, 11], target: [4.65, 1.5, 3.10] },
+            entrada: { pos: [8.0, 1.8, 0.2], target: [8.0, 1.5, 2.5] },
+            palier: { pos: [8.0, 1.8, 0.2], target: [8.0, 1.5, 2.5] },
+            living: { pos: [6.5, 1.7, 5.5], target: [6.5, 1.4, 2.0] },
+            cocina: { pos: [4.5, 1.7, 4.0], target: [4.2, 1.2, 5.8] },
+            cuarto: { pos: [1.8, 1.6, 4.6], target: [1.2, 1.1, 5.6] },
+            bano: { pos: [2.0, 1.6, 3.5], target: [1.0, 1.1, 3.5] },
+            estudio: { pos: [1.8, 1.7, 1.8], target: [1.0, 1.2, 0.8] }
         };
 
         function setView(name) {
@@ -864,8 +894,8 @@
         });
 
         document.getElementById('btn-top').addEventListener('click', () => {
-            camera.position.set(4.0, 18, 3.6);
-            controls.target.set(4.0, 0, 3.6);
+            camera.position.set(4.65, 18, 3.10);
+            controls.target.set(4.65, 0, 3.10);
             controls.update();
             document.getElementById('chk-roof').checked = false;
             roofGroup.visible = false;
