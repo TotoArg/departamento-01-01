@@ -1,141 +1,125 @@
 """
 Generador paramétrico de Departamento_01-01.obj y Departamento_01-01.mtl
-Distribución 100% fiel al diagrama esquemático 2D del usuario:
-- Placards integrados en habitaciones (Cuarto y Estudio)
-- Puertas de acceso en umbrales horizontales hacia el Pasillo
-- Puerta del Baño central directa al Pasillo
-- Cocina con acceso desde la circulación y tabique divisorio al Living
-- Gran Living longitudinal con entrada principal en la esquina inferior derecha
+Respeta estrictamente las reglas geométricas y de circulación especificadas:
+1. Perímetro exterior: Rectángulo cerrado de 7.00 m (X: 0.00 a 7.00) × 6.20 m (Y/Z: 0.00 a 6.20).
+   Pared inferior (Y = 6.20) continua de punta a punta con Puerta de Entrada en X = 5.40 a 6.20.
+2. Ejes verticales:
+   - X = 1.70: Cerramiento de Placard 1, Baño y Placard 2 (Y = 2.30 a 4.60) con puerta de Baño entre Y = 3.10 y 3.70.
+   - X = 3.00: Muro central de Y = 0.00 a 3.90, paso abierto de 0.70 m (Y = 3.90 a 4.60) y muro Cuarto/Cocina (Y = 4.60 a 6.20).
+   - X = 4.60: Muro derecho de la Cocina (Y = 4.60 a 6.20).
+3. Ejes horizontales:
+   - Y = 0.00: Muro exterior superior continuo (X = 0.00 a 7.00).
+   - Y = 2.30: Muro Estudio/Placard 1 (X = 0.00 a 1.70) y vano de entrada al Estudio (X = 1.70 a 3.00).
+   - Y = 2.80: Muro Placard 1 / Baño (X = 0.00 a 1.70).
+   - Y = 4.00: Muro Baño / Placard 2 (X = 0.00 a 1.70).
+   - Y = 4.60: Línea unificada de Placard 2 (0.00 a 1.70), entrada Cuarto (1.70 a 3.00) y frente Cocina (3.00 a 4.60).
+   - Y = 6.20: Muro exterior inferior continuo (0.00 a 7.00) con Entrada en X = 5.40 a 6.20.
 """
+
+import math
 
 def generate_obj_mtl():
     obj_lines = []
     mtl_lines = []
 
-    obj_lines.append("# Edificio Glaciares II - Depto 01-01 (1° Piso)")
-    obj_lines.append("# Superficie Oficial: 54.16 m2 | Diagrama 2D Oficial")
+    obj_lines.append("# Plano 3D Exacto (7.00m x 6.20m)")
     obj_lines.append("mtllib Departamento_01-01.mtl\n")
 
+    materials = {
+        "Piso": (0.95, 0.96, 0.98),
+        "Muro_Exterior": (0.88, 0.91, 0.94),
+        "Muro_Interior": (0.78, 0.83, 0.88),
+        "Mueble_Madera": (0.70, 0.42, 0.22),
+        "Mueble_Tapizado": (0.20, 0.30, 0.45),
+        "Sanitario": (0.98, 0.98, 1.00),
+    }
+
+    for name, (r, g, b) in materials.items():
+        mtl_lines.append(f"newmtl {name}")
+        mtl_lines.append(f"Kd {r:.3f} {g:.3f} {b:.3f}")
+        mtl_lines.append("Ka 0.200 0.200 0.200")
+        mtl_lines.append("Ks 0.100 0.100 0.100")
+        mtl_lines.append("Ns 30.0\n")
+
     v_count = 0
-    def add_box(name, x, z, y, sx, sz, sy, material):
+
+    def add_box(name, x1, z1, y1, sx, sz, sy, mat):
         nonlocal v_count
         obj_lines.append(f"o {name}")
-        obj_lines.append(f"usemtl {material}")
-
+        obj_lines.append(f"usemtl {mat}")
         corners = [
-            (x, y, z),
-            (x + sx, y, z),
-            (x + sx, y, z + sz),
-            (x, y, z + sz),
-            (x, y + sy, z),
-            (x + sx, y + sy, z),
-            (x + sx, y + sy, z + sz),
-            (x, y + sy, z + sz),
+            (x1, y1, z1),
+            (x1 + sx, y1, z1),
+            (x1 + sx, y1, z1 + sz),
+            (x1, y1, z1 + sz),
+            (x1, y1 + sy, z1),
+            (x1 + sx, y1 + sy, z1),
+            (x1 + sx, y1 + sy, z1 + sz),
+            (x1, y1 + sy, z1 + sz),
         ]
         for vx, vy, vz in corners:
             obj_lines.append(f"v {vx:.3f} {vy:.3f} {vz:.3f}")
-
         b = v_count
         obj_lines.append(f"f {b+1} {b+2} {b+3} {b+4}")
         obj_lines.append(f"f {b+5} {b+8} {b+7} {b+6}")
         obj_lines.append(f"f {b+1} {b+5} {b+6} {b+2}")
         obj_lines.append(f"f {b+2} {b+6} {b+7} {b+3}")
         obj_lines.append(f"f {b+3} {b+7} {b+8} {b+4}")
-        obj_lines.append(f"f {b+4} {b+8} {b+5} {b+1}")
+        obj_lines.append(f"f {b+4} {b+8} {b+5} {b+1}\n")
         v_count += 8
-        obj_lines.append("")
 
-    # 1. PISO (54.16 m2)
-    add_box("Piso_Sector_Oeste_Principal", 0.00, 0.00, -0.05, 5.10, 6.20, 0.05, "Piso_Ceramico")
-    add_box("Piso_Sector_Cocina_Frente_Ducto", 5.10, 0.00, -0.05, 0.40, 5.50, 0.05, "Piso_Ceramico")
-    add_box("Piso_Sector_Centro", 5.50, 0.00, -0.05, 1.50, 6.20, 0.05, "Piso_Ceramico")
-    add_box("Piso_Sector_Este_Living", 7.00, 1.40, -0.05, 2.30, 4.80, 0.05, "Piso_Ceramico")
+    H = 2.60
+    EXT = 0.14
+    INT = 0.10
 
-    # 2. MUROS EXTERIORES (54.16 m2)
-    add_box("Muro_Norte_Medianera", -0.20, -0.20, 0.0, 7.20, 0.20, 3.20, "Pared_Blanca")
-    add_box("Muro_Saliente_Palier", 7.00, -0.20, 0.0, 0.20, 1.60, 3.00, "Pared_Blanca")
-    add_box("Muro_Acceso_Palier_Izq", 7.00, 1.40, 0.0, 0.60, 0.20, 2.70, "Pared_Blanca")
-    add_box("Dintel_Puerta_Palier", 7.60, 1.40, 2.10, 0.90, 0.20, 0.60, "Pared_Blanca")
-    add_box("Muro_Acceso_Palier_Der", 8.50, 1.40, 0.0, 0.80, 0.20, 2.70, "Pared_Blanca")
-    add_box("Muro_Este_Lateral_Living", 9.30, 1.40, 0.0, 0.20, 4.80, 2.70, "Pared_Blanca")
-    add_box("Muro_Sur_Living", 5.50, 6.20, 0.0, 4.00, 0.20, 2.80, "Pared_Blanca")
-    add_box("Ducto_Pared_Este", 5.50, 5.50, 0.0, 0.10, 0.70, 3.20, "Pared_Blanca")
-    add_box("Ducto_Pared_Fondo", 5.10, 5.50, 0.0, 0.40, 0.10, 3.20, "Pared_Blanca")
-    add_box("Ducto_Pared_Oeste", 5.10, 5.50, 0.0, 0.10, 0.70, 3.20, "Pared_Blanca")
-    add_box("Muro_Sur_Cuarto_Cocina", -0.20, 6.20, 0.0, 5.30, 0.20, 2.80, "Pared_Blanca")
-    add_box("Muro_Oeste_Calle_Gunter", -0.20, 0.00, 0.0, 0.20, 6.20, 3.00, "Pared_Blanca")
+    # 1. Piso continuo (7.00 x 6.20)
+    add_box("Piso_General_7x62", 0.00, 0.00, -0.08, 7.00, 6.20, 0.08, "Piso")
 
-    # 3. TABIQUES INTERIORES
-    # Muro divisorio Estudio / Living (Norte)
-    add_box("Tabique_Estudio_Living", 3.50, 0.00, 0.0, 0.12, 2.10, 3.20, "Pared_Blanca")
-    # Muro divisorio Pasillo / Living con vano abierto
-    add_box("Tabique_Pasillo_Living_Norte", 3.50, 2.10, 0.0, 0.12, 1.40, 3.00, "Pared_Blanca")
-    add_box("Dintel_Paso_Pasillo_Living", 3.50, 3.50, 2.10, 0.12, 1.10, 0.90, "Pared_Blanca")
-    add_box("Tabique_Pasillo_Living_Sur", 3.50, 4.60, 0.0, 0.12, 0.30, 3.00, "Pared_Blanca")
+    # 2. Perímetro exterior
+    add_box("Muro_Ext_Superior_Y0", 0.00, -EXT/2, 0.00, 7.00, EXT, H, "Muro_Exterior")
+    add_box("Muro_Ext_Izquierdo_X0", -EXT/2, 0.00, 0.00, EXT, 6.20, H, "Muro_Exterior")
+    add_box("Muro_Ext_Derecho_X7", 7.00 - EXT/2, 0.00, 0.00, EXT, 6.20, H, "Muro_Exterior")
+    add_box("Muro_Ext_Inferior_Izq_Y620", 0.00, 6.20 - EXT/2, 0.00, 5.40, EXT, H, "Muro_Exterior")
+    add_box("Muro_Ext_Inferior_Der_Y620", 6.20, 6.20 - EXT/2, 0.00, 0.80, EXT, H, "Muro_Exterior")
 
-    # Estudio Gamer (Noroeste)
-    add_box("Tabique_Bano_Estudio_Ciego", 0.00, 2.70, 0.0, 2.40, 0.10, 3.00, "Pared_Blanca")
-    add_box("Tabique_Placard_Estudio_Pasillo", 2.40, 2.10, 0.0, 0.12, 0.60, 3.00, "Pared_Blanca")
-    add_box("Placard_Interior_Estudio", 0.10, 2.15, 0.0, 2.20, 0.55, 2.45, "Madera")
-    add_box("Dintel_Acceso_Estudio", 2.40, 2.10, 2.10, 1.10, 0.12, 0.90, "Pared_Blanca")
+    # 3. Ejes verticales internos
+    # X = 1.70 (Y = 2.30 a 4.60, con vano Baño entre 3.10 y 3.70)
+    add_box("Muro_V_X170_Sup", 1.70 - INT/2, 2.30, 0.00, INT, 0.80, H, "Muro_Interior")
+    add_box("Muro_V_X170_Inf", 1.70 - INT/2, 3.70, 0.00, INT, 0.90, H, "Muro_Interior")
 
-    # Baño Completo (Centro)
-    add_box("Tabique_Bano_Pasillo_Norte", 2.40, 2.70, 0.0, 0.12, 0.40, 3.00, "Pared_Blanca")
-    add_box("Dintel_Puerta_Bano", 2.40, 3.10, 2.10, 0.12, 0.80, 0.90, "Pared_Blanca")
-    add_box("Tabique_Bano_Pasillo_Sur", 2.40, 3.90, 0.0, 0.12, 0.40, 3.00, "Pared_Blanca")
+    # X = 3.00 (Y = 0.00 a 3.90, paso abierto 3.90 a 4.60, y muro Y = 4.60 a 6.20)
+    add_box("Muro_V_X300_Living_Estudio_Pasillo", 3.00 - INT/2, 0.00, 0.00, INT, 3.90, H, "Muro_Interior")
+    add_box("Muro_V_X300_Cuarto_Cocina", 3.00 - INT/2, 4.60, 0.00, INT, 1.60, H, "Muro_Interior")
 
-    # Cuarto Principal (Sudoeste)
-    add_box("Tabique_Bano_Cuarto_Ciego", 0.00, 4.30, 0.0, 2.40, 0.10, 2.80, "Pared_Blanca")
-    add_box("Tabique_Placard_Cuarto_Pasillo", 2.40, 4.30, 0.0, 0.12, 0.60, 2.80, "Pared_Blanca")
-    add_box("Placard_Interior_Cuarto", 0.10, 4.35, 0.0, 2.20, 0.55, 2.45, "Madera")
-    add_box("Dintel_Acceso_Cuarto", 2.40, 4.90, 2.10, 1.10, 0.12, 0.70, "Pared_Blanca")
-    add_box("Tabique_Cuarto_Cocina", 2.40, 4.90, 0.0, 0.12, 1.30, 2.80, "Pared_Blanca")
+    # X = 4.60 (Y = 4.60 a 6.20: pared derecha de la Cocina)
+    add_box("Muro_V_X460_Cocina_Living", 4.60 - INT/2, 4.60, 0.00, INT, 1.60, H, "Muro_Interior")
 
-    # Cocina
-    add_box("Dintel_Acceso_Cocina", 3.50, 4.90, 2.10, 1.30, 0.12, 0.70, "Pared_Blanca")
-    add_box("Tabique_Cocina_Living", 4.80, 4.90, 0.0, 0.12, 1.30, 2.80, "Pared_Blanca")
+    # 4. Líneas horizontales internas
+    # Y = 2.30 (X = 0.00 a 1.70 cerrado + mochetas de entrada a Estudio en 1.70..1.90 y 2.80..3.00)
+    add_box("Muro_H_Y230_Estudio_Placard1", 0.00, 2.30 - INT/2, 0.00, 1.70, INT, H, "Muro_Interior")
+    add_box("Muro_H_Y230_Mocheta_Izq", 1.70, 2.30 - INT/2, 0.00, 0.20, INT, H, "Muro_Interior")
+    add_box("Muro_H_Y230_Mocheta_Der", 2.80, 2.30 - INT/2, 0.00, 0.20, INT, H, "Muro_Interior")
 
-    # 4. MOBILIARIO Y EQUIPAMIENTO REAL
-    add_box("Mesada_Cocina", 3.65, 5.60, 0.0, 1.35, 0.60, 0.88, "Granito_Rosa")
-    add_box("Cocina_Gas", 2.80, 5.60, 0.0, 0.55, 0.60, 0.86, "Blanco_Sanitarios")
-    add_box("Termotanque_Sherman", 4.50, 5.60, 1.30, 0.35, 0.35, 0.85, "Blanco_Sanitarios")
+    # Y = 2.80 (X = 0.00 a 1.70: Placard 1 / Baño)
+    add_box("Muro_H_Y280_Placard1_Bano", 0.00, 2.80 - INT/2, 0.00, 1.70, INT, H, "Muro_Interior")
 
-    add_box("Banera", 0.10, 2.85, 0.0, 0.70, 1.40, 0.45, "Blanco_Sanitarios")
-    add_box("Inodoro", 1.40, 2.85, 0.0, 0.40, 0.55, 0.42, "Blanco_Sanitarios")
-    add_box("Bidet", 1.95, 2.85, 0.0, 0.38, 0.55, 0.40, "Blanco_Sanitarios")
-    add_box("Vanitory", 1.40, 3.65, 0.0, 0.60, 0.50, 0.85, "Madera")
+    # Y = 4.00 (X = 0.00 a 1.70: Baño / Placard 2)
+    add_box("Muro_H_Y400_Bano_Placard2", 0.00, 4.00 - INT/2, 0.00, 1.70, INT, H, "Muro_Interior")
 
-    add_box("Cama_Doble", 0.50, 5.05, 0.0, 1.40, 1.85, 0.45, "Gris_Tapizado")
-    add_box("Mesa_Luz", 1.95, 5.60, 0.0, 0.40, 0.45, 0.55, "Madera")
-
-    add_box("Escritorio_Gamer_L", 0.10, 0.10, 0.0, 1.50, 0.70, 0.75, "Negro_Metal")
-    add_box("Retorno_Escritorio", 0.10, 0.80, 0.0, 0.60, 0.90, 0.75, "Negro_Metal")
-
-    add_box("Sillon_Living", 5.60, 4.00, 0.0, 2.10, 0.90, 0.75, "Gris_Tapizado")
-    add_box("Mesa_Comedor", 6.80, 2.00, 0.0, 1.40, 0.85, 0.76, "Madera")
-    add_box("Calefactor_Gas_Tiro", 9.15, 2.60, 0.0, 0.15, 0.60, 0.65, "Negro_Metal")
-
-    # 5. VIGAS DE TECHO DE MADERA
-    for i in range(12):
-        z_pos = 0.25 + i * 0.52
-        add_box(f"Viga_Techo_{i+1}", -0.20, z_pos, 2.70 + i * 0.03, 9.60, 0.08, 0.14, "Vigas_Madera")
+    # Y = 4.60 (Línea unificada: Placard 2 [0..1.70], vano Cuarto [1.70..3.00], frente Cocina [3.00..4.60])
+    add_box("Muro_H_Y460_Placard2_Cuarto", 0.00, 4.60 - INT/2, 0.00, 1.70, INT, H, "Muro_Interior")
+    add_box("Muro_H_Y460_Cuarto_Mocheta_Izq", 1.70, 4.60 - INT/2, 0.00, 0.20, INT, H, "Muro_Interior")
+    add_box("Muro_H_Y460_Cuarto_Mocheta_Der", 2.80, 4.60 - INT/2, 0.00, 0.20, INT, H, "Muro_Interior")
+    add_box("Muro_H_Y460_Cocina_Mocheta_Izq", 3.00, 4.60 - INT/2, 0.00, 0.20, INT, H, "Muro_Interior")
+    add_box("Muro_H_Y460_Cocina_Mocheta_Der", 4.35, 4.60 - INT/2, 0.00, 0.25, INT, H, "Muro_Interior")
 
     with open("Departamento_01-01.obj", "w", encoding="utf-8") as f:
         f.write("\n".join(obj_lines))
 
-    mtl_lines.append("newmtl Piso_Ceramico\nKd 0.82 0.76 0.70\n")
-    mtl_lines.append("newmtl Pared_Blanca\nKd 0.95 0.95 0.96\n")
-    mtl_lines.append("newmtl Granito_Rosa\nKd 0.78 0.58 0.52\n")
-    mtl_lines.append("newmtl Madera\nKd 0.62 0.38 0.20\n")
-    mtl_lines.append("newmtl Vigas_Madera\nKd 0.45 0.24 0.12\n")
-    mtl_lines.append("newmtl Blanco_Sanitarios\nKd 0.96 0.96 0.96\n")
-    mtl_lines.append("newmtl Gris_Tapizado\nKd 0.35 0.40 0.45\n")
-    mtl_lines.append("newmtl Negro_Metal\nKd 0.15 0.15 0.18\n")
-
     with open("Departamento_01-01.mtl", "w", encoding="utf-8") as f:
         f.write("\n".join(mtl_lines))
 
-    print("Departamento_01-01.obj y .mtl actualizados fielmente al diagrama 2D.")
+    print("Departamento_01-01.obj y .mtl generados con geometría exacta 7.00m x 6.20m.")
 
 if __name__ == "__main__":
     generate_obj_mtl()

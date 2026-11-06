@@ -1,23 +1,35 @@
-newmtl Piso_Ceramico
-Kd 0.82 0.76 0.70
+newmtl Piso
+Kd 0.950 0.960 0.980
+Ka 0.200 0.200 0.200
+Ks 0.100 0.100 0.100
+Ns 30.0
 
-newmtl Pared_Blanca
-Kd 0.95 0.95 0.96
+newmtl Muro_Exterior
+Kd 0.880 0.910 0.940
+Ka 0.200 0.200 0.200
+Ks 0.100 0.100 0.100
+Ns 30.0
 
-newmtl Granito_Rosa
-Kd 0.78 0.58 0.52
+newmtl Muro_Interior
+Kd 0.780 0.830 0.880
+Ka 0.200 0.200 0.200
+Ks 0.100 0.100 0.100
+Ns 30.0
 
-newmtl Madera
-Kd 0.62 0.38 0.20
+newmtl Mueble_Madera
+Kd 0.700 0.420 0.220
+Ka 0.200 0.200 0.200
+Ks 0.100 0.100 0.100
+Ns 30.0
 
-newmtl Vigas_Madera
-Kd 0.45 0.24 0.12
+newmtl Mueble_Tapizado
+Kd 0.200 0.300 0.450
+Ka 0.200 0.200 0.200
+Ks 0.100 0.100 0.100
+Ns 30.0
 
-newmtl Blanco_Sanitarios
-Kd 0.96 0.96 0.96
-
-newmtl Gris_Tapizado
-Kd 0.35 0.40 0.45
-
-newmtl Negro_Metal
-Kd 0.15 0.15 0.18
+newmtl Sanitario
+Kd 0.980 0.980 1.000
+Ka 0.200 0.200 0.200
+Ks 0.100 0.100 0.100
+Ns 30.0
