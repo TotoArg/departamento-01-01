@@ -19,3 +19,7 @@ extract_samples.py
 analyze_frames.py
 inspect_items.py
 test_area.py
+analyze_ascii.py
+inspect_user_plan.py
+plano_usuario_*.png
+zoom_plan.py

@@ -649,83 +649,88 @@
         // 8. Muro Oeste: Fachada sobre Calle Günter Plüschow (6.20 m) - Ventanas Cuarto, Baño y Estudio
         createWall({ x: 0.00, z: 6.20 }, { x: 0.00, z: 0.00 }, 0.20, wallsGroup, { start: 4.60, width: 1.40, sill: 1.00, height: 1.20 });
 
-        // --- TABIQUES INTERIORES SEGÚN EL CROQUIS Y VIDEOS ---
+        // --- TABIQUES INTERIORES SEGÚN EL PLANO OFICIAL Y DIAGRAMA DEL USUARIO ---
         // A) ESTADO REAL ACTUAL:
-        // Gran tabique longitudinal divisorio entre Living y Pasillo/Habitaciones
-        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 4.20 }, 0.12, groupActual, null, { start: 2.20, width: 1.10, height: 2.10, type: 'open' });
-
-        // Tabique Cocina hacia Living (0.12m)
-        createWall({ x: 3.50, z: 4.20 }, { x: 3.50, z: 6.20 }, 0.12, groupActual);
-
-        // Tabique Cocina hacia Pasillo (0.12m)
-        createWall({ x: 2.40, z: 4.20 }, { x: 3.50, z: 4.20 }, 0.12, groupActual, null, { start: 0.20, width: 0.85, height: 2.10, type: 'open' });
-
-        // Tabique divisorio Cuarto / Cocina
-        createWall({ x: 2.40, z: 4.20 }, { x: 2.40, z: 6.20 }, 0.12, groupActual);
-
-        // Sector Privado Izquierdo (Calle Günter Plüschow):
-        // 1. CUARTO PRINCIPAL (Frente)
-        // Muro divisorio ciego entre Baño y Placard del Cuarto
+        // 1. CUARTO PRINCIPAL (Frente / Sudoeste)
+        // Muro ciego divisorio entre Baño y Placard del Cuarto
         createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupActual);
-        // Lateral del placard hacia el Pasillo (Muro ciego)
+        // Lateral ciego del placard del Cuarto hacia el Pasillo
         createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.90 }, 0.12, groupActual);
-        // Puerta de acceso al Cuarto desde el Pasillo
-        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 5.70 }, 0.12, groupActual, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
-        // Frente de Placard que abre HACIA EL INTERIOR del Cuarto (Orientación Sur)
+        // Frente de Placard que abre HACIA EL INTERIOR del Cuarto
         createWall({ x: 0.10, z: 4.90 }, { x: 2.30, z: 4.90 }, 0.06, groupActual, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
+        // Puerta de acceso al Cuarto desde el Pasillo (en el umbral horizontal)
+        createWall({ x: 2.40, z: 4.90 }, { x: 3.50, z: 4.90 }, 0.12, groupActual, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
+        // Muro divisorio entre Cuarto y Cocina
+        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 6.20 }, 0.12, groupActual);
 
-        // 2. BAÑO COMPLETO (Centro - entre las espaldas de ambos placards)
+        // 2. BAÑO COMPLETO (Centro - entre ambos placards)
         createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupActual, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' }); // Puerta Baño hacia Pasillo
 
-        // 3. ESTUDIO GAMER (Fondo)
-        // Muro divisorio ciego entre Baño y Placard del Estudio
+        // 3. ESTUDIO GAMER (Fondo / Noroeste)
+        // Muro ciego divisorio entre Baño y Placard del Estudio
         createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupActual);
-        // Lateral del placard hacia el Pasillo (Muro ciego)
+        // Lateral ciego del placard del Estudio hacia el Pasillo
         createWall({ x: 2.40, z: 2.10 }, { x: 2.40, z: 2.70 }, 0.12, groupActual);
-        // Puerta de acceso al Estudio desde el Pasillo
-        createWall({ x: 2.40, z: 1.30 }, { x: 2.40, z: 2.10 }, 0.12, groupActual, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
-        // Muro restante del Estudio hacia el Pasillo
-        createWall({ x: 2.40, z: 0.00 }, { x: 2.40, z: 1.30 }, 0.12, groupActual);
-        // Frente de Placard que abre HACIA EL INTERIOR del Estudio (Orientación Norte)
+        // Frente de Placard que abre HACIA EL INTERIOR del Estudio
         createWall({ x: 0.10, z: 2.10 }, { x: 2.30, z: 2.10 }, 0.06, groupActual, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
+        // Puerta de acceso al Estudio desde el Pasillo (en el umbral horizontal)
+        createWall({ x: 2.40, z: 2.10 }, { x: 3.50, z: 2.10 }, 0.12, groupActual, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
+
+        // 4. PASILLO Y PASO AL LIVING
+        // Tabique divisorio entre Estudio y Living (X = 3.50, de Z=0 a 2.10)
+        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 2.10 }, 0.12, groupActual);
+        // Tabique divisorio entre Pasillo y Living (X = 3.50, de Z=2.10 a 4.90) con vano de paso abierto
+        createWall({ x: 3.50, z: 2.10 }, { x: 3.50, z: 4.90 }, 0.12, groupActual, null, { start: 1.50, width: 1.10, height: 2.10, type: 'open' });
+
+        // 5. COCINA
+        // Acceso a la Cocina desde la circulación (en umbral horizontal Z=4.90)
+        createWall({ x: 3.50, z: 4.90 }, { x: 4.80, z: 4.90 }, 0.12, groupActual, null, { start: 0.10, width: 0.95, height: 2.10, type: 'open' });
+        // Tabique divisorio entre Cocina y Living
+        createWall({ x: 4.80, z: 4.90 }, { x: 4.80, z: 6.20 }, 0.12, groupActual);
 
         // B) PROPUESTA 1: COCINA ABIERTA CON ISLA
-        // Se demuele el tabique ciego entre Cocina y Living para ganar luminosidad y amplitud
-        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 4.20 }, 0.12, groupPropIsla, null, { start: 2.20, width: 1.10, height: 2.10, type: 'open' });
-        createWall({ x: 2.40, z: 4.20 }, { x: 2.40, z: 6.20 }, 0.12, groupPropIsla);
-        // Preserva la distribución privada de los dormitorios con sus placards interiores
         createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupPropIsla);
         createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.90 }, 0.12, groupPropIsla);
-        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 5.70 }, 0.12, groupPropIsla, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
         createWall({ x: 0.10, z: 4.90 }, { x: 2.30, z: 4.90 }, 0.06, groupPropIsla, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
+        createWall({ x: 2.40, z: 4.90 }, { x: 3.50, z: 4.90 }, 0.12, groupPropIsla, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
+        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 6.20 }, 0.12, groupPropIsla);
+
         createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupPropIsla, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' });
         createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupPropIsla);
         createWall({ x: 2.40, z: 2.10 }, { x: 2.40, z: 2.70 }, 0.12, groupPropIsla);
-        createWall({ x: 2.40, z: 1.30 }, { x: 2.40, z: 2.10 }, 0.12, groupPropIsla, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
-        createWall({ x: 2.40, z: 0.00 }, { x: 2.40, z: 1.30 }, 0.12, groupPropIsla);
         createWall({ x: 0.10, z: 2.10 }, { x: 2.30, z: 2.10 }, 0.06, groupPropIsla, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
+        createWall({ x: 2.40, z: 2.10 }, { x: 3.50, z: 2.10 }, 0.12, groupPropIsla, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
+        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 2.10 }, 0.12, groupPropIsla);
+        createWall({ x: 3.50, z: 2.10 }, { x: 3.50, z: 4.90 }, 0.12, groupPropIsla, null, { start: 1.50, width: 1.10, height: 2.10, type: 'open' });
 
-        // Barra Isla Desayunadora moderna
+        // Barra Isla Desayunadora moderna en lugar de tabique ciego de cocina
         const island = new THREE.Mesh(new THREE.BoxGeometry(0.80, 0.90, 1.80), woodDoorMat);
-        island.position.set(3.50, 0.45, 5.20);
+        island.position.set(4.80, 0.45, 5.55);
         const islandTop = new THREE.Mesh(new THREE.BoxGeometry(1.00, 0.05, 1.90), graniteMat);
-        islandTop.position.set(3.50, 0.925, 5.20);
+        islandTop.position.set(4.80, 0.925, 5.55);
         groupPropIsla.add(island, islandTop);
 
         // C) PROPUESTA 2: ENTREPISO / MEZZANINE EN EL ESTUDIO (Aprovechando los 3.85m)
         groupPropLoft.add(island.clone(), islandTop.clone());
-        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 4.20 }, 0.12, groupPropLoft, null, { start: 2.20, width: 1.10, height: 2.10, type: 'open' });
-        createWall({ x: 2.40, z: 4.20 }, { x: 2.40, z: 6.20 }, 0.12, groupPropLoft);
         createWall({ x: 0.00, z: 4.30 }, { x: 2.40, z: 4.30 }, 0.10, groupPropLoft);
         createWall({ x: 2.40, z: 4.30 }, { x: 2.40, z: 4.90 }, 0.12, groupPropLoft);
-        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 5.70 }, 0.12, groupPropLoft, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
         createWall({ x: 0.10, z: 4.90 }, { x: 2.30, z: 4.90 }, 0.06, groupPropLoft, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
+        createWall({ x: 2.40, z: 4.90 }, { x: 3.50, z: 4.90 }, 0.12, groupPropLoft, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
+        createWall({ x: 2.40, z: 4.90 }, { x: 2.40, z: 6.20 }, 0.12, groupPropLoft);
+
         createWall({ x: 2.40, z: 2.70 }, { x: 2.40, z: 4.30 }, 0.12, groupPropLoft, null, { start: 0.40, width: 0.75, height: 2.10, type: 'wood' });
         createWall({ x: 0.00, z: 2.70 }, { x: 2.40, z: 2.70 }, 0.10, groupPropLoft);
         createWall({ x: 2.40, z: 2.10 }, { x: 2.40, z: 2.70 }, 0.12, groupPropLoft);
-        createWall({ x: 2.40, z: 1.30 }, { x: 2.40, z: 2.10 }, 0.12, groupPropLoft, null, { start: 0.05, width: 0.75, height: 2.10, type: 'wood' });
-        createWall({ x: 2.40, z: 0.00 }, { x: 2.40, z: 1.30 }, 0.12, groupPropLoft);
         createWall({ x: 0.10, z: 2.10 }, { x: 2.30, z: 2.10 }, 0.06, groupPropLoft, null, { start: 0.05, width: 2.10, height: 2.50, type: 'wood' });
+        createWall({ x: 2.40, z: 2.10 }, { x: 3.50, z: 2.10 }, 0.12, groupPropLoft, null, { start: 0.10, width: 0.85, height: 2.10, type: 'wood' });
+        createWall({ x: 3.50, z: 0.00 }, { x: 3.50, z: 2.10 }, 0.12, groupPropLoft);
+        createWall({ x: 3.50, z: 2.10 }, { x: 3.50, z: 4.90 }, 0.12, groupPropLoft, null, { start: 1.50, width: 1.10, height: 2.10, type: 'open' });
+
+        const loftPlat = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.12, 1.80), woodCeilingMat);
+        loftPlat.position.set(1.20, 2.25, 1.00);
+        const loftRail = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.05, 0.05), ironMat);
+        loftRail.position.set(1.20, 3.15, 1.90);
+        groupPropLoft.add(loftPlat, loftRail);
 
         const loftPlat = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.12, 1.80), woodCeilingMat);
         loftPlat.position.set(1.20, 2.25, 1.00);

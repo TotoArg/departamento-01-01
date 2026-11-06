@@ -1,10 +1,11 @@
 """
 Generador paramétrico de Departamento_01-01.obj y Departamento_01-01.mtl
-Dimensiones exactas según Escritura Oficial y Plano Catastral:
-- Edificio Glaciares II - Calle Günter Plüschow 235, El Calafate
-- Unidad Funcional N° 6, Depto "A", Polígono 01-01
-- Superficie cubierta oficial: 54,16 m²
-- Los placards pertenecen y abren hacia el interior de sus respectivas habitaciones (Cuarto y Estudio)
+Distribución 100% fiel al diagrama esquemático 2D del usuario:
+- Placards integrados en habitaciones (Cuarto y Estudio)
+- Puertas de acceso en umbrales horizontales hacia el Pasillo
+- Puerta del Baño central directa al Pasillo
+- Cocina con acceso desde la circulación y tabique divisorio al Living
+- Gran Living longitudinal con entrada principal en la esquina inferior derecha
 """
 
 def generate_obj_mtl():
@@ -12,7 +13,7 @@ def generate_obj_mtl():
     mtl_lines = []
 
     obj_lines.append("# Edificio Glaciares II - Depto 01-01 (1° Piso)")
-    obj_lines.append("# Superficie Escriturada Oficial: 54.16 m2 | Porcentual: 10.03%")
+    obj_lines.append("# Superficie Oficial: 54.16 m2 | Diagrama 2D Oficial")
     obj_lines.append("mtllib Departamento_01-01.mtl\n")
 
     v_count = 0
@@ -65,54 +66,51 @@ def generate_obj_mtl():
     add_box("Muro_Oeste_Calle_Gunter", -0.20, 0.00, 0.0, 0.20, 6.20, 3.00, "Pared_Blanca")
 
     # 3. TABIQUES INTERIORES
-    add_box("Tabique_Living_Privado_Norte", 3.50, 0.00, 0.0, 0.12, 2.20, 3.20, "Pared_Blanca")
-    add_box("Dintel_Paso_Living_Pasillo", 3.50, 2.20, 2.10, 0.12, 1.10, 1.10, "Pared_Blanca")
-    add_box("Tabique_Living_Cocina", 3.50, 4.20, 0.0, 0.12, 2.00, 2.90, "Pared_Blanca")
+    # Muro divisorio Estudio / Living (Norte)
+    add_box("Tabique_Estudio_Living", 3.50, 0.00, 0.0, 0.12, 2.10, 3.20, "Pared_Blanca")
+    # Muro divisorio Pasillo / Living con vano abierto
+    add_box("Tabique_Pasillo_Living_Norte", 3.50, 2.10, 0.0, 0.12, 1.40, 3.00, "Pared_Blanca")
+    add_box("Dintel_Paso_Pasillo_Living", 3.50, 3.50, 2.10, 0.12, 1.10, 0.90, "Pared_Blanca")
+    add_box("Tabique_Pasillo_Living_Sur", 3.50, 4.60, 0.0, 0.12, 0.30, 3.00, "Pared_Blanca")
 
-    # Cocina
-    add_box("Tabique_Cocina_Pasillo", 2.40, 4.20, 0.0, 1.10, 0.12, 2.80, "Pared_Blanca")
-    add_box("Tabique_Cocina_Cuarto", 2.40, 4.20, 0.0, 0.12, 2.00, 2.80, "Pared_Blanca")
-
-    # Sector Privado (Calle Günter Plüschow):
-    # Cuarto Principal con su Placard interior
-    add_box("Tabique_Bano_Cuarto_Ciego", 0.00, 4.30, 0.0, 2.40, 0.10, 2.80, "Pared_Blanca")
-    add_box("Tabique_Pasillo_Cuarto_Placard", 2.40, 4.30, 0.0, 0.12, 0.60, 2.80, "Pared_Blanca")
-    add_box("Placard_Interior_Cuarto", 0.10, 4.35, 0.0, 2.20, 0.55, 2.45, "Madera")
-    add_box("Dintel_Puerta_Cuarto", 2.40, 4.90, 2.10, 0.12, 0.80, 0.70, "Pared_Blanca")
+    # Estudio Gamer (Noroeste)
+    add_box("Tabique_Bano_Estudio_Ciego", 0.00, 2.70, 0.0, 2.40, 0.10, 3.00, "Pared_Blanca")
+    add_box("Tabique_Placard_Estudio_Pasillo", 2.40, 2.10, 0.0, 0.12, 0.60, 3.00, "Pared_Blanca")
+    add_box("Placard_Interior_Estudio", 0.10, 2.15, 0.0, 2.20, 0.55, 2.45, "Madera")
+    add_box("Dintel_Acceso_Estudio", 2.40, 2.10, 2.10, 1.10, 0.12, 0.90, "Pared_Blanca")
 
     # Baño Completo (Centro)
-    add_box("Tabique_Pasillo_Bano", 2.40, 2.70, 0.0, 0.12, 0.40, 3.00, "Pared_Blanca")
+    add_box("Tabique_Bano_Pasillo_Norte", 2.40, 2.70, 0.0, 0.12, 0.40, 3.00, "Pared_Blanca")
     add_box("Dintel_Puerta_Bano", 2.40, 3.10, 2.10, 0.12, 0.80, 0.90, "Pared_Blanca")
-    add_box("Tabique_Pasillo_Bano_Sur", 2.40, 3.90, 0.0, 0.12, 0.40, 3.00, "Pared_Blanca")
+    add_box("Tabique_Bano_Pasillo_Sur", 2.40, 3.90, 0.0, 0.12, 0.40, 3.00, "Pared_Blanca")
 
-    # Estudio Gamer con su Placard interior
-    add_box("Tabique_Bano_Estudio_Ciego", 0.00, 2.70, 0.0, 2.40, 0.10, 3.00, "Pared_Blanca")
-    add_box("Tabique_Pasillo_Estudio_Placard", 2.40, 2.10, 0.0, 0.12, 0.60, 3.00, "Pared_Blanca")
-    add_box("Placard_Interior_Estudio", 0.10, 2.15, 0.0, 2.20, 0.55, 2.45, "Madera")
-    add_box("Dintel_Puerta_Estudio", 2.40, 1.30, 2.10, 0.12, 0.80, 0.90, "Pared_Blanca")
-    add_box("Tabique_Pasillo_Estudio_Norte", 2.40, 0.00, 0.0, 0.12, 1.30, 3.20, "Pared_Blanca")
+    # Cuarto Principal (Sudoeste)
+    add_box("Tabique_Bano_Cuarto_Ciego", 0.00, 4.30, 0.0, 2.40, 0.10, 2.80, "Pared_Blanca")
+    add_box("Tabique_Placard_Cuarto_Pasillo", 2.40, 4.30, 0.0, 0.12, 0.60, 2.80, "Pared_Blanca")
+    add_box("Placard_Interior_Cuarto", 0.10, 4.35, 0.0, 2.20, 0.55, 2.45, "Madera")
+    add_box("Dintel_Acceso_Cuarto", 2.40, 4.90, 2.10, 1.10, 0.12, 0.70, "Pared_Blanca")
+    add_box("Tabique_Cuarto_Cocina", 2.40, 4.90, 0.0, 0.12, 1.30, 2.80, "Pared_Blanca")
+
+    # Cocina
+    add_box("Dintel_Acceso_Cocina", 3.50, 4.90, 2.10, 1.30, 0.12, 0.70, "Pared_Blanca")
+    add_box("Tabique_Cocina_Living", 4.80, 4.90, 0.0, 0.12, 1.30, 2.80, "Pared_Blanca")
 
     # 4. MOBILIARIO Y EQUIPAMIENTO REAL
-    # Cocina
-    add_box("Mesada_Cocina", 3.70, 5.60, 0.0, 1.40, 0.60, 0.88, "Granito_Rosa")
-    add_box("Cocina_Gas", 3.10, 5.60, 0.0, 0.55, 0.60, 0.86, "Blanco_Sanitarios")
-    add_box("Termotanque_Sherman", 4.70, 5.60, 1.30, 0.40, 0.40, 0.85, "Blanco_Sanitarios")
+    add_box("Mesada_Cocina", 3.65, 5.60, 0.0, 1.35, 0.60, 0.88, "Granito_Rosa")
+    add_box("Cocina_Gas", 2.80, 5.60, 0.0, 0.55, 0.60, 0.86, "Blanco_Sanitarios")
+    add_box("Termotanque_Sherman", 4.50, 5.60, 1.30, 0.35, 0.35, 0.85, "Blanco_Sanitarios")
 
-    # Baño
     add_box("Banera", 0.10, 2.85, 0.0, 0.70, 1.40, 0.45, "Blanco_Sanitarios")
     add_box("Inodoro", 1.40, 2.85, 0.0, 0.40, 0.55, 0.42, "Blanco_Sanitarios")
     add_box("Bidet", 1.95, 2.85, 0.0, 0.38, 0.55, 0.40, "Blanco_Sanitarios")
     add_box("Vanitory", 1.40, 3.65, 0.0, 0.60, 0.50, 0.85, "Madera")
 
-    # Cuarto
-    add_box("Cama_Doble", 0.50, 4.95, 0.0, 1.40, 1.90, 0.45, "Gris_Tapizado")
+    add_box("Cama_Doble", 0.50, 5.05, 0.0, 1.40, 1.85, 0.45, "Gris_Tapizado")
     add_box("Mesa_Luz", 1.95, 5.60, 0.0, 0.40, 0.45, 0.55, "Madera")
 
-    # Estudio
     add_box("Escritorio_Gamer_L", 0.10, 0.10, 0.0, 1.50, 0.70, 0.75, "Negro_Metal")
     add_box("Retorno_Escritorio", 0.10, 0.80, 0.0, 0.60, 0.90, 0.75, "Negro_Metal")
 
-    # Living
     add_box("Sillon_Living", 5.60, 4.00, 0.0, 2.10, 0.90, 0.75, "Gris_Tapizado")
     add_box("Mesa_Comedor", 6.80, 2.00, 0.0, 1.40, 0.85, 0.76, "Madera")
     add_box("Calefactor_Gas_Tiro", 9.15, 2.60, 0.0, 0.15, 0.60, 0.65, "Negro_Metal")
@@ -137,7 +135,7 @@ def generate_obj_mtl():
     with open("Departamento_01-01.mtl", "w", encoding="utf-8") as f:
         f.write("\n".join(mtl_lines))
 
-    print("Departamento_01-01.obj y .mtl actualizados: Placards interiores de habitaciones.")
+    print("Departamento_01-01.obj y .mtl actualizados fielmente al diagrama 2D.")
 
 if __name__ == "__main__":
     generate_obj_mtl()
