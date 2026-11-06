@@ -4,15 +4,17 @@ Proyecto de modelado 3D interactivo y planos digitales para la **Unidad Funciona
 
 ---
 
-## 📋 Datos Legales y Catastrales Oficiales (Escritura)
+## 📋 Datos Legales y Catastrales Oficiales (Escritura y Planos de Obra)
 
 - **Edificio**: Glaciares II
-- **Ubicación**: Calle Günter Plüschow 235 (entre Antoine de Saint Exupéry y Calle 508), El Calafate, Provincia de Santa Cruz.
-- **Unidad Funcional**: N° 6 (Seis) — Planta Primer Piso — Departamento "A"
+- **Ubicación**: Calle Günter Plüschow 217 / 235 (entre Antoine de Saint Exupéry y Calle 508), El Calafate, Provincia de Santa Cruz.
+- **Google Maps**: [Ver ubicación en el mapa](https://maps.app.goo.gl/jLabdwtwafbUQ6w79)
+- **Unidad Funcional**: N° 6 (Seis) — Planta Primer Piso (Nivel +2.75 m) — Departamento "A"
 - **Polígono**: 01-01
-- **Superficie Cubierta Oficial**: **54,16 m²** *(Cincuenta y cuatro metros con dieciséis decímetros cuadrados)*
+- **Superficie Cubierta Oficial**: **54,16 m²** *(Coincidencia matemática exacta con la Planilla de Superficies de Lámina 1 y Escritura)*
 - **Porcentual de Dominio**: **10,03 %** *(Diez coma cero tres por ciento)*
-- **Nomenclatura Catastral**: Manzana 193, Parcela 14 (Plano de Mensura M-8876)
+- **Nomenclatura Catastral**: Manzana 193, Parcela 15 (Plano de Mensura M-8876, Agrimensora María Alejandra Piombi Matrícula 088)
+- **Estructura de Techo Propio**: En la Lámina N° 3 (Segundo Piso +5.15 m) se confirma que **no existe unidad construida sobre el polígono 01-01**, por lo que este departamento remata con su cubierta propia en pendiente con tirantería de madera y vigas vistas de gran altura (hasta 3.85 m).
 
 ---
 
