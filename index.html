@@ -748,6 +748,14 @@
         </div>
     </div>
 
+    <!-- Barra flotante de Selección y Eliminación Rápida de Objetos -->
+    <div id="selected-object-bar" class="glass-panel" style="display:none; position:fixed; bottom:74px; left:50%; transform:translateX(-50%); padding:6px 14px; border-radius:24px; border:1px solid #38bdf8; z-index:90; align-items:center; gap:10px; box-shadow:0 10px 25px rgba(0,0,0,0.45); font-size:12px;">
+        <span style="color:#38bdf8; font-size:14px;">🎯</span>
+        <span id="selected-obj-title" style="color:#f8fafc; font-weight:600; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Objeto</span>
+        <button id="btn-quick-del" class="action-btn btn-delete" style="padding:4px 10px; font-size:11px; margin:0;" title="Eliminar objeto (o tecla Supr / Backspace)">🗑️ Eliminar</button>
+        <button id="btn-quick-close" style="background:transparent; border:none; color:#94a3b8; font-size:14px; cursor:pointer; padding:0 4px;" title="Deseleccionar">✕</button>
+    </div>
+
     <!-- Bottom Quick Camera Views -->
     <div id="bottom-bar" class="glass-panel">
         <div class="view-chip active" data-view="top2d">📐 Plano 2D Exacto (Ortogonal)</div>
@@ -1323,29 +1331,29 @@
         addBoxFixture(2.48, 0.34, 6.86, 0.46, 0.62, 0.14, 0x9ca3af);
         addBoxFixture(2.48, 0.66, 6.86, 0.48, 0.03, 0.16, 0xf97316);
 
-        // 2) COCINA (según fotos): Sobre muro Este (X=5.20) van Heladera -> 1° tramo mesada + Calefón mural Orbis -> Cocina 4H -> 2° tramo mesada con Bacha + esquina en "L" bajo ventana Sur (Y=7.00)
-        // - 1° tramo de bajo mesada y mesada de granito entre Heladera y Cocina (Z=5.22..5.62)
-        addBoxFixture(4.87, 0.42, 5.42, 0.56, 0.84, 0.40, 0xb48a64);
-        addBoxFixture(4.86, 0.86, 5.42, 0.60, 0.04, 0.40, 0xc8b2a6);
-        // - Calefón a gas mural blanco (Orbis) colgado en pared Este sobre el 1° tramo de mesada (X=5.04, Y=1.44, Z=5.42) + caño amarillo
-        setMountWall(5.20, 5.42, false);
-        addBoxFixture(5.04, 1.44, 5.42, 0.22, 0.56, 0.36, 0xf8fafc, fixturesGroup, 0.25);
-        addBoxFixture(4.92, 1.28, 5.42, 0.02, 0.08, 0.12, 0x334155); // Visor/botonera calefón
-        addBoxFixture(5.08, 1.08, 5.28, 0.03, 0.22, 0.03, 0xeab308); // Caño de gas amarillo
+        // 2) COCINA (según fotos reales): Sobre muro Oeste (X=3.00) van Heladera -> 1° tramo mesada + Calefón mural Orbis/Bosch -> Cocina 4H -> 2° tramo mesada con Bacha + esquina en "L" bajo ventana Sur (Y=7.00). Muro Este (X=5.20) queda libre con portero y cestos.
+        // - 1° tramo de bajo mesada y mesada de granito entre Heladera y Cocina (Z=5.15..5.55, X=3.30)
+        addBoxFixture(3.30, 0.42, 5.35, 0.56, 0.84, 0.40, 0xb48a64);
+        addBoxFixture(3.30, 0.86, 5.35, 0.60, 0.04, 0.40, 0xc8b2a6);
+        // - Calefón a gas mural blanco (Orbis/Bosch) colgado en pared Oeste sobre el 1° tramo de mesada (X=3.16, Y=1.44, Z=5.35) + caño amarillo
+        setMountWall(3.00, 5.35, false);
+        addBoxFixture(3.16, 1.44, 5.35, 0.22, 0.56, 0.36, 0xf8fafc, fixturesGroup, 0.25);
+        addBoxFixture(3.28, 1.28, 5.35, 0.02, 0.08, 0.12, 0x334155); // Visor/botonera calefón
+        addBoxFixture(3.12, 1.08, 5.22, 0.03, 0.22, 0.03, 0xeab308); // Caño de gas amarillo
         setMountWall(null);
-        // - Cocina a gas blanca de 4 hornallas con horno visor negro sobre muro Este (X=4.86, Z=5.89, entre los dos tramos de mesada)
-        addBoxFixture(4.86, 0.43, 5.89, 0.58, 0.86, 0.54, 0xffffff, fixturesGroup, 0.25);
-        addBoxFixture(4.86, 0.87, 5.89, 0.52, 0.02, 0.48, 0x1e293b); // Rejilla 4 hornallas negra
-        addBoxFixture(4.56, 0.38, 5.89, 0.02, 0.44, 0.42, 0x0f172a); // Visor negro puerta del horno
-        // - 2° tramo de bajo mesada y mesada en "L" de granito gris/rosado (Muro Este Z=6.16..6.96 + retorno Sur X=3.88..4.58)
-        addBoxFixture(4.87, 0.42, 6.56, 0.56, 0.84, 0.80, 0xb48a64);
-        addBoxFixture(4.23, 0.42, 6.68, 0.70, 0.84, 0.56, 0xb48a64);
-        addBoxFixture(4.86, 0.86, 6.56, 0.60, 0.04, 0.80, 0xc8b2a6);
-        addBoxFixture(4.23, 0.86, 6.68, 0.68, 0.04, 0.58, 0xc8b2a6);
-        // - Bacha doble esquinera de acero inoxidable + grifería monocomando + filtro purificador negro PSA (X=4.68, Z=6.55)
-        addBoxFixture(4.82, 0.875, 6.46, 0.40, 0.02, 0.44, 0x94a3b8, fixturesGroup, 0.25);
-        addBoxFixture(4.48, 0.875, 6.66, 0.40, 0.02, 0.38, 0x94a3b8, fixturesGroup, 0.25);
-        addBoxFixture(4.88, 1.00, 6.66, 0.09, 0.24, 0.09, 0x0f172a, fixturesGroup, 0.2); // Filtro purificador de agua negro PSA
+        // - Cocina a gas blanca de 4 hornallas con horno visor negro sobre muro Oeste (X=3.30, Z=5.85, entre los dos tramos de mesada)
+        addBoxFixture(3.30, 0.43, 5.85, 0.58, 0.86, 0.54, 0xffffff, fixturesGroup, 0.25);
+        addBoxFixture(3.30, 0.87, 5.85, 0.52, 0.02, 0.48, 0x1e293b); // Rejilla 4 hornallas negra
+        addBoxFixture(3.60, 0.38, 5.85, 0.02, 0.44, 0.42, 0x0f172a); // Visor negro puerta del horno
+        // - 2° tramo de bajo mesada y mesada en "L" de granito gris/rosado (Muro Oeste Z=6.12..6.96 + retorno Sur X=3.60..4.30)
+        addBoxFixture(3.30, 0.42, 6.54, 0.56, 0.84, 0.84, 0xb48a64);
+        addBoxFixture(3.95, 0.42, 6.68, 0.70, 0.84, 0.56, 0xb48a64);
+        addBoxFixture(3.30, 0.86, 6.54, 0.60, 0.04, 0.84, 0xc8b2a6);
+        addBoxFixture(3.95, 0.86, 6.68, 0.68, 0.04, 0.58, 0xc8b2a6);
+        // - Bacha doble esquinera de acero inoxidable + grifería monocomando + filtro purificador negro PSA (X=3.35, Z=6.50)
+        addBoxFixture(3.35, 0.875, 6.46, 0.40, 0.02, 0.44, 0x94a3b8, fixturesGroup, 0.25);
+        addBoxFixture(3.70, 0.875, 6.66, 0.40, 0.02, 0.38, 0x94a3b8, fixturesGroup, 0.25);
+        addBoxFixture(3.30, 1.00, 6.66, 0.09, 0.24, 0.09, 0x0f172a, fixturesGroup, 0.2); // Filtro purificador de agua negro PSA
 
         // 3) BAÑO AMPLIO (según fotos #23 a #29): Bañera con mampara/cortina floral al Oeste + Lavatorio con botiquín espejo al Norte + Inodoro, Bidet y Alacena al Sur
         // Bañera blanca (X=0.05..0.75, Z=2.84..3.96) + esquinero ducha + cortina de baño blanca
@@ -1465,10 +1473,9 @@
         // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Cuarto sobre muro Este, fotos #17 y #22)
         addDashedLine(2.30, 4.50, 3.00, 4.50);
         addDoorSymbol2D(2.95, 4.50, 2.75, 4.72, 2.55, 4.72, 2.42, 4.50);
-        // - VANO ABIERTO COCINA (SIN PUERTA): Paso libre de X = 3.00 a X = 4.45 alineado con el pasillo de la cocina; mocheta de X = 4.45 a X = 5.20 delante del lateral de la heladera
-        addDashedLine(3.00, 4.50, 4.45, 4.50);
-        // - Mocheta frontal de Cocina (cubre el espesor de la heladera): De X = 4.45 a X = 5.20
-        addWallSegment(4.45, 4.50, 5.20, 4.50, INT_T, interiorWallsGroup, false);
+        // - VANO ABIERTO COCINA (SIN PUERTA): Mocheta frontal de Cocina de X = 3.00 a X = 3.65 (cubre el lateral de la heladera); paso libre hacia la cocina de X = 3.65 a X = 5.20
+        addWallSegment(3.00, 4.50, 3.65, 4.50, INT_T, interiorWallsGroup, false);
+        addDashedLine(3.65, 4.50, 5.20, 4.50);
 
         // ============================================================================
         // 4B. PUERTAS 3D REALES EXTRAÍDAS DEL VIDEO (MARCOS DE CHAPA, HOJAS MADERA,
@@ -1614,52 +1621,90 @@
             attachWallMount(holder, (x1 + x2) / 2, (z1 + z2) / 2, true);
         }
 
-        // 3) Constructor de Frentes de Placard Corredizos de Madera + Baulera (sec_063 y sec_064)
-        //    Hojas corredizas enchapadas en madera con marco oscuro y tiradores circulares embutidos (cubetas)
+        // 3) Constructor de Frentes de Placard (Fotos #20, #37, #38):
+        //    Placard embutido de 2 hojas corredizas de madera barnizada con tirador circular oscuro
+        //    + INTERIOR REAL (módulo cajonera blanca de 4 cajones + estantes blancos)
+        //    + BAULERA ABIERTA SUPERIOR (sin puertas corredizas arriba, piso voladizo blanco
+        //      sobre el cual se apoyan valijas, cajas PS5/Monitor, rueda de auxilio y casco bajo el techo en pendiente).
         function addSlidingPlacardFront3D(x1, x2, zWall, facingSign = -1) {
             const w = x2 - x1;
             const holder = new THREE.Group();
             holder.position.set((x1 + x2) / 2, 0, zWall + facingSign * (INT_T / 2 + 0.012));
 
-            // Marco perimetral oscuro y guía divisoria de baulera (a 1.92m de altura)
-            const frameT = 0.03;
-            const topTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.035, frameT), doorFrameMat);
-            topTrack.position.set(0, 2.46, 0);
-            const midTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.035, frameT), doorFrameMat);
-            midTrack.position.set(0, 1.92, 0);
-            const botTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.035, frameT), doorFrameMat);
-            botTrack.position.set(0, 0.06, 0);
-            const leftBorder = new THREE.Mesh(new THREE.BoxGeometry(0.035, 2.44, frameT), doorFrameMat);
-            leftBorder.position.set(-w / 2 + 0.017, 1.26, 0);
-            const rightBorder = new THREE.Mesh(new THREE.BoxGeometry(0.035, 2.44, frameT), doorFrameMat);
-            rightBorder.position.set(w / 2 - 0.017, 1.26, 0);
-            holder.add(topTrack, midTrack, botTrack, leftBorder, rightBorder);
+            // Marco metálico perimetral oscuro de chapa doblada (va desde piso Y=0.08 hasta dintel Y=2.08)
+            const PLACARD_H = 2.00;
+            const frameT = 0.035;
+            const topTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.04, frameT), doorFrameMat);
+            topTrack.position.set(0, 0.08 + PLACARD_H - 0.02, 0);
+            const botTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.04, frameT), doorFrameMat);
+            botTrack.position.set(0, 0.08 + 0.02, 0);
+            const leftBorder = new THREE.Mesh(new THREE.BoxGeometry(0.04, PLACARD_H, frameT), doorFrameMat);
+            leftBorder.position.set(-w / 2 + 0.02, 0.08 + PLACARD_H / 2, 0);
+            const rightBorder = new THREE.Mesh(new THREE.BoxGeometry(0.04, PLACARD_H, frameT), doorFrameMat);
+            rightBorder.position.set(w / 2 - 0.02, 0.08 + PLACARD_H / 2, 0);
+            holder.add(topTrack, botTrack, leftBorder, rightBorder);
 
-            // 3 Hojas corredizas principales de madera (0.08m a 1.90m) + 3 hojas de baulera (1.94m a 2.44m)
-            const leafW = (w - 0.04) / 3 + 0.03;
-            for (let i = 0; i < 3; i++) {
-                const xPos = -w / 2 + 0.03 + leafW / 2 + i * ((w - 0.06 - leafW) / 2);
-                const zOff = (i % 2 === 0) ? -0.006 : 0.006;
+            // Zócalo inferior blanco de obra (levanta el placard 8 cm del suelo, fotos #20 y #38)
+            const plinth = new THREE.Mesh(new THREE.BoxGeometry(w, 0.08, INT_T), intWallMat);
+            plinth.position.set(0, 0.04, 0);
+            holder.add(plinth);
 
-                // Hoja inferior corrediza
-                const mainLeaf = new THREE.Mesh(new THREE.BoxGeometry(leafW, 1.82, 0.022), placardWoodMat);
-                mainLeaf.position.set(xPos, 0.99, zOff);
-                holder.add(mainLeaf);
+            // Piso divisorio voladizo de la baulera abierta superior (estante losa blanca a 2.08 m)
+            const shelfDepth = 0.55;
+            const bauleraFloor = new THREE.Mesh(UNIT_BOX_GEO, extWallMat);
+            bauleraFloor.scale.set(w + 0.04, 0.05, shelfDepth);
+            bauleraFloor.position.set(0, 0.08 + PLACARD_H + 0.025, facingSign * (shelfDepth / 2 - 0.05));
+            holder.add(bauleraFloor);
 
-                // Cubeta / tirador circular embutido (visto en sec_063 y sec_064)
-                const pullRing = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.028, 16), doorFrameMat);
-                pullRing.rotation.x = Math.PI / 2;
-                pullRing.position.set(xPos + (i === 0 ? leafW * 0.32 : -leafW * 0.32), 0.98, zOff);
-                const pullCenter = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.030, 16), chromeMat);
-                pullCenter.rotation.x = Math.PI / 2;
-                pullCenter.position.set(pullRing.position.x, 0.98, zOff);
-                holder.add(pullRing, pullCenter);
-
-                // Hoja de baulera superior corrediza
-                const topLeaf = new THREE.Mesh(new THREE.BoxGeometry(leafW, 0.50, 0.022), placardWoodMat);
-                topLeaf.position.set(xPos, 2.19, zOff);
-                holder.add(topLeaf);
+            // --- INTERIOR VISIBLE DEL PLACARD (visto en fotos #20 y #38 cuando la hoja izquierda está abierta) ---
+            const interiorDepth = 0.46;
+            const interiorZ = facingSign * (-interiorDepth / 2);
+            // Cajonera blanca de 4 cajones amplios en sector izquierdo
+            const chestW = (w - 0.10) / 2;
+            const chestH = 0.88;
+            const chestMesh = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xf8fafc, 0.3));
+            chestMesh.scale.set(chestW, chestH, interiorDepth);
+            chestMesh.position.set(-w / 4, 0.08 + chestH / 2, interiorZ);
+            holder.add(chestMesh);
+            // Ranuras de 4 cajones blancos
+            for (let c = 0; c < 4; c++) {
+                const groove = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x64748b));
+                groove.scale.set(chestW - 0.04, 0.015, 0.02);
+                groove.position.set(-w / 4, 0.08 + (c + 1) * (chestH / 4) - 0.01, interiorZ + facingSign * (interiorDepth / 2 + 0.01));
+                holder.add(groove);
             }
+            // Estantes blancos superiores en sector izquierdo (ropa doblada / cajas de juegos de mesa)
+            for (let s = 1; s <= 3; s++) {
+                const shelf = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xffffff, 0.4));
+                shelf.scale.set(chestW, 0.02, interiorDepth);
+                shelf.position.set(-w / 4, 0.08 + chestH + s * 0.28, interiorZ);
+                holder.add(shelf);
+            }
+
+            // --- 2 HOJAS CORREDIZAS DE MADERA NATURAL / CEDRO ---
+            // Hoja derecha cerrada (fotos #20 y #38) + Hoja izquierda abierta (corrida detrás hacia la derecha)
+            const leafW = (w - 0.04) / 2 + 0.035;
+            const leafH = PLACARD_H - 0.05;
+            const leafT = 0.026;
+
+            // 1. Hoja derecha (exterior, frente cerrado)
+            const rightLeaf = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
+            rightLeaf.scale.set(leafW, leafH, leafT);
+            rightLeaf.position.set(w / 4 + 0.01, 0.08 + leafH / 2 + 0.01, 0.010);
+            // Tirador circular embutido oscuro (cubeta)
+            const pullRight = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.032, 16), doorFrameMat);
+            pullRight.rotation.x = Math.PI / 2;
+            pullRight.position.set(w / 4 + 0.01 + leafW * 0.36, 0.08 + 1.00, 0.010);
+            holder.add(rightLeaf, pullRight);
+
+            // 2. Hoja izquierda (interior, entreabierta hacia el centro permitiendo ver la cajonera y estantes como en fotos)
+            const leftLeaf = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
+            leftLeaf.scale.set(leafW, leafH, leafT);
+            leftLeaf.position.set(0.04, 0.08 + leafH / 2 + 0.01, -0.012);
+            const pullLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.032, 16), doorFrameMat);
+            pullLeft.rotation.x = Math.PI / 2;
+            pullLeft.position.set(0.04 - leafW * 0.36, 0.08 + 1.00, -0.012);
+            holder.add(leftLeaf, pullLeft);
 
             doors3DGroup.add(holder);
             attachWallMount(holder, (x1 + x2) / 2, zWall, true);
@@ -1671,14 +1716,14 @@
             if (extras3DBuilt) return;
             extras3DBuilt = true;
             buildWoodenRoof();
-            // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 4.45)
-            const wCocinaVano = 1.45;
+            // Dintel sobre el Vano Abierto de Cocina (X = 3.65 a 5.20)
+            const wCocinaVano = 1.55;
             const lintelH = WALL_H - DOOR_H;
             const cocinaLintel = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
             cocinaLintel.scale.set(wCocinaVano, lintelH, INT_T);
-            cocinaLintel.position.set(3.725, DOOR_H + lintelH / 2, 4.50);
+            cocinaLintel.position.set(4.425, DOOR_H + lintelH / 2, 4.50);
             doors3DGroup.add(cocinaLintel);
-            attachWallMount(cocinaLintel, 4.60, 4.50, true);
+            attachWallMount(cocinaLintel, 4.425, 4.50, true);
             // Instanciar puertas 3D relevadas de las fotos (#17, #23, #39, #40):
             // - Puerta Estudio: bisagra en X=3.00 (hingeAtStart=false), abre hacia adentro sobre muro Este (swingSign=-1)
             // - Puerta Baño: bisagra en Z=3.65 (hingeAtStart=false), abre hacia adentro al Sur (swingSign=1)
@@ -1697,11 +1742,13 @@
         // 4C. MUEBLES, ELECTRODOMÉSTICOS, CORTINAS Y DECORACIÓN EXTRAÍDOS DEL 2° VIDEO
         //     (https://photos.app.goo.gl/8k4MQeY4BcyoqhDK8 - video_34)
         // ============================================================================
-        function addDecorBox(x, y, z, w, h, d, color, rough = 0.45, rotY = 0) {
+        function addDecorBox(x, y, z, w, h, d, color, rough = 0.45, rotY = 0, name = '') {
             const m = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(color, rough));
             m.scale.set(w, h, d);
             m.position.set(x, y, z);
             if (rotY) m.rotation.y = rotY;
+            m.userData.name = name || 'Elemento / Mueble';
+            m.userData.isDecor = true;
             decorVideoGroup.add(m);
             if (currentMountWallSpec) {
                 attachWallMount(m, currentMountWallSpec.x, currentMountWallSpec.z, currentMountWallSpec.isHoriz);
@@ -1710,12 +1757,14 @@
         }
 
         const UNIT_CYL_GEO = new THREE.CylinderGeometry(1, 1, 1, 14);
-        function addDecorCyl(x, y, z, rTop, rBot, h, color, rough = 0.4) {
+        function addDecorCyl(x, y, z, rTop, rBot, h, color, rough = 0.4, name = '') {
             const isUniform = (rTop === rBot);
             const geo = isUniform ? UNIT_CYL_GEO : new THREE.CylinderGeometry(rTop, rBot, h, 14);
             const m = new THREE.Mesh(geo, getStdMat(color, rough));
             if (isUniform) m.scale.set(rTop, h, rTop);
             m.position.set(x, y, z);
+            m.userData.name = name || 'Elemento / Mueble';
+            m.userData.isDecor = true;
             decorVideoGroup.add(m);
             if (currentMountWallSpec) {
                 attachWallMount(m, currentMountWallSpec.x, currentMountWallSpec.z, currentMountWallSpec.isHoriz);
@@ -1876,61 +1925,61 @@
             addCurtainAssembly(6.30, 0.55, 6.30, 1.55, -0.12, 0, 0xd6ccc2);
 
             // ------------------------------------------------------------------------
-            // B) COCINA ([3.00, 4.50] a [5.20, 7.00]) - Relevamiento exacto de las 4 fotos de cocina
+            // B) COCINA ([3.00, 4.50] a [5.20, 7.00]) - Relevamiento exacto de las fotos
             // ------------------------------------------------------------------------
-            // 1. Mueble envolvente de heladera en esquina Noreste (X=4.85, Z=4.88, detrás de la mocheta):
-            // - Heladera blanca con freezer superior mirando al Oeste + imanes en la puerta
-            addDecorBox(4.85, 0.84, 4.88, 0.60, 1.68, 0.62, 0xf8fafc, 0.25);
-            // - Bodega portabotellas de 5 nichos + Alacena superior de 2 puertas en melamina roble claro hasta arriba
-            setMountWall(5.20, 4.88, false);
-            addDecorBox(4.85, 1.78, 4.88, 0.60, 0.16, 0.62, 0xd6ccc2, 0.5);  // Bodega portabotellas
-            addDecorBox(4.85, 2.12, 4.88, 0.60, 0.52, 0.62, 0xd6ccc2, 0.45); // Alacena alta sobre heladera
-            // 2. Alacenas superiores sobre Muro Este (X=5.20):
-            // - Alacena sobre el calefón Orbis (Z=5.42) + caño corrugado de aluminio arriba + plumero extensible violeta en el hueco
-            addDecorBox(4.96, 1.98, 5.42, 0.34, 0.48, 0.40, 0xd6ccc2, 0.45);
-            addDecorCyl(5.02, 2.30, 5.48, 0.05, 0.05, 0.22, 0x94a3b8, 0.3);    // Conducto aluminio calefón
-            addDecorCyl(4.62, 1.65, 5.20, 0.012, 0.012, 1.45, 0xf8fafc, 0.4);  // Cabo extensible blanco del plumero
-            addDecorCyl(4.62, 2.40, 5.20, 0.09, 0.05, 0.18, 0x7e22ce, 0.7);    // Plumero violeta arriba de la heladera
-            // - Alacena larga de 3 puertas sobre cocina y bacha (Z=5.64..6.68) + estante especiero inferior abierto + 2 latas negras Bagley arriba + imán portacuchillos
-            setMountWall(5.20, 6.20, false);
-            addDecorBox(4.96, 1.84, 6.16, 0.34, 0.64, 1.04, 0xd6ccc2, 0.45);
-            addDecorBox(4.96, 1.44, 6.16, 0.26, 0.14, 1.04, 0xb48a64, 0.5);    // Estante especiero inferior con tazas y Moka roja
-            addDecorCyl(4.96, 2.24, 5.82, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4);    // Lata redonda negra 1 sobre alacena
-            addDecorCyl(4.96, 2.24, 6.26, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4);    // Lata redonda negra 2 sobre alacena
-            addDecorBox(5.11, 1.24, 6.22, 0.02, 0.16, 0.28, 0x334155, 0.3);    // Imán portacuchillos en pared azulejada
-            // - Estante esquinero abierto de madera de 3 niveles en esquina Sureste (Z=6.82) con planta y cafetera Moka
-            addDecorBox(4.96, 1.74, 6.82, 0.30, 0.62, 0.26, 0x9a5b32, 0.5);
-            addDecorCyl(4.96, 2.12, 6.82, 0.06, 0.05, 0.16, 0x15803d, 0.6);    // Plantita en estante superior
+            // 1. Mueble envolvente de heladera en esquina Noroeste (X=3.35, Z=4.88, detrás de la mocheta de acceso):
+            // - Heladera blanca con freezer superior mirando al Este + imanes en la puerta
+            addDecorBox(3.35, 0.84, 4.88, 0.60, 1.68, 0.62, 0xf8fafc, 0.25, 0, 'Heladera con Freezer');
+            // - Bodega portabotellas de 8 nichos (4x2) + Alacena superior de 2 puertas en melamina roble claro hasta arriba
+            setMountWall(3.00, 4.88, false);
+            addDecorBox(3.35, 1.78, 4.88, 0.60, 0.16, 0.62, 0xd6ccc2, 0.5, 0, 'Bodega Portabotellas');  // Bodega portabotellas
+            addDecorBox(3.35, 2.12, 4.88, 0.60, 0.52, 0.62, 0xd6ccc2, 0.45, 0, 'Alacena sobre Heladera'); // Alacena alta sobre heladera
+            // 2. Alacenas superiores sobre Muro Oeste (X=3.00):
+            // - Alacena sobre el calefón Orbis/Bosch (Z=5.35) + caño corrugado de aluminio arriba + plumero extensible violeta en el hueco
+            addDecorBox(3.24, 1.98, 5.35, 0.34, 0.48, 0.40, 0xd6ccc2, 0.45, 0, 'Alacena sobre Calefón');
+            addDecorCyl(3.18, 2.30, 5.40, 0.05, 0.05, 0.22, 0x94a3b8, 0.3, 'Conducto Ventilación Calefón');    // Conducto aluminio calefón
+            addDecorCyl(3.58, 1.65, 5.15, 0.012, 0.012, 1.45, 0xf8fafc, 0.4, 'Cabo Plumero Extensible');  // Cabo extensible blanco del plumero
+            addDecorCyl(3.58, 2.40, 5.15, 0.09, 0.05, 0.18, 0x7e22ce, 0.7, 'Plumero Violeta');    // Plumero violeta arriba de la heladera
+            // - Alacena larga de 3 puertas sobre cocina y bacha (Z=5.60..6.65) + estante especiero inferior abierto + 2 latas negras Bagley arriba + imán portacuchillos
+            setMountWall(3.00, 6.15, false);
+            addDecorBox(3.24, 1.84, 6.12, 0.34, 0.64, 1.04, 0xd6ccc2, 0.45, 0, 'Alacena Cocina 3 Puertas');
+            addDecorBox(3.24, 1.44, 6.12, 0.26, 0.14, 1.04, 0xb48a64, 0.5, 0, 'Estante Especiero Cocina');    // Estante especiero inferior con tazas y Moka roja
+            addDecorCyl(3.24, 2.24, 5.80, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4, 'Lata Redonda Alacena 1');    // Lata redonda negra 1 sobre alacena
+            addDecorCyl(3.24, 2.24, 6.24, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4, 'Lata Redonda Alacena 2');    // Lata redonda negra 2 sobre alacena
+            addDecorBox(3.09, 1.24, 6.18, 0.02, 0.16, 0.28, 0x334155, 0.3, 0, 'Imán Portacuchillos');    // Imán portacuchillos en pared azulejada
+            // - Estante esquinero abierto de madera de 3 niveles en esquina Suroeste (Z=6.82) con planta y cafetera Moka
+            addDecorBox(3.24, 1.74, 6.82, 0.30, 0.62, 0.26, 0x9a5b32, 0.5, 0, 'Estante Esquinero Madera');
+            addDecorCyl(3.24, 2.12, 6.82, 0.06, 0.05, 0.16, 0x15803d, 0.6, 'Planta Estante Esquina');    // Plantita en estante superior
             setMountWall(null);
-            // - Rollo de cocina y termo sobre el 1° tramo de mesada (Z=5.32..5.52) + contenedor celeste y botellas en el 2° tramo
-            addDecorCyl(4.68, 0.98, 5.30, 0.06, 0.06, 0.22, 0xffffff, 0.4);    // Rollo de papel de cocina
-            addDecorCyl(4.72, 0.98, 5.52, 0.045, 0.045, 0.24, 0x475569, 0.3);  // Termo acero
-            addDecorBox(4.74, 0.92, 6.24, 0.18, 0.09, 0.22, 0x0284c7, 0.3);    // Recipiente celeste sobre mesada
+            // - Rollo de cocina y termo sobre el 1° tramo de mesada (Z=5.25..5.45) + contenedor celeste sobre mesada
+            addDecorCyl(3.48, 0.98, 5.25, 0.06, 0.06, 0.22, 0xffffff, 0.4, 'Rollo de Cocina');    // Rollo de papel de cocina
+            addDecorCyl(3.46, 0.98, 5.45, 0.045, 0.045, 0.24, 0x475569, 0.3, 'Termo Acero Inox');  // Termo acero
+            addDecorBox(3.46, 0.92, 6.20, 0.18, 0.09, 0.22, 0x0284c7, 0.3, 0, 'Tupper Celeste Mesada');    // Recipiente celeste sobre mesada
             // 3. Sector bajo Ventana Sur (Y=7.00):
             // - Cortina roller blanca en ventana Sur (X=3.25..4.55, Z=6.94)
             setMountWall(3.90, 7.00, true);
-            addDecorBox(3.90, 1.82, 6.94, 1.28, 0.36, 0.03, 0xf8fafc, 0.3);
+            addDecorBox(3.90, 1.82, 6.94, 1.28, 0.36, 0.03, 0xf8fafc, 0.3, 0, 'Cortina Roller Ventana');
             setMountWall(null);
-            // - Escurridor de platos negro sobre el retorno Sur de la mesada (mitad izquierda bajo la ventana: X=4.22, Z=6.68)
-            addDecorBox(4.22, 0.93, 6.68, 0.38, 0.10, 0.36, 0x1e293b, 0.4);
-            // - Lavarropas automático blanco de carga frontal bajo la mitad derecha de la ventana Sur (X=3.54, Z=6.67, mirando al Norte) + tapa de madera
-            addDecorBox(3.54, 0.42, 6.67, 0.60, 0.84, 0.58, 0xf8fafc, 0.3);  // Cuerpo lavarropas
-            const drum = addDecorCyl(3.54, 0.44, 6.37, 0.18, 0.18, 0.04, 0x334155, 0.2); // Ojo de buey mirando al Norte
+            // - Escurridor de platos negro sobre el retorno Sur de la mesada (mitad izquierda bajo la ventana: X=3.95, Z=6.68)
+            addDecorBox(3.95, 0.93, 6.68, 0.38, 0.10, 0.36, 0x1e293b, 0.4, 0, 'Escurridor de Platos Negro');
+            // - Lavarropas automático blanco de carga frontal bajo la mitad derecha de la ventana Sur (X=4.65, Z=6.67, mirando al Norte) + tapa de madera
+            addDecorBox(4.65, 0.42, 6.67, 0.60, 0.84, 0.58, 0xf8fafc, 0.3, 0, 'Lavarropas Automático');  // Cuerpo lavarropas
+            const drum = addDecorCyl(4.65, 0.44, 6.37, 0.18, 0.18, 0.04, 0x334155, 0.2, 'Puerta Lavarropas'); // Ojo de buey mirando al Norte
             drum.rotation.x = Math.PI / 2;
-            addDecorBox(3.54, 0.86, 6.67, 0.64, 0.04, 0.60, 0xb47b48, 0.45); // Tapa de madera sobre lavarropas
+            addDecorBox(4.65, 0.86, 6.67, 0.64, 0.04, 0.60, 0xb47b48, 0.45, 0, 'Tapa Madera Lavarropas'); // Tapa de madera sobre lavarropas
             // - Estación de café sobre la tapa de madera del lavarropas (frente a la ventana): Cafetera expreso + Pava eléctrica negra
-            addDecorBox(3.62, 1.04, 6.68, 0.28, 0.32, 0.28, 0x334155, 0.3);  // Cafetera expreso plateada/negra
-            addDecorCyl(3.32, 0.98, 6.68, 0.08, 0.09, 0.20, 0x0f172a, 0.3);  // Pava eléctrica negra
-            // 4. Pared Oeste de la Cocina (X=3.00): 2 Cestos de basura en fila + bolso térmico + escoba azul con pala + portero eléctrico + aplique luz
-            addDecorBox(3.24, 0.26, 6.08, 0.34, 0.52, 0.34, 0xf8fafc, 0.4);  // Cesto blanco (más cercano al lavarropas)
-            addDecorBox(3.24, 0.53, 6.08, 0.30, 0.03, 0.30, 0x1e293b, 0.4);  // Tapa vaivén negra del cesto blanco
-            addDecorBox(3.24, 0.28, 5.68, 0.34, 0.56, 0.36, 0x64748b, 0.5);  // Cesto gris con tapa
-            addDecorBox(3.24, 0.14, 5.32, 0.28, 0.26, 0.26, 0x1e1b4b, 0.7);  // Bolso térmico negro/rosa delante del cesto gris
-            addDecorCyl(3.07, 0.65, 5.68, 0.015, 0.015, 1.25, 0x1d4ed8, 0.4);// Escoba cabo azul apoyada en pared Oeste
-            addDecorBox(3.08, 0.36, 5.68, 0.08, 0.22, 0.20, 0xf8fafc, 0.4);  // Pala blanca colgada en la escoba
-            setMountWall(3.00, 5.50, false);
-            addDecorBox(3.06, 1.42, 5.15, 0.05, 0.22, 0.10, 0xfef3c7, 0.4);  // Teléfono portero eléctrico beige
-            addDecorBox(3.06, 2.15, 5.35, 0.06, 0.16, 0.24, 0xffffff, 0.3);  // Aplique de pared medialuna blanco
+            addDecorBox(4.58, 1.04, 6.68, 0.28, 0.32, 0.28, 0x334155, 0.3, 0, 'Cafetera Espresso');  // Cafetera expreso plateada/negra
+            addDecorCyl(4.88, 0.98, 6.68, 0.08, 0.09, 0.20, 0x0f172a, 0.3, 'Pava Eléctrica Negra');  // Pava eléctrica negra
+            // 4. Pared Este de la Cocina (X=5.20): 2 Cestos de basura en fila + bolso térmico + escoba azul con pala + portero eléctrico + aplique luz
+            addDecorBox(4.96, 0.26, 6.08, 0.34, 0.52, 0.34, 0xf8fafc, 0.4, 0, 'Cesto Basura Blanco');  // Cesto blanco (más cercano al lavarropas)
+            addDecorBox(4.96, 0.53, 6.08, 0.30, 0.03, 0.30, 0x1e293b, 0.4, 0, 'Tapa Cesto Blanco');  // Tapa vaivén negra del cesto blanco
+            addDecorBox(4.96, 0.28, 5.68, 0.34, 0.56, 0.36, 0x64748b, 0.5, 0, 'Cesto Basura Gris');  // Cesto gris con tapa
+            addDecorBox(4.96, 0.14, 5.32, 0.28, 0.26, 0.26, 0x1e1b4b, 0.7, 0, 'Bolso Térmico');  // Bolso térmico negro/rosa delante del cesto gris
+            addDecorCyl(5.13, 0.65, 5.68, 0.015, 0.015, 1.25, 0x1d4ed8, 0.4, 'Escoba Azul'); // Escoba cabo azul apoyada en pared Este
+            addDecorBox(5.12, 0.36, 5.68, 0.08, 0.22, 0.20, 0xf8fafc, 0.4, 0, 'Pala de Basura');  // Pala blanca colgada en la escoba
+            setMountWall(5.20, 5.50, false);
+            addDecorBox(5.14, 1.42, 5.15, 0.05, 0.22, 0.10, 0xfef3c7, 0.4, 0, 'Portero Eléctrico Intercom');  // Teléfono portero eléctrico beige
+            addDecorBox(5.14, 2.15, 5.35, 0.06, 0.16, 0.24, 0xffffff, 0.3, 0, 'Aplique de Pared Cocina');  // Aplique de pared medialuna blanco
             setMountWall(null);
 
             // ------------------------------------------------------------------------
@@ -1954,13 +2003,17 @@
             addDecorBox(2.48, 0.48, 6.88, 0.50, 0.50, 0.05, 0x0f172a, 0.2);  // Panel calefactor vidrio negro
             addDecorBox(2.72, 0.35, 6.20, 0.38, 0.70, 0.44, 0x475569, 0.8);  // Cesto ropa sucia gris con ropa arriba
             setMountWall(1.38, 4.50, true);
-            addDecorBox(1.38, 2.36, 4.28, 0.72, 0.44, 0.40, 0x1e293b, 0.5);  // Valijas grandes sobre el placard del cuarto (foto #20)
+            // Equipaje y cajas sobre la losa voladiza de la baulera abierta del cuarto (foto #20):
+            addDecorBox(1.65, 2.38, 4.28, 0.52, 0.46, 0.38, 0x1e293b, 0.4);  // Valija rígida negra grande parada
+            addDecorBox(1.10, 2.26, 4.28, 0.54, 0.28, 0.36, 0x0f172a, 0.5);  // Valija rígida negra mediana acostada
+            addDecorBox(0.68, 2.38, 4.28, 0.38, 0.52, 0.34, 0x475569, 0.4);  // Mueblecito organizador gris / bolso
+            addDecorBox(1.22, 2.58, 4.28, 0.56, 0.24, 0.22, 0xd4a373, 0.6);  // Caja de cartón Samsung Curved Monitor 27" arriba
             setMountWall(null);
             // 5. Cortina gris topo con barral de madera en la ventana Sur del Cuarto (V5: X=0.90..2.10, Z=7.00)
             addCurtainAssembly(0.90, 7.00, 2.10, 7.00, 0, -0.12, 0x78716c);
 
             // ------------------------------------------------------------------------
-            // D) ESTUDIO AMPLIADO ([0.00, 0.00] a [3.00, 2.30], fotos #31 a #40)
+            // D) ESTUDIO ([0.00, 0.00] a [3.00, 2.30], fotos #31 a #40)
             // ------------------------------------------------------------------------
             // 1. Escritorio en "L" de madera lustrada caoba/cedro rojizo (#8f3818):
             // - Tramo principal sobre Muro Este (X=2.64, Z=0.14..1.78)
@@ -2006,7 +2059,12 @@
             addDecorCyl(0.28, 0.74, 2.04, 0.20, 0.20, 0.04, 0x475569, 0.3);  // Tablero de Ajedrez El Señor de los Anillos (LOTR)
             addDecorCyl(1.12, 0.18, 2.04, 0.14, 0.14, 0.34, 0xeab308, 0.3);  // Aspiradora Kärcher amarilla y negra frente al placard del estudio (foto #37 y #38)
             setMountWall(1.48, 2.30, true);
-            addDecorCyl(1.48, 2.28, 2.48, 0.28, 0.28, 0.22, 0x334155, 0.7);  // Rueda de auxilio y cajas sobre la baulera del placard del estudio (foto #37)
+            // Cosas guardadas en la baulera abierta sobre el placard del estudio (fotos #37 y #38):
+            addDecorCyl(1.78, 2.22, 2.52, 0.26, 0.26, 0.18, 0x27272a, 0.8);  // Rueda de auxilio cubierta con lona
+            addDecorCyl(1.78, 2.38, 2.52, 0.12, 0.12, 0.12, 0xd97706, 0.5);  // Casco de moto arriba
+            addDecorBox(1.25, 2.22, 2.52, 0.42, 0.22, 0.32, 0x1e293b, 0.5);  // Bolso deportivo negro/violeta
+            addDecorBox(0.82, 2.22, 2.52, 0.36, 0.24, 0.30, 0xd4a373, 0.6);  // Caja de cartón marrón de zapatos
+            addDecorBox(0.42, 2.24, 2.52, 0.32, 0.26, 0.26, 0x3b82f6, 0.5);  // Caja de PS5 PlayStation 5 / Mirage
             setMountWall(null);
 
             // 6. Cortina gris oscura con visillo blanco en la ventana Norte del Estudio (V4: X=1.35..2.55, Z=0.00, encuadrada sobre el ala Norte del escritorio en L)
@@ -2027,18 +2085,18 @@
             labelElements.push({ el, pos: new THREE.Vector3(x, 0.1, z), isDecor });
         }
 
-        // Estudio Ampliado: [0.00, 0.00] a [3.00, 2.30]
-        addPlanLabel(1.15, 1.35, "ESTUDIO AMPLIADO");
+        // Estudio: [0.00, 0.00] a [3.00, 2.30]
+        addPlanLabel(1.15, 1.35, "ESTUDIO");
         // Placard Superior: [0.00, 2.30] a [2.30, 2.80]
         addPlanLabel(1.15, 2.55, "PLACARD", "arch-label sm");
-        // Baño Amplio: [0.00, 2.80] a [2.30, 4.00]
-        addPlanLabel(1.15, 3.40, "BAÑO AMPLIO");
+        // Baño: [0.00, 2.80] a [2.30, 4.00]
+        addPlanLabel(1.15, 3.40, "BAÑO");
         // Placard Inferior: [0.00, 4.00] a [2.30, 4.50]
         addPlanLabel(1.15, 4.25, "PLACARD", "arch-label sm");
         // Pasillo Distribuidor: [2.30, 2.30] a [3.00, 4.50]
         addPlanLabel(2.70, 3.30, "PASILLO", "arch-label vertical");
-        // Cuarto Ampliado: [0.00, 4.50] a [3.00, 7.00]
-        addPlanLabel(1.15, 5.45, "CUARTO AMPLIADO");
+        // Cuarto: [0.00, 4.50] a [3.00, 7.00]
+        addPlanLabel(1.15, 5.45, "CUARTO");
         // Living: [3.00, 0.00] a [6.30, 4.50]
         addPlanLabel(5.15, 2.10, "LIVING");
         // Cocina: [3.00, 4.50] a [5.20, 7.00]
@@ -2242,10 +2300,94 @@
             renderFurniture3D();
         });
 
-        document.getElementById('btn-del-furniture').addEventListener('click', () => {
-            furnitureList = furnitureList.filter(f => f.id !== selectedId);
-            selectedId = furnitureList[0] ? furnitureList[0].id : null;
-            renderFurniture3D();
+        // ============================================================================
+        // 7B. SELECCIÓN, MEDICIÓN Y ELIMINACIÓN DE OBJETOS (3D Y 2D)
+        // ============================================================================
+        let selectedDecorMesh = null;
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.innerText = msg;
+            toast.style.cssText = 'position:fixed; top:68px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.95); border:1px solid #38bdf8; color:#38bdf8; padding:8px 18px; border-radius:20px; font-size:12px; font-weight:600; z-index:9999; box-shadow:0 10px 25px rgba(0,0,0,0.5); pointer-events:none; transition:opacity 0.35s;';
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 350);
+            }, 1800);
+        }
+
+        function showSelectionBar(name) {
+            const bar = document.getElementById('selected-object-bar');
+            if (!bar) return;
+            document.getElementById('selected-obj-title').innerText = name || 'Objeto';
+            bar.style.display = 'flex';
+        }
+
+        function hideSelectionBar() {
+            const bar = document.getElementById('selected-object-bar');
+            if (bar) bar.style.display = 'none';
+        }
+
+        function clearSelection() {
+            selectedId = null;
+            selectedDecorMesh = null;
+            if (selectionBox) {
+                scene.remove(selectionBox);
+                selectionBox.dispose();
+                selectionBox = null;
+            }
+            hideSelectionBar();
+            wakeRenderer();
+        }
+
+        function selectDecorObject(mesh, defaultTitle = 'Elemento Relevado') {
+            selectedId = null;
+            selectedDecorMesh = mesh;
+            if (selectionBox) {
+                scene.remove(selectionBox);
+                selectionBox.dispose();
+                selectionBox = null;
+            }
+            selectionBox = new THREE.BoxHelper(mesh, 0x38bdf8);
+            scene.add(selectionBox);
+            const title = mesh.userData.name || defaultTitle;
+            showSelectionBar(title);
+            wakeRenderer();
+        }
+
+        function deleteCurrentSelected() {
+            if (selectedId) {
+                const item = furnitureList.find(f => f.id === selectedId);
+                const name = item ? item.name : 'Mueble';
+                furnitureList = furnitureList.filter(f => f.id !== selectedId);
+                selectedId = null;
+                renderFurniture3D();
+                clearSelection();
+                showToast(`🗑️ "${name}" eliminado`);
+            } else if (selectedDecorMesh) {
+                const name = selectedDecorMesh.userData.name || 'Objeto';
+                if (selectedDecorMesh.parent) {
+                    selectedDecorMesh.parent.remove(selectedDecorMesh);
+                }
+                if (selectedDecorMesh.geometry) selectedDecorMesh.geometry.dispose();
+                clearSelection();
+                showToast(`🗑️ "${name}" eliminado`);
+            }
+        }
+
+        document.getElementById('btn-del-furniture').addEventListener('click', deleteCurrentSelected);
+        document.getElementById('btn-quick-del').addEventListener('click', deleteCurrentSelected);
+        document.getElementById('btn-quick-close').addEventListener('click', clearSelection);
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                const tag = document.activeElement ? document.activeElement.tagName : '';
+                if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
+                if (selectedId || selectedDecorMesh) {
+                    e.preventDefault();
+                    deleteCurrentSelected();
+                }
+            }
         });
 
         // Selección táctil / click
@@ -2263,14 +2405,44 @@
             pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(pointer, activeCamera);
 
+            // 1. Raycast sobre muebles interactivos
             const hits = raycaster.intersectObjects(furnitureMeshes, false);
             if (hits.length > 0) {
                 selectedId = hits[0].object.userData.id;
+                selectedDecorMesh = null;
                 renderFurniture3D();
+                const item = furnitureList.find(f => f.id === selectedId);
+                showSelectionBar(item ? item.name : 'Mueble Interactivo');
                 const ed = document.getElementById('furniture-editor');
                 ed.classList.remove('minimized');
                 document.getElementById('btn-min-editor').innerText = '▼';
+                return;
             }
+
+            // 2. Raycast sobre objetos decorativos y electrodomésticos
+            const decorCandidates = [];
+            decorVideoGroup.traverse(child => {
+                if (child.isMesh) decorCandidates.push(child);
+            });
+            const decorHits = raycaster.intersectObjects(decorCandidates, false);
+            if (decorHits.length > 0) {
+                selectDecorObject(decorHits[0].object);
+                return;
+            }
+
+            // 3. Raycast sobre equipamiento fijo (cocina, calefactor, sanitarios)
+            const fixtureCandidates = [];
+            fixturesGroup.traverse(child => {
+                if (child.isMesh) fixtureCandidates.push(child);
+            });
+            const fixtureHits = raycaster.intersectObjects(fixtureCandidates, false);
+            if (fixtureHits.length > 0) {
+                selectDecorObject(fixtureHits[0].object, 'Equipamiento Fijo');
+                return;
+            }
+
+            // Clic en el suelo vacío: deseleccionar
+            clearSelection();
         });
 
         // Añadir Mueble Modal
@@ -2285,7 +2457,7 @@
             mesa: { name: "Mesa Comedor", room: "Living", x: 5.00, z: 2.80, w: 1.40, d: 0.80, h: 0.76, color: 0xb46b38 },
             escritorio: { name: "Escritorio", room: "Estudio", x: 1.50, z: 0.60, w: 1.40, d: 0.65, h: 0.75, color: 0x1e293b },
             placard: { name: "Placard", room: "Placard", x: 0.85, z: 2.55, w: 1.60, d: 0.45, h: 2.30, color: 0xb46b38 },
-            heladera: { name: "Heladera", room: "Cocina", x: 4.85, z: 4.95, w: 0.60, d: 0.60, h: 1.70, color: 0x94a3b8 },
+            heladera: { name: "Heladera", room: "Cocina", x: 3.35, z: 4.88, w: 0.60, d: 0.60, h: 1.70, color: 0x94a3b8 },
             cubo: { name: "Mueble a Medida", room: "General", x: 5.00, z: 3.00, w: 1.00, d: 1.00, h: 0.80, color: 0x0284c7 }
         };
 
@@ -2315,8 +2487,8 @@
             { id: 'vid_perchero', name: 'Perchero + Zapatero Entrada', room: 'Entrada', x: 6.08, z: 4.38, y: 0.93, w: 0.30, d: 0.64, h: 1.86, rot: 0, color: 0x1e293b },
             { id: 'vid_mesa_red', name: 'Mesa Comedor Redonda + 4 Sillas', room: 'Living', x: 4.55, z: 1.22, y: 0.38, w: 1.10, d: 1.10, h: 0.76, rot: 0, color: 0x882915 },
             { id: 'vid_cucha_ne', name: 'Cucha Perro Esquina NE', room: 'Living', x: 5.55, z: 0.38, y: 0.05, w: 0.92, d: 0.62, h: 0.10, rot: 0, color: 0x94a3b8 },
-            { id: 'vid_heladera', name: 'Heladera c/ Freezer + Bodega', room: 'Cocina', x: 4.85, z: 4.88, y: 0.84, w: 0.60, d: 0.62, h: 1.68, rot: 0, color: 0xe2e8f0 },
-            { id: 'vid_lavarropas', name: 'Lavarropas + Estación Café (Bajo Ventana)', room: 'Cocina', x: 3.54, z: 6.67, y: 0.43, w: 0.60, d: 0.58, h: 0.86, rot: 0, color: 0xcbd5e1 },
+            { id: 'vid_heladera', name: 'Heladera c/ Freezer + Bodega', room: 'Cocina', x: 3.35, z: 4.88, y: 0.84, w: 0.60, d: 0.62, h: 1.68, rot: 0, color: 0xe2e8f0 },
+            { id: 'vid_lavarropas', name: 'Lavarropas + Estación Café (Bajo Ventana)', room: 'Cocina', x: 4.65, z: 6.67, y: 0.43, w: 0.60, d: 0.58, h: 0.86, rot: 0, color: 0xcbd5e1 },
             { id: 'vid_cama_2p', name: 'Cama 2 Plazas + Respaldo Nogal', room: 'Cuarto', x: 1.05, z: 5.80, y: 0.24, w: 1.90, d: 1.45, h: 0.48, rot: 0, color: 0x475569 },
             { id: 'vid_luz_n', name: 'Mesa de Luz Norte', room: 'Cuarto', x: 0.28, z: 4.84, y: 0.31, w: 0.42, d: 0.44, h: 0.62, rot: 0, color: 0x4a3222 },
             { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.28, z: 6.72, y: 0.31, w: 0.42, d: 0.42, h: 0.62, rot: 0, color: 0x4a3222 },
