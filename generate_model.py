@@ -138,11 +138,11 @@ def build_apartment():
     b.add_box(4.90, 2.05, -EXT / 2, 6.00, H, EXT / 2)
     b.add_box(6.00, 0.00, -EXT / 2, 6.30, H, EXT / 2)
 
-    # Muro Este X = 6.30 (V3 Living Y = 1.00..2.50)
-    b.add_box(6.30 - EXT / 2, 0.00, 0.00, 6.30 + EXT / 2, H, 1.00)
-    b.add_box(6.30 - EXT / 2, 0.00, 1.00, 6.30 + EXT / 2, 0.95, 2.50)
-    b.add_box(6.30 - EXT / 2, 2.05, 1.00, 6.30 + EXT / 2, H, 2.50)
-    b.add_box(6.30 - EXT / 2, 0.00, 2.50, 6.30 + EXT / 2, H, 5.70)
+    # Muro Este X = 6.30 (V3 Living Y = 0.55..1.55)
+    b.add_box(6.30 - EXT / 2, 0.00, 0.00, 6.30 + EXT / 2, H, 0.55)
+    b.add_box(6.30 - EXT / 2, 0.00, 0.55, 6.30 + EXT / 2, 0.95, 1.55)
+    b.add_box(6.30 - EXT / 2, 2.05, 0.55, 6.30 + EXT / 2, H, 1.55)
+    b.add_box(6.30 - EXT / 2, 0.00, 1.55, 6.30 + EXT / 2, H, 5.70)
 
     # Retranqueo Palier Y = 5.70 (Puerta Principal X = 5.38..6.12)
     b.add_box(5.20, 0.00, 5.70 - EXT / 2, 5.38, H, 5.70 + EXT / 2)
@@ -172,7 +172,7 @@ def build_apartment():
     b.add_box(0.85, 0.95, -0.02, 2.05, 2.05, 0.02)
     b.add_box(3.35, 0.95, -0.02, 4.55, 2.05, 0.02)
     b.add_box(4.90, 0.95, -0.02, 6.00, 2.05, 0.02)
-    b.add_box(6.28, 0.95, 1.00, 6.32, 2.05, 2.50)
+    b.add_box(6.28, 0.95, 0.55, 6.32, 2.05, 1.55)
     b.add_box(0.90, 0.95, 6.98, 2.10, 2.05, 7.02)
     b.add_box(3.55, 1.05, 6.98, 4.55, 2.00, 7.02)
     b.add_box(-0.02, 1.35, 3.05, 0.02, 2.00, 3.75)
@@ -236,9 +236,9 @@ def build_apartment():
 
     # 4. CALEFACTORES E INSTALACIONES FIJAS DEL VIDEO
     b.set_group("03_Calefactores_Tiro_Balanceado", "Heater_Metal")
-    b.add_box(6.05, 0.05, 2.75, 6.23, 0.65, 3.35)  # Calefactor Living
-    b.add_box(6.10, 0.65, 3.00, 6.20, 2.80, 3.10)  # Caño tiraje vertical Living
-    b.add_box(0.25, 0.05, 6.78, 0.72, 0.65, 6.94)  # Calefactor Cuarto
+    b.add_box(6.05, 0.05, 1.62, 6.23, 0.65, 2.18)  # Calefactor Living (al Norte del Rack de TV)
+    b.add_box(6.10, 0.65, 1.85, 6.20, 2.80, 1.95)  # Caño tiraje vertical Living
+    b.add_box(2.24, 0.05, 6.78, 2.72, 0.65, 6.94)  # Calefactor Cuarto (esquina Sur-Este)
     b.add_box(0.06, 0.05, 0.80, 0.22, 0.65, 1.25)  # Calefactor Estudio
 
     b.set_group("04_Equipamiento_Cocina_Bano", "Kitchen_Granite")
@@ -255,27 +255,27 @@ def build_apartment():
 
     # 5. MUEBLES Y DECORACIÓN EXTRAÍDOS DEL SEGUNDO VIDEO
     b.set_group("05_Muebles_Living_Comedor", "Furniture_Sofa_Blue")
-    b.add_box(3.06, 0.05, 1.76, 3.92, 0.82, 3.68)  # Futón 3 cuerpos azul petróleo
+    b.add_box(3.06, 0.05, 1.84, 3.92, 0.82, 3.76)  # Futón 3 cuerpos azul petróleo (alineado en Y=2.80)
 
     b.set_group("05B_Muebles_Madera_Caoba", "Furniture_Wood_Mahogany")
-    b.add_box(5.78, 0.00, 3.16, 6.22, 0.80, 4.48)  # Rack TV madera rojiza
-    b.add_box(4.11, 0.00, 2.21, 4.65, 0.56, 3.23)  # Mesa ratona elevable frente al futón
+    b.add_box(5.78, 0.00, 2.14, 6.22, 0.80, 3.46)  # Rack TV madera rojiza (alineado en Y=2.80)
+    b.add_box(4.11, 0.00, 2.29, 4.65, 0.56, 3.31)  # Mesa ratona elevable (alineada en Y=2.80)
     b.add_box(4.01, 0.00, 0.68, 5.09, 0.76, 1.76)  # Mesa comedor redonda + sillas
     b.add_box(2.32, 0.00, 0.14, 2.96, 0.76, 1.78)  # Escritorio en L tramo principal (Estudio)
     b.add_box(1.35, 0.00, 0.09, 2.32, 0.76, 0.67)  # Escritorio en L ala ventana (Estudio)
     b.add_box(2.73, 1.43, 0.22, 2.95, 1.85, 1.80)  # Estantes flotantes sobre escritorio
 
     b.set_group("05C_Muebles_Madera_Nogal", "Furniture_Wood_Walnut")
-    b.add_box(2.89, 0.10, 4.69, 2.95, 1.25, 6.91)  # Respaldo ancho de cama (Cuarto)
-    b.add_box(1.00, 0.00, 5.07, 2.90, 0.48, 6.53)  # Cama 2 plazas (Cuarto)
-    b.add_box(2.51, 0.00, 4.64, 2.93, 0.62, 5.08)  # Mesa de luz Norte (Cuarto)
-    b.add_box(2.51, 0.00, 6.51, 2.93, 0.62, 6.93)  # Mesa de luz Sur (Cuarto)
+    b.add_box(0.05, 0.10, 4.68, 0.11, 1.25, 6.92)  # Respaldo ancho de cama sobre pared Oeste (X=0.00)
+    b.add_box(0.10, 0.00, 5.07, 2.00, 0.48, 6.53)  # Cama 2 plazas sobre pared Oeste (Cuarto)
+    b.add_box(0.07, 0.00, 4.62, 0.49, 0.62, 5.06)  # Mesa de luz Norte sobre pared Oeste (Cuarto)
+    b.add_box(0.07, 0.00, 6.51, 0.49, 0.62, 6.93)  # Mesa de luz Sur sobre pared Oeste (Cuarto)
     b.add_box(0.04, 0.00, 0.47, 0.36, 1.84, 1.29)  # Biblioteca 5 estantes (Estudio)
     b.add_box(0.13, 0.00, 1.74, 0.57, 0.74, 2.18)  # Mesa con Ajedrez LOTR (Estudio)
 
     b.set_group("05D_Electronica_Y_Perchero", "Electronics_Black")
-    b.add_box(5.93, 0.00, 4.70, 6.23, 1.86, 5.34)  # Perchero + Zapatero Entrada
-    b.add_box(6.13, 1.05, 3.25, 6.19, 1.71, 4.39)  # Smart TV 50" en pared
+    b.add_box(5.93, 0.00, 4.06, 6.23, 1.86, 4.70)  # Perchero + Zapatero Entrada
+    b.add_box(6.13, 1.05, 2.23, 6.19, 1.71, 3.37)  # Smart TV 50" en pared (alineada en Y=2.80)
     b.add_box(1.68, 0.00, 0.88, 2.18, 1.06, 1.36)  # Silla Gamer (Estudio)
 
     b.save("Departamento_01-01.obj", "Departamento_01-01.mtl", "Departamento_01-01.mtl")
