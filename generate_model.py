@@ -65,6 +65,10 @@ class OBJBuilder:
             "Kitchen_Granite": (0.84, 0.72, 0.68),
             "Sanitary_White": (0.98, 0.99, 1.00),
             "Wood_Roof": (0.72, 0.48, 0.24),
+            "Door_Frame_Dark": (0.17, 0.19, 0.21),
+            "Door_Wood_Cedar": (0.74, 0.47, 0.25),
+            "Door_Main_Grey": (0.55, 0.57, 0.60),
+            "Placard_Wood": (0.77, 0.49, 0.27),
         }
 
         with open(mtl_path, "w", encoding="utf-8") as mf:
@@ -188,7 +192,43 @@ def build_apartment():
 
     b.add_box(0.00, 0.00, 4.50 - INT / 2, 2.30, H, 4.50 + INT / 2)
     b.add_box(2.30, 2.05, 4.50 - INT / 2, 3.00, H, 4.50 + INT / 2)
+    b.add_box(3.00, 2.05, 4.50 - INT / 2, 3.85, H, 4.50 + INT / 2)  # Dintel sobre vano abierto Cocina
     b.add_box(3.85, 0.00, 4.50 - INT / 2, 5.20, H, 4.50 + INT / 2)
+
+    # 3B. PUERTAS 3D Y PLACARDS EXTRAÍDOS DEL VIDEO
+    # Marcos de chapa gris oscuro
+    b.set_group("02B_Marcos_Puertas_Chapa", "Door_Frame_Dark")
+    # Marco Puerta Principal (Y=5.70, X=5.38..6.12)
+    b.add_box(5.38, 0.00, 5.62, 5.42, 2.05, 5.78)
+    b.add_box(6.08, 0.00, 5.62, 6.12, 2.05, 5.78)
+    b.add_box(5.38, 2.01, 5.62, 6.12, 2.05, 5.78)
+    # Marco Puerta Estudio (Y=2.30, X=2.30..3.00)
+    b.add_box(2.30, 0.00, 2.24, 2.34, 2.05, 2.36)
+    b.add_box(2.96, 0.00, 2.24, 3.00, 2.05, 2.36)
+    b.add_box(2.30, 2.01, 2.24, 3.00, 2.05, 2.36)
+    # Marco Puerta Baño (X=2.30, Y=3.02..3.65)
+    b.add_box(2.24, 0.00, 3.02, 2.36, 2.05, 3.06)
+    b.add_box(2.24, 0.00, 3.61, 2.36, 2.05, 3.65)
+    b.add_box(2.24, 2.01, 3.02, 2.36, 2.05, 3.65)
+    # Marco Puerta Cuarto (Y=4.50, X=2.30..3.00)
+    b.add_box(2.30, 0.00, 4.44, 2.34, 2.05, 4.56)
+    b.add_box(2.96, 0.00, 4.44, 3.00, 2.05, 4.56)
+    b.add_box(2.30, 2.01, 4.44, 3.00, 2.05, 4.56)
+
+    # Hojas de Puertas Interiores Placa Madera (abiertas hacia adentro de cada ambiente)
+    b.set_group("02C_Hojas_Puertas_Madera", "Door_Wood_Cedar")
+    b.add_box(2.34, 0.01, 1.68, 2.38, 2.01, 2.30)  # Hoja Estudio abierta hacia adentro (Y < 2.30)
+    b.add_box(1.72, 0.01, 3.06, 2.30, 2.01, 3.10)  # Hoja Baño abierta hacia adentro (X < 2.30)
+    b.add_box(2.34, 0.01, 4.50, 2.38, 2.01, 5.12)  # Hoja Cuarto abierta hacia adentro (Y > 4.50)
+
+    # Hoja Puerta Principal Gris Moldurada (abierta hacia adentro de Entrada)
+    b.set_group("02D_Puerta_Principal_Gris", "Door_Main_Grey")
+    b.add_box(5.42, 0.01, 5.04, 5.47, 2.01, 5.70)
+
+    # Frentes de Placard Corredizos de Madera
+    b.set_group("02E_Placards_Corredizos_Madera", "Placard_Wood")
+    b.add_box(0.15, 0.06, 2.22, 2.18, 2.45, 2.25)  # Frente Placard Superior (Estudio)
+    b.add_box(0.15, 0.06, 4.55, 2.18, 2.45, 4.58)  # Frente Placard Inferior (Cuarto)
 
     # 4. CALEFACTORES E INSTALACIONES FIJAS DEL VIDEO
     b.set_group("03_Calefactores_Tiro_Balanceado", "Heater_Metal")

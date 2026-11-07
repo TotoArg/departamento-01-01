@@ -602,6 +602,11 @@
             <div class="toggle-switch"></div>
         </label>
         <label class="toggle-row">
+            <span>Puertas 3D (Madera / Entrada / Placard)</span>
+            <input type="checkbox" id="chk-doors" checked>
+            <div class="toggle-switch"></div>
+        </label>
+        <label class="toggle-row">
             <span>Paredes Bajas (1.10 m)</span>
             <input type="checkbox" id="chk-wall-cut">
             <div class="toggle-switch"></div>
@@ -892,17 +897,57 @@
         const woodRoofMat = new THREE.MeshStandardMaterial({ color: 0xb87a3d, roughness: 0.65, side: THREE.DoubleSide });
         const woodBeamMat = new THREE.MeshStandardMaterial({ color: 0x854d1e, roughness: 0.6 });
 
+        // Textura procedural de veta de madera cálida (cedro / haya) para las puertas placa interiores y placards del video
+        function createWoodDoorTexture(baseHex = '#b8733e', grainHex = '#9c5a28') {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = baseHex;
+            ctx.fillRect(0, 0, 128, 256);
+            ctx.strokeStyle = grainHex;
+            ctx.globalAlpha = 0.28;
+            for (let i = 0; i < 28; i++) {
+                const x = (i * 4.7) % 128;
+                ctx.lineWidth = 1 + (i % 3);
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.bezierCurveTo(x + 4, 85, x - 4, 170, x, 256);
+                ctx.stroke();
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            return tex;
+        }
+
+        // Materiales de las puertas extraídas del video
+        const doorFrameMat = new THREE.MeshStandardMaterial({ color: 0x2b3036, roughness: 0.45, metalness: 0.35 }); // Marco de chapa gris grafito oscuro
+        const woodDoorMat = new THREE.MeshStandardMaterial({
+            map: createWoodDoorTexture('#bc7740', '#965626'),
+            roughness: 0.48
+        });
+        const placardWoodMat = new THREE.MeshStandardMaterial({
+            map: createWoodDoorTexture('#c47e44', '#9e5d2a'),
+            roughness: 0.50
+        });
+        const mainDoorMat = new THREE.MeshStandardMaterial({ color: 0x8c929a, roughness: 0.42, metalness: 0.25 }); // Puerta principal gris satinado
+        const mainDoorPanelMat = new THREE.MeshStandardMaterial({ color: 0x737982, roughness: 0.48, metalness: 0.20 }); // Molduras rebajadas
+        const chromeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.18, metalness: 0.88 }); // Picaportes y manijón cromado
+
         const apartmentGroup = new THREE.Group();
         const floorGroup = new THREE.Group();
         const exteriorWallsGroup = new THREE.Group();
         const interiorWallsGroup = new THREE.Group();
+        const doors3DGroup = new THREE.Group();
+        doors3DGroup.visible = false; // Oculto en vista 2D ortogonal para no tapar arcos CAD; visible automáticamente en 3D
         const fixturesGroup = new THREE.Group();
         const roofGroup = new THREE.Group();
         roofGroup.visible = false; // Oculto al inicio para ver el plano interior limpio
         const furnitureGroup = new THREE.Group();
         const lines2DGroup = new THREE.Group();
 
-        apartmentGroup.add(floorGroup, exteriorWallsGroup, interiorWallsGroup, fixturesGroup, roofGroup, furnitureGroup, lines2DGroup);
+        apartmentGroup.add(floorGroup, exteriorWallsGroup, interiorWallsGroup, doors3DGroup, fixturesGroup, roofGroup, furnitureGroup, lines2DGroup);
         scene.add(apartmentGroup);
 
         const WALL_H = 2.60;
@@ -1287,6 +1332,220 @@
         addWallSegment(3.85, 4.50, 5.20, 4.50, INT_T, interiorWallsGroup, false);
 
         // ============================================================================
+        // 4B. PUERTAS 3D REALES EXTRAÍDAS DEL VIDEO (MARCOS DE CHAPA, HOJAS MADERA,
+        //     PUERTA PRINCIPAL MOLDURADA GRIS Y PLACARDS CORREDIZOS DE MADERA)
+        // ============================================================================
+        const DOOR_H = 2.05;
+
+        // 1) Constructor de Puerta Placa Interior de Madera (Estudio, Baño y Cuarto)
+        //    Extraído de sec_066, sec_068, sec_084, sec_092 y video_06_s10:
+        //    Hoja placa enchapada en madera cedro/haya + marco de chapa gris oscuro + picaporte cromado + dintel superior
+        function addInteriorWoodDoor3D(x1, z1, x2, z2, hingeAtStart = true, swingSign = 1, openAngleDeg = 45) {
+            const dx = x2 - x1;
+            const dz = z2 - z1;
+            const w = Math.hypot(dx, dz);
+            const angle = Math.atan2(dz, dx);
+
+            const holder = new THREE.Group();
+            holder.position.set((x1 + x2) / 2, 0, (z1 + z2) / 2);
+            holder.rotation.y = -angle;
+
+            // Dintel superior de mampostería (de 2.05m a 2.60m)
+            const lintelH = WALL_H - DOOR_H;
+            const lintelMesh = new THREE.Mesh(new THREE.BoxGeometry(w, lintelH, INT_T), intWallMat);
+            lintelMesh.position.set(0, DOOR_H + lintelH / 2, 0);
+            lintelMesh.castShadow = true;
+            lintelMesh.receiveShadow = true;
+            holder.add(lintelMesh);
+
+            // Marco de chapa doblada color gris grafito oscuro (#2b3036) en jambas y dintel
+            const frameDepth = INT_T + 0.026;
+            const jambW = 0.035;
+            const leftJamb = new THREE.Mesh(new THREE.BoxGeometry(jambW, DOOR_H, frameDepth), doorFrameMat);
+            leftJamb.position.set(-w / 2 + jambW / 2, DOOR_H / 2, 0);
+            const rightJamb = new THREE.Mesh(new THREE.BoxGeometry(jambW, DOOR_H, frameDepth), doorFrameMat);
+            rightJamb.position.set(w / 2 - jambW / 2, DOOR_H / 2, 0);
+            const topJamb = new THREE.Mesh(new THREE.BoxGeometry(w, jambW, frameDepth), doorFrameMat);
+            topJamb.position.set(0, DOOR_H - jambW / 2, 0);
+            holder.add(leftJamb, rightJamb, topJamb);
+
+            // Hoja abatible de madera barnizada (espesor 4 cm)
+            const leafW = w - jambW * 2;
+            const leafH = DOOR_H - jambW - 0.01;
+            const leafT = 0.04;
+
+            const pivot = new THREE.Group();
+            const dir = hingeAtStart ? 1 : -1;
+            pivot.position.set(hingeAtStart ? (-w / 2 + jambW) : (w / 2 - jambW), 0, 0);
+            pivot.rotation.y = swingSign * (openAngleDeg * Math.PI / 180);
+
+            const leafMesh = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, leafT), woodDoorMat);
+            leafMesh.position.set(dir * (leafW / 2), leafH / 2 + 0.005, 0);
+            leafMesh.castShadow = true;
+            leafMesh.receiveShadow = true;
+            pivot.add(leafMesh);
+
+            // Picaporte doble curvo cromado + roseta + bocallave en ambas caras
+            const handleX = dir * (leafW - 0.065);
+            const handleY = 0.96;
+            // Eje pasante
+            const spindle = new THREE.Mesh(new THREE.BoxGeometry(0.016, 0.016, leafT + 0.04), chromeMat);
+            spindle.position.set(handleX, handleY, 0);
+            // Manijas curvas a ambos lados
+            const leverFront = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.018, 0.018), chromeMat);
+            leverFront.position.set(handleX - dir * 0.04, handleY, leafT / 2 + 0.025);
+            const leverBack = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.018, 0.018), chromeMat);
+            leverBack.position.set(handleX - dir * 0.04, handleY, -(leafT / 2 + 0.025));
+            // Bocallaves inferiores
+            const keyEscutcheon = new THREE.Mesh(new THREE.BoxGeometry(0.024, 0.042, leafT + 0.008), doorFrameMat);
+            keyEscutcheon.position.set(handleX, handleY - 0.08, 0);
+            pivot.add(spindle, leverFront, leverBack, keyEscutcheon);
+
+            holder.add(pivot);
+            doors3DGroup.add(holder);
+        }
+
+        // 2) Constructor de Puerta Principal de Entrada (Y = 5.70, X = 5.38 a 6.12)
+        //    Extraído de sec_000 y video_34_s00:
+        //    Puerta gris satinada con 2 tableros moldurados (superior con arco rebajado + inferior),
+        //    marco de chapa oscuro y manijón vertical cromado interior
+        function addMainEntranceDoor3D(x1, z1, x2, z2) {
+            const dx = x2 - x1;
+            const dz = z2 - z1;
+            const w = Math.hypot(dx, dz);
+            const angle = Math.atan2(dz, dx);
+
+            const holder = new THREE.Group();
+            holder.position.set((x1 + x2) / 2, 0, (z1 + z2) / 2);
+            holder.rotation.y = -angle;
+
+            // Dintel superior en muro exterior (de 2.05m a 2.60m)
+            const lintelH = WALL_H - DOOR_H;
+            const lintelMesh = new THREE.Mesh(new THREE.BoxGeometry(w, lintelH, EXT_T), extWallMat);
+            lintelMesh.position.set(0, DOOR_H + lintelH / 2, 0);
+            lintelMesh.castShadow = true;
+            holder.add(lintelMesh);
+
+            // Marco pesado de chapa gris grafito oscuro
+            const frameDepth = EXT_T + 0.028;
+            const jambW = 0.042;
+            const leftJamb = new THREE.Mesh(new THREE.BoxGeometry(jambW, DOOR_H, frameDepth), doorFrameMat);
+            leftJamb.position.set(-w / 2 + jambW / 2, DOOR_H / 2, 0);
+            const rightJamb = new THREE.Mesh(new THREE.BoxGeometry(jambW, DOOR_H, frameDepth), doorFrameMat);
+            rightJamb.position.set(w / 2 - jambW / 2, DOOR_H / 2, 0);
+            const topJamb = new THREE.Mesh(new THREE.BoxGeometry(w, jambW, frameDepth), doorFrameMat);
+            topJamb.position.set(0, DOOR_H - jambW / 2, 0);
+            holder.add(leftJamb, rightJamb, topJamb);
+
+            // Hoja principal gris con tableros moldurados (abre hacia adentro de ENTRADA, Z < 5.70)
+            const leafW = w - jambW * 2;
+            const leafH = DOOR_H - jambW - 0.01;
+            const leafT = 0.048;
+
+            const pivot = new THREE.Group();
+            pivot.position.set(-w / 2 + jambW, 0, 0);
+            pivot.rotation.y = 32 * Math.PI / 180; // Entreabierta hacia adentro de Entrada
+
+            const leafMesh = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, leafT), mainDoorMat);
+            leafMesh.position.set(leafW / 2, leafH / 2 + 0.005, 0);
+            leafMesh.castShadow = true;
+            leafMesh.receiveShadow = true;
+            pivot.add(leafMesh);
+
+            // Tablero moldurado superior (con travesaño curvo/escalonado como en sec_000 y video_34_s00)
+            const topPanel = new THREE.Mesh(new THREE.BoxGeometry(leafW * 0.68, 0.92, leafT + 0.010), mainDoorPanelMat);
+            topPanel.position.set(leafW / 2, 1.36, 0);
+            const topArch = new THREE.Mesh(new THREE.BoxGeometry(leafW * 0.46, 0.08, leafT + 0.012), mainDoorPanelMat);
+            topArch.position.set(leafW / 2, 1.84, 0);
+            // Tablero moldurado inferior
+            const botPanel = new THREE.Mesh(new THREE.BoxGeometry(leafW * 0.68, 0.52, leafT + 0.010), mainDoorPanelMat);
+            botPanel.position.set(leafW / 2, 0.46, 0);
+            pivot.add(topPanel, topArch, botPanel);
+
+            // Manijón vertical cromado interior (visto en sec_000) + picaporte exterior (video_34_s00)
+            const barHandle = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.36, 0.028), chromeMat);
+            barHandle.position.set(leafW - 0.075, 1.02, -leafT / 2 - 0.018);
+            const extLever = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.02, 0.025), chromeMat);
+            extLever.position.set(leafW - 0.11, 0.98, leafT / 2 + 0.018);
+            pivot.add(barHandle, extLever);
+
+            holder.add(pivot);
+            doors3DGroup.add(holder);
+        }
+
+        // 3) Constructor de Frentes de Placard Corredizos de Madera + Baulera (sec_063 y sec_064)
+        //    Hojas corredizas enchapadas en madera con marco oscuro y tiradores circulares embutidos (cubetas)
+        function addSlidingPlacardFront3D(x1, x2, zWall, facingSign = -1) {
+            const w = x2 - x1;
+            const holder = new THREE.Group();
+            holder.position.set((x1 + x2) / 2, 0, zWall + facingSign * (INT_T / 2 + 0.012));
+
+            // Marco perimetral oscuro y guía divisoria de baulera (a 1.92m de altura)
+            const frameT = 0.03;
+            const topTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.035, frameT), doorFrameMat);
+            topTrack.position.set(0, 2.46, 0);
+            const midTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.035, frameT), doorFrameMat);
+            midTrack.position.set(0, 1.92, 0);
+            const botTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.035, frameT), doorFrameMat);
+            botTrack.position.set(0, 0.06, 0);
+            const leftBorder = new THREE.Mesh(new THREE.BoxGeometry(0.035, 2.44, frameT), doorFrameMat);
+            leftBorder.position.set(-w / 2 + 0.017, 1.26, 0);
+            const rightBorder = new THREE.Mesh(new THREE.BoxGeometry(0.035, 2.44, frameT), doorFrameMat);
+            rightBorder.position.set(w / 2 - 0.017, 1.26, 0);
+            holder.add(topTrack, midTrack, botTrack, leftBorder, rightBorder);
+
+            // 3 Hojas corredizas principales de madera (0.08m a 1.90m) + 3 hojas de baulera (1.94m a 2.44m)
+            const leafW = (w - 0.04) / 3 + 0.03;
+            for (let i = 0; i < 3; i++) {
+                const xPos = -w / 2 + 0.03 + leafW / 2 + i * ((w - 0.06 - leafW) / 2);
+                const zOff = (i % 2 === 0) ? -0.006 : 0.006;
+
+                // Hoja inferior corrediza
+                const mainLeaf = new THREE.Mesh(new THREE.BoxGeometry(leafW, 1.82, 0.022), placardWoodMat);
+                mainLeaf.position.set(xPos, 0.99, zOff);
+                holder.add(mainLeaf);
+
+                // Cubeta / tirador circular embutido (visto en sec_063 y sec_064)
+                const pullRing = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.028, 16), doorFrameMat);
+                pullRing.rotation.x = Math.PI / 2;
+                pullRing.position.set(xPos + (i === 0 ? leafW * 0.32 : -leafW * 0.32), 0.98, zOff);
+                const pullCenter = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.030, 16), chromeMat);
+                pullCenter.rotation.x = Math.PI / 2;
+                pullCenter.position.set(pullRing.position.x, 0.98, zOff);
+                holder.add(pullRing, pullCenter);
+
+                // Hoja de baulera superior corrediza
+                const topLeaf = new THREE.Mesh(new THREE.BoxGeometry(leafW, 0.50, 0.022), placardWoodMat);
+                topLeaf.position.set(xPos, 2.19, zOff);
+                holder.add(topLeaf);
+            }
+
+            doors3DGroup.add(holder);
+        }
+
+        // 4) Dintel de mampostería sobre el Vano Abierto de Cocina (Y = 4.50, X = 3.00 a 3.85, sin puerta como en sec_018)
+        {
+            const wCocinaVano = 0.85;
+            const lintelH = WALL_H - DOOR_H;
+            const cocinaLintel = new THREE.Mesh(new THREE.BoxGeometry(wCocinaVano, lintelH, INT_T), intWallMat);
+            cocinaLintel.position.set(3.425, DOOR_H + lintelH / 2, 4.50);
+            doors3DGroup.add(cocinaLintel);
+        }
+
+        // Instanciar todas las puertas 3D relevadas del video:
+        // - Puerta Principal de Entrada (Y = 5.70, X = 5.38..6.12): Gris moldurada + manijón cromado
+        addMainEntranceDoor3D(5.38, 5.70, 6.12, 5.70);
+        // - Puerta Estudio Ampliado (Y = 2.30, X = 2.30..3.00): Placa madera cedro, abre hacia adentro del Estudio (Y < 2.30)
+        addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, true, 1, 45);
+        // - Puerta Baño Amplio (X = 2.30, Y = 3.02..3.65): Placa madera cedro, abre hacia adentro del Baño (X < 2.30)
+        addInteriorWoodDoor3D(2.30, 3.02, 2.30, 3.65, true, -1, 45);
+        // - Puerta Cuarto Ampliado (Y = 4.50, X = 2.30..3.00): Placa madera cedro, abre hacia adentro del Cuarto (Y > 4.50)
+        addInteriorWoodDoor3D(2.30, 4.50, 3.00, 4.50, true, -1, 45);
+        // - Frentes de Placards corredizos de madera con cubetas (Placard Superior hacia Estudio y Placard Inferior hacia Cuarto)
+        addSlidingPlacardFront3D(0.15, 2.18, 2.30, -1);
+        addSlidingPlacardFront3D(0.15, 2.18, 4.50, 1);
+
+        // ============================================================================
         // 5. ETIQUETAS DE AMBIENTES EN COORDENADAS EXACTAS
         // ============================================================================
         const labelElements = [];
@@ -1605,6 +1864,9 @@
             document.getElementById('chk-int-walls').checked = showInt;
             const allHidden = !showExt && !showInt;
             document.getElementById('chk-hide-all-walls').checked = allHidden;
+            if (activeCamera === perspCam) {
+                doors3DGroup.visible = !allHidden && document.getElementById('chk-doors').checked;
+            }
         }
 
         document.getElementById('chk-hide-all-walls').addEventListener('change', (e) => {
@@ -1621,6 +1883,12 @@
         document.getElementById('chk-int-walls').addEventListener('change', (e) => {
             interiorWallsGroup.visible = e.target.checked;
             document.getElementById('chk-hide-all-walls').checked = (!e.target.checked && !exteriorWallsGroup.visible);
+        });
+        document.getElementById('chk-doors').addEventListener('change', (e) => {
+            if (activeCamera === orthoCam && e.target.checked) {
+                switchTo3D('isom', false, false);
+            }
+            doors3DGroup.visible = (activeCamera === perspCam) && e.target.checked;
         });
         document.getElementById('chk-fixtures').addEventListener('change', (e) => {
             fixturesGroup.visible = e.target.checked;
@@ -1648,6 +1916,7 @@
             const scaleY = isCut ? 0.42 : 1.0;
             exteriorWallsGroup.scale.y = scaleY;
             interiorWallsGroup.scale.y = scaleY;
+            doors3DGroup.scale.y = scaleY;
         }
         document.getElementById('chk-wall-cut').addEventListener('change', (e) => setWallCut(e.target.checked));
 
@@ -1680,6 +1949,7 @@
             controlsOrtho.enabled = true;
             dirLight.castShadow = false;
             ambLight.intensity = 0.96;
+            doors3DGroup.visible = false;
             roofGroup.visible = false;
             document.getElementById('chk-roof').checked = false;
             document.getElementById('btn-toggle-roof').classList.remove('active');

@@ -33,6 +33,7 @@ def setup_scene():
         "piso": bpy.data.collections.new("00_Piso"),
         "ext": bpy.data.collections.new("01_Muros_Exteriores"),
         "int": bpy.data.collections.new("02_Tabiques_Interiores"),
+        "puertas": bpy.data.collections.new("02B_Puertas_Y_Placards_Video"),
         "muebles": bpy.data.collections.new("03_Mobiliario_Editable"),
         "setup": bpy.data.collections.new("04_Camaras_Y_Luces"),
     }
@@ -62,6 +63,10 @@ def create_materials():
         "ext": get_or_create("Mat_Muro_Exterior", (0.86, 0.89, 0.93, 1.0), 0.45),
         "int": get_or_create("Mat_Muro_Interior", (0.92, 0.94, 0.96, 1.0), 0.45),
         "dintel": get_or_create("Mat_Dintel", (0.82, 0.85, 0.89, 1.0), 0.45),
+        "marco_chapa": get_or_create("Mat_Marco_Chapa_Oscuro", (0.17, 0.19, 0.21, 1.0), 0.4),
+        "puerta_madera": get_or_create("Mat_Puerta_Placa_Madera", (0.74, 0.47, 0.25, 1.0), 0.45),
+        "puerta_principal": get_or_create("Mat_Puerta_Principal_Gris", (0.55, 0.57, 0.60, 1.0), 0.4),
+        "placard_madera": get_or_create("Mat_Placard_Corredizo_Madera", (0.77, 0.49, 0.27, 1.0), 0.5),
     }
 
 
@@ -138,12 +143,12 @@ def build_apartment():
     # 3. MUROS INTERNOS, PUERTAS Y VANOS ABIERTOS
     # -------------------------------------------------------------
     # Eje Vertical X = 2.30 (Cierre de Placards y Baño):
-    # - Muro sólido de Y = 2.30 a Y = 2.80 (Placard Sup.)
-    add_box("Muro_V_X230_Placard_Sup", 2.30 - INT / 2, 2.30, 0.00, INT, 0.50, H, mats["int"], cols["int"])
-    # - Puerta Baño: Entre Y = 2.80 e Y = 3.70
-    add_box("Dintel_Puerta_Bano", 2.30 - INT / 2, 2.80, H_PASO, INT, 0.90, H_DINT, mats["dintel"], cols["int"])
-    # - Muro sólido de Y = 3.70 a Y = 4.50 (Baño 3.70-4.00 + Placard Inf. 4.00-4.50)
-    add_box("Muro_V_X230_Bano_Placard_Inf", 2.30 - INT / 2, 3.70, 0.00, INT, 0.80, H, mats["int"], cols["int"])
+    # - Muro sólido de Y = 2.30 a Y = 3.02 (Placard Sup. + mocheta superior Baño)
+    add_box("Muro_V_X230_Placard_Sup_Bano", 2.30 - INT / 2, 2.30, 0.00, INT, 0.72, H, mats["int"], cols["int"])
+    # - Puerta Baño: Entre Y = 3.02 e Y = 3.65 (abre hacia adentro del Baño)
+    add_box("Dintel_Puerta_Bano", 2.30 - INT / 2, 3.02, H_PASO, INT, 0.63, H_DINT, mats["dintel"], cols["int"])
+    # - Muro sólido de Y = 3.65 a Y = 4.50 (Baño 3.65-4.00 + Placard Inf. 4.00-4.50)
+    add_box("Muro_V_X230_Bano_Placard_Inf", 2.30 - INT / 2, 3.65, 0.00, INT, 0.85, H, mats["int"], cols["int"])
 
     # Eje Vertical Central X = 3.00:
     # - Muro sólido de Y = 0.00 a Y = 3.70 (separa Estudio y parte del Pasillo del Living)
@@ -158,7 +163,7 @@ def build_apartment():
     # Eje Horizontal Y = 2.30 (Base Estudio):
     # - Muro sólido de X = 0.00 a X = 2.30
     add_box("Muro_H_Y230_Estudio_Placard_Sup", 0.00, 2.30 - INT / 2, 0.00, 2.30, INT, H, mats["int"], cols["int"])
-    # - Puerta Estudio: De X = 2.30 a X = 3.00
+    # - Puerta Estudio: De X = 2.30 a X = 3.00 (abre hacia adentro del Estudio)
     add_box("Dintel_Puerta_Estudio", 2.30, 2.30 - INT / 2, H_PASO, 0.70, INT, H_DINT, mats["dintel"], cols["int"])
 
     # Eje Horizontal Y = 2.80 (Placard Sup. / Baño): de X = 0.00 a X = 2.30
@@ -170,11 +175,25 @@ def build_apartment():
     # Eje Horizontal Y = 4.50 (Línea Cuarto y Cocina):
     # - Muro sólido de X = 0.00 a X = 2.30
     add_box("Muro_H_Y450_Placard_Inf_Cuarto", 0.00, 4.50 - INT / 2, 0.00, 2.30, INT, H, mats["int"], cols["int"])
-    # - Puerta Cuarto: De X = 2.30 a X = 3.00
+    # - Puerta Cuarto: De X = 2.30 a X = 3.00 (abre hacia adentro del Cuarto)
     add_box("Dintel_Puerta_Cuarto", 2.30, 4.50 - INT / 2, H_PASO, 0.70, INT, H_DINT, mats["dintel"], cols["int"])
-    # - VANO ABIERTO COCINA: Sin muro de X = 3.00 a X = 3.85
+    # - VANO ABIERTO COCINA (SIN PUERTA): Dintel superior de X = 3.00 a X = 3.85
+    add_box("Dintel_Vano_Cocina_Sin_Puerta", 3.00, 4.50 - INT / 2, H_PASO, 0.85, INT, H_DINT, mats["dintel"], cols["int"])
     # - Muro sólido frontal de Cocina: De X = 3.85 a X = 5.20
     add_box("Muro_H_Y450_Frente_Cocina", 3.85, 4.50 - INT / 2, 0.00, 1.35, INT, H, mats["int"], cols["int"])
+
+    # -------------------------------------------------------------
+    # 3B. PUERTAS 3D Y PLACARDS RELEVADOS DEL VIDEO
+    # -------------------------------------------------------------
+    # Hojas de puertas placa de madera (abiertas hacia adentro de Estudio, Baño y Cuarto)
+    add_box("Puerta_Madera_Estudio", 2.34, 1.68, 0.01, 0.04, 0.62, 2.00, mats["puerta_madera"], cols["puertas"])
+    add_box("Puerta_Madera_Bano", 1.72, 3.05, 0.01, 0.58, 0.04, 2.00, mats["puerta_madera"], cols["puertas"])
+    add_box("Puerta_Madera_Cuarto", 2.34, 4.50, 0.01, 0.04, 0.62, 2.00, mats["puerta_madera"], cols["puertas"])
+    # Puerta Principal Gris Moldurada (abierta hacia adentro de Entrada)
+    add_box("Puerta_Principal_Gris_Moldurada", 5.42, 5.04, 0.01, 0.05, 0.66, 2.00, mats["puerta_principal"], cols["puertas"])
+    # Frentes de Placard Corredizos de Madera
+    add_box("Frente_Placard_Corredizo_Estudio", 0.15, 2.22, 0.06, 2.03, 0.03, 2.38, mats["placard_madera"], cols["puertas"])
+    add_box("Frente_Placard_Corredizo_Cuarto", 0.15, 4.55, 0.06, 2.03, 0.03, 2.38, mats["placard_madera"], cols["puertas"])
 
     # -------------------------------------------------------------
     # 4. CÁMARAS Y LUCES PRECONFIGURADAS
