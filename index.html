@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Plano Arquitectónico 2D y 3D (6.30m × 7.00m)</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
@@ -24,13 +24,11 @@
         #webgl-container { width: 100%; height: 100%; display: block; }
 
         .glass-panel {
-            background: rgba(15, 23, 42, 0.92);
+            background: rgba(15, 23, 42, 0.95);
             color: #f1f5f9;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 14px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
 
         /* Top UI Wrapper */
@@ -831,17 +829,16 @@
         // Arranca en modo Plano 2D Ortográfico Exacto para que coincida 1:1 con el plano 2D
         let activeCamera = orthoCam;
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.shadowMap.enabled = false;
         container.appendChild(renderer.domElement);
 
         const controlsPersp = new THREE.OrbitControls(perspCam, renderer.domElement);
         controlsPersp.target.set(3.15, 0.3, 3.50);
         controlsPersp.enableDamping = true;
-        controlsPersp.dampingFactor = 0.06;
+        controlsPersp.dampingFactor = 0.08;
         controlsPersp.maxPolarAngle = Math.PI / 2 - 0.02;
         controlsPersp.enabled = false;
 
@@ -856,25 +853,49 @@
         controlsOrtho.maxZoom = 4.0;
         controlsOrtho.enabled = true; // Activo para zoom y arrastre desde el inicio
 
-        // Iluminación (En 2D arranca sin sombras proyectadas para que el plano se vea 100% limpio sin manchas grises)
+        // Iluminación rápida sin mapas de sombras pesados
         const ambLight = new THREE.AmbientLight(0xffffff, 0.96);
         scene.add(ambLight);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.35);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.38);
         dirLight.position.set(6, 15, 8);
-        dirLight.castShadow = false;
         scene.add(dirLight);
+        const fillLight = new THREE.DirectionalLight(0xffffff, 0.18);
+        fillLight.position.set(-5, 10, -4);
+        scene.add(fillLight);
+
+        // Pool global de geometrías y materiales para compilación instantánea en WebGL
+        const UNIT_BOX_GEO = new THREE.BoxGeometry(1, 1, 1);
+        const stdMatCache = new Map();
+        const basicMatCache = new Map();
+        function getStdMat(color, rough = 0.45) {
+            const key = `${color}_${rough}`;
+            let m = stdMatCache.get(key);
+            if (!m) {
+                m = new THREE.MeshStandardMaterial({ color, roughness: rough });
+                stdMatCache.set(key, m);
+            }
+            return m;
+        }
+        function getBasicMat(color) {
+            let m = basicMatCache.get(color);
+            if (!m) {
+                m = new THREE.MeshBasicMaterial({ color });
+                basicMatCache.set(color, m);
+            }
+            return m;
+        }
 
         // Textura procedural para el piso cerámico esmaltado beige de 33×33 cm relevado del video
         function createCeramicTexture(bgHex, lineHex, repeatX, repeatY) {
             const canvas = document.createElement('canvas');
-            canvas.width = 128;
-            canvas.height = 128;
+            canvas.width = 64;
+            canvas.height = 64;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = bgHex;
-            ctx.fillRect(0, 0, 128, 128);
+            ctx.fillRect(0, 0, 64, 64);
             ctx.strokeStyle = lineHex;
-            ctx.lineWidth = 4;
-            ctx.strokeRect(0, 0, 128, 128);
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, 64, 64);
             const tex = new THREE.CanvasTexture(canvas);
             tex.wrapS = THREE.RepeatWrapping;
             tex.wrapT = THREE.RepeatWrapping;
@@ -900,44 +921,14 @@
         const intWallMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.55 });
         const topCapMat = new THREE.MeshBasicMaterial({ color: 0x262d34 }); // Trazo arquitectónico oscuro
         const winFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e242b, roughness: 0.35, metalness: 0.4 });
-        const winGlassMat = new THREE.MeshPhysicalMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.42, roughness: 0.1 });
+        const winGlassMat = new THREE.MeshBasicMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.42 });
         const woodRoofMat = new THREE.MeshStandardMaterial({ color: 0xb87a3d, roughness: 0.65, side: THREE.DoubleSide });
         const woodBeamMat = new THREE.MeshStandardMaterial({ color: 0x854d1e, roughness: 0.6 });
 
-        // Textura procedural de veta de madera cálida (cedro / haya) para las puertas placa interiores y placards del video
-        function createWoodDoorTexture(baseHex = '#b8733e', grainHex = '#9c5a28') {
-            const canvas = document.createElement('canvas');
-            canvas.width = 128;
-            canvas.height = 256;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = baseHex;
-            ctx.fillRect(0, 0, 128, 256);
-            ctx.strokeStyle = grainHex;
-            ctx.globalAlpha = 0.28;
-            for (let i = 0; i < 28; i++) {
-                const x = (i * 4.7) % 128;
-                ctx.lineWidth = 1 + (i % 3);
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.bezierCurveTo(x + 4, 85, x - 4, 170, x, 256);
-                ctx.stroke();
-            }
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.wrapS = THREE.RepeatWrapping;
-            tex.wrapT = THREE.RepeatWrapping;
-            return tex;
-        }
-
-        // Materiales de las puertas extraídas del video
+        // Materiales de las puertas extraídas del video (sin bloqueo de canvas al inicio)
         const doorFrameMat = new THREE.MeshStandardMaterial({ color: 0x2b3036, roughness: 0.45, metalness: 0.35 }); // Marco de chapa gris grafito oscuro
-        const woodDoorMat = new THREE.MeshStandardMaterial({
-            map: createWoodDoorTexture('#bc7740', '#965626'),
-            roughness: 0.48
-        });
-        const placardWoodMat = new THREE.MeshStandardMaterial({
-            map: createWoodDoorTexture('#c47e44', '#9e5d2a'),
-            roughness: 0.50
-        });
+        const woodDoorMat = new THREE.MeshStandardMaterial({ color: 0xbc7740, roughness: 0.48 });
+        const placardWoodMat = new THREE.MeshStandardMaterial({ color: 0xc47e44, roughness: 0.50 });
         const mainDoorMat = new THREE.MeshStandardMaterial({ color: 0x8c929a, roughness: 0.42, metalness: 0.25 }); // Puerta principal gris satinado
         const mainDoorPanelMat = new THREE.MeshStandardMaterial({ color: 0x737982, roughness: 0.48, metalness: 0.20 }); // Molduras rebajadas
         const chromeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.18, metalness: 0.88 }); // Picaportes y manijón cromado
@@ -1004,15 +995,13 @@
             holder.position.set((x1 + x2) / 2, 0, (z1 + z2) / 2);
             holder.rotation.y = -angle;
 
-            const bodyGeo = new THREE.BoxGeometry(len, WALL_H, thickness);
-            const bodyMesh = new THREE.Mesh(bodyGeo, isExterior ? extWallMat : intWallMat);
+            const bodyMesh = new THREE.Mesh(UNIT_BOX_GEO, isExterior ? extWallMat : intWallMat);
+            bodyMesh.scale.set(len, WALL_H, thickness);
             bodyMesh.position.set(0, WALL_H / 2, 0);
-            bodyMesh.castShadow = true;
-            bodyMesh.receiveShadow = true;
             holder.add(bodyMesh);
 
-            const capGeo = new THREE.BoxGeometry(len + 0.01, 0.02, thickness + 0.01);
-            const capMesh = new THREE.Mesh(capGeo, topCapMat);
+            const capMesh = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            capMesh.scale.set(len + 0.01, 0.02, thickness + 0.01);
             capMesh.position.set(0, WALL_H + 0.01, 0);
             holder.add(capMesh);
 
@@ -1030,51 +1019,54 @@
             holder.rotation.y = -angle;
 
             // Antepecho inferior
-            const sillMesh = new THREE.Mesh(new THREE.BoxGeometry(len, sillH, EXT_T), extWallMat);
+            const sillMesh = new THREE.Mesh(UNIT_BOX_GEO, extWallMat);
+            sillMesh.scale.set(len, sillH, EXT_T);
             sillMesh.position.set(0, sillH / 2, 0);
-            sillMesh.castShadow = true;
             holder.add(sillMesh);
 
             // Dintel superior
             const lintelH = WALL_H - (sillH + winH);
             if (lintelH > 0.02) {
-                const lintelMesh = new THREE.Mesh(new THREE.BoxGeometry(len, lintelH, EXT_T), extWallMat);
+                const lintelMesh = new THREE.Mesh(UNIT_BOX_GEO, extWallMat);
+                lintelMesh.scale.set(len, lintelH, EXT_T);
                 lintelMesh.position.set(0, sillH + winH + lintelH / 2, 0);
                 holder.add(lintelMesh);
             }
 
-            // Marco de aluminio negro + vidrio corredizo 2 hojas
-            const frameOuter = new THREE.Mesh(new THREE.BoxGeometry(len, winH, 0.06), winFrameMat);
-            frameOuter.position.set(0, sillH + winH / 2, 0);
             // Vidrio interior
-            const glass = new THREE.Mesh(new THREE.BoxGeometry(len - 0.08, winH - 0.08, 0.025), winGlassMat);
+            const glass = new THREE.Mesh(UNIT_BOX_GEO, winGlassMat);
+            glass.scale.set(len - 0.08, winH - 0.08, 0.025);
             glass.position.set(0, sillH + winH / 2, 0);
             holder.add(glass);
             // Parante central corredizo
-            const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.035, winH, 0.065), winFrameMat);
+            const mullion = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+            mullion.scale.set(0.035, winH, 0.065);
             mullion.position.set(0, sillH + winH / 2, 0);
             holder.add(mullion);
             // Marcos horizontales superior e inferior de la ventana
-            const topBar = new THREE.Mesh(new THREE.BoxGeometry(len, 0.04, 0.065), winFrameMat);
+            const topBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+            topBar.scale.set(len, 0.04, 0.065);
             topBar.position.set(0, sillH + winH - 0.02, 0);
-            const botBar = new THREE.Mesh(new THREE.BoxGeometry(len, 0.04, 0.065), winFrameMat);
+            const botBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+            botBar.scale.set(len, 0.04, 0.065);
             botBar.position.set(0, sillH + 0.02, 0);
             holder.add(topBar, botBar);
 
             // Símbolo 2D en la tapa superior (para que en vista 2D se vea igual al plano técnico)
-            const capBg = new THREE.Mesh(
-                new THREE.BoxGeometry(len, 0.025, EXT_T + 0.01),
-                new THREE.MeshBasicMaterial({ color: 0xdbeafe })
-            );
+            const capBg = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0xdbeafe));
+            capBg.scale.set(len, 0.025, EXT_T + 0.01);
             capBg.position.set(0, WALL_H + 0.012, 0);
             holder.add(capBg);
 
-            const lineMat = new THREE.MeshBasicMaterial({ color: 0x0284c7 });
-            const l1 = new THREE.Mesh(new THREE.BoxGeometry(len, 0.028, 0.018), lineMat);
+            const lineMat = getBasicMat(0x0284c7);
+            const l1 = new THREE.Mesh(UNIT_BOX_GEO, lineMat);
+            l1.scale.set(len, 0.028, 0.018);
             l1.position.set(0, WALL_H + 0.015, -0.022);
-            const l2 = new THREE.Mesh(new THREE.BoxGeometry(len, 0.028, 0.018), lineMat);
+            const l2 = new THREE.Mesh(UNIT_BOX_GEO, lineMat);
+            l2.scale.set(len, 0.028, 0.018);
             l2.position.set(0, WALL_H + 0.015, 0.022);
-            const midCap = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.03, EXT_T + 0.015), topCapMat);
+            const midCap = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            midCap.scale.set(0.025, 0.03, EXT_T + 0.015);
             midCap.position.set(0, WALL_H + 0.016, 0);
             holder.add(l1, l2, midCap);
 
@@ -1086,8 +1078,8 @@
             const dz = z2 - z1;
             const len = Math.hypot(dx, dz);
             if (len < 0.002) return;
-            const geo = new THREE.BoxGeometry(len, 0.01, width);
-            const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color }));
+            const mesh = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(color));
+            mesh.scale.set(len, 0.01, width);
             mesh.position.set((x1 + x2) / 2, 0.012, (z1 + z2) / 2);
             mesh.rotation.y = -Math.atan2(dz, dx);
             lines2DGroup.add(mesh);
@@ -1098,6 +1090,8 @@
             const dx = (x2 - x1) / dist;
             const dz = (z2 - z1) / dist;
             const dash = 0.06, gap = 0.055;
+            const dashMat = getBasicMat(0x64748b);
+            const rotY = -Math.atan2(dz, dx);
             let curr = 0;
             while (curr < dist) {
                 const end = Math.min(curr + dash, dist);
@@ -1105,10 +1099,10 @@
                 if (len > 0.01) {
                     const mx = x1 + dx * (curr + end) / 2;
                     const mz = z1 + dz * (curr + end) / 2;
-                    const geo = new THREE.BoxGeometry(len, 0.01, 0.022);
-                    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x64748b }));
+                    const mesh = new THREE.Mesh(UNIT_BOX_GEO, dashMat);
+                    mesh.scale.set(len, 0.01, 0.022);
                     mesh.position.set(mx, 0.01, mz);
-                    mesh.rotation.y = -Math.atan2(dz, dx);
+                    mesh.rotation.y = rotY;
                     lines2DGroup.add(mesh);
                 }
                 curr += dash + gap;
@@ -1187,13 +1181,9 @@
         // 3B. EQUIPAMIENTO FIJO, CALEFACTORES Y TECHO DE MADERA EXTRAÍDOS DEL VIDEO
         // ============================================================================
         function addBoxFixture(x, y, z, w, h, d, color, group = fixturesGroup, rough = 0.4) {
-            const m = new THREE.Mesh(
-                new THREE.BoxGeometry(w, h, d),
-                new THREE.MeshStandardMaterial({ color, roughness: rough })
-            );
+            const m = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(color, rough));
+            m.scale.set(w, h, d);
             m.position.set(x, y, z);
-            m.castShadow = true;
-            m.receiveShadow = true;
             group.add(m);
             return m;
         }
@@ -1284,14 +1274,14 @@
                 roofGroup.add(bL);
 
                 if (zBeam <= 5.65) {
-                    const bR = new THREE.Mesh(new THREE.BoxGeometry(lenR, 0.11, 0.07), woodBeamMat);
+                    const bR = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
+                    bR.scale.set(lenR, 0.11, 0.07);
                     bR.position.set(4.65, 2.56 + dyR / 2, zBeam);
                     bR.rotation.z = -angR;
                     roofGroup.add(bR);
                 }
             }
         }
-        buildWoodenRoof();
 
         // ============================================================================
         // 4. MUROS INTERNOS, PUERTAS (HACIA ADENTRO DE BAÑO Y HABITACIONES) Y VANOS ABIERTOS
@@ -1532,57 +1522,54 @@
             doors3DGroup.add(holder);
         }
 
-        // 4) Dintel de mampostería sobre el Vano Abierto de Cocina (Y = 4.50, X = 3.00 a 3.85, sin puerta como en sec_018)
-        {
+        // Construcción diferida de puertas 3D y techo de madera (se ejecuta tras el primer render 2D para carga instantánea)
+        let extras3DBuilt = false;
+        function ensure3DExtrasBuilt() {
+            if (extras3DBuilt) return;
+            extras3DBuilt = true;
+            buildWoodenRoof();
+            // Dintel sobre el Vano Abierto de Cocina
             const wCocinaVano = 0.85;
             const lintelH = WALL_H - DOOR_H;
-            const cocinaLintel = new THREE.Mesh(new THREE.BoxGeometry(wCocinaVano, lintelH, INT_T), intWallMat);
+            const cocinaLintel = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
+            cocinaLintel.scale.set(wCocinaVano, lintelH, INT_T);
             cocinaLintel.position.set(3.425, DOOR_H + lintelH / 2, 4.50);
             doors3DGroup.add(cocinaLintel);
+            // Instanciar puertas 3D relevadas del video
+            addMainEntranceDoor3D(5.38, 5.70, 6.12, 5.70);
+            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, true, 1, 45);
+            addInteriorWoodDoor3D(2.30, 3.02, 2.30, 3.65, true, -1, 45);
+            addInteriorWoodDoor3D(2.30, 4.50, 3.00, 4.50, true, -1, 45);
+            addSlidingPlacardFront3D(0.15, 2.18, 2.30, -1);
+            addSlidingPlacardFront3D(0.15, 2.18, 4.50, 1);
         }
-
-        // Instanciar todas las puertas 3D relevadas del video:
-        // - Puerta Principal de Entrada (Y = 5.70, X = 5.38..6.12): Gris moldurada + manijón cromado
-        addMainEntranceDoor3D(5.38, 5.70, 6.12, 5.70);
-        // - Puerta Estudio Ampliado (Y = 2.30, X = 2.30..3.00): Placa madera cedro, abre hacia adentro del Estudio (Y < 2.30)
-        addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, true, 1, 45);
-        // - Puerta Baño Amplio (X = 2.30, Y = 3.02..3.65): Placa madera cedro, abre hacia adentro del Baño (X < 2.30)
-        addInteriorWoodDoor3D(2.30, 3.02, 2.30, 3.65, true, -1, 45);
-        // - Puerta Cuarto Ampliado (Y = 4.50, X = 2.30..3.00): Placa madera cedro, abre hacia adentro del Cuarto (Y > 4.50)
-        addInteriorWoodDoor3D(2.30, 4.50, 3.00, 4.50, true, -1, 45);
-        // - Frentes de Placards corredizos de madera con cubetas (Placard Superior hacia Estudio y Placard Inferior hacia Cuarto)
-        addSlidingPlacardFront3D(0.15, 2.18, 2.30, -1);
-        addSlidingPlacardFront3D(0.15, 2.18, 4.50, 1);
+        setTimeout(ensure3DExtrasBuilt, 60);
 
         // ============================================================================
         // 4C. MUEBLES, ELECTRODOMÉSTICOS, CORTINAS Y DECORACIÓN EXTRAÍDOS DEL 2° VIDEO
         //     (https://photos.app.goo.gl/8k4MQeY4BcyoqhDK8 - video_34)
         // ============================================================================
         function addDecorBox(x, y, z, w, h, d, color, rough = 0.45, rotY = 0) {
-            const m = new THREE.Mesh(
-                new THREE.BoxGeometry(w, h, d),
-                new THREE.MeshStandardMaterial({ color, roughness: rough })
-            );
+            const m = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(color, rough));
+            m.scale.set(w, h, d);
             m.position.set(x, y, z);
             if (rotY) m.rotation.y = rotY;
-            m.castShadow = true;
-            m.receiveShadow = true;
             decorVideoGroup.add(m);
             return m;
         }
 
+        const UNIT_CYL_GEO = new THREE.CylinderGeometry(1, 1, 1, 14);
         function addDecorCyl(x, y, z, rTop, rBot, h, color, rough = 0.4) {
-            const m = new THREE.Mesh(
-                new THREE.CylinderGeometry(rTop, rBot, h, 24),
-                new THREE.MeshStandardMaterial({ color, roughness: rough })
-            );
+            const isUniform = (rTop === rBot);
+            const geo = isUniform ? UNIT_CYL_GEO : new THREE.CylinderGeometry(rTop, rBot, h, 14);
+            const m = new THREE.Mesh(geo, getStdMat(color, rough));
+            if (isUniform) m.scale.set(rTop, h, rTop);
             m.position.set(x, y, z);
-            m.castShadow = true;
-            m.receiveShadow = true;
             decorVideoGroup.add(m);
             return m;
         }
 
+        const sheerCurtainMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc, transparent: true, opacity: 0.55 });
         // Constructor de Cortinas con barral de madera y paños laterales atados
         function addCurtainAssembly(x1, z1, x2, z2, offsetInwardX, offsetInwardZ, drapeColor = 0xc8beb4) {
             const dx = x2 - x1;
@@ -1594,27 +1581,24 @@
             g.rotation.y = -angle;
 
             // Barral de madera tono cedro a Y = 2.12m
-            const rod = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.014, 0.014, len, 12),
-                new THREE.MeshStandardMaterial({ color: 0x7c3aed ? 0x7c2d12 : 0x7c2d12, roughness: 0.5 })
-            );
-            rod.rotation.z = Math.PI / 2;
+            const rod = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0x7c2d12, 0.5));
+            rod.scale.set(len, 0.028, 0.028);
             rod.position.set(0, 2.12, 0);
             g.add(rod);
 
             // Visillo blanco translúcido central
-            const sheer = new THREE.Mesh(
-                new THREE.BoxGeometry(len - 0.12, 1.22, 0.015),
-                new THREE.MeshStandardMaterial({ color: 0xf8fafc, transparent: true, opacity: 0.55 })
-            );
+            const sheer = new THREE.Mesh(UNIT_BOX_GEO, sheerCurtainMat);
+            sheer.scale.set(len - 0.12, 1.22, 0.015);
             sheer.position.set(0, 1.48, 0);
             g.add(sheer);
 
             // 2 Paños de cortina laterales con alzapaños
-            const panelMat = new THREE.MeshStandardMaterial({ color: drapeColor, roughness: 0.75 });
-            const leftPanel = new THREE.Mesh(new THREE.BoxGeometry(0.26, 1.32, 0.035), panelMat);
+            const panelMat = getStdMat(drapeColor, 0.75);
+            const leftPanel = new THREE.Mesh(UNIT_BOX_GEO, panelMat);
+            leftPanel.scale.set(0.26, 1.32, 0.035);
             leftPanel.position.set(-len / 2 + 0.16, 1.44, 0.015);
-            const rightPanel = new THREE.Mesh(new THREE.BoxGeometry(0.26, 1.32, 0.035), panelMat);
+            const rightPanel = new THREE.Mesh(UNIT_BOX_GEO, panelMat);
+            rightPanel.scale.set(0.26, 1.32, 0.035);
             rightPanel.position.set(len / 2 - 0.16, 1.44, 0.015);
             g.add(leftPanel, rightPanel);
 
@@ -1702,15 +1686,20 @@
                 { x: 3.92, z: 1.18, rot: -Math.PI / 2 },
                 { x: 5.18, z: 1.18, rot: Math.PI / 2 }
             ];
+            const chairWoodMat = getStdMat(0xc28a52, 0.55);
+            const chairCushionMat = getStdMat(0x84cc16, 0.7);
             chairCoords.forEach(c => {
                 const cg = new THREE.Group();
                 cg.position.set(c.x, 0, c.z);
                 cg.rotation.y = c.rot;
-                const seat = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.44, 0.44), new THREE.MeshStandardMaterial({ color: 0xc28a52, roughness: 0.55 }));
+                const seat = new THREE.Mesh(UNIT_BOX_GEO, chairWoodMat);
+                seat.scale.set(0.44, 0.44, 0.44);
                 seat.position.set(0, 0.22, 0);
-                const cushion = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.06, 0.42), new THREE.MeshStandardMaterial({ color: 0x84cc16, roughness: 0.7 }));
+                const cushion = new THREE.Mesh(UNIT_BOX_GEO, chairCushionMat);
+                cushion.scale.set(0.42, 0.06, 0.42);
                 cushion.position.set(0, 0.46, 0);
-                const back = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.46, 0.05), new THREE.MeshStandardMaterial({ color: 0xc28a52, roughness: 0.55 }));
+                const back = new THREE.Mesh(UNIT_BOX_GEO, chairWoodMat);
+                back.scale.set(0.44, 0.46, 0.05);
                 back.position.set(0, 0.69, 0.20);
                 cg.add(seat, cushion, back);
                 decorVideoGroup.add(cg);
@@ -1850,7 +1839,7 @@
         addPlanLabel(5.75, 1.90, "🔥 CALEFACTOR", "arch-label sub");
         addPlanLabel(2.48, 6.62, "🔥 CALEF.", "arch-label sub");
         addPlanLabel(0.40, 3.40, "BAÑERA", "arch-label sub");
-        addPlanLabel(3.32, 5.62, "TERMO", "arch-label sub");
+        addPlanLabel(4.88, 5.62, "TERMO", "arch-label sub");
 
         // Etiquetas de Muebles y Decoración extraídos del 2° video (se ocultan si se desactiva "🛋️ Amoblado")
         addPlanLabel(3.52, 2.80, "🛋️ FUTÓN 3C", "arch-label sub", true);
@@ -1859,8 +1848,8 @@
         addPlanLabel(6.02, 4.38, "🧥 PERCHERO/ZAP.", "arch-label sub", true);
         addPlanLabel(4.55, 1.18, "🍽️ MESA + 4 SILLAS", "arch-label sub", true);
         addPlanLabel(5.55, 0.36, "🐕 CUCHA PERRO", "arch-label sub", true);
-        addPlanLabel(3.35, 4.95, "❄️ HELADERA", "arch-label sub", true);
-        addPlanLabel(4.84, 6.66, "🧺 LAVARR. + CAFÉ", "arch-label sub", true);
+        addPlanLabel(4.85, 4.95, "❄️ HELADERA", "arch-label sub", true);
+        addPlanLabel(3.36, 6.66, "🧺 LAVARR. + CAFÉ", "arch-label sub", true);
         addPlanLabel(1.05, 5.95, "🛏️ CAMA 2P + RESPALDO", "arch-label sub", true);
         addPlanLabel(0.28, 4.84, "MESA LUZ", "arch-label sub", true);
         addPlanLabel(0.28, 6.72, "MESA LUZ", "arch-label sub", true);
@@ -1874,28 +1863,42 @@
         addPlanLabel(3.15, -0.30, "6.30 m", "arch-label dim");
         addPlanLabel(-0.32, 3.50, "7.00 m", "arch-label dim-v");
 
-        function updateLabels() {
-            const containerEl = document.getElementById('labels-container');
-            if (!document.getElementById('chk-labels').checked) {
-                containerEl.style.display = 'none';
+        const _projVec = new THREE.Vector3();
+        const labelsContainerEl = document.getElementById('labels-container');
+        const chkLabelsEl = document.getElementById('chk-labels');
+        let lastLabelStateKey = '';
+
+        function updateLabels(force = false) {
+            const showLabels = chkLabelsEl.checked;
+            if (!showLabels) {
+                if (labelsContainerEl.style.display !== 'none') labelsContainerEl.style.display = 'none';
                 return;
             }
-            containerEl.style.display = 'block';
+            if (labelsContainerEl.style.display !== 'block') labelsContainerEl.style.display = 'block';
+
+            const camPos = activeCamera.position;
+            const stateKey = `${activeCamera.uuid}_${camPos.x.toFixed(3)}_${camPos.y.toFixed(3)}_${camPos.z.toFixed(3)}_${activeCamera.zoom.toFixed(3)}_${decorVideoGroup.visible}_${window.innerWidth}_${window.innerHeight}`;
+            if (!force && stateKey === lastLabelStateKey) return;
+            lastLabelStateKey = stateKey;
+
             const halfW = window.innerWidth / 2;
             const halfH = window.innerHeight / 2;
-            for (const item of labelElements) {
-                if (item.isDecor && !decorVideoGroup.visible) {
-                    item.el.style.display = 'none';
+            const showDecor = decorVideoGroup.visible;
+
+            for (let i = 0; i < labelElements.length; i++) {
+                const item = labelElements[i];
+                if (item.isDecor && !showDecor) {
+                    if (item.el.style.display !== 'none') item.el.style.display = 'none';
                     continue;
                 }
-                const p = item.pos.clone().project(activeCamera);
-                if (p.z > 1.0) {
-                    item.el.style.display = 'none';
+                _projVec.copy(item.pos).project(activeCamera);
+                if (_projVec.z > 1.0) {
+                    if (item.el.style.display !== 'none') item.el.style.display = 'none';
                     continue;
                 }
-                item.el.style.display = 'block';
-                item.el.style.left = `${(p.x * halfW) + halfW}px`;
-                item.el.style.top = `${-(p.y * halfH) + halfH}px`;
+                if (item.el.style.display !== 'block') item.el.style.display = 'block';
+                item.el.style.left = `${(_projVec.x * halfW + halfW).toFixed(1)}px`;
+                item.el.style.top = `${(-_projVec.y * halfH + halfH).toFixed(1)}px`;
             }
         }
 
@@ -2295,10 +2298,10 @@
         }
 
         function switchTo3D(presetName = 'isom', cut = false, hideWalls = false) {
+            ensure3DExtrasBuilt();
             activeCamera = perspCam;
             controlsOrtho.enabled = false;
             controlsPersp.enabled = true;
-            dirLight.castShadow = true;
             ambLight.intensity = 0.85;
             if (hideWalls) {
                 applyWallsVisibility(false, false);
@@ -2369,24 +2372,31 @@
         });
 
         document.getElementById('btn-export-obj').addEventListener('click', () => {
-            const exporter = new THREE.OBJExporter();
-            const result = exporter.parse(apartmentGroup);
-            const blob = new Blob([result], { type: 'text/plain' });
             const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'Departamento_63x70_Exacto.obj';
+            link.href = 'Departamento_01-01.obj';
+            link.download = 'Departamento_01-01.obj';
             link.click();
         });
 
         renderFurniture3D();
 
+        let dirtyFrames = 45;
+        function wakeRenderer() { dirtyFrames = 45; }
+        ['pointerdown', 'pointermove', 'wheel', 'touchstart', 'touchmove', 'keydown', 'click', 'change', 'input'].forEach(ev => {
+            window.addEventListener(ev, wakeRenderer, { passive: true });
+        });
+
         function animate() {
             requestAnimationFrame(animate);
-            if (controlsPersp.enabled) controlsPersp.update();
-            if (controlsOrtho.enabled) controlsOrtho.update();
-            updateLabels();
-            if (selectionBox) selectionBox.update();
-            renderer.render(scene, activeCamera);
+            const movedPersp = controlsPersp.enabled && controlsPersp.update();
+            const movedOrtho = controlsOrtho.enabled && controlsOrtho.update();
+            if (movedPersp || movedOrtho) dirtyFrames = Math.max(dirtyFrames, 5);
+            if (dirtyFrames > 0) {
+                dirtyFrames--;
+                updateLabels();
+                if (selectionBox) selectionBox.update();
+                renderer.render(scene, activeCamera);
+            }
         }
         animate();
 
@@ -2403,6 +2413,7 @@
             orthoCam.updateProjectionMatrix();
 
             renderer.setSize(window.innerWidth, window.innerHeight);
+            wakeRenderer();
         });
     </script>
 </body>
