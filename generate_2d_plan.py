@@ -184,9 +184,10 @@ def main():
         fill=granite_fill,
         outline=granite_border,
     )
-    # Bacha de acero inoxidable sobre el tramo Este antes de la esquina (X=4.64 a 5.10, Y=6.22 a 6.68)
-    draw.rectangle([*px(4.64, 6.22), *px(5.10, 6.68)], fill=(226, 232, 240), outline=(100, 116, 139), width=2)
-    draw.rectangle([*px(4.69, 6.27), *px(5.05, 6.63)], fill=(241, 245, 249), outline=(148, 163, 184), width=1)
+    # Bacha doble esquinera de acero inoxidable + filtro PSA en la esquina Sureste (X=4.44 a 5.08, Y=6.32 a 6.82)
+    draw.rectangle([*px(4.62, 6.30), *px(5.08, 6.76)], fill=(226, 232, 240), outline=(100, 116, 139), width=2)
+    draw.rectangle([*px(4.67, 6.35), *px(5.03, 6.53)], fill=(241, 245, 249), outline=(148, 163, 184), width=1)
+    draw.rectangle([*px(4.67, 6.56), *px(5.03, 6.72)], fill=(241, 245, 249), outline=(148, 163, 184), width=1)
 
     # --- BAÑO: Bañera (X=0.04..0.74, Y=2.84..3.96), Lavatorio (X=1.10..1.55, Y=2.84..3.22), Inodoro (X=1.65..2.05, Y=3.55..3.96) ---
     draw.rectangle([*px(0.05, 2.84), *px(0.75, 3.96)], fill=(255, 255, 255), outline=(148, 163, 184), width=2)

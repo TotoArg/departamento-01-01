@@ -1225,8 +1225,10 @@
         addBoxFixture(4.23, 0.42, 6.68, 0.70, 0.84, 0.56, 0xb48a64);
         addBoxFixture(4.86, 0.86, 6.56, 0.60, 0.04, 0.80, 0xc8b2a6);
         addBoxFixture(4.23, 0.86, 6.68, 0.68, 0.04, 0.58, 0xc8b2a6);
-        // - Bacha de acero inoxidable sobre el tramo Este antes de la esquina (X=4.86, Z=6.46)
-        addBoxFixture(4.86, 0.875, 6.46, 0.42, 0.02, 0.50, 0x94a3b8, fixturesGroup, 0.25);
+        // - Bacha doble esquinera de acero inoxidable + grifería monocomando + filtro purificador negro PSA (X=4.68, Z=6.55)
+        addBoxFixture(4.82, 0.875, 6.46, 0.40, 0.02, 0.44, 0x94a3b8, fixturesGroup, 0.25);
+        addBoxFixture(4.48, 0.875, 6.66, 0.40, 0.02, 0.38, 0x94a3b8, fixturesGroup, 0.25);
+        addBoxFixture(4.88, 1.00, 6.66, 0.09, 0.24, 0.09, 0x0f172a, fixturesGroup, 0.2); // Filtro purificador de agua negro PSA
 
         // 3) BAÑO AMPLIO: Bañera en muro Oeste + Lavatorio Pedestal + Inodoro con mochila
         // Bañera (X=0.05..0.75, Z=2.84..3.96)
@@ -1239,48 +1241,59 @@
         addBoxFixture(1.86, 0.22, 3.74, 0.38, 0.42, 0.44, 0xffffff, fixturesGroup, 0.25);
         addBoxFixture(1.86, 0.58, 3.90, 0.38, 0.34, 0.16, 0xffffff, fixturesGroup, 0.25);
 
-        // 4) TECHO DE MADERA MACHIMBRADA EN PENDIENTE CON VIGAS VISTAS (Extraído del video)
-        // Dos faldones que suben hacia la cumbrera en el eje X = 3.00 (de 2.62m en bordes a 3.30m en el centro)
+        // 4) TECHO DE MADERA MACHIMBRADA EN PENDIENTE CON VIGAS VISTAS DE NORTE A SUR (Extraído de las fotos y videos)
+        // Dos faldones que suben hacia la cumbrera central Este-Oeste (Z = 3.50, de 2.62m en frentes Norte/Sur a 3.30m en la cumbrera)
+        // con cabios/vigas vistas corriendo de Norte a Sur hacia las ventanas (tal como se ve en las fotos de la cocina y living)
         function buildWoodenRoof() {
-            // Faldón Derecho (Living + Cocina + Entrada: X = 3.00 a 6.30, Z = 0.00 a 5.70)
-            const dxR = 3.30, dyR = 0.68;
-            const lenR = Math.hypot(dxR, dyR);
-            const angR = Math.atan2(dyR, dxR);
-            const roofRight = new THREE.Mesh(new THREE.BoxGeometry(lenR, 0.05, 5.70), woodRoofMat);
-            roofRight.position.set(4.65, 2.62 + dyR / 2, 2.85);
-            roofRight.rotation.z = -angR;
-            roofGroup.add(roofRight);
+            const dzSlope = 3.50, dySlope = 0.68;
+            const lenSlope = Math.hypot(dzSlope, dySlope);
+            const angSlope = Math.atan2(dySlope, dzSlope);
 
-            // Extensión Sur sobre Cocina (X = 3.00 a 5.20, Z = 5.70 a 7.00)
-            const dxC = 2.20, dyC = 0.45;
-            const lenC = Math.hypot(dxC, dyC);
-            const roofCocina = new THREE.Mesh(new THREE.BoxGeometry(lenC, 0.05, 1.30), woodRoofMat);
-            roofCocina.position.set(4.10, 2.78 + dyC / 2, 6.35);
-            roofCocina.rotation.z = -angR;
-            roofGroup.add(roofCocina);
+            // Faldón Norte completo (Estudio + Living Norte: X = 0.00 a 6.30, Z = 0.00 a 3.50)
+            const roofNorth = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofNorth.scale.set(6.30, 0.05, lenSlope);
+            roofNorth.position.set(3.15, 2.62 + dySlope / 2, 1.75);
+            roofNorth.rotation.x = -angSlope;
+            roofGroup.add(roofNorth);
 
-            // Faldón Izquierdo (Estudio + Baño + Cuarto: X = 0.00 a 3.00, Z = 0.00 a 7.00)
-            const dxL = 3.00, dyL = 0.68;
-            const lenL = Math.hypot(dxL, dyL);
-            const angL = Math.atan2(dyL, dxL);
-            const roofLeft = new THREE.Mesh(new THREE.BoxGeometry(lenL, 0.05, 7.00), woodRoofMat);
-            roofLeft.position.set(1.50, 2.62 + dyL / 2, 3.50);
-            roofLeft.rotation.z = angL;
-            roofGroup.add(roofLeft);
+            // Faldón Sur principal (Baño + Cuarto + Cocina: X = 0.00 a 5.20, Z = 3.50 a 7.00, baja hacia la ventana Sur Z = 7.00)
+            const roofSouthMain = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofSouthMain.scale.set(5.20, 0.05, lenSlope);
+            roofSouthMain.position.set(2.60, 2.62 + dySlope / 2, 5.25);
+            roofSouthMain.rotation.x = angSlope;
+            roofGroup.add(roofSouthMain);
 
-            // Vigas/cabios vistos de madera cada 0.65 m
-            for (let zBeam = 0.45; zBeam <= 6.60; zBeam += 0.65) {
-                const bL = new THREE.Mesh(new THREE.BoxGeometry(lenL, 0.11, 0.07), woodBeamMat);
-                bL.position.set(1.50, 2.56 + dyL / 2, zBeam);
-                bL.rotation.z = angL;
-                roofGroup.add(bL);
+            // Faldón Sur sobre Entrada (X = 5.20 a 6.30, Z = 3.50 a 5.70)
+            const dzEnt = 2.20, dyEnt = (2.20 / 3.50) * dySlope;
+            const lenEnt = Math.hypot(dzEnt, dyEnt);
+            const roofSouthEnt = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofSouthEnt.scale.set(1.10, 0.05, lenEnt);
+            roofSouthEnt.position.set(5.75, 3.30 - dyEnt / 2, 4.60);
+            roofSouthEnt.rotation.x = angSlope;
+            roofGroup.add(roofSouthEnt);
 
-                if (zBeam <= 5.65) {
-                    const bR = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-                    bR.scale.set(lenR, 0.11, 0.07);
-                    bR.position.set(4.65, 2.56 + dyR / 2, zBeam);
-                    bR.rotation.z = -angR;
-                    roofGroup.add(bR);
+            // Vigas/cabios vistos de madera corriendo de Norte a Sur (4 cabios en el ancho de la cocina, cada ~0.55 m)
+            for (let xBeam = 0.45; xBeam <= 6.00; xBeam += 0.55) {
+                // Cabio Norte (Z = 0.00 a 3.50)
+                const bN = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
+                bN.scale.set(0.07, 0.11, lenSlope);
+                bN.position.set(xBeam, 2.56 + dySlope / 2, 1.75);
+                bN.rotation.x = -angSlope;
+                roofGroup.add(bN);
+
+                // Cabio Sur (Z = 3.50 a 7.00 en sector depto, o Z = 3.50 a 5.70 en Entrada)
+                if (xBeam <= 5.15) {
+                    const bS = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
+                    bS.scale.set(0.07, 0.11, lenSlope);
+                    bS.position.set(xBeam, 2.56 + dySlope / 2, 5.25);
+                    bS.rotation.x = angSlope;
+                    roofGroup.add(bS);
+                } else {
+                    const bSE = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
+                    bSE.scale.set(0.07, 0.11, lenEnt);
+                    bSE.position.set(xBeam, 3.24 - dyEnt / 2, 4.60);
+                    bSE.rotation.x = angSlope;
+                    roofGroup.add(bSE);
                 }
             }
         }
@@ -1725,18 +1738,24 @@
             addDecorBox(4.85, 1.78, 4.88, 0.60, 0.16, 0.62, 0xd6ccc2, 0.5);  // Bodega portabotellas
             addDecorBox(4.85, 2.12, 4.88, 0.60, 0.52, 0.62, 0xd6ccc2, 0.45); // Alacena alta sobre heladera
             // 2. Alacenas superiores sobre Muro Este (X=5.20):
-            // - Alacena sobre el calefón Orbis (Z=5.42)
+            // - Alacena sobre el calefón Orbis (Z=5.42) + caño corrugado de aluminio arriba + plumero extensible violeta en el hueco
             addDecorBox(4.96, 1.98, 5.42, 0.34, 0.48, 0.40, 0xd6ccc2, 0.45);
-            // - Alacena larga de 3 puertas sobre cocina y bacha (Z=5.64..6.68) + estante especiero inferior abierto
+            addDecorCyl(5.02, 2.30, 5.48, 0.05, 0.05, 0.22, 0x94a3b8, 0.3);    // Conducto aluminio calefón
+            addDecorCyl(4.62, 1.65, 5.20, 0.012, 0.012, 1.45, 0xf8fafc, 0.4);  // Cabo extensible blanco del plumero
+            addDecorCyl(4.62, 2.40, 5.20, 0.09, 0.05, 0.18, 0x7e22ce, 0.7);    // Plumero violeta arriba de la heladera
+            // - Alacena larga de 3 puertas sobre cocina y bacha (Z=5.64..6.68) + estante especiero inferior abierto + 2 latas negras Bagley arriba + imán portacuchillos
             addDecorBox(4.96, 1.84, 6.16, 0.34, 0.64, 1.04, 0xd6ccc2, 0.45);
-            addDecorBox(4.96, 1.44, 6.16, 0.26, 0.14, 1.04, 0xb48a64, 0.5);  // Estante especiero inferior
+            addDecorBox(4.96, 1.44, 6.16, 0.26, 0.14, 1.04, 0xb48a64, 0.5);    // Estante especiero inferior con tazas y Moka roja
+            addDecorCyl(4.96, 2.24, 5.82, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4);    // Lata redonda negra 1 sobre alacena
+            addDecorCyl(4.96, 2.24, 6.26, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4);    // Lata redonda negra 2 sobre alacena
+            addDecorBox(5.11, 1.24, 6.22, 0.02, 0.16, 0.28, 0x334155, 0.3);    // Imán portacuchillos en pared azulejada
             // - Estante esquinero abierto de madera de 3 niveles en esquina Sureste (Z=6.82) con planta y cafetera Moka
             addDecorBox(4.96, 1.74, 6.82, 0.30, 0.62, 0.26, 0x9a5b32, 0.5);
-            addDecorCyl(4.96, 2.12, 6.82, 0.06, 0.05, 0.16, 0x15803d, 0.6);  // Plantita en estante superior
-            // - Rollo de cocina y termo sobre el 1° tramo de mesada (Z=5.32..5.52) + contenedor celeste al lado de las hornallas
-            addDecorCyl(4.68, 0.98, 5.30, 0.06, 0.06, 0.22, 0xffffff, 0.4);  // Rollo de papel de cocina
-            addDecorCyl(4.72, 0.98, 5.52, 0.045, 0.045, 0.24, 0x475569, 0.3);// Termo acero
-            addDecorBox(4.74, 0.92, 6.24, 0.18, 0.09, 0.22, 0x0284c7, 0.3);  // Recipiente celeste sobre mesada
+            addDecorCyl(4.96, 2.12, 6.82, 0.06, 0.05, 0.16, 0x15803d, 0.6);    // Plantita en estante superior
+            // - Rollo de cocina y termo sobre el 1° tramo de mesada (Z=5.32..5.52) + contenedor celeste y botellas en el 2° tramo
+            addDecorCyl(4.68, 0.98, 5.30, 0.06, 0.06, 0.22, 0xffffff, 0.4);    // Rollo de papel de cocina
+            addDecorCyl(4.72, 0.98, 5.52, 0.045, 0.045, 0.24, 0x475569, 0.3);  // Termo acero
+            addDecorBox(4.74, 0.92, 6.24, 0.18, 0.09, 0.22, 0x0284c7, 0.3);    // Recipiente celeste sobre mesada
             // 3. Sector bajo Ventana Sur (Y=7.00):
             // - Cortina roller blanca en ventana Sur (X=3.25..4.55, Z=6.94)
             addDecorBox(3.90, 1.82, 6.94, 1.28, 0.36, 0.03, 0xf8fafc, 0.3);
