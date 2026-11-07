@@ -1,8 +1,15 @@
-# Materiales Arquitectónicos Departamento 6.30m x 7.00m (Planta en L)
+# Materiales Arquitectónicos Departamento 6.30m x 7.00m (Planta en L + Video)
 
-newmtl Floor_Light
+newmtl Floor_Ceramic_Beige
 Ka 0.200 0.200 0.200
-Kd 0.960 0.960 0.970
+Kd 0.980 0.960 0.940
+Ks 0.080 0.080 0.080
+Ns 30.0
+d 1.0
+
+newmtl Floor_Bath_White
+Ka 0.200 0.200 0.200
+Kd 0.970 0.980 0.990
 Ks 0.080 0.080 0.080
 Ns 30.0
 d 1.0
@@ -16,14 +23,49 @@ d 1.0
 
 newmtl Wall_Exterior
 Ka 0.200 0.200 0.200
-Kd 0.850 0.880 0.920
+Kd 0.920 0.940 0.960
 Ks 0.080 0.080 0.080
 Ns 30.0
 d 1.0
 
 newmtl Wall_Interior
 Ka 0.200 0.200 0.200
-Kd 0.780 0.820 0.880
+Kd 0.860 0.890 0.930
+Ks 0.080 0.080 0.080
+Ns 30.0
+d 1.0
+
+newmtl Window_Glass
+Ka 0.200 0.200 0.200
+Kd 0.580 0.770 0.980
+Ks 0.080 0.080 0.080
+Ns 30.0
+d 1.0
+
+newmtl Heater_Metal
+Ka 0.200 0.200 0.200
+Kd 0.620 0.650 0.690
+Ks 0.080 0.080 0.080
+Ns 30.0
+d 1.0
+
+newmtl Kitchen_Granite
+Ka 0.200 0.200 0.200
+Kd 0.840 0.720 0.680
+Ks 0.080 0.080 0.080
+Ns 30.0
+d 1.0
+
+newmtl Sanitary_White
+Ka 0.200 0.200 0.200
+Kd 0.980 0.990 1.000
+Ks 0.080 0.080 0.080
+Ns 30.0
+d 1.0
+
+newmtl Wood_Roof
+Ka 0.200 0.200 0.200
+Kd 0.720 0.480 0.240
 Ks 0.080 0.080 0.080
 Ns 30.0
 d 1.0

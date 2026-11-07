@@ -1,6 +1,10 @@
 """
 Generador de Modelo 3D (.OBJ + .MTL) para Blender / CAD.
-Estructura arquitectónica exacta en "L" de 6.30 m x 7.00 m (sin muebles fijos).
+Estructura arquitectónica exacta en "L" de 6.30 m x 7.00 m con elementos extraídos del video:
+- Suelo cerámico 33x33 cm + piso de baño + palier exterior
+- 7 ventanas caladas con marco de aluminio oscuro y vidrio
+- 3 calefactores tiro balanceado + equipamiento fijo de cocina y baño
+- Techo de madera machimbrada en su propio grupo (05_Techo_Madera)
 """
 
 
@@ -16,9 +20,6 @@ class OBJBuilder:
         self.current_material = material_name
 
     def add_box(self, x1, y1, z1, x2, y2, z2):
-        # X: ancho (0.00 a 6.30 m)
-        # Y: altura (0.00 a 2.60 m)
-        # Z: profundidad (0.00 a 7.00 m)
         x_min, x_max = min(x1, x2), max(x1, x2)
         y_min, y_max = min(y1, y2), max(y1, y2)
         z_min, z_max = min(z1, z2), max(z1, z2)
@@ -37,12 +38,12 @@ class OBJBuilder:
         self.vertices.extend(verts)
 
         box_faces = [
-            (0, 3, 2, 1),  # Norte (-Z)
-            (4, 5, 6, 7),  # Sur (+Z)
-            (0, 4, 7, 3),  # Oeste (-X)
-            (1, 2, 6, 5),  # Este (+X)
-            (3, 7, 6, 2),  # Arriba (+Y)
-            (0, 1, 5, 4),  # Abajo (-Y)
+            (0, 3, 2, 1),
+            (4, 5, 6, 7),
+            (0, 4, 7, 3),
+            (1, 2, 6, 5),
+            (3, 7, 6, 2),
+            (0, 1, 5, 4),
         ]
 
         for f in box_faces:
@@ -54,14 +55,20 @@ class OBJBuilder:
 
     def save(self, obj_path, mtl_path, mtl_filename):
         materials = {
-            "Floor_Light": (0.96, 0.96, 0.97),
+            "Floor_Ceramic_Beige": (0.98, 0.96, 0.94),
+            "Floor_Bath_White": (0.97, 0.98, 0.99),
             "Palier_Ext": (0.91, 0.92, 0.94),
-            "Wall_Exterior": (0.85, 0.88, 0.92),
-            "Wall_Interior": (0.78, 0.82, 0.88),
+            "Wall_Exterior": (0.92, 0.94, 0.96),
+            "Wall_Interior": (0.86, 0.89, 0.93),
+            "Window_Glass": (0.58, 0.77, 0.98),
+            "Heater_Metal": (0.62, 0.65, 0.69),
+            "Kitchen_Granite": (0.84, 0.72, 0.68),
+            "Sanitary_White": (0.98, 0.99, 1.00),
+            "Wood_Roof": (0.72, 0.48, 0.24),
         }
 
         with open(mtl_path, "w", encoding="utf-8") as mf:
-            mf.write("# Materiales Arquitectónicos Departamento 6.30m x 7.00m (Planta en L)\n\n")
+            mf.write("# Materiales Arquitectónicos Departamento 6.30m x 7.00m (Planta en L + Video)\n\n")
             for name, (r, g, b) in materials.items():
                 mf.write(f"newmtl {name}\n")
                 mf.write("Ka 0.200 0.200 0.200\n")
@@ -71,7 +78,7 @@ class OBJBuilder:
                 mf.write("d 1.0\n\n")
 
         with open(obj_path, "w", encoding="utf-8") as of:
-            of.write("# Modelo 3D Arquitectónico Exacto 6.30m x 7.00m (Planta en L)\n")
+            of.write("# Modelo 3D Arquitectónico Exacto 6.30m x 7.00m (Planta en L + Relevamiento Video)\n")
             of.write(f"mtllib {mtl_filename}\n\n")
 
             for v in self.vertices:
@@ -94,78 +101,114 @@ class OBJBuilder:
 
 def build_apartment():
     b = OBJBuilder()
-    H = 2.60       # Altura de muros
-    EXT = 0.14     # Espesor muro exterior
-    INT = 0.10     # Espesor tabique interior
+    H = 2.60
+    EXT = 0.14
+    INT = 0.10
 
-    # 1. PISO POLIGONAL EN "L" (6.30m x 7.00m) + PALIER EXTERIOR
-    b.set_group("00_Piso_General", "Floor_Light")
+    # 1. PISOS
+    b.set_group("00_Piso_Ceramico_33x33", "Floor_Ceramic_Beige")
     b.add_box(0.00, -0.10, 0.00, 6.30, 0.00, 5.70)
     b.add_box(0.00, -0.10, 5.70, 5.20, 0.00, 7.00)
+
+    b.set_group("00_Piso_Bano", "Floor_Bath_White")
+    b.add_box(0.00, -0.095, 2.80, 2.30, 0.002, 4.00)
 
     b.set_group("00_Palier_Edificio", "Palier_Ext")
     b.add_box(5.20, -0.10, 5.70, 6.30, 0.00, 7.00)
 
-    # 2. PERÍMETRO EXTERIOR (Polígono en "L": 6.30m x 7.00m)
+    # 2. PERÍMETRO EXTERIOR CON 7 VENTANAS CALADAS
     b.set_group("01_Muros_Exteriores", "Wall_Exterior")
-    # Muro Superior Norte: Y = 0.00 (X = 0.00 a 6.30)
-    b.add_box(0.00, 0.00, -EXT / 2, 6.30, H, EXT / 2)
-    # Muro Derecho Este: X = 6.30 (Y = 0.00 a 5.70)
-    b.add_box(6.30 - EXT / 2, 0.00, 0.00, 6.30 + EXT / 2, H, 5.70)
-    # Retranqueo Palier / Puerta Principal: Y = 5.70 (X = 5.20 a 6.30 con vano 5.38 a 6.12)
+    # Muro Norte Y = 0.00 (V4 Estudio 0.85..2.05, V1 Living 3.35..4.55, V2 Living 4.90..6.00)
+    b.add_box(0.00, 0.00, -EXT / 2, 0.85, H, EXT / 2)
+    b.add_box(0.85, 0.00, -EXT / 2, 2.05, 0.95, EXT / 2)
+    b.add_box(0.85, 2.05, -EXT / 2, 2.05, H, EXT / 2)
+    b.add_box(2.05, 0.00, -EXT / 2, 3.35, H, EXT / 2)
+    b.add_box(3.35, 0.00, -EXT / 2, 4.55, 0.95, EXT / 2)
+    b.add_box(3.35, 2.05, -EXT / 2, 4.55, H, EXT / 2)
+    b.add_box(4.55, 0.00, -EXT / 2, 4.90, H, EXT / 2)
+    b.add_box(4.90, 0.00, -EXT / 2, 6.00, 0.95, EXT / 2)
+    b.add_box(4.90, 2.05, -EXT / 2, 6.00, H, EXT / 2)
+    b.add_box(6.00, 0.00, -EXT / 2, 6.30, H, EXT / 2)
+
+    # Muro Este X = 6.30 (V3 Living Y = 1.00..2.50)
+    b.add_box(6.30 - EXT / 2, 0.00, 0.00, 6.30 + EXT / 2, H, 1.00)
+    b.add_box(6.30 - EXT / 2, 0.00, 1.00, 6.30 + EXT / 2, 0.95, 2.50)
+    b.add_box(6.30 - EXT / 2, 2.05, 1.00, 6.30 + EXT / 2, H, 2.50)
+    b.add_box(6.30 - EXT / 2, 0.00, 2.50, 6.30 + EXT / 2, H, 5.70)
+
+    # Retranqueo Palier Y = 5.70 (Puerta Principal X = 5.38..6.12)
     b.add_box(5.20, 0.00, 5.70 - EXT / 2, 5.38, H, 5.70 + EXT / 2)
     b.add_box(6.12, 0.00, 5.70 - EXT / 2, 6.30, H, 5.70 + EXT / 2)
-    b.add_box(5.38, 2.05, 5.70 - EXT / 2, 6.12, H, 5.70 + EXT / 2)  # Dintel puerta entrada
-    # Muro Derecho Cocina (baja al fondo): X = 5.20 (Y = 5.70 a 7.00)
+    b.add_box(5.38, 2.05, 5.70 - EXT / 2, 6.12, H, 5.70 + EXT / 2)
+
+    # Muro Derecho Cocina X = 5.20 (Y = 5.70..7.00)
     b.add_box(5.20 - EXT / 2, 0.00, 5.70, 5.20 + EXT / 2, H, 7.00)
-    # Muro Inferior Sur: Y = 7.00 (X = 0.00 a 5.20)
-    b.add_box(0.00, 0.00, 7.00 - EXT / 2, 5.20, H, 7.00 + EXT / 2)
-    # Muro Izquierdo Oeste: X = 0.00 (Y = 0.00 a 7.00)
-    b.add_box(-EXT / 2, 0.00, 0.00, EXT / 2, H, 7.00)
+
+    # Muro Sur Y = 7.00 (V5 Cuarto 0.90..2.10, V6 Cocina 3.55..4.55)
+    b.add_box(0.00, 0.00, 7.00 - EXT / 2, 0.90, H, 7.00 + EXT / 2)
+    b.add_box(0.90, 0.00, 7.00 - EXT / 2, 2.10, 0.95, 7.00 + EXT / 2)
+    b.add_box(0.90, 2.05, 7.00 - EXT / 2, 2.10, H, 7.00 + EXT / 2)
+    b.add_box(2.10, 0.00, 7.00 - EXT / 2, 3.55, H, 7.00 + EXT / 2)
+    b.add_box(3.55, 0.00, 7.00 - EXT / 2, 4.55, 1.05, 7.00 + EXT / 2)
+    b.add_box(3.55, 2.00, 7.00 - EXT / 2, 4.55, H, 7.00 + EXT / 2)
+    b.add_box(4.55, 0.00, 7.00 - EXT / 2, 5.20, H, 7.00 + EXT / 2)
+
+    # Muro Oeste X = 0.00 (V7 Ventiluz Baño Y = 3.05..3.75)
+    b.add_box(-EXT / 2, 0.00, 0.00, EXT / 2, H, 3.05)
+    b.add_box(-EXT / 2, 0.00, 3.05, EXT / 2, 1.35, 3.75)
+    b.add_box(-EXT / 2, 2.00, 3.05, EXT / 2, H, 3.75)
+    b.add_box(-EXT / 2, 0.00, 3.75, EXT / 2, H, 7.00)
+
+    # Vidrios de las 7 ventanas
+    b.set_group("01B_Ventanas_Aluminio", "Window_Glass")
+    b.add_box(0.85, 0.95, -0.02, 2.05, 2.05, 0.02)
+    b.add_box(3.35, 0.95, -0.02, 4.55, 2.05, 0.02)
+    b.add_box(4.90, 0.95, -0.02, 6.00, 2.05, 0.02)
+    b.add_box(6.28, 0.95, 1.00, 6.32, 2.05, 2.50)
+    b.add_box(0.90, 0.95, 6.98, 2.10, 2.05, 7.02)
+    b.add_box(3.55, 1.05, 6.98, 4.55, 2.00, 7.02)
+    b.add_box(-0.02, 1.35, 3.05, 0.02, 2.00, 3.75)
 
     # 3. TABIQUES INTERIORES
     b.set_group("02_Tabiques_Interiores", "Wall_Interior")
-    # Eje Vertical X = 2.30 (Cierre Placards y Baño):
-    # - Muro sólido de Y = 2.30 a Y = 2.80 (Placard Sup.)
     b.add_box(2.30 - INT / 2, 0.00, 2.30, 2.30 + INT / 2, H, 2.80)
-    # - Puerta Baño: Entre Y = 2.80 e Y = 3.70 (dintel superior)
     b.add_box(2.30 - INT / 2, 2.05, 2.80, 2.30 + INT / 2, H, 3.70)
-    # - Muro sólido de Y = 3.70 a Y = 4.50 (tramo Baño 3.70-4.00 + Placard Inf. 4.00-4.50)
     b.add_box(2.30 - INT / 2, 0.00, 3.70, 2.30 + INT / 2, H, 4.50)
 
-    # Eje Vertical Central X = 3.00:
-    # - Muro sólido de Y = 0.00 a Y = 3.70 (Estudio y Pasillo / Living)
     b.add_box(3.00 - INT / 2, 0.00, 0.00, 3.00 + INT / 2, H, 3.70)
-    # - Vano Abierto de Y = 3.70 a Y = 4.50 (sin muro)
-    # - Muro sólido de Y = 4.50 a Y = 7.00 (Cuarto / Cocina)
     b.add_box(3.00 - INT / 2, 0.00, 4.50, 3.00 + INT / 2, H, 7.00)
 
-    # Eje Vertical X = 5.20 (Cocina / Entrada): Y = 4.50 a 5.70
     b.add_box(5.20 - INT / 2, 0.00, 4.50, 5.20 + INT / 2, H, 5.70)
 
-    # Eje Horizontal Y = 2.30 (Base Estudio):
-    # - Muro sólido X = 0.00 a 2.30
     b.add_box(0.00, 0.00, 2.30 - INT / 2, 2.30, H, 2.30 + INT / 2)
-    # - Dintel Puerta Estudio X = 2.30 a 3.00
     b.add_box(2.30, 2.05, 2.30 - INT / 2, 3.00, H, 2.30 + INT / 2)
 
-    # Eje Horizontal Y = 2.80 (Placard Sup. / Baño): X = 0.00 a 2.30
     b.add_box(0.00, 0.00, 2.80 - INT / 2, 2.30, H, 2.80 + INT / 2)
-
-    # Eje Horizontal Y = 4.00 (Baño / Placard Inf.): X = 0.00 a 2.30
     b.add_box(0.00, 0.00, 4.00 - INT / 2, 2.30, H, 4.00 + INT / 2)
 
-    # Eje Horizontal Y = 4.50 (Línea Cuarto y Cocina):
-    # - Muro sólido X = 0.00 a 2.30 (Placard Inf. / Cuarto)
     b.add_box(0.00, 0.00, 4.50 - INT / 2, 2.30, H, 4.50 + INT / 2)
-    # - Dintel Puerta Cuarto X = 2.30 a 3.00
     b.add_box(2.30, 2.05, 4.50 - INT / 2, 3.00, H, 4.50 + INT / 2)
-    # - Vano Abierto Cocina X = 3.00 a 3.85 (sin muro)
-    # - Muro sólido frontal de Cocina X = 3.85 a 5.20
     b.add_box(3.85, 0.00, 4.50 - INT / 2, 5.20, H, 4.50 + INT / 2)
 
+    # 4. CALEFACTORES E INSTALACIONES FIJAS DEL VIDEO
+    b.set_group("03_Calefactores_Tiro_Balanceado", "Heater_Metal")
+    b.add_box(6.05, 0.05, 2.75, 6.23, 0.65, 3.35)  # Calefactor Living
+    b.add_box(6.10, 0.65, 3.00, 6.20, 2.80, 3.10)  # Caño tiraje vertical Living
+    b.add_box(0.25, 0.05, 6.78, 0.72, 0.65, 6.94)  # Calefactor Cuarto
+    b.add_box(0.06, 0.05, 0.80, 0.22, 0.65, 1.25)  # Calefactor Estudio
+
+    b.set_group("04_Equipamiento_Cocina_Bano", "Kitchen_Granite")
+    b.add_box(3.05, 0.00, 5.35, 3.62, 0.86, 6.94)  # Mesada tramo izquierdo
+    b.add_box(3.62, 0.00, 6.40, 4.62, 0.86, 6.94)  # Mesada tramo sur bajo ventana
+
+    b.set_group("04B_Sanitarios_Y_Termo", "Sanitary_White")
+    b.add_box(3.12, 0.86, 5.42, 3.52, 1.90, 5.82)  # Termotanque Sherman
+    b.add_box(0.05, 0.00, 2.84, 0.75, 0.48, 3.96)  # Bañera
+    b.add_box(1.12, 0.00, 2.84, 1.58, 0.82, 3.20)  # Lavatorio
+    b.add_box(1.68, 0.00, 3.56, 2.06, 0.75, 3.95)  # Inodoro
+
     b.save("Departamento_01-01.obj", "Departamento_01-01.mtl", "Departamento_01-01.mtl")
-    print("Modelo 3D (.obj y .mtl) 6.30m x 7.00m generado exitosamente.")
+    print("Modelo 3D completo (.obj y .mtl) con detalles de video generado exitosamente.")
 
 
 if __name__ == "__main__":
