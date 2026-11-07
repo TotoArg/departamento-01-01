@@ -1,1470 +1,248 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Plano Arquitectónico 2D y 3D (6.30m × 6.20m)</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #f8fafc;
-            color: #0f172a;
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
-            touch-action: none;
-        }
-        #webgl-container { width: 100%; height: 100%; display: block; }
-
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.92);
-            color: #f1f5f9;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 14px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-        }
-
-        /* Top UI Wrapper */
-        #top-ui-wrapper {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            right: 12px;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            z-index: 20;
-            pointer-events: none;
-        }
-        #top-ui-wrapper > * {
-            pointer-events: auto;
-        }
-
-        /* Header Card */
-        #header-card {
-            position: static;
-            padding: 10px 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            max-width: 360px;
-            flex-shrink: 0;
-        }
-        .header-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-        }
-        .badge {
-            font-size: 10.5px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            padding: 3px 9px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #fff;
-        }
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .icon-btn {
-            background: rgba(56, 189, 248, 0.16);
-            border: 1px solid rgba(56, 189, 248, 0.4);
-            color: #38bdf8;
-            padding: 5px 9px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-        .icon-btn:hover { background: rgba(56, 189, 248, 0.3); }
-        h1 { font-size: 14.5px; font-weight: 700; color: #ffffff; }
-        .metrics-row {
-            display: flex;
-            gap: 12px;
-            margin-top: 3px;
-            padding-top: 5px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .metric { display: flex; flex-direction: column; }
-        .metric-val { font-size: 12.5px; font-weight: 700; color: #38bdf8; }
-        .metric-lbl { font-size: 8.5px; color: #94a3b8; text-transform: uppercase; }
-
-        /* Top Mode Switcher */
-        #top-toolbar {
-            position: static;
-            padding: 6px 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-        .mode-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            color: #cbd5e1;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11.5px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .mode-btn:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
-        .mode-btn.active {
-            background: linear-gradient(135deg, #0284c7, #0369a1);
-            border-color: #38bdf8;
-            color: #fff;
-            box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
-        }
-
-        /* Right Sidebar */
-        #sidebar-right {
-            position: absolute;
-            top: 14px;
-            right: 14px;
-            padding: 14px;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            gap: 9px;
-            width: 235px;
-        }
-        .panel-title {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #94a3b8;
-            letter-spacing: 0.6px;
-        }
-        .ui-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            color: #e2e8f0;
-            padding: 7px 10px;
-            border-radius: 8px;
-            font-size: 11.5px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s;
-            width: 100%;
-        }
-        .ui-btn:hover { background: rgba(255, 255, 255, 0.16); }
-
-        .toggle-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 11.5px;
-            color: #cbd5e1;
-            cursor: pointer;
-            padding: 3px 0;
-            user-select: none;
-        }
-        .toggle-row input { display: none; }
-        .toggle-switch {
-            width: 34px;
-            height: 19px;
-            background: rgba(255, 255, 255, 0.18);
-            border-radius: 20px;
-            position: relative;
-            transition: 0.25s;
-            flex-shrink: 0;
-        }
-        .toggle-switch::after {
-            content: '';
-            width: 15px;
-            height: 15px;
-            background: #fff;
-            border-radius: 50%;
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            transition: 0.25s;
-        }
-        .toggle-row input:checked + .toggle-switch { background: #10b981; }
-        .toggle-row input:checked + .toggle-switch::after { transform: translateX(15px); }
-
-        /* Furniture Editor Panel */
-        #furniture-editor {
-            position: absolute;
-            bottom: 66px;
-            left: 14px;
-            width: 345px;
-            padding: 12px;
-            z-index: 15;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        #furniture-editor.minimized #editor-body { display: none; }
-        .editor-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 6px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .editor-title {
-            font-size: 12.5px;
-            font-weight: 700;
-            color: #38bdf8;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .furniture-select {
-            width: 100%;
-            background: rgba(15, 23, 42, 0.95);
-            color: #fff;
-            border: 1px solid rgba(56, 189, 248, 0.4);
-            border-radius: 8px;
-            padding: 7px 9px;
-            font-size: 12px;
-            font-weight: 600;
-            outline: none;
-            margin-bottom: 6px;
-        }
-        .control-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 7px;
-        }
-        .control-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 8px;
-            padding: 6px 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .control-lbl {
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-            color: #94a3b8;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        .control-lbl span.val { color: #38bdf8; font-weight: 700; }
-        .stepper-row {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .step-btn {
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            color: #fff;
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
-        }
-        .step-btn:active { background: #0284c7; }
-        .step-input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #fff;
-            text-align: center;
-            font-size: 11.5px;
-            font-weight: 600;
-            border-radius: 5px;
-            padding: 3px 2px;
-        }
-        input[type="range"] {
-            width: 100%;
-            accent-color: #38bdf8;
-            height: 4px;
-            cursor: pointer;
-        }
-        .editor-actions {
-            display: flex;
-            gap: 6px;
-            margin-top: 6px;
-        }
-        .action-btn {
-            flex: 1;
-            padding: 7px;
-            border-radius: 7px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid transparent;
-            text-align: center;
-        }
-        .btn-delete { background: rgba(239, 68, 68, 0.18); border-color: rgba(239, 68, 68, 0.45); color: #f87171; }
-        .btn-export { background: rgba(56, 189, 248, 0.18); border-color: rgba(56, 189, 248, 0.45); color: #38bdf8; }
-
-        /* Bottom Bar */
-        #bottom-bar {
-            position: absolute;
-            bottom: 14px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 7px 12px;
-            z-index: 10;
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            max-width: 96vw;
-            scrollbar-width: none;
-        }
-        #bottom-bar::-webkit-scrollbar { display: none; }
-        .view-chip {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: #cbd5e1;
-            padding: 6px 12px;
-            border-radius: 18px;
-            font-size: 11.5px;
-            font-weight: 500;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-        .view-chip:hover, .view-chip.active {
-            background: #0284c7;
-            border-color: #38bdf8;
-            color: #fff;
-        }
-
-        /* Architectural Labels on Plan */
-        #labels-container {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 5;
-        }
-        .arch-label {
-            position: absolute;
-            transform: translate(-50%, -50%);
-            font-family: 'JetBrains Mono', monospace;
-            color: #111827;
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 0.6px;
-            white-space: nowrap;
-            text-shadow: 0 0 4px #ffffff, 0 0 6px #ffffff;
-        }
-        .arch-label.sm {
-            font-size: 10.5px;
-        }
-        .arch-label.vertical {
-            transform: translate(-50%, -50%) rotate(-90deg);
-            font-size: 11px;
-        }
-        .arch-label.dim {
-            font-size: 12px;
-            color: #334155;
-            font-weight: 600;
-        }
-        .arch-label.dim-v {
-            transform: translate(-50%, -50%) rotate(-90deg);
-            font-size: 12px;
-            color: #334155;
-            font-weight: 600;
-        }
-
-        /* Modals */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(4px);
-            z-index: 100;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-        .modal-box {
-            max-width: 720px;
-            width: 100%;
-            max-height: 92vh;
-            overflow-y: auto;
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .preset-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        .add-preset-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            color: #f1f5f9;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: left;
-            transition: 0.2s;
-        }
-        .add-preset-btn:hover { background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; }
-
-        /* Mobile UI Optimization */
-        @media (max-width: 900px) {
-            #top-ui-wrapper {
-                top: 6px;
-                left: 6px;
-                right: 6px;
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            #header-card {
-                max-width: none;
-                width: 100%;
-                padding: 6px 10px;
-                border-radius: 10px;
-                gap: 2px;
-            }
-            #header-card h1 { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .badge { font-size: 9px; padding: 2px 7px; }
-            .metrics-row { gap: 8px; margin-top: 2px; padding-top: 3px; }
-            .metric-val { font-size: 11px; }
-            .metric-lbl { font-size: 7.5px; }
-            .icon-btn { font-size: 9px; padding: 2px 6px; }
-
-            #top-toolbar {
-                width: 100%;
-                justify-content: space-between;
-                padding: 4px 6px;
-                border-radius: 10px;
-                gap: 3px;
-            }
-            .mode-btn {
-                padding: 4px 6px;
-                font-size: 10px;
-                flex: 1;
-                justify-content: center;
-                gap: 3px;
-            }
-            #top-toolbar .icon-btn {
-                padding: 3px 6px !important;
-                font-size: 10px !important;
-            }
-
-            #sidebar-right {
-                top: 92px;
-                right: 6px;
-                display: none;
-                width: 210px;
-                z-index: 30;
-                padding: 10px;
-            }
-            #sidebar-right.show-mobile { display: flex; }
-
-            #furniture-editor {
-                bottom: 44px;
-                left: 6px;
-                right: 6px;
-                width: auto;
-                padding: 6px 10px;
-                border-radius: 10px;
-            }
-            .editor-title { font-size: 11px; }
-
-            #bottom-bar {
-                bottom: 4px;
-                left: 6px;
-                right: 6px;
-                transform: none;
-                max-width: none;
-                padding: 3px 6px;
-                border-radius: 20px;
-                gap: 4px;
-            }
-            .view-chip {
-                padding: 4px 8px;
-                font-size: 9.5px;
-            }
-
-            .arch-label {
-                font-size: 10px;
-            }
-            .arch-label.sm {
-                font-size: 8.5px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Departamento 01-01 | Plano 2D y 3D Interactivo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: #0b1120; color: #f8fafc; overflow: hidden; height: 100vh; }
+    header {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px);
+      padding: 12px 24px; display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .title-group { display: flex; align-items: center; gap: 12px; }
+    h1 { font-size: 16px; font-weight: 700; color: #f8fafc; }
+    .badge { font-size: 11px; background: #0284c7; color: white; padding: 4px 10px; border-radius: 999px; font-weight: 600; }
+    .nav-buttons { display: flex; gap: 8px; }
+    button {
+      background: #1e293b; border: 1px solid #475569; color: #f8fafc;
+      padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    button:hover { background: #334155; border-color: #38bdf8; }
+    button.active { background: #0284c7; border-color: #38bdf8; color: white; }
+    #container-3d { width: 100vw; height: 100vh; display: block; }
+    #container-2d {
+      width: 100vw; height: 100vh; display: none;
+      justify-content: center; align-items: center; background: #0f172a;
+      overflow: auto; padding: 60px 20px 20px;
+    }
+    #container-2d svg { max-width: 90vw; max-height: 85vh; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .hint-3d {
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(6px);
+      padding: 6px 16px; border-radius: 999px; font-size: 12px; color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.1); pointer-events: none;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
-
-    <div id="webgl-container"></div>
-    <div id="labels-container"></div>
-
-    <!-- Top UI Container (Evita cualquier superposición en móviles) -->
-    <div id="top-ui-wrapper">
-        <!-- Header Card -->
-        <div id="header-card" class="glass-panel">
-            <div class="header-top">
-                <div class="badge" style="background: linear-gradient(135deg, #10b981, #059669);">Escritura: 54,16 m²</div>
-                <div class="header-actions">
-                    <a href="plano_arquitectonico_2d.png" download="Plano_2D_63x62.png" class="icon-btn">⬇️ PNG 2D</a>
-                    <button class="icon-btn" id="btn-toggle-layers">⚙️ Capas</button>
-                </div>
-            </div>
-            <h1>Plano Arquitectónico Exacto (6.30m × 6.20m)</h1>
-            <div class="metrics-row">
-                <div class="metric"><span class="metric-val">54,16 m²</span><span class="metric-lbl">Escritura Oficial</span></div>
-                <div class="metric"><span class="metric-val">39,06 m²</span><span class="metric-lbl">Planta Libre (6.30×6.20)</span></div>
-                <div class="metric"><span class="metric-val">6.30 m</span><span class="metric-lbl">Ancho (X)</span></div>
-                <div class="metric"><span class="metric-val">6.20 m</span><span class="metric-lbl">Alto (Y)</span></div>
-            </div>
-        </div>
-
-        <!-- Top Mode Switcher -->
-        <div id="top-toolbar" class="glass-panel">
-            <button class="mode-btn active" id="btn-mode-2d"><span>📐</span> 2D</button>
-            <button class="mode-btn" id="btn-mode-3d"><span>🧊</span> 3D Muros</button>
-            <button class="mode-btn" id="btn-mode-cut"><span>✂️</span> Bajas</button>
-            <button class="mode-btn" id="btn-mode-nowalls"><span>🚫</span> Sin Paredes</button>
-            <div style="display:flex; gap:3px; margin-left:2px; border-left:1px solid rgba(255,255,255,0.15); padding-left:4px;">
-                <button class="icon-btn" id="btn-zoom-in" title="Acercar plano" style="padding:4px 6px; font-size:11px; font-weight:700;">🔍 +</button>
-                <button class="icon-btn" id="btn-zoom-out" title="Alejar plano" style="padding:4px 6px; font-size:11px; font-weight:700;">🔍 −</button>
-                <button class="icon-btn" id="btn-zoom-reset" title="Restablecer vista" style="padding:4px 6px; font-size:11px;">⟲</button>
-            </div>
-        </div>
+  <header>
+    <div class="title-group">
+      <h1>Departamento 01-01</h1>
+      <span class="badge">Área: 40.85 m²</span>
     </div>
-
-    <!-- Right Sidebar (Visibility & Layers) -->
-    <div id="sidebar-right" class="glass-panel">
-        <div class="panel-title">Paredes y Visibilidad</div>
-        <label class="toggle-row" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 6px; padding: 5px 8px;">
-            <span style="font-weight: 700; color: #fca5a5;">Ocultar Todas las Paredes</span>
-            <input type="checkbox" id="chk-hide-all-walls">
-            <div class="toggle-switch"></div>
-        </label>
-        <label class="toggle-row">
-            <span>Paredes Exteriores</span>
-            <input type="checkbox" id="chk-ext-walls" checked>
-            <div class="toggle-switch"></div>
-        </label>
-        <label class="toggle-row">
-            <span>Tabiques Interiores</span>
-            <input type="checkbox" id="chk-int-walls" checked>
-            <div class="toggle-switch"></div>
-        </label>
-        <label class="toggle-row">
-            <span>Paredes Bajas (1.10 m)</span>
-            <input type="checkbox" id="chk-wall-cut">
-            <div class="toggle-switch"></div>
-        </label>
-        <label class="toggle-row">
-            <span>Paredes Transparentes</span>
-            <input type="checkbox" id="chk-transparent">
-            <div class="toggle-switch"></div>
-        </label>
-        <label class="toggle-row">
-            <span>Mobiliario 3D</span>
-            <input type="checkbox" id="chk-furniture" checked>
-            <div class="toggle-switch"></div>
-        </label>
-        <label class="toggle-row">
-            <span>Etiquetas de Ambientes</span>
-            <input type="checkbox" id="chk-labels" checked>
-            <div class="toggle-switch"></div>
-        </label>
-
-        <div class="panel-title" style="margin-top: 6px;">Exportar</div>
-        <button class="ui-btn" id="btn-export-obj" style="background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.45); color: #34d399;">
-            <span>💾</span> Descargar .OBJ (Blender)
-        </button>
+    <div class="nav-buttons">
+      <button id="btn-3d" class="active" onclick="switchView('3d')">🎮 Vista 3D</button>
+      <button id="btn-2d" onclick="switchView('2d')">📐 Plano 2D Técnico</button>
+      <button onclick="resetCamera()">⟲ Centrar</button>
     </div>
-
-    <!-- Furniture Editor Panel -->
-    <div id="furniture-editor" class="glass-panel minimized">
-        <div class="editor-header">
-            <div class="editor-title">
-                <span>🛋️</span> Muebles (<span id="lbl-count">0</span>)
-            </div>
-            <div style="display: flex; gap: 5px;">
-                <button class="icon-btn" id="btn-add-modal" style="background:#059669; border-color:#10b981; color:#fff;">+ Añadir Mueble</button>
-                <button class="icon-btn" id="btn-min-editor" title="Expandir/Minimizar">▲</button>
-            </div>
-        </div>
-
-        <div id="editor-body">
-            <div id="empty-furniture-msg" style="font-size:11.5px; color:#94a3b8; padding:8px 0; text-align:center;">
-                El plano está limpio (sin muebles). Tocá <b>"+ Añadir Mueble"</b> para ir agregando y midiendo tus muebles.
-            </div>
-
-            <div id="editor-controls" style="display:none;">
-                <select id="furniture-select" class="furniture-select"></select>
-
-                <div class="control-grid">
-                    <div class="control-box">
-                        <div class="control-lbl">Ancho (X) <span class="val" id="lbl-dim-w">1.40 m</span></div>
-                        <div class="stepper-row">
-                            <div class="step-btn" data-field="w" data-delta="-0.05">-</div>
-                            <input type="number" step="0.01" class="step-input" id="inp-w">
-                            <div class="step-btn" data-field="w" data-delta="0.05">+</div>
-                        </div>
-                        <input type="range" min="0.2" max="4.0" step="0.02" id="rng-w">
-                    </div>
-
-                    <div class="control-box">
-                        <div class="control-lbl">Largo (Y) <span class="val" id="lbl-dim-d">1.90 m</span></div>
-                        <div class="stepper-row">
-                            <div class="step-btn" data-field="d" data-delta="-0.05">-</div>
-                            <input type="number" step="0.01" class="step-input" id="inp-d">
-                            <div class="step-btn" data-field="d" data-delta="0.05">+</div>
-                        </div>
-                        <input type="range" min="0.2" max="4.0" step="0.02" id="rng-d">
-                    </div>
-                </div>
-
-                <div class="control-grid" style="margin-top: 6px;">
-                    <div class="control-box">
-                        <div class="control-lbl">Altura <span class="val" id="lbl-dim-h">0.45 m</span></div>
-                        <div class="stepper-row">
-                            <div class="step-btn" data-field="h" data-delta="-0.05">-</div>
-                            <input type="number" step="0.01" class="step-input" id="inp-h">
-                            <div class="step-btn" data-field="h" data-delta="0.05">+</div>
-                        </div>
-                        <input type="range" min="0.1" max="2.6" step="0.02" id="rng-h">
-                    </div>
-
-                    <div class="control-box">
-                        <div class="control-lbl">Rotación <span class="val" id="lbl-rot">0°</span></div>
-                        <div class="stepper-row">
-                            <div class="step-btn" id="btn-rot-left">⟲</div>
-                            <input type="number" class="step-input" id="inp-rot">
-                            <div class="step-btn" id="btn-rot-right">⟳</div>
-                        </div>
-                        <input type="range" min="0" max="360" step="5" id="rng-rot">
-                    </div>
-                </div>
-
-                <div class="control-grid" style="margin-top: 6px;">
-                    <div class="control-box">
-                        <div class="control-lbl">Pos X (0-7m) <span class="val" id="lbl-pos-x">1.20 m</span></div>
-                        <div class="stepper-row">
-                            <div class="step-btn" data-field="x" data-delta="-0.05">◀</div>
-                            <input type="number" step="0.01" class="step-input" id="inp-x">
-                            <div class="step-btn" data-field="x" data-delta="0.05">▶</div>
-                        </div>
-                        <input type="range" min="0.1" max="6.9" step="0.05" id="rng-x">
-                    </div>
-
-                    <div class="control-box">
-                        <div class="control-lbl">Pos Y (0-6.2m) <span class="val" id="lbl-pos-z">5.30 m</span></div>
-                        <div class="stepper-row">
-                            <div class="step-btn" data-field="z" data-delta="-0.05">▲</div>
-                            <input type="number" step="0.01" class="step-input" id="inp-z">
-                            <div class="step-btn" data-field="z" data-delta="0.05">▼</div>
-                        </div>
-                        <input type="range" min="0.1" max="6.1" step="0.05" id="rng-z">
-                    </div>
-                </div>
-
-                <div class="editor-actions">
-                    <button class="action-btn btn-delete" id="btn-del-furniture">🗑️ Eliminar</button>
-                    <button class="action-btn btn-export" id="btn-copy-json">📋 Copiar Medidas</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom Quick Camera Views -->
-    <div id="bottom-bar" class="glass-panel">
-        <div class="view-chip active" data-view="top2d">📐 Plano 2D Exacto (Ortogonal)</div>
-        <div class="view-chip" data-view="isom">🧊 Maqueta 3D General</div>
-        <div class="view-chip" data-view="living">🛋️ Living y Entrada</div>
-        <div class="view-chip" data-view="cocina">🍳 Cocina</div>
-        <div class="view-chip" data-view="cuarto">🛏️ Cuarto</div>
-        <div class="view-chip" data-view="bano">🚿 Baño y Pasillo</div>
-        <div class="view-chip" data-view="estudio">🖥️ Estudio</div>
-    </div>
-
-    <!-- Modal Añadir Mueble -->
-    <div class="modal-overlay" id="add-modal">
-        <div class="modal-box glass-panel" style="max-width:420px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="font-size:14px; color:#38bdf8;">➕ Añadir Mueble al Plano</h3>
-                <button class="icon-btn" id="btn-close-add">✕</button>
-            </div>
-            <div class="preset-grid">
-                <button class="add-preset-btn" data-type="cama">🛏️ Cama 2 Plazas (1.40×1.90m)</button>
-                <button class="add-preset-btn" data-type="cama_simple">🛌 Cama 1 Plaza (0.90×1.90m)</button>
-                <button class="add-preset-btn" data-type="sillon">🛋️ Sillón 3 Cuerpos (2.00×0.85m)</button>
-                <button class="add-preset-btn" data-type="mesa">🍽️ Mesa Comedor (1.40×0.80m)</button>
-                <button class="add-preset-btn" data-type="escritorio">🖥️ Escritorio (1.40×0.65m)</button>
-                <button class="add-preset-btn" data-type="placard">🚪 Placard (1.60×0.50m)</button>
-                <button class="add-preset-btn" data-type="heladera">❄️ Heladera (0.60×0.60m)</button>
-                <button class="add-preset-btn" data-type="cubo">📦 Mueble a Medida (1.00×1.00m)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Exportar Medidas JSON -->
-    <div class="modal-overlay" id="json-modal">
-        <div class="modal-box glass-panel" style="max-width:480px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="font-size:14px; color:#38bdf8;">📋 Medidas de Muebles (JSON)</h3>
-                <button class="icon-btn" id="btn-close-json">✕</button>
-            </div>
-            <textarea id="json-text" rows="9" style="width:100%; background:#060911; color:#38bdf8; border:1px solid rgba(56,189,248,0.3); border-radius:8px; padding:8px; font-family:monospace; font-size:11px;"></textarea>
-            <div style="display:flex; gap:8px;">
-                <button class="action-btn btn-export" id="btn-copy-clipboard">📋 Copiar al Portapapeles</button>
-                <button class="action-btn btn-delete" id="btn-clear-all">🗑️ Vaciar Todos</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // ============================================================================
-        // 1. CÁMARA ORTOGRÁFICA (2D EXACTO SIN DEFORMACIÓN) + CÁMARA PERSPECTIVA (3D)
-        // ============================================================================
-        const container = document.getElementById('webgl-container');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xffffff);
-
-        const perspCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-        perspCam.position.set(3.50, 10.5, 9.20);
-
-        function getOrthoViewSize() {
-            const aspect = window.innerWidth / window.innerHeight;
-            // En pantallas verticales móviles (aspect < 1.0), dejamos margen para que barras arriba y abajo no tapen nada
-            if (aspect < 1.0) {
-                return 10.2 / aspect;
-            }
-            return 8.8;
-        }
-
-        function createOrthoCam() {
-            const aspect = window.innerWidth / window.innerHeight;
-            const viewSize = getOrthoViewSize();
-            const cam = new THREE.OrthographicCamera(
-                -viewSize * aspect / 2,
-                viewSize * aspect / 2,
-                viewSize / 2,
-                -viewSize / 2,
-                0.1,
-                100
-            );
-            cam.position.set(3.15, 20, 3.10);
-            cam.up.set(0, 0, -1); // Norte (Y=0) arriba en pantalla, Sur (Y=6.20) abajo
-            cam.lookAt(3.15, 0, 3.10);
-            return cam;
-        }
-        const orthoCam = createOrthoCam();
-
-        // Arranca en modo Plano 2D Ortográfico Exacto para que coincida 1:1 con el plano 2D
-        let activeCamera = orthoCam;
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        container.appendChild(renderer.domElement);
-
-        const controlsPersp = new THREE.OrbitControls(perspCam, renderer.domElement);
-        controlsPersp.target.set(3.15, 0.3, 3.10);
-        controlsPersp.enableDamping = true;
-        controlsPersp.dampingFactor = 0.06;
-        controlsPersp.maxPolarAngle = Math.PI / 2 - 0.02;
-        controlsPersp.enabled = false;
-
-        // Controles para 2D Ortográfico (Zoom con rueda / pellizco táctil y Pan / desplazamiento)
-        const controlsOrtho = new THREE.OrbitControls(orthoCam, renderer.domElement);
-        controlsOrtho.target.set(3.15, 0, 3.10);
-        controlsOrtho.enableDamping = true;
-        controlsOrtho.dampingFactor = 0.08;
-        controlsOrtho.enableRotate = false; // Solo zoom y pan en 2D plano
-        controlsOrtho.screenSpacePanning = true;
-        controlsOrtho.minZoom = 0.4;
-        controlsOrtho.maxZoom = 4.0;
-        controlsOrtho.enabled = true; // Activo para zoom y arrastre desde el inicio
-
-        // Iluminación
-        scene.add(new THREE.AmbientLight(0xffffff, 0.85));
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.45);
-        dirLight.position.set(6, 15, 8);
-        dirLight.castShadow = true;
-        scene.add(dirLight);
-
-        // Materiales arquitectónicos limpios
-        const floorMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
-        const extWallMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.5 });
-        const intWallMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.5 });
-        const topCapMat = new THREE.MeshBasicMaterial({ color: 0x111827 }); // Trazo negro arquitectónico
-
-        const apartmentGroup = new THREE.Group();
-        const floorGroup = new THREE.Group();
-        const exteriorWallsGroup = new THREE.Group();
-        const interiorWallsGroup = new THREE.Group();
-        const furnitureGroup = new THREE.Group();
-        const lines2DGroup = new THREE.Group();
-
-        apartmentGroup.add(floorGroup, exteriorWallsGroup, interiorWallsGroup, furnitureGroup, lines2DGroup);
-        scene.add(apartmentGroup);
-
-        const WALL_H = 2.60;
-        const EXT_T = 0.12;
-        const INT_T = 0.08;
-
-        // ============================================================================
-        // 2. PISO RECTANGULAR SIMPLE: 6.30 m (X: 0.00 a 6.30) × 6.20 m (Y: 0.00 a 6.20)
-        // ============================================================================
-        const floorGeo = new THREE.BoxGeometry(6.30, 0.06, 6.20);
-        const floorMesh = new THREE.Mesh(floorGeo, floorMat);
-        floorMesh.position.set(3.15, -0.03, 3.10);
-        floorMesh.receiveShadow = true;
-        floorGroup.add(floorMesh);
-
-        function addWallSegment(x1, z1, x2, z2, thickness, group, isExterior = false) {
-            const dx = x2 - x1;
-            const dz = z2 - z1;
-            const len = Math.hypot(dx, dz);
-            if (len < 0.005) return;
-            const angle = Math.atan2(dz, dx);
-
-            const holder = new THREE.Group();
-            holder.position.set((x1 + x2) / 2, 0, (z1 + z2) / 2);
-            holder.rotation.y = -angle;
-
-            const bodyGeo = new THREE.BoxGeometry(len, WALL_H, thickness);
-            const bodyMesh = new THREE.Mesh(bodyGeo, isExterior ? extWallMat : intWallMat);
-            bodyMesh.position.set(0, WALL_H / 2, 0);
-            bodyMesh.castShadow = true;
-            bodyMesh.receiveShadow = true;
-            holder.add(bodyMesh);
-
-            const capGeo = new THREE.BoxGeometry(len + 0.01, 0.02, thickness + 0.01);
-            const capMesh = new THREE.Mesh(capGeo, topCapMat);
-            capMesh.position.set(0, WALL_H + 0.01, 0);
-            holder.add(capMesh);
-
-            group.add(holder);
-        }
-
-        function addDashedLine(x1, z1, x2, z2) {
-            const dist = Math.hypot(x2 - x1, z2 - z1);
-            const dx = (x2 - x1) / dist;
-            const dz = (z2 - z1) / dist;
-            const dash = 0.07, gap = 0.06;
-            let curr = 0;
-            while (curr < dist) {
-                const end = Math.min(curr + dash, dist);
-                const len = end - curr;
-                if (len > 0.01) {
-                    const mx = x1 + dx * (curr + end) / 2;
-                    const mz = z1 + dz * (curr + end) / 2;
-                    const geo = new THREE.BoxGeometry(len, 0.01, 0.025);
-                    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x718096 }));
-                    mesh.position.set(mx, 0.01, mz);
-                    mesh.rotation.y = -Math.atan2(dz, dx);
-                    lines2DGroup.add(mesh);
-                }
-                curr += dash + gap;
-            }
-        }
-
-        // ============================================================================
-        // 3. REGLA 1: PERÍMETRO EXTERIOR (Rectángulo simple 6.30 m × 6.20 m)
-        // ============================================================================
-        // Muro superior continuo: Y = 0.00 (X = 0.00 a 6.30)
-        addWallSegment(0.00, 0.00, 6.30, 0.00, EXT_T, exteriorWallsGroup, true);
-        // Muro izquierdo continuo: X = 0.00 (Y = 0.00 a 6.20)
-        addWallSegment(0.00, 0.00, 0.00, 6.20, EXT_T, exteriorWallsGroup, true);
-        // Muro derecho continuo: X = 6.30 (Y = 0.00 a 6.20)
-        addWallSegment(6.30, 0.00, 6.30, 6.20, EXT_T, exteriorWallsGroup, true);
-        // Muro inferior continuo: Y = 6.20 (X = 0.00 a 6.30) con Puerta de Entrada en X = 5.20 a 6.10
-        addWallSegment(0.00, 6.20, 5.20, 6.20, EXT_T, exteriorWallsGroup, true);
-        addWallSegment(6.10, 6.20, 6.30, 6.20, EXT_T, exteriorWallsGroup, true);
-
-        // Jambas de Puerta de Entrada en X = 5.20 y X = 6.10 sobre Y = 6.20 (vano de 0.90 m)
-        addWallSegment(5.20, 6.07, 5.20, 6.33, 0.04, exteriorWallsGroup, true);
-        addWallSegment(6.10, 6.07, 6.10, 6.33, 0.04, exteriorWallsGroup, true);
-        const entranceThreshold = new THREE.Mesh(
-            new THREE.BoxGeometry(0.90, 0.01, 0.02),
-            new THREE.MeshBasicMaterial({ color: 0x94a3b8 })
-        );
-        entranceThreshold.position.set(5.65, 0.01, 6.20);
-        lines2DGroup.add(entranceThreshold);
-
-        // ============================================================================
-        // 4. REGLA 2: EJES VERTICALES PRINCIPALES
-        // ============================================================================
-        // X = 1.70: Cerramiento de Baño y Placards (desde Y = 2.00 hasta Y = 4.20)
-        // Puerta de acceso al Baño en el centro (entre Y = 2.80 y Y = 3.40) abriendo desde el Pasillo
-        addWallSegment(1.70, 2.00, 1.70, 2.80, INT_T, interiorWallsGroup, false);
-        addDashedLine(1.70, 2.80, 1.70, 3.40);
-        addWallSegment(1.70, 3.40, 1.70, 4.20, INT_T, interiorWallsGroup, false);
-
-        // X = 3.00: Eje central divisorio
-        // 1) Separa Estudio y Pasillo del Living (desde Y = 0.00 hasta Y = 3.50)
-        addWallSegment(3.00, 0.00, 3.00, 3.50, INT_T, interiorWallsGroup, false);
-        addWallSegment(2.91, 3.50, 3.09, 3.50, 0.05, interiorWallsGroup, false);
-        // Entre Y = 3.50 y Y = 4.20: Paso totalmente abierto de 0.70 m en X = 3.00
-        addDashedLine(3.00, 3.50, 3.00, 4.20);
-        // 2) Separa el Cuarto de la Cocina (desde Y = 4.20 hasta Y = 6.20)
-        addWallSegment(3.00, 4.20, 3.00, 6.20, INT_T, interiorWallsGroup, false);
-
-        // X = 5.00: Pared derecha de la Cocina (desde Y = 4.20 hasta Y = 6.20)
-        addWallSegment(5.00, 4.20, 5.00, 6.20, INT_T, interiorWallsGroup, false);
-
-        // ============================================================================
-        // 5. REGLA 3: LÍNEAS HORIZONTALES Y ALINEACIONES CRÍTICAS (SIMETRÍA ESTUDIO = CUARTO)
-        // ============================================================================
-        // Y = 2.00: Línea de cierre del Estudio (2.00 m de alto)
-        // De X = 0.00 a X = 1.70: Muro cerrado que divide el Estudio del Placard 1
-        addWallSegment(0.00, 2.00, 1.70, 2.00, INT_T, interiorWallsGroup, false);
-        // De X = 1.70 a X = 3.00: Vano/puerta de entrada al Estudio (X = 1.90 a 2.80)
-        addWallSegment(1.70, 2.00, 1.90, 2.00, INT_T, interiorWallsGroup, false);
-        addDashedLine(1.90, 2.00, 2.80, 2.00);
-        addWallSegment(2.80, 2.00, 3.00, 2.00, INT_T, interiorWallsGroup, false);
-
-        // Y = 2.50: Muro horizontal que divide el Placard 1 (0.50 m de alto) del Baño (de X = 0.00 a X = 1.70)
-        addWallSegment(0.00, 2.50, 1.70, 2.50, INT_T, interiorWallsGroup, false);
-
-        // Y = 3.70: Muro horizontal que divide el Baño (1.20 m de alto) del Placard 2 (de X = 0.00 a X = 1.70)
-        addWallSegment(0.00, 3.70, 1.70, 3.70, INT_T, interiorWallsGroup, false);
-
-        // Y = 4.20: Línea horizontal unificada de Cuarto y Cocina (2.00 m desde la base)
-        // 1) Muro inferior del Placard 2 (0.50 m de alto, de X = 0.00 a X = 1.70)
-        addWallSegment(0.00, 4.20, 1.70, 4.20, INT_T, interiorWallsGroup, false);
-        // 2) Vano/puerta de entrada al Cuarto (X = 1.90 a 2.80)
-        addWallSegment(1.70, 4.20, 1.90, 4.20, INT_T, interiorWallsGroup, false);
-        addDashedLine(1.90, 4.20, 2.80, 4.20);
-        addWallSegment(2.80, 4.20, 3.00, 4.20, INT_T, interiorWallsGroup, false);
-        // 3) Frente superior de la Cocina con su vano amplio de acceso (de X = 3.25 a X = 4.65)
-        addWallSegment(3.00, 4.20, 3.25, 4.20, INT_T, interiorWallsGroup, false);
-        addDashedLine(3.25, 4.20, 4.65, 4.20);
-        addWallSegment(4.65, 4.20, 5.00, 4.20, INT_T, interiorWallsGroup, false);
-
-        // ============================================================================
-        // 6. ETIQUETAS DE AMBIENTES EN COORDENADAS EXACTAS
-        // ============================================================================
-        const labelElements = [];
-        function addPlanLabel(x, z, text, cls = 'arch-label') {
-            const el = document.createElement('div');
-            el.className = cls;
-            el.innerText = text;
-            document.getElementById('labels-container').appendChild(el);
-            labelElements.push({ el, pos: new THREE.Vector3(x, 0.1, z) });
-        }
-
-        // Estudio: [0.00, 0.00] a [3.00, 2.00] (3.00 m × 2.00 m)
-        addPlanLabel(1.50, 1.00, "ESTUDIO");
-        // Placard 1: [0.00, 2.00] a [1.70, 2.50] (1.70 m × 0.50 m)
-        addPlanLabel(0.85, 2.25, "PLACARD", "arch-label sm");
-        // Baño: [0.00, 2.50] a [1.70, 3.70] (1.70 m × 1.20 m)
-        addPlanLabel(0.85, 3.10, "BAÑO");
-        // Placard 2: [0.00, 3.70] a [1.70, 4.20] (1.70 m × 0.50 m)
-        addPlanLabel(0.85, 3.95, "PLACARD", "arch-label sm");
-        // Pasillo: [1.70, 2.00] a [3.00, 4.20] (1.30 m × 2.20 m)
-        addPlanLabel(2.35, 3.10, "PASILLO", "arch-label vertical");
-        // Cuarto: [0.00, 4.20] a [3.00, 6.20] (3.00 m × 2.00 m — idéntico al Estudio)
-        addPlanLabel(1.50, 5.20, "CUARTO");
-        // Cocina: [3.00, 4.20] a [5.00, 6.20] (2.00 m × 2.00 m)
-        addPlanLabel(4.00, 5.20, "COCINA");
-        // Living: [3.00, 0.00] a [6.30, 4.20] + [5.00, 4.20] a [6.30, 6.20]
-        addPlanLabel(4.65, 2.10, "LIVING");
-        // Entrada: X = 5.20 a 6.10 sobre Y = 6.20
-        addPlanLabel(5.65, 6.55, "ENTRADA", "arch-label sm");
-
-        // Cotas Exteriores
-        addPlanLabel(3.15, -0.32, "6.30 m", "arch-label dim");
-        addPlanLabel(-0.32, 3.10, "6.20 m", "arch-label dim-v");
-
-        function updateLabels() {
-            const containerEl = document.getElementById('labels-container');
-            if (!document.getElementById('chk-labels').checked) {
-                containerEl.style.display = 'none';
-                return;
-            }
-            containerEl.style.display = 'block';
-            const halfW = window.innerWidth / 2;
-            const halfH = window.innerHeight / 2;
-            for (const item of labelElements) {
-                const p = item.pos.clone().project(activeCamera);
-                if (p.z > 1.0) {
-                    item.el.style.display = 'none';
-                    continue;
-                }
-                item.el.style.display = 'block';
-                item.el.style.left = `${(p.x * halfW) + halfW}px`;
-                item.el.style.top = `${-(p.y * halfH) + halfH}px`;
-            }
-        }
-
-        // ============================================================================
-        // 7. GESTOR DE MUEBLES (Inicia limpio sin bloques extra para respetar el plano)
-        // ============================================================================
-        const STORAGE_KEY = 'depto_7x62_clean_v4';
-        let furnitureList = [];
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try { furnitureList = JSON.parse(saved); } catch (e) { furnitureList = []; }
-        }
-
-        let selectedId = furnitureList[0] ? furnitureList[0].id : null;
-        let furnitureMeshes = [];
-        let selectionBox = null;
-
-        function renderFurniture3D() {
-            while (furnitureGroup.children.length > 0) {
-                furnitureGroup.remove(furnitureGroup.children[0]);
-            }
-            furnitureMeshes = [];
-
-            furnitureList.forEach(item => {
-                const geo = new THREE.BoxGeometry(item.w, item.h, item.d);
-                const mat = new THREE.MeshStandardMaterial({
-                    color: item.color || 0x0284c7,
-                    roughness: 0.45
-                });
-                const mesh = new THREE.Mesh(geo, mat);
-                mesh.position.set(item.x, item.y, item.z);
-                mesh.rotation.y = (item.rot || 0) * (Math.PI / 180);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                mesh.userData = { id: item.id };
-
-                furnitureGroup.add(mesh);
-                furnitureMeshes.push(mesh);
-            });
-
-            document.getElementById('lbl-count').innerText = furnitureList.length;
-            const emptyMsg = document.getElementById('empty-furniture-msg');
-            const ctrlBox = document.getElementById('editor-controls');
-            if (furnitureList.length === 0) {
-                emptyMsg.style.display = 'block';
-                ctrlBox.style.display = 'none';
-            } else {
-                emptyMsg.style.display = 'none';
-                ctrlBox.style.display = 'block';
-            }
-
-            updateSelectionVisual();
-            populateSelectOptions();
-            syncFormWithSelected();
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
-        }
-
-        function updateSelectionVisual() {
-            if (selectionBox) scene.remove(selectionBox);
-            const selMesh = furnitureMeshes.find(m => m.userData.id === selectedId);
-            if (selMesh && document.getElementById('chk-furniture').checked) {
-                selectionBox = new THREE.BoxHelper(selMesh, 0x0284c7);
-                scene.add(selectionBox);
-            }
-        }
-
-        function populateSelectOptions() {
-            const sel = document.getElementById('furniture-select');
-            sel.innerHTML = '';
-            furnitureList.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item.id;
-                opt.innerText = `[${item.room || 'Mueble'}] ${item.name}`;
-                if (item.id === selectedId) opt.selected = true;
-                sel.appendChild(opt);
-            });
-        }
-
-        function syncFormWithSelected() {
-            const item = furnitureList.find(f => f.id === selectedId);
-            if (!item) return;
-
-            document.getElementById('lbl-dim-w').innerText = `${item.w.toFixed(2)} m`;
-            document.getElementById('inp-w').value = item.w;
-            document.getElementById('rng-w').value = item.w;
-
-            document.getElementById('lbl-dim-d').innerText = `${item.d.toFixed(2)} m`;
-            document.getElementById('inp-d').value = item.d;
-            document.getElementById('rng-d').value = item.d;
-
-            document.getElementById('lbl-dim-h').innerText = `${item.h.toFixed(2)} m`;
-            document.getElementById('inp-h').value = item.h;
-            document.getElementById('rng-h').value = item.h;
-
-            document.getElementById('lbl-pos-x').innerText = `${item.x.toFixed(2)} m`;
-            document.getElementById('inp-x').value = item.x;
-            document.getElementById('rng-x').value = item.x;
-
-            document.getElementById('lbl-pos-z').innerText = `${item.z.toFixed(2)} m`;
-            document.getElementById('inp-z').value = item.z;
-            document.getElementById('rng-z').value = item.z;
-
-            document.getElementById('lbl-rot').innerText = `${Math.round(item.rot || 0)}°`;
-            document.getElementById('inp-rot').value = Math.round(item.rot || 0);
-            document.getElementById('rng-rot').value = Math.round(item.rot || 0);
-        }
-
-        function updateSelectedItem(field, val) {
-            const item = furnitureList.find(f => f.id === selectedId);
-            if (!item) return;
-
-            if (field === 'w') item.w = Math.max(0.1, parseFloat(val));
-            if (field === 'd') item.d = Math.max(0.1, parseFloat(val));
-            if (field === 'h') {
-                const oldH = item.h;
-                item.h = Math.max(0.05, parseFloat(val));
-                item.y += (item.h - oldH) / 2;
-            }
-            if (field === 'x') item.x = parseFloat(val);
-            if (field === 'z') item.z = parseFloat(val);
-            if (field === 'rot') item.rot = (parseFloat(val) % 360 + 360) % 360;
-
-            renderFurniture3D();
-        }
-
-        document.querySelectorAll('.step-btn[data-field]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const field = btn.dataset.field;
-                const delta = parseFloat(btn.dataset.delta);
-                const item = furnitureList.find(f => f.id === selectedId);
-                if (item) updateSelectedItem(field, item[field] + delta);
-            });
-        });
-
-        ['w', 'd', 'h', 'x', 'z', 'rot'].forEach(f => {
-            document.getElementById(`inp-${f}`).addEventListener('input', (e) => updateSelectedItem(f, e.target.value));
-            document.getElementById(`rng-${f}`).addEventListener('input', (e) => updateSelectedItem(f, e.target.value));
-        });
-
-        document.getElementById('btn-rot-left').addEventListener('click', () => {
-            const item = furnitureList.find(f => f.id === selectedId);
-            if (item) updateSelectedItem('rot', (item.rot || 0) - 90);
-        });
-        document.getElementById('btn-rot-right').addEventListener('click', () => {
-            const item = furnitureList.find(f => f.id === selectedId);
-            if (item) updateSelectedItem('rot', (item.rot || 0) + 90);
-        });
-
-        document.getElementById('furniture-select').addEventListener('change', (e) => {
-            selectedId = e.target.value;
-            renderFurniture3D();
-        });
-
-        document.getElementById('btn-del-furniture').addEventListener('click', () => {
-            furnitureList = furnitureList.filter(f => f.id !== selectedId);
-            selectedId = furnitureList[0] ? furnitureList[0].id : null;
-            renderFurniture3D();
-        });
-
-        // Selección táctil / click
-        const raycaster = new THREE.Raycaster();
-        const pointer = new THREE.Vector2();
-        let downTs = 0;
-
-        window.addEventListener('pointerdown', (e) => {
-            if (e.target === renderer.domElement) downTs = Date.now();
-        });
-        window.addEventListener('pointerup', (e) => {
-            if (e.target !== renderer.domElement || Date.now() - downTs > 250) return;
-            const rect = renderer.domElement.getBoundingClientRect();
-            pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-            pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-            raycaster.setFromCamera(pointer, activeCamera);
-
-            const hits = raycaster.intersectObjects(furnitureMeshes, false);
-            if (hits.length > 0) {
-                selectedId = hits[0].object.userData.id;
-                renderFurniture3D();
-                const ed = document.getElementById('furniture-editor');
-                ed.classList.remove('minimized');
-                document.getElementById('btn-min-editor').innerText = '▼';
-            }
-        });
-
-        // Añadir Mueble Modal
-        const addModal = document.getElementById('add-modal');
-        document.getElementById('btn-add-modal').addEventListener('click', () => addModal.style.display = 'flex');
-        document.getElementById('btn-close-add').addEventListener('click', () => addModal.style.display = 'none');
-
-        const PRESETS = {
-            cama: { name: "Cama 2 Plazas", room: "Cuarto", x: 1.50, z: 5.40, w: 1.40, d: 1.90, h: 0.45, color: 0x475569 },
-            cama_simple: { name: "Cama 1 Plaza", room: "Estudio", x: 1.50, z: 1.15, w: 0.90, d: 1.90, h: 0.45, color: 0x475569 },
-            sillon: { name: "Sillón", room: "Living", x: 5.00, z: 1.20, w: 2.00, d: 0.85, h: 0.75, color: 0x1e3a5f },
-            mesa: { name: "Mesa Comedor", room: "Living", x: 5.00, z: 2.80, w: 1.40, d: 0.80, h: 0.76, color: 0xb46b38 },
-            escritorio: { name: "Escritorio", room: "Estudio", x: 1.50, z: 0.60, w: 1.40, d: 0.65, h: 0.75, color: 0x1e293b },
-            placard: { name: "Placard", room: "Placard", x: 0.85, z: 2.55, w: 1.60, d: 0.45, h: 2.30, color: 0xb46b38 },
-            heladera: { name: "Heladera", room: "Cocina", x: 3.45, z: 5.10, w: 0.60, d: 0.60, h: 1.70, color: 0x94a3b8 },
-            cubo: { name: "Mueble a Medida", room: "General", x: 5.00, z: 3.00, w: 1.00, d: 1.00, h: 0.80, color: 0x0284c7 }
-        };
-
-        document.querySelectorAll('.add-preset-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const t = PRESETS[btn.dataset.type] || PRESETS.cubo;
-                const newId = `mueble_${Date.now()}`;
-                furnitureList.push({
-                    id: newId, name: t.name, room: t.room,
-                    x: t.x, z: t.z, y: t.h / 2,
-                    w: t.w, d: t.d, h: t.h, rot: 0, color: t.color
-                });
-                selectedId = newId;
-                renderFurniture3D();
-                addModal.style.display = 'none';
-                const ed = document.getElementById('furniture-editor');
-                ed.classList.remove('minimized');
-                document.getElementById('btn-min-editor').innerText = '▼';
-            });
-        });
-
-        // JSON Modal
-        const jsonModal = document.getElementById('json-modal');
-        document.getElementById('btn-copy-json').addEventListener('click', () => {
-            document.getElementById('json-text').value = JSON.stringify(furnitureList, null, 2);
-            jsonModal.style.display = 'flex';
-        });
-        document.getElementById('btn-close-json').addEventListener('click', () => jsonModal.style.display = 'none');
-        document.getElementById('btn-copy-clipboard').addEventListener('click', () => {
-            navigator.clipboard.writeText(document.getElementById('json-text').value);
-            alert("¡Medidas copiadas al portapapeles!");
-            jsonModal.style.display = 'none';
-        });
-        document.getElementById('btn-clear-all').addEventListener('click', () => {
-            if (confirm("¿Vaciar todos los muebles agregados?")) {
-                furnitureList = [];
-                selectedId = null;
-                renderFurniture3D();
-                jsonModal.style.display = 'none';
-            }
-        });
-
-        document.getElementById('btn-min-editor').addEventListener('click', (e) => {
-            const ed = document.getElementById('furniture-editor');
-            ed.classList.toggle('minimized');
-            e.target.innerText = ed.classList.contains('minimized') ? '▲' : '▼';
-        });
-
-        // ============================================================================
-        // 8. CONTROLES DE VISIBILIDAD Y CAMBIO 2D / 3D
-        // ============================================================================
-        function applyWallsVisibility(showExt, showInt) {
-            exteriorWallsGroup.visible = showExt;
-            interiorWallsGroup.visible = showInt;
-            document.getElementById('chk-ext-walls').checked = showExt;
-            document.getElementById('chk-int-walls').checked = showInt;
-            const allHidden = !showExt && !showInt;
-            document.getElementById('chk-hide-all-walls').checked = allHidden;
-        }
-
-        document.getElementById('chk-hide-all-walls').addEventListener('change', (e) => {
-            const hideAll = e.target.checked;
-            applyWallsVisibility(!hideAll, !hideAll);
-            if (hideAll) setActiveTopBtn('btn-mode-nowalls');
-            else setActiveTopBtn('btn-mode-3d');
-        });
-
-        document.getElementById('chk-ext-walls').addEventListener('change', (e) => {
-            exteriorWallsGroup.visible = e.target.checked;
-            document.getElementById('chk-hide-all-walls').checked = (!e.target.checked && !interiorWallsGroup.visible);
-        });
-        document.getElementById('chk-int-walls').addEventListener('change', (e) => {
-            interiorWallsGroup.visible = e.target.checked;
-            document.getElementById('chk-hide-all-walls').checked = (!e.target.checked && !exteriorWallsGroup.visible);
-        });
-        document.getElementById('chk-furniture').addEventListener('change', (e) => {
-            furnitureGroup.visible = e.target.checked;
-            updateSelectionVisual();
-        });
-
-        function setWallCut(isCut) {
-            document.getElementById('chk-wall-cut').checked = isCut;
-            const scaleY = isCut ? 0.42 : 1.0;
-            exteriorWallsGroup.scale.y = scaleY;
-            interiorWallsGroup.scale.y = scaleY;
-        }
-        document.getElementById('chk-wall-cut').addEventListener('change', (e) => setWallCut(e.target.checked));
-
-        document.getElementById('chk-transparent').addEventListener('change', (e) => {
-            const isTrans = e.target.checked;
-            [extWallMat, intWallMat].forEach(m => {
-                m.transparent = isTrans;
-                m.opacity = isTrans ? 0.35 : 1.0;
-                m.needsUpdate = true;
-            });
-        });
-
-        function setActiveTopBtn(id) {
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        const viewPresets = {
-            isom:   { pos: [3.15, 9.8, 8.80], target: [3.15, 0.3, 3.10] },
-            living: { pos: [4.90, 3.4, 5.80], target: [4.65, 0.6, 2.00] },
-            cocina: { pos: [4.00, 3.4, 3.80], target: [4.00, 0.6, 5.50] },
-            cuarto: { pos: [2.40, 3.4, 4.30], target: [1.20, 0.5, 5.50] },
-            bano:   { pos: [2.60, 3.4, 3.40], target: [0.85, 0.5, 3.40] },
-            estudio:{ pos: [2.40, 3.4, 2.50], target: [1.20, 0.5, 0.90] }
-        };
-
-        function switchTo2D() {
-            activeCamera = orthoCam;
-            controlsPersp.enabled = false;
-            controlsOrtho.enabled = true;
-            setActiveTopBtn('btn-mode-2d');
-            document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === 'top2d'));
-        }
-
-        function get3DPreset(name) {
-            const v = viewPresets[name] || viewPresets.isom;
-            const aspect = window.innerWidth / window.innerHeight;
-            if (aspect < 1.0) {
-                // En móvil vertical, alejamos la cámara un 40% para que el depto entre entero sin recortarse
-                return {
-                    pos: [v.pos[0], v.pos[1] * 1.45, v.pos[2] * 1.35],
-                    target: v.target
-                };
-            }
-            return v;
-        }
-
-        function switchTo3D(presetName = 'isom', cut = false, hideWalls = false) {
-            activeCamera = perspCam;
-            controlsOrtho.enabled = false;
-            controlsPersp.enabled = true;
-            if (hideWalls) {
-                applyWallsVisibility(false, false);
-                setActiveTopBtn('btn-mode-nowalls');
-            } else {
-                applyWallsVisibility(true, true);
-                setWallCut(cut);
-                setActiveTopBtn(cut ? 'btn-mode-cut' : 'btn-mode-3d');
-            }
-            const v = get3DPreset(presetName);
-            perspCam.position.set(v.pos[0], v.pos[1], v.pos[2]);
-            controlsPersp.target.set(v.target[0], v.target[1], v.target[2]);
-            controlsPersp.update();
-            document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === presetName));
-        }
-
-        document.getElementById('btn-mode-2d').addEventListener('click', () => {
-            applyWallsVisibility(true, true);
-            switchTo2D();
-        });
-        document.getElementById('btn-mode-3d').addEventListener('click', () => switchTo3D('isom', false, false));
-        document.getElementById('btn-mode-cut').addEventListener('click', () => switchTo3D('isom', true, false));
-        document.getElementById('btn-mode-nowalls').addEventListener('click', () => switchTo3D('isom', false, true));
-
-        // Botones de Zoom rápido (+ / - / Reset)
-        document.getElementById('btn-zoom-in').addEventListener('click', () => {
-            if (activeCamera === orthoCam) {
-                orthoCam.zoom = Math.min(orthoCam.zoom * 1.25, 4.0);
-                orthoCam.updateProjectionMatrix();
-            } else {
-                perspCam.position.lerp(controlsPersp.target, 0.2);
-            }
-        });
-        document.getElementById('btn-zoom-out').addEventListener('click', () => {
-            if (activeCamera === orthoCam) {
-                orthoCam.zoom = Math.max(orthoCam.zoom / 1.25, 0.35);
-                orthoCam.updateProjectionMatrix();
-            } else {
-                const dir = perspCam.position.clone().sub(controlsPersp.target).normalize();
-                perspCam.position.addScaledVector(dir, 1.5);
-            }
-        });
-        document.getElementById('btn-zoom-reset').addEventListener('click', () => {
-            if (activeCamera === orthoCam) {
-                orthoCam.zoom = 1.0;
-                orthoCam.position.set(3.15, 20, 3.10);
-                controlsOrtho.target.set(3.15, 0, 3.10);
-                orthoCam.updateProjectionMatrix();
-                controlsOrtho.update();
-            } else {
-                switchTo3D('isom', document.getElementById('chk-wall-cut').checked);
-            }
-        });
-
-        document.querySelectorAll('.view-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                const v = chip.dataset.view;
-                if (v === 'top2d') {
-                    switchTo2D();
-                } else {
-                    switchTo3D(v, document.getElementById('chk-wall-cut').checked);
-                }
-            });
-        });
-
-        document.getElementById('btn-toggle-layers').addEventListener('click', () => {
-            document.getElementById('sidebar-right').classList.toggle('show-mobile');
-        });
-
-        document.getElementById('btn-export-obj').addEventListener('click', () => {
-            const exporter = new THREE.OBJExporter();
-            const result = exporter.parse(apartmentGroup);
-            const blob = new Blob([result], { type: 'text/plain' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'Departamento_63x62_Exacto.obj';
-            link.click();
-        });
-
-        renderFurniture3D();
-
-        function animate() {
-            requestAnimationFrame(animate);
-            if (controlsPersp.enabled) controlsPersp.update();
-            if (controlsOrtho.enabled) controlsOrtho.update();
-            updateLabels();
-            if (selectionBox) selectionBox.update();
-            renderer.render(scene, activeCamera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            const aspect = window.innerWidth / window.innerHeight;
-            perspCam.aspect = aspect;
-            perspCam.updateProjectionMatrix();
-
-            const viewSize = getOrthoViewSize();
-            orthoCam.left = -viewSize * aspect / 2;
-            orthoCam.right = viewSize * aspect / 2;
-            orthoCam.top = viewSize / 2;
-            orthoCam.bottom = -viewSize / 2;
-            orthoCam.updateProjectionMatrix();
-
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
+  </header>
+
+  <div id="container-3d"></div>
+  <div class="hint-3d" id="hint-3d">Click izquierdo + arrastrar: rotar • Rueda: zoom • Click derecho: desplazar</div>
+
+  <div id="container-2d">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 980" style="background-color: #0f172a;">
+      <defs>
+        <pattern id="wood" width="40" height="10" patternUnits="userSpaceOnUse">
+          <rect width="40" height="10" fill="none" stroke="#d97706" stroke-width="0.3" stroke-opacity="0.15" />
+        </pattern>
+        <marker id="tick" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <line x1="1" y1="9" x2="9" y2="1" stroke="#38bdf8" stroke-width="1.8"/>
+        </marker>
+      </defs>
+      
+      <g transform="translate(130, 100)">
+        <rect x="0" y="0" width="280" height="280" fill="#1e293b"/>
+        <rect x="0" y="280" width="280" height="50" fill="#2e1065"/>
+        <rect x="0" y="330" width="280" height="90" fill="#0c4a6e"/>
+        <rect x="0" y="420" width="280" height="80" fill="#2e1065"/>
+        <rect x="0" y="500" width="350" height="200" fill="#1e293b"/>
+        <rect x="280" y="280" width="70" height="220" fill="#1e293b"/>
+        <rect x="350" y="500" width="220" height="200" fill="#1e293b"/>
+        <polygon points="350,0 630,0 630,570 570,570 570,500 350,500" fill="#1e293b"/>
+
+        <text x="140" y="145" fill="#f8fafc" font-size="13" font-weight="700" text-anchor="middle">ESTUDIO (7.84 m²)</text>
+        <text x="140" y="310" fill="#c084fc" font-size="9" font-weight="600" text-anchor="middle">PLACARD SUP. (1.40 m²)</text>
+        <text x="140" y="380" fill="#38bdf8" font-size="12" font-weight="700" text-anchor="middle">BAÑO COMPLETO (2.52 m²)</text>
+        <text x="140" y="465" fill="#c084fc" font-size="9" font-weight="600" text-anchor="middle">PLACARD INF. (2.24 m²)</text>
+        <text x="175" y="610" fill="#f8fafc" font-size="13" font-weight="700" text-anchor="middle">DORMITORIO (7.00 m²)</text>
+        <text x="490" y="250" fill="#f8fafc" font-size="15" font-weight="700" text-anchor="middle">LIVING - COMEDOR (14.00 m²)</text>
+        <text x="460" y="605" fill="#f8fafc" font-size="13" font-weight="700" text-anchor="middle">COCINA (4.40 m²)</text>
+        <text x="600" y="535" fill="#10b981" font-size="10" font-weight="700" text-anchor="middle">HALL ACCESO</text>
+
+        <g stroke="#f59e0b" stroke-width="2" fill="none">
+          <line x1="280" y1="280" x2="280" y2="350"/>
+          <path d="M 350 280 A 70 70 0 0 1 280 350" stroke-dasharray="3,3"/>
+          <line x1="280" y1="415" x2="210" y2="415"/>
+          <path d="M 280 340 A 75 75 0 0 1 210 415" stroke-dasharray="3,3"/>
+          <line x1="280" y1="500" x2="280" y2="570"/>
+          <path d="M 350 500 A 70 70 0 0 1 280 570" stroke-dasharray="3,3"/>
+          <line x1="625" y1="570" x2="625" y2="480" stroke="#10b981"/>
+          <path d="M 535 570 A 90 90 0 0 1 625 480" stroke="#10b981" stroke-dasharray="3,3"/>
+        </g>
+
+        <path d="M -6 -6 L 636 -6 L 636 576 L 576 576 L 576 706 L -6 706 Z M 0 0 L 0 700 L 570 700 L 570 570 L 630 570 L 630 0 Z" fill="#334155" fill-rule="evenodd"/>
+        
+        <rect x="275" y="0" width="10" height="280" fill="#475569"/>
+        <rect x="0" y="275" width="280" height="10" fill="#475569"/>
+        <rect x="0" y="325" width="280" height="10" fill="#475569"/>
+        <rect x="0" y="415" width="280" height="10" fill="#475569"/>
+        <rect x="0" y="495" width="280" height="10" fill="#475569"/>
+        <rect x="345" y="500" width="10" height="200" fill="#475569"/>
+        <rect x="435" y="495" width="135" height="10" fill="#475569"/>
+
+        <line x1="0" y1="-30" x2="630" y2="-30" stroke="#38bdf8" stroke-width="1.2" marker-start="url(#tick)" marker-end="url(#tick)"/>
+        <text x="315" y="-36" fill="#38bdf8" font-size="12" text-anchor="middle" font-weight="600">6.30 m</text>
+        <line x1="-30" y1="0" x2="-30" y2="700" stroke="#38bdf8" stroke-width="1.2" marker-start="url(#tick)" marker-end="url(#tick)"/>
+        <text x="-38" y="350" fill="#38bdf8" font-size="12" text-anchor="middle" font-weight="600" transform="rotate(-90 -38 350)">7.00 m</text>
+      </g>
+    </svg>
+  </div>
+
+  <script>
+    let scene, camera, renderer, controls;
+    const container3D = document.getElementById('container-3d');
+    const container2D = document.getElementById('container-2d');
+    const hint3D = document.getElementById('hint-3d');
+
+    function init3D() {
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0b1120);
+
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(3.15, 12, 10);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container3D.appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.target.set(3.15, 0, 3.5);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxPolarAngle = Math.PI / 2.05;
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+      scene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      dirLight.position.set(10, 15, 8);
+      dirLight.castShadow = true;
+      scene.add(dirLight);
+
+      const wallMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8 });
+      const floorWoodMat = new THREE.MeshStandardMaterial({ color: 0x92400e, roughness: 0.5 });
+      const floorTileMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.3 });
+      const floorDarkMat = new THREE.MeshStandardMaterial({ color: 0x1e1b4b, roughness: 0.4 });
+
+      function addFloor(x, z, w, d, mat) {
+        const geo = new THREE.PlaneGeometry(w, d);
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.rotation.x = -Math.PI / 2;
+        mesh.position.set(x + w / 2, 0, z + d / 2);
+        mesh.receiveShadow = true;
+        scene.add(mesh);
+      }
+
+      addFloor(0, 0, 2.8, 2.8, floorWoodMat);      // Estudio
+      addFloor(0, 2.8, 2.8, 0.5, floorDarkMat);    // Placard Sup
+      addFloor(0, 3.3, 2.8, 0.9, floorTileMat);    // Baño
+      addFloor(0, 4.2, 2.8, 0.8, floorDarkMat);    // Placard Inf
+      addFloor(0, 5.0, 3.5, 2.0, floorWoodMat);    // Cuarto
+      addFloor(2.8, 2.8, 0.7, 2.2, floorWoodMat);  // Pasillo
+      addFloor(3.5, 5.0, 2.2, 2.0, floorTileMat);  // Cocina
+      addFloor(3.5, 0, 2.8, 5.0, floorWoodMat);    // Living
+      addFloor(5.7, 5.0, 0.6, 0.7, floorWoodMat);  // Foyer
+
+      const H = 2.4;
+      function addWall(x, z, w, d) {
+        const geo = new THREE.BoxGeometry(w, H, d);
+        const mesh = new THREE.Mesh(geo, wallMat);
+        mesh.position.set(x + w / 2, H / 2, z + d / 2);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        scene.add(mesh);
+      }
+
+      const T = 0.15;
+      // Perímetro en "L"
+      addWall(0, 0, 6.3, T);                       // Norte
+      addWall(0, 0, T, 7.0);                       // Oeste
+      addWall(6.3 - T, 0, T, 5.7);                 // Este
+      addWall(5.7, 5.7 - T, 0.6, T);               // Palier
+      addWall(5.7 - T, 5.7, T, 1.3);               // Cocina lateral ext
+      addWall(0, 7.0 - T, 5.7, T);                 // Sur base
+
+      // Tabiques Interiores
+      addWall(2.8, 0, T, 2.8);
+      addWall(0, 2.8, 2.8, T);
+      addWall(0, 3.3, 2.8, T);
+      addWall(0, 4.2, 2.8, T);
+      addWall(0, 5.0, 2.8, T);
+      addWall(2.8, 2.8, T, 0.6);
+      addWall(2.8, 4.15, T, 0.85);
+      addWall(3.5, 5.0, T, 2.0);
+      addWall(4.35, 5.0, 1.35, T);
+
+      const grid = new THREE.GridHelper(14, 14, 0x38bdf8, 0x1e293b);
+      grid.position.set(3.15, -0.01, 3.5);
+      scene.add(grid);
+
+      window.addEventListener('resize', onWindowResize);
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function resetCamera() {
+      camera.position.set(3.15, 12, 10);
+      controls.target.set(3.15, 0, 3.5);
+    }
+
+    function switchView(mode) {
+      document.getElementById('btn-3d').classList.toggle('active', mode === '3d');
+      document.getElementById('btn-2d').classList.toggle('active', mode === '2d');
+      if (mode === '3d') {
+        container3D.style.display = 'block';
+        hint3D.style.display = 'block';
+        container2D.style.display = 'none';
+      } else {
+        container3D.style.display = 'none';
+        hint3D.style.display = 'none';
+        container2D.style.display = 'flex';
+      }
+    }
+
+    window.onload = init3D;
+  </script>
 </body>
 </html>
