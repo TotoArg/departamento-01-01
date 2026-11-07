@@ -568,11 +568,12 @@
 
         <!-- Top Mode Switcher -->
         <div id="top-toolbar" class="glass-panel">
-            <button class="mode-btn active" id="btn-mode-2d"><span>📐</span> 2D</button>
-            <button class="mode-btn" id="btn-mode-3d"><span>🧊</span> 3D Muros</button>
-            <button class="mode-btn" id="btn-mode-cut"><span>✂️</span> Bajas</button>
-            <button class="mode-btn" id="btn-mode-nowalls"><span>🚫</span> Sin Paredes</button>
-            <button class="mode-btn active" id="btn-toggle-video-decor" title="Mostrar/Ocultar Muebles, Electrodomésticos y Decoración del Video"><span>🛋️</span> Amoblado</button>
+            <button class="mode-btn active" id="btn-mode-2d" title="Plano 2D Ortogonal"><span>📐</span> 2D</button>
+            <button class="mode-btn" id="btn-mode-sims" title="Paredes estilo Los Sims: bajan dinámicamente las paredes que tapan la cámara al rotar"><span>🏠</span> Corte Sims</button>
+            <button class="mode-btn" id="btn-mode-3d" title="Paredes Completas (Todas Arriba)"><span>🧱</span> Arriba</button>
+            <button class="mode-btn" id="btn-mode-cut" title="Paredes Bajas estilo Los Sims (Todas Abajo)"><span>📐</span> Abajo</button>
+            <button class="mode-btn active" id="btn-toggle-labels" title="Mostrar/Ocultar Nombres de los Ambientes"><span>🏷️</span> Nombres</button>
+            <button class="mode-btn active" id="btn-toggle-video-decor" title="Mostrar/Ocultar Muebles, Electrodomésticos y Decoración"><span>🛋️</span> Amoblado</button>
             <button class="mode-btn" id="btn-toggle-roof" title="Mostrar/Ocultar Techo de Madera y Vigas"><span>🪵</span> Techo</button>
             <div style="display:flex; gap:3px; margin-left:2px; border-left:1px solid rgba(255,255,255,0.15); padding-left:4px;">
                 <button class="icon-btn" id="btn-zoom-in" title="Acercar plano" style="padding:4px 6px; font-size:11px; font-weight:700;">🔍 +</button>
@@ -584,9 +585,19 @@
 
     <!-- Right Sidebar (Visibility & Layers) -->
     <div id="sidebar-right" class="glass-panel">
-        <div class="panel-title">Paredes y Visibilidad</div>
-        <label class="toggle-row" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 6px; padding: 5px 8px;">
-            <span style="font-weight: 700; color: #fca5a5;">Ocultar Todas las Paredes</span>
+        <div class="panel-title">Paredes (Estilo Los Sims)</div>
+        <label class="toggle-row" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 6px; padding: 5px 8px;">
+            <span style="font-weight: 700; color: #38bdf8;">🏠 Corte Dinámico (Sims)</span>
+            <input type="checkbox" id="chk-wall-sims" checked>
+            <div class="toggle-switch"></div>
+        </label>
+        <label class="toggle-row">
+            <span>Paredes Todas Abajo (Sims)</span>
+            <input type="checkbox" id="chk-wall-cut">
+            <div class="toggle-switch"></div>
+        </label>
+        <label class="toggle-row" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; padding: 4px 8px;">
+            <span style="font-weight: 600; color: #fca5a5;">Ocultar Todas las Paredes</span>
             <input type="checkbox" id="chk-hide-all-walls">
             <div class="toggle-switch"></div>
         </label>
@@ -603,11 +614,6 @@
         <label class="toggle-row">
             <span>Puertas 3D (Madera / Entrada / Placard)</span>
             <input type="checkbox" id="chk-doors" checked>
-            <div class="toggle-switch"></div>
-        </label>
-        <label class="toggle-row">
-            <span>Paredes Bajas (1.10 m)</span>
-            <input type="checkbox" id="chk-wall-cut">
             <div class="toggle-switch"></div>
         </label>
         <label class="toggle-row">
@@ -636,7 +642,7 @@
             <div class="toggle-switch"></div>
         </label>
         <label class="toggle-row">
-            <span>Etiquetas de Ambientes</span>
+            <span>Nombres de Ambientes</span>
             <input type="checkbox" id="chk-labels" checked>
             <div class="toggle-switch"></div>
         </label>
@@ -984,6 +990,78 @@
         palierMesh.position.set(5.75, -0.03, 6.35);
         floorGroup.add(palierMesh);
 
+        const simsWalls = [];
+        const WALL_CUT_H = 0.22; // Altura de corte estilo Los Sims (zócalo de 22 cm)
+        const pendingWallMounts = [];
+        let currentMountWallSpec = null;
+
+        function getWallNormals(x1, z1, x2, z2, isExterior) {
+            const dx = x2 - x1;
+            const dz = z2 - z1;
+            const mx = (x1 + x2) / 2;
+            const mz = (z1 + z2) / 2;
+            let isHoriz = Math.abs(dx) >= Math.abs(dz);
+            // Jambas cortas de la puerta de entrada en Z=5.70 se comportan como parte del muro horizontal Sur
+            if (isExterior && mz > 5.55 && mz < 5.85 && mx > 5.30 && mx < 6.20) {
+                isHoriz = true;
+            }
+            const nx = isHoriz ? 0 : 1;
+            const nz = isHoriz ? 1 : 0;
+            // El muro Este de la Cocina (X=5.20, Z=4.50..7.00) actúa de forma unificada hacia el Este
+            const isKitchenEastFull = (!isHoriz && Math.abs(mx - 5.20) < 0.05 && mz >= 4.50);
+            const actsAsExterior = isExterior || isKitchenEastFull;
+            let outNx = 0, outNz = 0;
+            if (actsAsExterior) {
+                if (isHoriz) {
+                    outNz = (mz < 1.0) ? -1 : 1;
+                } else {
+                    outNx = (mx < 1.0) ? -1 : 1;
+                }
+            }
+            return {
+                mx, mz, nx, nz, outNx, outNz, isHoriz, actsAsExterior,
+                x1: Math.min(x1, x2), x2: Math.max(x1, x2),
+                z1: Math.min(z1, z2), z2: Math.max(z1, z2)
+            };
+        }
+
+        function findNearestWall(x, z, isHoriz = null) {
+            let best = null;
+            let bestDist = Infinity;
+            for (let i = 0; i < simsWalls.length; i++) {
+                const w = simsWalls[i];
+                if (isHoriz !== null && w.isHoriz !== isHoriz) continue;
+                const cx = Math.max(w.x1, Math.min(x, w.x2));
+                const cz = Math.max(w.z1, Math.min(z, w.z2));
+                const d = Math.hypot(x - cx, z - cz);
+                if (d < bestDist) {
+                    bestDist = d;
+                    best = w;
+                }
+            }
+            return best;
+        }
+
+        function attachWallMount(obj, x, z, isHoriz = null) {
+            pendingWallMounts.push({ obj, x, z, isHoriz });
+        }
+
+        function resolveWallMounts() {
+            while (pendingWallMounts.length > 0) {
+                const item = pendingWallMounts.pop();
+                const w = findNearestWall(item.x, item.z, item.isHoriz);
+                if (w) w.linkedObjs.push(item.obj);
+            }
+        }
+
+        function setMountWall(x, z, isHoriz = null) {
+            if (x === null) {
+                currentMountWallSpec = null;
+            } else {
+                currentMountWallSpec = { x, z, isHoriz };
+            }
+        }
+
         function addWallSegment(x1, z1, x2, z2, thickness, group, isExterior = false) {
             const dx = x2 - x1;
             const dz = z2 - z1;
@@ -1006,6 +1084,18 @@
             holder.add(capMesh);
 
             group.add(holder);
+
+            simsWalls.push({
+                type: 'wall',
+                holder,
+                bodyMesh,
+                capMesh,
+                isExterior,
+                currentH: WALL_H,
+                targetH: WALL_H,
+                linkedObjs: [],
+                ...getWallNormals(x1, z1, x2, z2, isExterior)
+            });
         }
 
         // Ventana real calada en muro exterior (con antepecho, dintel, marco aluminio negro y símbolo 2D)
@@ -1024,25 +1114,27 @@
             sillMesh.position.set(0, sillH / 2, 0);
             holder.add(sillMesh);
 
+            const upperWinGroup = new THREE.Group();
+
             // Dintel superior
             const lintelH = WALL_H - (sillH + winH);
             if (lintelH > 0.02) {
                 const lintelMesh = new THREE.Mesh(UNIT_BOX_GEO, extWallMat);
                 lintelMesh.scale.set(len, lintelH, EXT_T);
                 lintelMesh.position.set(0, sillH + winH + lintelH / 2, 0);
-                holder.add(lintelMesh);
+                upperWinGroup.add(lintelMesh);
             }
 
             // Vidrio interior
             const glass = new THREE.Mesh(UNIT_BOX_GEO, winGlassMat);
             glass.scale.set(len - 0.08, winH - 0.08, 0.025);
             glass.position.set(0, sillH + winH / 2, 0);
-            holder.add(glass);
+            upperWinGroup.add(glass);
             // Parante central corredizo
             const mullion = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
             mullion.scale.set(0.035, winH, 0.065);
             mullion.position.set(0, sillH + winH / 2, 0);
-            holder.add(mullion);
+            upperWinGroup.add(mullion);
             // Marcos horizontales (superior/inferior) y jambas verticales (izquierda/derecha) de la ventana
             const topBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
             topBar.scale.set(len, 0.04, 0.065);
@@ -1056,27 +1148,46 @@
             const rightBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
             rightBar.scale.set(0.04, winH, 0.065);
             rightBar.position.set(len / 2 - 0.02, sillH + winH / 2, 0);
-            holder.add(topBar, botBar, leftBar, rightBar);
+            upperWinGroup.add(topBar, botBar, leftBar, rightBar);
+            holder.add(upperWinGroup);
 
-            // Símbolo 2D en la tapa superior (para que en vista 2D se vea igual al plano técnico)
+            // Símbolo 2D en la tapa superior (para que en vista 2D y en corte Sims se vea igual al plano técnico)
+            const capGroup = new THREE.Group();
+            capGroup.position.set(0, WALL_H + 0.012, 0);
+
             const capBg = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0xdbeafe));
             capBg.scale.set(len, 0.025, EXT_T + 0.01);
-            capBg.position.set(0, WALL_H + 0.012, 0);
-            holder.add(capBg);
+            capBg.position.set(0, 0, 0);
+            capGroup.add(capBg);
 
             const lineMat = getBasicMat(0x0284c7);
             const l1 = new THREE.Mesh(UNIT_BOX_GEO, lineMat);
             l1.scale.set(len, 0.028, 0.018);
-            l1.position.set(0, WALL_H + 0.015, -0.022);
+            l1.position.set(0, 0.003, -0.022);
             const l2 = new THREE.Mesh(UNIT_BOX_GEO, lineMat);
             l2.scale.set(len, 0.028, 0.018);
-            l2.position.set(0, WALL_H + 0.015, 0.022);
+            l2.position.set(0, 0.003, 0.022);
             const midCap = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
             midCap.scale.set(0.025, 0.03, EXT_T + 0.015);
-            midCap.position.set(0, WALL_H + 0.016, 0);
-            holder.add(l1, l2, midCap);
+            midCap.position.set(0, 0.004, 0);
+            capGroup.add(l1, l2, midCap);
+            holder.add(capGroup);
 
             exteriorWallsGroup.add(holder);
+
+            simsWalls.push({
+                type: 'window',
+                holder,
+                sillMesh,
+                sillH,
+                upperWinGroup,
+                capGroup,
+                isExterior: true,
+                currentH: WALL_H,
+                targetH: WALL_H,
+                linkedObjs: [],
+                ...getWallNormals(x1, z1, x2, z2, true)
+            });
         }
 
         function addLine2DSegment(x1, z1, x2, z2, width = 0.022, color = 0x334155) {
@@ -1191,6 +1302,9 @@
             m.scale.set(w, h, d);
             m.position.set(x, y, z);
             group.add(m);
+            if (currentMountWallSpec) {
+                attachWallMount(m, currentMountWallSpec.x, currentMountWallSpec.z, currentMountWallSpec.isHoriz);
+            }
             return m;
         }
 
@@ -1203,6 +1317,7 @@
         const pipeVert = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 2.25, 16), pipeMat);
         pipeVert.position.set(6.15, 1.72, 1.90);
         fixturesGroup.add(pipeVert);
+        attachWallMount(pipeVert, 6.30, 1.90, false);
 
         // Calefactor Cuarto Ampliado (Muro Sur Y=7.00, X=2.25 a 2.72, a la derecha de la ventana)
         addBoxFixture(2.48, 0.34, 6.86, 0.46, 0.62, 0.14, 0x9ca3af);
@@ -1213,9 +1328,11 @@
         addBoxFixture(4.87, 0.42, 5.42, 0.56, 0.84, 0.40, 0xb48a64);
         addBoxFixture(4.86, 0.86, 5.42, 0.60, 0.04, 0.40, 0xc8b2a6);
         // - Calefón a gas mural blanco (Orbis) colgado en pared Este sobre el 1° tramo de mesada (X=5.04, Y=1.44, Z=5.42) + caño amarillo
+        setMountWall(5.20, 5.42, false);
         addBoxFixture(5.04, 1.44, 5.42, 0.22, 0.56, 0.36, 0xf8fafc, fixturesGroup, 0.25);
         addBoxFixture(4.92, 1.28, 5.42, 0.02, 0.08, 0.12, 0x334155); // Visor/botonera calefón
         addBoxFixture(5.08, 1.08, 5.28, 0.03, 0.22, 0.03, 0xeab308); // Caño de gas amarillo
+        setMountWall(null);
         // - Cocina a gas blanca de 4 hornallas con horno visor negro sobre muro Este (X=4.86, Z=5.89, entre los dos tramos de mesada)
         addBoxFixture(4.86, 0.43, 5.89, 0.58, 0.86, 0.54, 0xffffff, fixturesGroup, 0.25);
         addBoxFixture(4.86, 0.87, 5.89, 0.52, 0.02, 0.48, 0x1e293b); // Rejilla 4 hornallas negra
@@ -1237,13 +1354,17 @@
         // Lavatorio de pedestal blanco en muro Norte (X=1.42, Z=3.02) + botiquín con espejo arriba
         addBoxFixture(1.42, 0.42, 2.98, 0.18, 0.80, 0.18, 0xffffff, fixturesGroup, 0.25);
         addBoxFixture(1.42, 0.82, 3.02, 0.46, 0.14, 0.36, 0xffffff, fixturesGroup, 0.25);
+        setMountWall(1.42, 2.80, true);
         addBoxFixture(1.42, 1.48, 2.88, 0.52, 0.62, 0.14, 0xd6ccc2, fixturesGroup, 0.4); // Botiquín madera clara con espejo
+        setMountWall(null);
         // Inodoro con mochila (X=1.74, Z=3.76) + Bidet blanco (X=1.20, Z=3.76) en muro Sur (Z=4.00)
         addBoxFixture(1.74, 0.22, 3.74, 0.38, 0.42, 0.44, 0xffffff, fixturesGroup, 0.25);
         addBoxFixture(1.74, 0.58, 3.90, 0.38, 0.34, 0.16, 0xffffff, fixturesGroup, 0.25);
         addBoxFixture(1.20, 0.20, 3.75, 0.36, 0.40, 0.42, 0xffffff, fixturesGroup, 0.25); // Bidet 3 llaves
         // Alacena colgante de baño sobre inodoro y bidet (Muro Sur Z=3.86, X=1.48, Y=1.88: 2 puertas + estantes abiertos con toallas)
+        setMountWall(1.48, 4.00, true);
         addBoxFixture(1.48, 1.88, 3.86, 0.78, 0.56, 0.26, 0xe5dec9, fixturesGroup, 0.45);
+        setMountWall(null);
 
         // 4) TECHO DE MADERA MACHIMBRADA EN PENDIENTE CON VIGAS VISTAS DE NORTE A SUR (Extraído de las fotos y videos)
         // Dos faldones que suben hacia la cumbrera central Este-Oeste (Z = 3.50, de 2.62m en frentes Norte/Sur a 3.30m en la cumbrera)
@@ -1421,6 +1542,7 @@
 
             holder.add(pivot);
             doors3DGroup.add(holder);
+            attachWallMount(holder, (x1 + x2) / 2, (z1 + z2) / 2, Math.abs(dx) >= Math.abs(dz));
         }
 
         // 2) Constructor de Puerta Principal de Entrada (Y = 5.70, X = 5.38 a 6.12)
@@ -1489,6 +1611,7 @@
 
             holder.add(pivot);
             doors3DGroup.add(holder);
+            attachWallMount(holder, (x1 + x2) / 2, (z1 + z2) / 2, true);
         }
 
         // 3) Constructor de Frentes de Placard Corredizos de Madera + Baulera (sec_063 y sec_064)
@@ -1539,6 +1662,7 @@
             }
 
             doors3DGroup.add(holder);
+            attachWallMount(holder, (x1 + x2) / 2, zWall, true);
         }
 
         // Construcción diferida de puertas 3D y techo de madera (se ejecuta tras el primer render 2D para carga instantánea)
@@ -1554,6 +1678,7 @@
             cocinaLintel.scale.set(wCocinaVano, lintelH, INT_T);
             cocinaLintel.position.set(3.725, DOOR_H + lintelH / 2, 4.50);
             doors3DGroup.add(cocinaLintel);
+            attachWallMount(cocinaLintel, 4.60, 4.50, true);
             // Instanciar puertas 3D relevadas de las fotos (#17, #23, #39, #40):
             // - Puerta Estudio: bisagra en X=3.00 (hingeAtStart=false), abre hacia adentro sobre muro Este (swingSign=-1)
             // - Puerta Baño: bisagra en Z=3.65 (hingeAtStart=false), abre hacia adentro al Sur (swingSign=1)
@@ -1564,6 +1689,7 @@
             addInteriorWoodDoor3D(2.30, 4.50, 3.00, 4.50, false, 1, 55);
             addSlidingPlacardFront3D(0.22, 1.92, 2.30, -1);
             addSlidingPlacardFront3D(0.22, 1.92, 4.50, 1);
+            resolveWallMounts();
         }
         setTimeout(ensure3DExtrasBuilt, 60);
 
@@ -1577,6 +1703,9 @@
             m.position.set(x, y, z);
             if (rotY) m.rotation.y = rotY;
             decorVideoGroup.add(m);
+            if (currentMountWallSpec) {
+                attachWallMount(m, currentMountWallSpec.x, currentMountWallSpec.z, currentMountWallSpec.isHoriz);
+            }
             return m;
         }
 
@@ -1588,6 +1717,9 @@
             if (isUniform) m.scale.set(rTop, h, rTop);
             m.position.set(x, y, z);
             decorVideoGroup.add(m);
+            if (currentMountWallSpec) {
+                attachWallMount(m, currentMountWallSpec.x, currentMountWallSpec.z, currentMountWallSpec.isHoriz);
+            }
             return m;
         }
 
@@ -1625,6 +1757,7 @@
             g.add(leftPanel, rightPanel);
 
             decorVideoGroup.add(g);
+            attachWallMount(g, (x1 + x2) / 2, (z1 + z2) / 2, Math.abs(dx) >= Math.abs(dz));
         }
 
         function buildFurnishedVideoDecor() {
@@ -1633,13 +1766,18 @@
             // ------------------------------------------------------------------------
             // 1. Entrada (X = 5.20..6.30, Z = 4.00..5.70):
             // - Crucifijo de madera oscura sobre dintel puerta principal + retablo dorado + tablero eléctrico
+            setMountWall(5.75, 5.70, true);
             addDecorBox(5.75, 2.26, 5.62, 0.14, 0.24, 0.02, 0x3b2314);
             addDecorBox(6.18, 1.48, 5.62, 0.08, 0.13, 0.02, 0xd4af37);
+            setMountWall(5.20, 5.22, false);
             addDecorBox(5.26, 1.45, 5.22, 0.02, 0.22, 0.26, 0x1e293b);
+            setMountWall(null);
             // - Perchero de hierro negro con estante superior de madera y camperas + Zapatero de 3 niveles abajo (Muro Este Z=4.06..4.70)
             addDecorBox(6.08, 0.26, 4.38, 0.30, 0.52, 0.64, 0x1e293b); // Zapatero 3 niveles con calzados
+            setMountWall(6.30, 4.38, false);
             addDecorBox(6.08, 1.35, 4.38, 0.24, 0.85, 0.62, 0x334155); // Camperas colgadas (negra / gris / azul)
             addDecorBox(6.08, 1.86, 4.38, 0.26, 0.03, 0.66, 0x9a5b32); // Estante superior madera perchero
+            setMountWall(null);
             // - Maceta blanca redonda sobre pie nórdico de madera con Sansevieria (Lengua de suegra) en X=6.05, Z=3.75 (entre Rack TV y Perchero)
             addDecorBox(6.05, 0.14, 3.75, 0.24, 0.28, 0.24, 0xc2844f); // Pie nórdico madera
             addDecorCyl(6.05, 0.28, 3.75, 0.13, 0.11, 0.24, 0xf8fafc); // Maceta cerámica blanca
@@ -1650,8 +1788,10 @@
             addDecorBox(6.00, 0.39, 2.80, 0.44, 0.78, 1.32, 0x7c2d12, 0.4);
             addDecorBox(6.00, 0.79, 2.80, 0.46, 0.03, 1.36, 0x8f3818, 0.35); // Tapa superior lustrada
             // - Smart TV 50" colgado en pared e inclinado hacia el sillón (centrado exactamente en Z=2.80 frente al futón)
+            setMountWall(6.30, 2.80, false);
             const tvMesh = addDecorBox(6.16, 1.38, 2.80, 0.05, 0.66, 1.14, 0x0f172a, 0.2);
             tvMesh.rotation.z = 0.08;
+            setMountWall(null);
             // - 2 Torres de sonido altas negras LG Home Theater flanqueando el rack + barra central + Google Home Mini
             addDecorBox(6.04, 0.96, 3.38, 0.22, 0.36, 0.22, 0x0f172a, 0.25); // Base torre sur
             addDecorBox(6.04, 1.32, 3.38, 0.10, 1.05, 0.10, 0x111827, 0.25); // Columna torre sur
@@ -1742,6 +1882,7 @@
             // - Heladera blanca con freezer superior mirando al Oeste + imanes en la puerta
             addDecorBox(4.85, 0.84, 4.88, 0.60, 1.68, 0.62, 0xf8fafc, 0.25);
             // - Bodega portabotellas de 5 nichos + Alacena superior de 2 puertas en melamina roble claro hasta arriba
+            setMountWall(5.20, 4.88, false);
             addDecorBox(4.85, 1.78, 4.88, 0.60, 0.16, 0.62, 0xd6ccc2, 0.5);  // Bodega portabotellas
             addDecorBox(4.85, 2.12, 4.88, 0.60, 0.52, 0.62, 0xd6ccc2, 0.45); // Alacena alta sobre heladera
             // 2. Alacenas superiores sobre Muro Este (X=5.20):
@@ -1751,6 +1892,7 @@
             addDecorCyl(4.62, 1.65, 5.20, 0.012, 0.012, 1.45, 0xf8fafc, 0.4);  // Cabo extensible blanco del plumero
             addDecorCyl(4.62, 2.40, 5.20, 0.09, 0.05, 0.18, 0x7e22ce, 0.7);    // Plumero violeta arriba de la heladera
             // - Alacena larga de 3 puertas sobre cocina y bacha (Z=5.64..6.68) + estante especiero inferior abierto + 2 latas negras Bagley arriba + imán portacuchillos
+            setMountWall(5.20, 6.20, false);
             addDecorBox(4.96, 1.84, 6.16, 0.34, 0.64, 1.04, 0xd6ccc2, 0.45);
             addDecorBox(4.96, 1.44, 6.16, 0.26, 0.14, 1.04, 0xb48a64, 0.5);    // Estante especiero inferior con tazas y Moka roja
             addDecorCyl(4.96, 2.24, 5.82, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4);    // Lata redonda negra 1 sobre alacena
@@ -1759,13 +1901,16 @@
             // - Estante esquinero abierto de madera de 3 niveles en esquina Sureste (Z=6.82) con planta y cafetera Moka
             addDecorBox(4.96, 1.74, 6.82, 0.30, 0.62, 0.26, 0x9a5b32, 0.5);
             addDecorCyl(4.96, 2.12, 6.82, 0.06, 0.05, 0.16, 0x15803d, 0.6);    // Plantita en estante superior
+            setMountWall(null);
             // - Rollo de cocina y termo sobre el 1° tramo de mesada (Z=5.32..5.52) + contenedor celeste y botellas en el 2° tramo
             addDecorCyl(4.68, 0.98, 5.30, 0.06, 0.06, 0.22, 0xffffff, 0.4);    // Rollo de papel de cocina
             addDecorCyl(4.72, 0.98, 5.52, 0.045, 0.045, 0.24, 0x475569, 0.3);  // Termo acero
             addDecorBox(4.74, 0.92, 6.24, 0.18, 0.09, 0.22, 0x0284c7, 0.3);    // Recipiente celeste sobre mesada
             // 3. Sector bajo Ventana Sur (Y=7.00):
             // - Cortina roller blanca en ventana Sur (X=3.25..4.55, Z=6.94)
+            setMountWall(3.90, 7.00, true);
             addDecorBox(3.90, 1.82, 6.94, 1.28, 0.36, 0.03, 0xf8fafc, 0.3);
+            setMountWall(null);
             // - Escurridor de platos negro sobre el retorno Sur de la mesada (mitad izquierda bajo la ventana: X=4.22, Z=6.68)
             addDecorBox(4.22, 0.93, 6.68, 0.38, 0.10, 0.36, 0x1e293b, 0.4);
             // - Lavarropas automático blanco de carga frontal bajo la mitad derecha de la ventana Sur (X=3.54, Z=6.67, mirando al Norte) + tapa de madera
@@ -1783,8 +1928,10 @@
             addDecorBox(3.24, 0.14, 5.32, 0.28, 0.26, 0.26, 0x1e1b4b, 0.7);  // Bolso térmico negro/rosa delante del cesto gris
             addDecorCyl(3.07, 0.65, 5.68, 0.015, 0.015, 1.25, 0x1d4ed8, 0.4);// Escoba cabo azul apoyada en pared Oeste
             addDecorBox(3.08, 0.36, 5.68, 0.08, 0.22, 0.20, 0xf8fafc, 0.4);  // Pala blanca colgada en la escoba
+            setMountWall(3.00, 5.50, false);
             addDecorBox(3.06, 1.42, 5.15, 0.05, 0.22, 0.10, 0xfef3c7, 0.4);  // Teléfono portero eléctrico beige
             addDecorBox(3.06, 2.15, 5.35, 0.06, 0.16, 0.24, 0xffffff, 0.3);  // Aplique de pared medialuna blanco
+            setMountWall(null);
 
             // ------------------------------------------------------------------------
             // C) CUARTO AMPLIADO ([0.00, 4.50] a [3.00, 7.00]) - CAMA Y MESAS DE LUZ SOBRE MURO OESTE (X=0.00, fotos #17 a #22)
@@ -1806,7 +1953,9 @@
             // 4. Panel calefactor eléctrico negro en muro Sur (X=2.48, Z=6.88) + Cesto de ropa sucia gris en muro Este (X=2.72, Z=6.20, foto #17) + Valijas sobre baulera del placard (foto #20)
             addDecorBox(2.48, 0.48, 6.88, 0.50, 0.50, 0.05, 0x0f172a, 0.2);  // Panel calefactor vidrio negro
             addDecorBox(2.72, 0.35, 6.20, 0.38, 0.70, 0.44, 0x475569, 0.8);  // Cesto ropa sucia gris con ropa arriba
+            setMountWall(1.38, 4.50, true);
             addDecorBox(1.38, 2.36, 4.28, 0.72, 0.44, 0.40, 0x1e293b, 0.5);  // Valijas grandes sobre el placard del cuarto (foto #20)
+            setMountWall(null);
             // 5. Cortina gris topo con barral de madera en la ventana Sur del Cuarto (V5: X=0.90..2.10, Z=7.00)
             addCurtainAssembly(0.90, 7.00, 2.10, 7.00, 0, -0.12, 0x78716c);
 
@@ -1836,11 +1985,13 @@
             addDecorBox(1.74, 0.72, 1.12, 0.13, 0.64, 0.50, 0xdc2626, 0.5);  // Bordes rojos silla gamer
 
             // 3. 3 Estantes flotantes largos de madera sobre Muro Este (X=2.84, Z=0.22..1.80, foto #40) con libros Tolkien, consolas Game Boy/Switch y potus
+            setMountWall(3.00, 1.02, false);
             addDecorBox(2.84, 1.38, 1.02, 0.22, 0.03, 1.58, 0x9a441e, 0.45); // 1° Estante inferior (Consolas Game Boy / DS / Switch Pikachu / Globo / Estuches)
             addDecorBox(2.84, 1.72, 1.02, 0.22, 0.03, 1.58, 0x9a441e, 0.45); // 2° Estante medio (Colección Libros Tolkien + Bolso cámara + Potus)
             addDecorBox(2.84, 2.06, 0.85, 0.22, 0.03, 1.20, 0x9a441e, 0.45); // 3° Estante superior (Maceta potus y figura Goku, foto #40)
             addDecorBox(2.84, 1.86, 1.15, 0.18, 0.24, 0.96, 0x7f1d1d, 0.6);  // Hilera de libros encuadernados Tolkien
             addDecorCyl(2.84, 1.86, 0.30, 0.09, 0.08, 0.24, 0x16a34a, 0.6);  // Planta Potus colgante en el extremo norte
+            setMountWall(null);
 
             // 4. Muro Norte (izquierda de la ventana, foto #33): Panel calefactor eléctrico negro (X=0.92, Z=0.08) + Mesa plegable con Ajedrez clásico en esquina NO (X=0.28, Z=0.28)
             addDecorBox(0.92, 0.48, 0.08, 0.50, 0.50, 0.05, 0x0f172a, 0.2);  // Panel calefactor eléctrico vidrio negro en pared Norte (foto #33)
@@ -1854,12 +2005,15 @@
             addDecorCyl(0.28, 0.36, 2.04, 0.22, 0.22, 0.72, 0xd4a373, 0.55); // Mesita redonda plegable de madera clara en esquina SO junto al placard (foto #37)
             addDecorCyl(0.28, 0.74, 2.04, 0.20, 0.20, 0.04, 0x475569, 0.3);  // Tablero de Ajedrez El Señor de los Anillos (LOTR)
             addDecorCyl(1.12, 0.18, 2.04, 0.14, 0.14, 0.34, 0xeab308, 0.3);  // Aspiradora Kärcher amarilla y negra frente al placard del estudio (foto #37 y #38)
+            setMountWall(1.48, 2.30, true);
             addDecorCyl(1.48, 2.28, 2.48, 0.28, 0.28, 0.22, 0x334155, 0.7);  // Rueda de auxilio y cajas sobre la baulera del placard del estudio (foto #37)
+            setMountWall(null);
 
             // 6. Cortina gris oscura con visillo blanco en la ventana Norte del Estudio (V4: X=1.35..2.55, Z=0.00, encuadrada sobre el ala Norte del escritorio en L)
             addCurtainAssembly(1.35, 0.00, 2.55, 0.00, 0, 0.12, 0x57534e);
         }
         buildFurnishedVideoDecor();
+        resolveWallMounts();
 
         // ============================================================================
         // 5. ETIQUETAS DE AMBIENTES Y MUEBLES EN COORDENADAS EXACTAS
@@ -2208,8 +2362,98 @@
         });
 
         // ============================================================================
-        // 8. CONTROLES DE VISIBILIDAD Y CAMBIO 2D / 3D
+        // 8. CONTROLES DE VISIBILIDAD, NOMBRES Y PAREDES ESTILO LOS SIMS (2D / 3D)
         // ============================================================================
+        let wallMode = 'sims'; // 'sims' (Corte Dinámico) | 'up' (Paredes Arriba) | 'down' (Paredes Abajo)
+        let current3DPreset = 'isom';
+
+        function applyWallHeight(w, h) {
+            if (w.type === 'wall') {
+                w.bodyMesh.scale.y = h;
+                w.bodyMesh.position.y = h / 2;
+                w.capMesh.position.y = h + 0.01;
+            } else if (w.type === 'window') {
+                const curSill = Math.min(w.sillH, h);
+                w.sillMesh.scale.y = curSill;
+                w.sillMesh.position.y = curSill / 2;
+                w.upperWinGroup.visible = (h > w.sillH + 0.25);
+                if (w.upperWinGroup.visible) {
+                    const t = Math.max(0.01, (h - w.sillH) / (WALL_H - w.sillH));
+                    w.upperWinGroup.scale.y = t;
+                    w.upperWinGroup.position.y = w.sillH * (1 - t);
+                }
+                w.capGroup.position.y = h + 0.012;
+            }
+            const showLinked = (h > 1.35);
+            for (let j = 0; j < w.linkedObjs.length; j++) {
+                if (w.linkedObjs[j].visible !== showLinked) {
+                    w.linkedObjs[j].visible = showLinked;
+                }
+            }
+        }
+
+        function shouldWallBeCutSims(w, cx, cz, tx, tz, vx, vz, distCam) {
+            const projFromTarget = (w.mx - tx) * vx + (w.mz - tz) * vz;
+            if (w.actsAsExterior) {
+                // Si estamos enfocados dentro de un ambiente y este muro está detrás del centro que miramos, queda levantado
+                if (distCam < 5.2 && projFromTarget < -0.15) return false;
+                const wx = cx - w.mx;
+                const wz = cz - w.mz;
+                const wDist = Math.hypot(wx, wz) || 0.001;
+                const dotCamOut = (wx / wDist) * w.outNx + (wz / wDist) * w.outNz;
+                const dotViewOut = vx * w.outNx + vz * w.outNz;
+                return (dotCamOut > 0.08 || dotViewOut > 0.28);
+            } else {
+                // Tabique interior: en vista general de maqueta baja para despejar toda la planta estilo Los Sims;
+                // en vista cercana de habitación sólo baja si se interpone entre la cámara y el ambiente.
+                if (distCam >= 5.2) return true;
+                const align = Math.abs(vx * w.nx + vz * w.nz);
+                return (projFromTarget > 0.12 && align > 0.25);
+            }
+        }
+
+        function updateSimsWalls(instant = false) {
+            const is2D = (activeCamera === orthoCam);
+            const cx = perspCam.position.x;
+            const cz = perspCam.position.z;
+            const tx = controlsPersp.target.x;
+            const tz = controlsPersp.target.z;
+            const dxCam = cx - tx;
+            const dzCam = cz - tz;
+            const distCam = Math.hypot(dxCam, dzCam) || 0.001;
+            const vx = dxCam / distCam;
+            const vz = dzCam / distCam;
+
+            let anyAnimating = false;
+            for (let i = 0; i < simsWalls.length; i++) {
+                const w = simsWalls[i];
+                if (is2D || wallMode === 'up') {
+                    w.targetH = WALL_H;
+                } else if (wallMode === 'down') {
+                    w.targetH = WALL_CUT_H;
+                } else {
+                    // Modo 'sims' (Corte Dinámico según cámara)
+                    w.targetH = shouldWallBeCutSims(w, cx, cz, tx, tz, vx, vz, distCam) ? WALL_CUT_H : WALL_H;
+                }
+
+                if (instant) {
+                    w.currentH = w.targetH;
+                    applyWallHeight(w, w.currentH);
+                } else {
+                    const diff = w.targetH - w.currentH;
+                    if (Math.abs(diff) > 0.004) {
+                        w.currentH += diff * 0.26;
+                        applyWallHeight(w, w.currentH);
+                        anyAnimating = true;
+                    } else if (w.currentH !== w.targetH) {
+                        w.currentH = w.targetH;
+                        applyWallHeight(w, w.currentH);
+                    }
+                }
+            }
+            return anyAnimating;
+        }
+
         function applyWallsVisibility(showExt, showInt) {
             exteriorWallsGroup.visible = showExt;
             interiorWallsGroup.visible = showInt;
@@ -2220,45 +2464,88 @@
             if (activeCamera === perspCam) {
                 doors3DGroup.visible = !allHidden && document.getElementById('chk-doors').checked;
             }
+            wakeRenderer();
         }
+
+        function setWallMode(mode) {
+            wallMode = mode;
+            document.getElementById('chk-wall-sims').checked = (mode === 'sims');
+            document.getElementById('chk-wall-cut').checked = (mode === 'down');
+            if (activeCamera === perspCam) {
+                if (mode === 'sims') setActiveTopBtn('btn-mode-sims');
+                else if (mode === 'up') setActiveTopBtn('btn-mode-3d');
+                else if (mode === 'down') setActiveTopBtn('btn-mode-cut');
+            }
+            wakeRenderer();
+        }
+
+        document.getElementById('chk-wall-sims').addEventListener('change', (e) => {
+            if (activeCamera === orthoCam) switchTo3D(current3DPreset, e.target.checked ? 'sims' : 'up');
+            else setWallMode(e.target.checked ? 'sims' : 'up');
+        });
+
+        document.getElementById('chk-wall-cut').addEventListener('change', (e) => {
+            if (activeCamera === orthoCam) switchTo3D(current3DPreset, e.target.checked ? 'down' : 'sims');
+            else setWallMode(e.target.checked ? 'down' : 'sims');
+        });
 
         document.getElementById('chk-hide-all-walls').addEventListener('change', (e) => {
             const hideAll = e.target.checked;
             applyWallsVisibility(!hideAll, !hideAll);
-            if (hideAll) setActiveTopBtn('btn-mode-nowalls');
-            else setActiveTopBtn('btn-mode-3d');
         });
 
         document.getElementById('chk-ext-walls').addEventListener('change', (e) => {
             exteriorWallsGroup.visible = e.target.checked;
             document.getElementById('chk-hide-all-walls').checked = (!e.target.checked && !interiorWallsGroup.visible);
+            wakeRenderer();
         });
         document.getElementById('chk-int-walls').addEventListener('change', (e) => {
             interiorWallsGroup.visible = e.target.checked;
             document.getElementById('chk-hide-all-walls').checked = (!e.target.checked && !exteriorWallsGroup.visible);
+            wakeRenderer();
         });
         document.getElementById('chk-doors').addEventListener('change', (e) => {
             if (activeCamera === orthoCam && e.target.checked) {
-                switchTo3D('isom', false, false);
+                switchTo3D(current3DPreset, wallMode);
             }
             doors3DGroup.visible = (activeCamera === perspCam) && e.target.checked;
+            wakeRenderer();
         });
         document.getElementById('chk-fixtures').addEventListener('change', (e) => {
             fixturesGroup.visible = e.target.checked;
+            wakeRenderer();
         });
         document.getElementById('chk-video-decor').addEventListener('change', (e) => {
             decorVideoGroup.visible = e.target.checked;
             document.getElementById('btn-toggle-video-decor').classList.toggle('active', e.target.checked);
+            wakeRenderer();
         });
         document.getElementById('btn-toggle-video-decor').addEventListener('click', () => {
             const nextState = !decorVideoGroup.visible;
             decorVideoGroup.visible = nextState;
             document.getElementById('chk-video-decor').checked = nextState;
             document.getElementById('btn-toggle-video-decor').classList.toggle('active', nextState);
+            wakeRenderer();
         });
+
+        // Mostrar / Ocultar Nombres de Ambientes (Botón superior + Checkbox lateral)
+        document.getElementById('chk-labels').addEventListener('change', (e) => {
+            document.getElementById('btn-toggle-labels').classList.toggle('active', e.target.checked);
+            updateLabels(true);
+            wakeRenderer();
+        });
+        document.getElementById('btn-toggle-labels').addEventListener('click', () => {
+            const nextState = !chkLabelsEl.checked;
+            chkLabelsEl.checked = nextState;
+            document.getElementById('btn-toggle-labels').classList.toggle('active', nextState);
+            updateLabels(true);
+            wakeRenderer();
+        });
+
         document.getElementById('chk-roof').addEventListener('change', (e) => {
             roofGroup.visible = e.target.checked;
             document.getElementById('btn-toggle-roof').classList.toggle('active', e.target.checked);
+            wakeRenderer();
         });
         document.getElementById('btn-toggle-roof').addEventListener('click', () => {
             const nextState = !roofGroup.visible;
@@ -2266,22 +2553,15 @@
             document.getElementById('chk-roof').checked = nextState;
             document.getElementById('btn-toggle-roof').classList.toggle('active', nextState);
             if (nextState && activeCamera === orthoCam) {
-                switchTo3D('isom', false, false);
+                switchTo3D(current3DPreset, wallMode);
             }
+            wakeRenderer();
         });
         document.getElementById('chk-furniture').addEventListener('change', (e) => {
             furnitureGroup.visible = e.target.checked;
             updateSelectionVisual();
+            wakeRenderer();
         });
-
-        function setWallCut(isCut) {
-            document.getElementById('chk-wall-cut').checked = isCut;
-            const scaleY = isCut ? 0.42 : 1.0;
-            exteriorWallsGroup.scale.y = scaleY;
-            interiorWallsGroup.scale.y = scaleY;
-            doors3DGroup.scale.y = scaleY;
-        }
-        document.getElementById('chk-wall-cut').addEventListener('change', (e) => setWallCut(e.target.checked));
 
         document.getElementById('chk-transparent').addEventListener('change', (e) => {
             const isTrans = e.target.checked;
@@ -2290,11 +2570,13 @@
                 m.opacity = isTrans ? 0.35 : 1.0;
                 m.needsUpdate = true;
             });
+            wakeRenderer();
         });
 
         function setActiveTopBtn(id) {
-            document.querySelectorAll('.mode-btn:not(#btn-toggle-roof):not(#btn-toggle-video-decor)').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.mode-btn:not(#btn-toggle-roof):not(#btn-toggle-video-decor):not(#btn-toggle-labels)').forEach(b => b.classList.remove('active'));
+            const el = document.getElementById(id);
+            if (el) el.classList.add('active');
         }
 
         const viewPresets = {
@@ -2316,8 +2598,10 @@
             roofGroup.visible = false;
             document.getElementById('chk-roof').checked = false;
             document.getElementById('btn-toggle-roof').classList.remove('active');
+            updateSimsWalls(true);
             setActiveTopBtn('btn-mode-2d');
             document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === 'top2d'));
+            wakeRenderer();
         }
 
         function get3DPreset(name) {
@@ -2333,34 +2617,38 @@
             return v;
         }
 
-        function switchTo3D(presetName = 'isom', cut = false, hideWalls = false) {
+        function switchTo3D(presetName = 'isom', mode = wallMode, moveCam = true) {
             ensure3DExtrasBuilt();
+            current3DPreset = presetName;
             activeCamera = perspCam;
             controlsOrtho.enabled = false;
             controlsPersp.enabled = true;
             ambLight.intensity = 0.85;
-            if (hideWalls) {
-                applyWallsVisibility(false, false);
-                setActiveTopBtn('btn-mode-nowalls');
-            } else {
-                applyWallsVisibility(true, true);
-                setWallCut(cut);
-                setActiveTopBtn(cut ? 'btn-mode-cut' : 'btn-mode-3d');
+            applyWallsVisibility(true, true);
+            setWallMode(mode || 'sims');
+            if (moveCam) {
+                const v = get3DPreset(presetName);
+                perspCam.position.set(v.pos[0], v.pos[1], v.pos[2]);
+                controlsPersp.target.set(v.target[0], v.target[1], v.target[2]);
+                controlsPersp.update();
             }
-            const v = get3DPreset(presetName);
-            perspCam.position.set(v.pos[0], v.pos[1], v.pos[2]);
-            controlsPersp.target.set(v.target[0], v.target[1], v.target[2]);
-            controlsPersp.update();
             document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === presetName));
+            wakeRenderer();
         }
 
         document.getElementById('btn-mode-2d').addEventListener('click', () => {
             applyWallsVisibility(true, true);
             switchTo2D();
         });
-        document.getElementById('btn-mode-3d').addEventListener('click', () => switchTo3D('isom', false, false));
-        document.getElementById('btn-mode-cut').addEventListener('click', () => switchTo3D('isom', true, false));
-        document.getElementById('btn-mode-nowalls').addEventListener('click', () => switchTo3D('isom', false, true));
+        document.getElementById('btn-mode-sims').addEventListener('click', () => {
+            switchTo3D(current3DPreset, 'sims', activeCamera === orthoCam);
+        });
+        document.getElementById('btn-mode-3d').addEventListener('click', () => {
+            switchTo3D(current3DPreset, 'up', activeCamera === orthoCam);
+        });
+        document.getElementById('btn-mode-cut').addEventListener('click', () => {
+            switchTo3D(current3DPreset, 'down', activeCamera === orthoCam);
+        });
 
         // Botones de Zoom rápido (+ / - / Reset)
         document.getElementById('btn-zoom-in').addEventListener('click', () => {
@@ -2370,6 +2658,7 @@
             } else {
                 perspCam.position.lerp(controlsPersp.target, 0.2);
             }
+            wakeRenderer();
         });
         document.getElementById('btn-zoom-out').addEventListener('click', () => {
             if (activeCamera === orthoCam) {
@@ -2379,6 +2668,7 @@
                 const dir = perspCam.position.clone().sub(controlsPersp.target).normalize();
                 perspCam.position.addScaledVector(dir, 1.5);
             }
+            wakeRenderer();
         });
         document.getElementById('btn-zoom-reset').addEventListener('click', () => {
             if (activeCamera === orthoCam) {
@@ -2388,8 +2678,9 @@
                 orthoCam.updateProjectionMatrix();
                 controlsOrtho.update();
             } else {
-                switchTo3D('isom', document.getElementById('chk-wall-cut').checked);
+                switchTo3D('isom', wallMode, true);
             }
+            wakeRenderer();
         });
 
         document.querySelectorAll('.view-chip').forEach(chip => {
@@ -2398,7 +2689,7 @@
                 if (v === 'top2d') {
                     switchTo2D();
                 } else {
-                    switchTo3D(v, document.getElementById('chk-wall-cut').checked);
+                    switchTo3D(v, wallMode, true);
                 }
             });
         });
@@ -2428,6 +2719,8 @@
             const movedOrtho = controlsOrtho.enabled && controlsOrtho.update();
             if (movedPersp || movedOrtho) dirtyFrames = Math.max(dirtyFrames, 5);
             if (dirtyFrames > 0) {
+                const wallsMoving = updateSimsWalls(false);
+                if (wallsMoving) dirtyFrames = Math.max(dirtyFrames, 3);
                 dirtyFrames--;
                 updateLabels();
                 if (selectionBox) selectionBox.update();
