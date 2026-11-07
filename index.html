@@ -1230,16 +1230,20 @@
         addBoxFixture(4.48, 0.875, 6.66, 0.40, 0.02, 0.38, 0x94a3b8, fixturesGroup, 0.25);
         addBoxFixture(4.88, 1.00, 6.66, 0.09, 0.24, 0.09, 0x0f172a, fixturesGroup, 0.2); // Filtro purificador de agua negro PSA
 
-        // 3) BAÑO AMPLIO: Bañera en muro Oeste + Lavatorio Pedestal + Inodoro con mochila
-        // Bañera (X=0.05..0.75, Z=2.84..3.96)
+        // 3) BAÑO AMPLIO (según fotos #23 a #29): Bañera con mampara/cortina floral al Oeste + Lavatorio con botiquín espejo al Norte + Inodoro, Bidet y Alacena al Sur
+        // Bañera blanca (X=0.05..0.75, Z=2.84..3.96) + esquinero ducha + cortina de baño blanca
         addBoxFixture(0.40, 0.24, 3.40, 0.70, 0.48, 1.12, 0xffffff, fixturesGroup, 0.25);
         addBoxFixture(0.40, 0.49, 3.40, 0.56, 0.02, 0.96, 0xe2e8f0, fixturesGroup, 0.2);
-        // Lavatorio de pedestal blanco (X=1.35, Z=3.02)
-        addBoxFixture(1.35, 0.42, 2.98, 0.18, 0.80, 0.18, 0xffffff, fixturesGroup, 0.25);
-        addBoxFixture(1.35, 0.82, 3.02, 0.46, 0.14, 0.36, 0xffffff, fixturesGroup, 0.25);
-        // Inodoro con mochila (X=1.86, Z=3.76)
-        addBoxFixture(1.86, 0.22, 3.74, 0.38, 0.42, 0.44, 0xffffff, fixturesGroup, 0.25);
-        addBoxFixture(1.86, 0.58, 3.90, 0.38, 0.34, 0.16, 0xffffff, fixturesGroup, 0.25);
+        // Lavatorio de pedestal blanco en muro Norte (X=1.42, Z=3.02) + botiquín con espejo arriba
+        addBoxFixture(1.42, 0.42, 2.98, 0.18, 0.80, 0.18, 0xffffff, fixturesGroup, 0.25);
+        addBoxFixture(1.42, 0.82, 3.02, 0.46, 0.14, 0.36, 0xffffff, fixturesGroup, 0.25);
+        addBoxFixture(1.42, 1.48, 2.88, 0.52, 0.62, 0.14, 0xd6ccc2, fixturesGroup, 0.4); // Botiquín madera clara con espejo
+        // Inodoro con mochila (X=1.74, Z=3.76) + Bidet blanco (X=1.20, Z=3.76) en muro Sur (Z=4.00)
+        addBoxFixture(1.74, 0.22, 3.74, 0.38, 0.42, 0.44, 0xffffff, fixturesGroup, 0.25);
+        addBoxFixture(1.74, 0.58, 3.90, 0.38, 0.34, 0.16, 0xffffff, fixturesGroup, 0.25);
+        addBoxFixture(1.20, 0.20, 3.75, 0.36, 0.40, 0.42, 0xffffff, fixturesGroup, 0.25); // Bidet 3 llaves
+        // Alacena colgante de baño sobre inodoro y bidet (Muro Sur Z=3.86, X=1.48, Y=1.88: 2 puertas + estantes abiertos con toallas)
+        addBoxFixture(1.48, 1.88, 3.86, 0.78, 0.56, 0.26, 0xe5dec9, fixturesGroup, 0.45);
 
         // 4) TECHO DE MADERA MACHIMBRADA EN PENDIENTE CON VIGAS VISTAS DE NORTE A SUR (Extraído de las fotos y videos)
         // Dos faldones que suben hacia la cumbrera central Este-Oeste (Z = 3.50, de 2.62m en frentes Norte/Sur a 3.30m en la cumbrera)
@@ -1304,9 +1308,9 @@
         // Eje Vertical X = 2.30 (Cierre de Placards y Baño):
         // - Muro sólido más largo arriba: de Y = 2.30 a Y = 3.02 (cubre Placard Sup. 2.30..2.80 + mocheta superior del Baño 2.80..3.02)
         addWallSegment(2.30, 2.30, 2.30, 3.02, INT_T, interiorWallsGroup, false);
-        // - PUERTA BAÑO: Entre Y = 3.02 e Y = 3.65 (abre HACIA ADENTRO del Baño, hacia la izquierda X < 2.30)
+        // - PUERTA BAÑO: Entre Y = 3.02 e Y = 3.65 (bisagra al Sur en Y=3.65, abre HACIA ADENTRO del Baño hacia la izquierda X < 2.30, foto #23)
         addDashedLine(2.30, 3.02, 2.30, 3.65);
-        addDoorSymbol2D(2.30, 3.05, 2.08, 3.25, 2.04, 3.46, 2.30, 3.62);
+        addDoorSymbol2D(2.30, 3.62, 2.08, 3.42, 2.04, 3.20, 2.30, 3.05);
         // - Muro sólido abajo: de Y = 3.65 a Y = 4.50 (mocheta inferior del Baño 3.65..4.00 + Placard Inf. 4.00..4.50)
         addWallSegment(2.30, 3.65, 2.30, 4.50, INT_T, interiorWallsGroup, false);
 
@@ -1324,9 +1328,9 @@
         // Eje Horizontal Y = 2.30 (Base Estudio):
         // - Muro sólido de X = 0.00 a X = 2.30
         addWallSegment(0.00, 2.30, 2.30, 2.30, INT_T, interiorWallsGroup, false);
-        // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (abre HACIA ADENTRO del Estudio, hacia arriba Y < 2.30)
+        // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Estudio sobre muro Este, fotos #39 y #40)
         addDashedLine(2.30, 2.30, 3.00, 2.30);
-        addDoorSymbol2D(2.35, 2.30, 2.55, 2.08, 2.75, 2.08, 2.88, 2.30);
+        addDoorSymbol2D(2.95, 2.30, 2.75, 2.08, 2.55, 2.08, 2.42, 2.30);
 
         // Eje Horizontal Y = 2.80 (Divide Placard Superior y Baño): de X = 0.00 a X = 2.30
         addWallSegment(0.00, 2.80, 2.30, 2.80, INT_T, interiorWallsGroup, false);
@@ -1337,9 +1341,9 @@
         // Eje Horizontal Y = 4.50 (Línea Cuarto y Cocina):
         // - Muro sólido de X = 0.00 a X = 2.30 (divide Placard Inferior y Cuarto)
         addWallSegment(0.00, 4.50, 2.30, 4.50, INT_T, interiorWallsGroup, false);
-        // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (abre HACIA ADENTRO del Cuarto, hacia abajo Y > 4.50)
+        // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Cuarto sobre muro Este, fotos #17 y #22)
         addDashedLine(2.30, 4.50, 3.00, 4.50);
-        addDoorSymbol2D(2.35, 4.50, 2.55, 4.72, 2.75, 4.72, 2.88, 4.50);
+        addDoorSymbol2D(2.95, 4.50, 2.75, 4.72, 2.55, 4.72, 2.42, 4.50);
         // - VANO ABIERTO COCINA (SIN PUERTA): Paso libre de X = 3.00 a X = 4.45 alineado con el pasillo de la cocina; mocheta de X = 4.45 a X = 5.20 delante del lateral de la heladera
         addDashedLine(3.00, 4.50, 4.45, 4.50);
         // - Mocheta frontal de Cocina (cubre el espesor de la heladera): De X = 4.45 a X = 5.20
@@ -1550,13 +1554,16 @@
             cocinaLintel.scale.set(wCocinaVano, lintelH, INT_T);
             cocinaLintel.position.set(3.725, DOOR_H + lintelH / 2, 4.50);
             doors3DGroup.add(cocinaLintel);
-            // Instanciar puertas 3D relevadas del video
+            // Instanciar puertas 3D relevadas de las fotos (#17, #23, #39, #40):
+            // - Puerta Estudio: bisagra en X=3.00 (hingeAtStart=false), abre hacia adentro sobre muro Este (swingSign=-1)
+            // - Puerta Baño: bisagra en Z=3.65 (hingeAtStart=false), abre hacia adentro al Sur (swingSign=1)
+            // - Puerta Cuarto: bisagra en X=3.00 (hingeAtStart=false), abre hacia adentro sobre muro Este (swingSign=1)
             addMainEntranceDoor3D(5.38, 5.70, 6.12, 5.70);
-            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, true, 1, 45);
-            addInteriorWoodDoor3D(2.30, 3.02, 2.30, 3.65, true, -1, 45);
-            addInteriorWoodDoor3D(2.30, 4.50, 3.00, 4.50, true, -1, 45);
-            addSlidingPlacardFront3D(0.15, 2.18, 2.30, -1);
-            addSlidingPlacardFront3D(0.15, 2.18, 4.50, 1);
+            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 55);
+            addInteriorWoodDoor3D(2.30, 3.02, 2.30, 3.65, false, 1, 55);
+            addInteriorWoodDoor3D(2.30, 4.50, 3.00, 4.50, false, 1, 55);
+            addSlidingPlacardFront3D(0.22, 1.92, 2.30, -1);
+            addSlidingPlacardFront3D(0.22, 1.92, 4.50, 1);
         }
         setTimeout(ensure3DExtrasBuilt, 60);
 
@@ -1780,30 +1787,31 @@
             addDecorBox(3.06, 2.15, 5.35, 0.06, 0.16, 0.24, 0xffffff, 0.3);  // Aplique de pared medialuna blanco
 
             // ------------------------------------------------------------------------
-            // C) CUARTO AMPLIADO ([0.00, 4.50] a [3.00, 7.00]) - CAMA Y MESAS DE LUZ SOBRE MURO OESTE (X=0.00)
+            // C) CUARTO AMPLIADO ([0.00, 4.50] a [3.00, 7.00]) - CAMA Y MESAS DE LUZ SOBRE MURO OESTE (X=0.00, fotos #17 a #22)
             // ------------------------------------------------------------------------
             // 1. Amplio respaldo horizontal de madera oscura nogal/wengué en Muro Oeste X=0.00 (Z=4.68..6.90)
             addDecorBox(0.08, 0.68, 5.80, 0.06, 1.15, 2.22, 0x4a3222, 0.5);
-            // 2. Cama de 2 plazas (1.45m ancho × 1.90m largo) con cabecera en X=0.10 extendiéndose hacia el Este hasta X=2.00, centrada en Z=5.80
+            // 2. Cama de 2 plazas (1.45m ancho × 1.90m largo) con cabecera en X=0.10 extendiéndose hacia el Este hasta X=2.00, centrada en Z=5.80 + 2 valijas abiertas encima (fotos #18-#21)
             addDecorBox(1.05, 0.24, 5.80, 1.90, 0.46, 1.45, 0x475569, 0.7);  // Colchón + acolchado a rayas gris topo
             addDecorBox(1.05, 0.48, 5.80, 1.86, 0.03, 1.40, 0x64748b, 0.75); // Franjas claras del acolchado
             addDecorBox(0.32, 0.53, 5.48, 0.34, 0.10, 0.52, 0xe2e8f0, 0.8);  // Almohada norte (lado Oeste)
             addDecorBox(0.32, 0.53, 6.12, 0.34, 0.10, 0.52, 0xe2e8f0, 0.8);  // Almohada sur (lado Oeste)
+            addDecorBox(1.48, 0.58, 5.56, 0.58, 0.16, 0.42, 0x1e293b, 0.4);  // Valija negra sobre la cama
             // 3. 2 Mesas de luz de madera nogal oscuro a ambos lados de la cama (sobre Muro Oeste X=0.00):
-            // - Mesa de luz Norte (X=0.28, Z=4.84, pegada al Placard Inferior) con humidificador cilíndrico blanco y parlante inteligente
+            // - Mesa de luz Norte (X=0.28, Z=4.84, pegada al Placard Inferior) con humidificador blanco y parlante inteligente
             addDecorBox(0.28, 0.31, 4.84, 0.42, 0.62, 0.44, 0x4a3222, 0.5);
             addDecorCyl(0.28, 0.72, 4.90, 0.07, 0.07, 0.18, 0xffffff, 0.2);  // Humidificador blanco
-            // - Mesa de luz Sur (X=0.28, Z=6.72, en esquina Suroeste) con reloj digital blanco, peluches y bolso naranja
+            // - Mesa de luz Sur (X=0.28, Z=6.72, en esquina Suroeste) con reloj digital blanco y peluches
             addDecorBox(0.28, 0.31, 6.72, 0.42, 0.62, 0.42, 0x4a3222, 0.5);
-            addDecorBox(0.26, 0.74, 6.84, 0.26, 0.24, 0.14, 0xea580c, 0.6);  // Bolso naranja en esquina SO
-            // 4. Panel calefactor eléctrico negro en muro Sur (X=2.48, Z=6.88) + Cesto de ropa sucia gris en esquina SE (X=2.68, Z=6.35)
-            addDecorBox(2.48, 0.42, 6.88, 0.52, 0.52, 0.05, 0x0f172a, 0.2);  // Panel calefactor vidrio negro
-            addDecorBox(2.68, 0.35, 6.35, 0.40, 0.70, 0.44, 0x334155, 0.8);  // Cesto ropa sucia gris oscuro (frente a la puerta del cuarto)
+            // 4. Panel calefactor eléctrico negro en muro Sur (X=2.48, Z=6.88) + Cesto de ropa sucia gris en muro Este (X=2.72, Z=6.20, foto #17) + Valijas sobre baulera del placard (foto #20)
+            addDecorBox(2.48, 0.48, 6.88, 0.50, 0.50, 0.05, 0x0f172a, 0.2);  // Panel calefactor vidrio negro
+            addDecorBox(2.72, 0.35, 6.20, 0.38, 0.70, 0.44, 0x475569, 0.8);  // Cesto ropa sucia gris con ropa arriba
+            addDecorBox(1.38, 2.36, 4.28, 0.72, 0.44, 0.40, 0x1e293b, 0.5);  // Valijas grandes sobre el placard del cuarto (foto #20)
             // 5. Cortina gris topo con barral de madera en la ventana Sur del Cuarto (V5: X=0.90..2.10, Z=7.00)
             addCurtainAssembly(0.90, 7.00, 2.10, 7.00, 0, -0.12, 0x78716c);
 
             // ------------------------------------------------------------------------
-            // D) ESTUDIO AMPLIADO ([0.00, 0.00] a [3.00, 2.30])
+            // D) ESTUDIO AMPLIADO ([0.00, 0.00] a [3.00, 2.30], fotos #31 a #40)
             // ------------------------------------------------------------------------
             // 1. Escritorio en "L" de madera lustrada caoba/cedro rojizo (#8f3818):
             // - Tramo principal sobre Muro Este (X=2.64, Z=0.14..1.78)
@@ -1813,11 +1821,12 @@
             // - Gabinete PC Gamer negro bajo el extremo sur del escritorio (X=2.66, Z=1.54) + impresora bajo el ala norte
             addDecorBox(2.66, 0.24, 1.54, 0.44, 0.46, 0.22, 0x0f172a, 0.3);  // PC Gamer negra Thermaltake
             addDecorBox(1.92, 0.22, 0.38, 0.42, 0.28, 0.36, 0x1e293b, 0.4);  // Impresora multifunción abajo
-            // - Equipamiento sobre el escritorio: Deskmat negro XXL + Monitor 27" + Teclado/Mouse + Parlantes + Bandeja blanca + Lámpara aro LED
+            // - Equipamiento sobre el escritorio (foto #40): Deskmat negro + Monitor 27" + Soporte notebook aluminio + Micrófono en brazo + Parlantes + Lámpara lupa LED
             addDecorBox(2.54, 0.77, 1.02, 0.42, 0.01, 0.88, 0x111827, 0.6);  // Deskmat negro
             addDecorBox(2.80, 1.06, 0.98, 0.05, 0.38, 0.62, 0x0f172a, 0.2);  // Monitor 27" con webcam y barra LED
-            addDecorBox(2.74, 0.92, 1.50, 0.16, 0.26, 0.22, 0x111827, 0.3);  // Parlantes 2.1 + auriculares en soporte
-            addDecorBox(2.58, 0.81, 1.58, 0.26, 0.08, 0.32, 0xf8fafc, 0.3);  // Bandeja organizadora blanca
+            addDecorBox(2.58, 0.90, 0.52, 0.22, 0.22, 0.24, 0x94a3b8, 0.3);  // Soporte aluminio de notebook
+            addDecorBox(2.74, 0.92, 1.50, 0.16, 0.26, 0.22, 0x111827, 0.3);  // Parlantes 2.1 + auriculares en soporte + brazo micrófono
+            addDecorBox(2.58, 0.81, 1.58, 0.26, 0.08, 0.32, 0xf8fafc, 0.3);  // Papeles y bandeja blanca
             addDecorCyl(2.12, 1.05, 0.42, 0.10, 0.10, 0.02, 0x1e293b);       // Lámpara articulada con aro LED / lupa
             addDecorCyl(2.12, 0.84, 0.48, 0.05, 0.06, 0.14, 0x10b981);       // Escultura impresa en 3D resina verde
 
@@ -1826,20 +1835,28 @@
             addDecorBox(1.75, 0.72, 1.12, 0.12, 0.68, 0.48, 0x111827, 0.5);  // Respaldo alto negro
             addDecorBox(1.74, 0.72, 1.12, 0.13, 0.64, 0.50, 0xdc2626, 0.5);  // Bordes rojos silla gamer
 
-            // 3. 2 Estantes flotantes largos de madera sobre Muro Este (X=2.84, Z=0.22..1.80, Y=1.45 y Y=1.82) con libros, consolas y potus
-            addDecorBox(2.84, 1.45, 1.02, 0.22, 0.03, 1.58, 0x9a441e, 0.45); // Estante flotante inferior (Consolas Nintendo / Globo / Estuches)
-            addDecorBox(2.84, 1.82, 1.02, 0.22, 0.03, 1.58, 0x9a441e, 0.45); // Estante flotante superior (Colección Libros Tolkien + Potus)
-            addDecorBox(2.84, 1.96, 1.08, 0.18, 0.24, 1.10, 0x7f1d1d, 0.6);  // Hilera de libros encuadernados
-            addDecorCyl(2.84, 1.96, 0.32, 0.09, 0.08, 0.24, 0x16a34a, 0.6);  // Planta Potus colgante en el extremo norte
+            // 3. 3 Estantes flotantes largos de madera sobre Muro Este (X=2.84, Z=0.22..1.80, foto #40) con libros Tolkien, consolas Game Boy/Switch y potus
+            addDecorBox(2.84, 1.38, 1.02, 0.22, 0.03, 1.58, 0x9a441e, 0.45); // 1° Estante inferior (Consolas Game Boy / DS / Switch Pikachu / Globo / Estuches)
+            addDecorBox(2.84, 1.72, 1.02, 0.22, 0.03, 1.58, 0x9a441e, 0.45); // 2° Estante medio (Colección Libros Tolkien + Bolso cámara + Potus)
+            addDecorBox(2.84, 2.06, 0.85, 0.22, 0.03, 1.20, 0x9a441e, 0.45); // 3° Estante superior (Maceta potus y figura Goku, foto #40)
+            addDecorBox(2.84, 1.86, 1.15, 0.18, 0.24, 0.96, 0x7f1d1d, 0.6);  // Hilera de libros encuadernados Tolkien
+            addDecorCyl(2.84, 1.86, 0.30, 0.09, 0.08, 0.24, 0x16a34a, 0.6);  // Planta Potus colgante en el extremo norte
 
-            // 4. Biblioteca alta de madera oscura de 5 estantes en Muro Oeste (X=0.20, Z=0.88) + Funda Guitarra + Mesa con Ajedrez LOTR (X=0.35, Z=1.96)
-            addDecorBox(0.20, 0.92, 0.88, 0.32, 1.84, 0.82, 0x3b2314, 0.55); // Biblioteca 5 estantes (libros, figuras Toy Story, peluches Pokémon, Switch 2, Torre Eiffel)
-            addDecorCyl(0.22, 0.52, 1.48, 0.12, 0.18, 1.02, 0x1e293b, 0.7);  // Funda negra de guitarra acústica
-            // - Mesita plegable de madera clara con Tablero de Ajedrez de El Señor de los Anillos en la esquina SO junto al placard (X=0.35, Z=1.96)
-            addDecorBox(0.35, 0.36, 1.96, 0.44, 0.72, 0.44, 0xd4a373, 0.55); // Mesita plegable madera clara
-            addDecorBox(0.35, 0.74, 1.96, 0.42, 0.04, 0.42, 0x1e293b, 0.3);  // Tablero de Ajedrez LOTR
+            // 4. Muro Norte (izquierda de la ventana, foto #33): Panel calefactor eléctrico negro (X=0.92, Z=0.08) + Mesa plegable con Ajedrez clásico en esquina NO (X=0.28, Z=0.28)
+            addDecorBox(0.92, 0.48, 0.08, 0.50, 0.50, 0.05, 0x0f172a, 0.2);  // Panel calefactor eléctrico vidrio negro en pared Norte (foto #33)
+            addDecorBox(0.28, 0.35, 0.28, 0.44, 0.70, 0.44, 0xb47b48, 0.55); // Mesa plegable cuadrada en esquina Noroeste (foto #33)
+            addDecorBox(0.28, 0.72, 0.28, 0.38, 0.03, 0.38, 0x1e293b, 0.3);  // Tablero de ajedrez clásico en esquina NO
 
-            // 5. Cortina gris oscura con visillo blanco en la ventana Norte del Estudio (V4: X=1.35..2.55, Z=0.00, encuadrada sobre el ala Norte del escritorio en L)
+            // 5. Muro Oeste (X=0.00, fotos #35 a #38): Biblioteca alta de 6 niveles (X=0.20, Z=1.18) + Funda Guitarra (Z=1.68) + Mesita redonda con Ajedrez LOTR en esquina SO (X=0.28, Z=2.04) + Aspiradora Kärcher amarilla
+            addDecorBox(0.20, 0.92, 1.18, 0.32, 1.84, 0.84, 0x3b2314, 0.55); // Biblioteca 6 estantes (libros, Buzz/Woody, peluches Pokémon, cajas Switch/Switch 2 y Torre Eiffel arriba)
+            addDecorBox(0.20, 2.02, 1.18, 0.26, 0.32, 0.72, 0xdc2626, 0.5);  // Cajas Nintendo Switch / Switch 2 / Funko sobre la biblioteca (foto #35)
+            addDecorCyl(0.22, 0.52, 1.72, 0.12, 0.18, 1.02, 0x1e293b, 0.7);  // Funda negra acolchada de guitarra acústica (foto #35 y #37)
+            addDecorCyl(0.28, 0.36, 2.04, 0.22, 0.22, 0.72, 0xd4a373, 0.55); // Mesita redonda plegable de madera clara en esquina SO junto al placard (foto #37)
+            addDecorCyl(0.28, 0.74, 2.04, 0.20, 0.20, 0.04, 0x475569, 0.3);  // Tablero de Ajedrez El Señor de los Anillos (LOTR)
+            addDecorCyl(1.12, 0.18, 2.04, 0.14, 0.14, 0.34, 0xeab308, 0.3);  // Aspiradora Kärcher amarilla y negra frente al placard del estudio (foto #37 y #38)
+            addDecorCyl(1.48, 2.28, 2.48, 0.28, 0.28, 0.22, 0x334155, 0.7);  // Rueda de auxilio y cajas sobre la baulera del placard del estudio (foto #37)
+
+            // 6. Cortina gris oscura con visillo blanco en la ventana Norte del Estudio (V4: X=1.35..2.55, Z=0.00, encuadrada sobre el ala Norte del escritorio en L)
             addCurtainAssembly(1.35, 0.00, 2.55, 0.00, 0, 0.12, 0x57534e);
         }
         buildFurnishedVideoDecor();
@@ -1881,10 +1898,11 @@
         // Etiquetas de Calefactores e Instalaciones del video
         addPlanLabel(5.75, 1.90, "🔥 CALEFACTOR", "arch-label sub");
         addPlanLabel(2.48, 6.62, "🔥 CALEF.", "arch-label sub");
+        addPlanLabel(0.92, 0.22, "🔥 CALEF.", "arch-label sub");
         addPlanLabel(0.40, 3.40, "BAÑERA", "arch-label sub");
         addPlanLabel(4.88, 5.42, "CALEFÓN", "arch-label sub");
 
-        // Etiquetas de Muebles y Decoración extraídos del 2° video (se ocultan si se desactiva "🛋️ Amoblado")
+        // Etiquetas de Muebles y Decoración extraídos del 2° video y fotos (se ocultan si se desactiva "🛋️ Amoblado")
         addPlanLabel(3.52, 2.80, "🛋️ FUTÓN 3C", "arch-label sub", true);
         addPlanLabel(4.38, 2.80, "MESA RATONA", "arch-label sub", true);
         addPlanLabel(5.96, 2.80, "📺 TV 50\" + RACK", "arch-label sub", true);
@@ -1896,11 +1914,12 @@
         addPlanLabel(1.05, 5.95, "🛏️ CAMA 2P + RESPALDO", "arch-label sub", true);
         addPlanLabel(0.28, 4.84, "MESA LUZ", "arch-label sub", true);
         addPlanLabel(0.28, 6.72, "MESA LUZ", "arch-label sub", true);
-        addPlanLabel(2.68, 6.35, "CESTO ROPA", "arch-label sub", true);
+        addPlanLabel(2.70, 6.20, "CESTO ROPA", "arch-label sub", true);
         addPlanLabel(2.58, 0.96, "🖥️ ESCRITORIO EN L + PC", "arch-label sub", true);
         addPlanLabel(1.95, 1.12, "💺 SILLA GAMER", "arch-label sub", true);
-        addPlanLabel(0.32, 0.88, "📚 BIBLIOTECA", "arch-label sub", true);
-        addPlanLabel(0.42, 1.96, "♟️ AJEDREZ LOTR", "arch-label sub", true);
+        addPlanLabel(0.32, 1.18, "📚 BIBLIOTECA", "arch-label sub", true);
+        addPlanLabel(0.38, 0.28, "♟️ AJEDREZ", "arch-label sub", true);
+        addPlanLabel(0.38, 2.04, "♟️ AJEDREZ LOTR", "arch-label sub", true);
 
         // Cotas Exteriores
         addPlanLabel(3.15, -0.30, "6.30 m", "arch-label dim");

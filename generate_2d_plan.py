@@ -189,17 +189,18 @@ def main():
     draw.rectangle([*px(4.67, 6.35), *px(5.03, 6.53)], fill=(241, 245, 249), outline=(148, 163, 184), width=1)
     draw.rectangle([*px(4.67, 6.56), *px(5.03, 6.72)], fill=(241, 245, 249), outline=(148, 163, 184), width=1)
 
-    # --- BAÑO: Bañera (X=0.04..0.74, Y=2.84..3.96), Lavatorio (X=1.10..1.55, Y=2.84..3.22), Inodoro (X=1.65..2.05, Y=3.55..3.96) ---
+    # --- BAÑO (según fotos #23 a #29): Bañera (X=0.05..0.75), Lavatorio + Botiquín (X=1.18..1.64, Y=2.84..3.20), Bidet (X=1.02..1.38, Y=3.56..3.95) e Inodoro (X=1.56..1.94, Y=3.56..3.95) ---
     draw.rectangle([*px(0.05, 2.84), *px(0.75, 3.96)], fill=(255, 255, 255), outline=(148, 163, 184), width=2)
     draw.rounded_rectangle([*px(0.12, 2.92), *px(0.68, 3.88)], radius=12, fill=(241, 245, 249), outline=(148, 163, 184), width=1)
     draw.text(px(0.40, 3.40), "BAÑERA", fill=(100, 116, 139), font=load_font(10, bold=True), anchor="mm")
 
-    # Lavatorio
-    draw.rounded_rectangle([*px(1.12, 2.84), *px(1.58, 3.20)], radius=8, fill=(255, 255, 255), outline=(148, 163, 184), width=2)
-    # Inodoro
-    draw.rounded_rectangle([*px(1.68, 3.56), *px(2.06, 3.95)], radius=8, fill=(255, 255, 255), outline=(148, 163, 184), width=2)
+    # Lavatorio (Norte)
+    draw.rounded_rectangle([*px(1.18, 2.84), *px(1.64, 3.20)], radius=8, fill=(255, 255, 255), outline=(148, 163, 184), width=2)
+    # Bidet (Sur-Oeste) e Inodoro (Sur-Este)
+    draw.rounded_rectangle([*px(1.02, 3.56), *px(1.38, 3.95)], radius=8, fill=(255, 255, 255), outline=(148, 163, 184), width=2)
+    draw.rounded_rectangle([*px(1.56, 3.56), *px(1.94, 3.95)], radius=8, fill=(255, 255, 255), outline=(148, 163, 184), width=2)
 
-    # --- CALEFACTORES TIRO BALANCEADO (3 relevados en el video) ---
+    # --- CALEFACTORES (Living tiro balanceado + Cuarto y Estudio paneles eléctricos negros, fotos #13, #17 y #33) ---
     heater_fill = (254, 215, 170)
     heater_border = (234, 88, 12)
     # 1) Living Este (X=6.06 a 6.26, Y=1.64 a 2.16, entre ventana V3 y el Rack de TV)
@@ -208,6 +209,9 @@ def main():
     # 2) Cuarto Sur-Este (X=2.25 a 2.72, Y=6.78 a 6.96)
     draw.rectangle([*px(2.25, 6.78), *px(2.72, 6.96)], fill=heater_fill, outline=heater_border, width=2)
     draw.text(px(2.48, 6.66), "CALEF.", fill=heater_border, font=load_font(10, bold=True), anchor="mm")
+    # 3) Estudio Norte (X=0.68 a 1.16, Y=0.05 a 0.20, a la izquierda de la ventana V4, foto #33)
+    draw.rectangle([*px(0.68, 0.05), *px(1.16, 0.20)], fill=heater_fill, outline=heater_border, width=2)
+    draw.text(px(0.92, 0.30), "CALEF.", fill=heater_border, font=load_font(10, bold=True), anchor="mm")
 
     # --- MUEBLES, ELECTRODOMÉSTICOS Y DECORACIÓN EXTRAÍDOS DEL 2° VIDEO ---
     f_furn = load_font(10, bold=True)
@@ -257,16 +261,22 @@ def main():
     draw.rounded_rectangle([*px(2.48, 6.12), *px(2.88, 6.58)], radius=5, fill=(226, 232, 240), outline=(71, 85, 105), width=2)
     draw.text(px(2.68, 6.35), "CESTO", fill=(71, 85, 105), font=f_furn, anchor="mm")
 
-    # D) ESTUDIO AMPLIADO: Escritorio en "L" + PC Gamer + Estantes + Silla Gamer + Biblioteca 5 Estantes + Mesa Ajedrez LOTR
+    # D) ESTUDIO AMPLIADO (según fotos #31 a #40): Escritorio en "L" + PC Gamer + 3 Estantes + Silla Gamer + Mesa Ajedrez NO + Biblioteca 6 Estantes + Mesa redonda Ajedrez LOTR SO
     draw.polygon([px(1.35, 0.09), px(2.95, 0.09), px(2.95, 1.78), px(2.32, 1.78), px(2.32, 0.67), px(1.35, 0.67)], fill=(254, 226, 226), outline=(153, 27, 27), width=2)
     draw.text(px(2.63, 1.00), "ESCRITORIO\nEN L + PC", fill=(153, 27, 27), font=f_furn, anchor="mm")
     cx_sg, cy_sg = px(1.95, 1.12)
     draw.ellipse([cx_sg - 22, cy_sg - 22, cx_sg + 22, cy_sg + 22], fill=(254, 202, 202), outline=(185, 28, 28), width=2)
     draw.text(px(1.95, 1.12), "SILLA", fill=(185, 28, 28), font=f_furn, anchor="mm")
-    draw.rounded_rectangle([*px(0.06, 0.45), *px(0.38, 1.30)], radius=4, fill=(254, 243, 199), outline=(120, 53, 15), width=2)
-    draw.text(px(0.22, 0.88), "BIBLIO.", fill=(120, 53, 15), font=f_furn, anchor="mm")
-    draw.rounded_rectangle([*px(0.13, 1.74), *px(0.57, 2.18)], radius=5, fill=(254, 243, 199), outline=(120, 53, 15), width=2)
-    draw.text(px(0.35, 1.96), "AJEDREZ\nLOTR", fill=(120, 53, 15), font=f_furn, anchor="mm")
+    # Mesa plegable cuadrada con ajedrez clásico en esquina Noroeste (foto #33)
+    draw.rounded_rectangle([*px(0.08, 0.08), *px(0.50, 0.50)], radius=4, fill=(254, 243, 199), outline=(120, 53, 15), width=2)
+    draw.text(px(0.29, 0.29), "AJEDREZ", fill=(120, 53, 15), font=load_font(9, bold=True), anchor="mm")
+    # Biblioteca alta de 6 estantes en pared Oeste (foto #35)
+    draw.rounded_rectangle([*px(0.06, 0.74), *px(0.38, 1.60)], radius=4, fill=(254, 243, 199), outline=(120, 53, 15), width=2)
+    draw.text(px(0.22, 1.17), "BIBLIO.", fill=(120, 53, 15), font=f_furn, anchor="mm")
+    # Mesita redonda con Ajedrez LOTR en esquina Suroeste junto al placard (foto #37)
+    cx_aj, cy_aj = px(0.30, 2.02)
+    draw.ellipse([cx_aj - 30, cy_aj - 30, cx_aj + 30, cy_aj + 30], fill=(254, 243, 199), outline=(120, 53, 15), width=2)
+    draw.text(px(0.30, 2.02), "AJEDREZ\nLOTR", fill=(120, 53, 15), font=load_font(9, bold=True), anchor="mm")
 
     # -------------------------------------------------------------------------
     # 2. PERÍMETRO EXTERIOR (Polígono en "L": 6.30 m x 7.00 m)
@@ -312,9 +322,9 @@ def main():
     # Eje Vertical X = 2.30 (Cierre de Placards y Baño):
     # - Muro sólido superior más largo (de Y = 2.30 a Y = 3.02: Placard Sup. + mocheta superior del Baño)
     draw.line([px(2.30, 2.30), px(2.30, 3.02)], fill=WALL_COLOR, width=INT_W)
-    # - Puerta Baño (de Y = 3.02 a Y = 3.65): abre HACIA ADENTRO del Baño (hacia la izquierda X < 2.30)
+    # - Puerta Baño (de Y = 3.02 a Y = 3.65): bisagra al Sur (Y=3.65), abre HACIA ADENTRO del Baño (foto #23)
     draw_dashed_line(draw, *px(2.30, 3.02), *px(2.30, 3.65), fill=DASH_COLOR, width=3)
-    draw_door_symbol(draw, px, (2.30, 3.05), (2.08, 3.25), (2.04, 3.46), (2.30, 3.62), DOOR_COLOR, width=3)
+    draw_door_symbol(draw, px, (2.30, 3.62), (2.08, 3.42), (2.04, 3.20), (2.30, 3.05), DOOR_COLOR, width=3)
     # - Muro sólido inferior (de Y = 3.65 a Y = 4.50: mocheta inferior del Baño + Placard Inf.)
     draw.line([px(2.30, 3.65), px(2.30, 4.50)], fill=WALL_COLOR, width=INT_W)
 
@@ -328,9 +338,9 @@ def main():
 
     # Eje Horizontal Y = 2.30 (Base Estudio):
     draw.line([px(0.00, 2.30), px(2.30, 2.30)], fill=WALL_COLOR, width=INT_W)
-    # - Puerta Estudio (de X = 2.30 a X = 3.00): abre HACIA ADENTRO del Estudio (hacia arriba Y < 2.30)
+    # - Puerta Estudio (de X = 2.30 a X = 3.00): bisagra al Este (X=3.00), abre HACIA ADENTRO del Estudio sobre muro Este (fotos #39 y #40)
     draw_dashed_line(draw, *px(2.30, 2.30), *px(3.00, 2.30), fill=DASH_COLOR, width=3)
-    draw_door_symbol(draw, px, (2.35, 2.30), (2.55, 2.08), (2.75, 2.08), (2.88, 2.30), DOOR_COLOR, width=3)
+    draw_door_symbol(draw, px, (2.95, 2.30), (2.75, 2.08), (2.55, 2.08), (2.42, 2.30), DOOR_COLOR, width=3)
 
     # Eje Horizontal Y = 2.80 (Divide Placard Superior y Baño): de X = 0.00 a X = 2.30
     draw.line([px(0.00, 2.80), px(2.30, 2.80)], fill=WALL_COLOR, width=INT_W)
@@ -340,9 +350,9 @@ def main():
 
     # Eje Horizontal Y = 4.50 (Línea Cuarto y Cocina):
     draw.line([px(0.00, 4.50), px(2.30, 4.50)], fill=WALL_COLOR, width=INT_W)
-    # - Puerta Cuarto (de X = 2.30 a X = 3.00): abre HACIA ADENTRO del Cuarto (hacia abajo Y > 4.50)
+    # - Puerta Cuarto (de X = 2.30 a X = 3.00): bisagra al Este (X=3.00), abre HACIA ADENTRO del Cuarto sobre muro Este (fotos #17 y #22)
     draw_dashed_line(draw, *px(2.30, 4.50), *px(3.00, 4.50), fill=DASH_COLOR, width=3)
-    draw_door_symbol(draw, px, (2.35, 4.50), (2.55, 4.72), (2.75, 4.72), (2.88, 4.50), DOOR_COLOR, width=3)
+    draw_door_symbol(draw, px, (2.95, 4.50), (2.75, 4.72), (2.55, 4.72), (2.42, 4.50), DOOR_COLOR, width=3)
     # - Cocina SIN PUERTA (vano abierto libre de X = 3.00 a X = 4.45; mocheta de X = 4.45 a X = 5.20 delante de la heladera)
     draw_dashed_line(draw, *px(3.00, 4.50), *px(4.45, 4.50), fill=DASH_COLOR, width=3)
     draw.line([px(4.45, 4.50), px(5.20, 4.50)], fill=WALL_COLOR, width=INT_W)

@@ -219,11 +219,11 @@ def build_apartment():
     b.add_box(2.96, 0.00, 4.44, 3.00, 2.05, 4.56)
     b.add_box(2.30, 2.01, 4.44, 3.00, 2.05, 4.56)
 
-    # Hojas de Puertas Interiores Placa Madera (abiertas hacia adentro de cada ambiente)
+    # Hojas de Puertas Interiores Placa Madera (abiertas hacia adentro de cada ambiente, según fotos #17, #23, #39, #40)
     b.set_group("02C_Hojas_Puertas_Madera", "Door_Wood_Cedar")
-    b.add_box(2.34, 0.01, 1.68, 2.38, 2.01, 2.30)  # Hoja Estudio abierta hacia adentro (Y < 2.30)
-    b.add_box(1.72, 0.01, 3.06, 2.30, 2.01, 3.10)  # Hoja Baño abierta hacia adentro (X < 2.30)
-    b.add_box(2.34, 0.01, 4.50, 2.38, 2.01, 5.12)  # Hoja Cuarto abierta hacia adentro (Y > 4.50)
+    b.add_box(2.92, 0.01, 1.68, 2.96, 2.01, 2.30)  # Hoja Estudio abierta sobre muro Este (X=3.00, Y < 2.30)
+    b.add_box(1.72, 0.01, 3.57, 2.30, 2.01, 3.61)  # Hoja Baño abierta hacia el Sur (X < 2.30, Y=3.61)
+    b.add_box(2.92, 0.01, 4.50, 2.96, 2.01, 5.12)  # Hoja Cuarto abierta sobre muro Este (X=3.00, Y > 4.50)
 
     # Hoja Puerta Principal Gris Moldurada (abierta hacia adentro de Entrada)
     b.set_group("02D_Puerta_Principal_Gris", "Door_Main_Grey")
@@ -249,8 +249,9 @@ def build_apartment():
     b.add_box(4.92, 1.16, 5.24, 5.15, 1.72, 5.60)  # Calefón mural a gas Orbis sobre 1° tramo de mesada
     b.add_box(4.58, 0.00, 5.62, 5.15, 0.86, 6.16)  # Cocina a gas blanca 4 hornallas
     b.add_box(0.05, 0.00, 2.84, 0.75, 0.48, 3.96)  # Bañera
-    b.add_box(1.12, 0.00, 2.84, 1.58, 0.82, 3.20)  # Lavatorio
-    b.add_box(1.68, 0.00, 3.56, 2.06, 0.75, 3.95)  # Inodoro
+    b.add_box(1.18, 0.00, 2.84, 1.64, 0.82, 3.20)  # Lavatorio
+    b.add_box(1.02, 0.00, 3.56, 1.38, 0.40, 3.95)  # Bidet
+    b.add_box(1.56, 0.00, 3.56, 1.94, 0.75, 3.95)  # Inodoro
     b.add_box(4.55, 0.00, 4.57, 5.15, 1.68, 5.19)  # Heladera con freezer en esquina Noreste de Cocina
     b.add_box(3.24, 0.00, 6.38, 3.84, 0.86, 6.94)  # Lavarropas carga frontal bajo ventana Sur (mirando al Norte)
 
@@ -271,8 +272,9 @@ def build_apartment():
     b.add_box(0.10, 0.00, 5.07, 2.00, 0.48, 6.53)  # Cama 2 plazas sobre pared Oeste (Cuarto)
     b.add_box(0.07, 0.00, 4.62, 0.49, 0.62, 5.06)  # Mesa de luz Norte sobre pared Oeste (Cuarto)
     b.add_box(0.07, 0.00, 6.51, 0.49, 0.62, 6.93)  # Mesa de luz Sur sobre pared Oeste (Cuarto)
-    b.add_box(0.04, 0.00, 0.47, 0.36, 1.84, 1.29)  # Biblioteca 5 estantes (Estudio)
-    b.add_box(0.13, 0.00, 1.74, 0.57, 0.74, 2.18)  # Mesa con Ajedrez LOTR (Estudio)
+    b.add_box(0.04, 0.00, 0.76, 0.36, 1.84, 1.60)  # Biblioteca 6 estantes (Estudio)
+    b.add_box(0.06, 0.00, 0.06, 0.50, 0.70, 0.50)  # Mesa con Ajedrez clásico en esquina NO (Estudio)
+    b.add_box(0.08, 0.00, 1.82, 0.50, 0.72, 2.24)  # Mesita redonda con Ajedrez LOTR en esquina SO (Estudio)
 
     b.set_group("05D_Electronica_Y_Perchero", "Electronics_Black")
     b.add_box(5.93, 0.00, 4.06, 6.23, 1.86, 4.70)  # Perchero + Zapatero Entrada
