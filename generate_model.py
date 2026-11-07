@@ -126,11 +126,11 @@ def build_apartment():
 
     # 2. PERÍMETRO EXTERIOR CON 7 VENTANAS CALADAS
     b.set_group("01_Muros_Exteriores", "Wall_Exterior")
-    # Muro Norte Y = 0.00 (V4 Estudio 0.85..2.05, V1 Living 3.35..4.55, V2 Living 4.90..6.00)
-    b.add_box(0.00, 0.00, -EXT / 2, 0.85, H, EXT / 2)
-    b.add_box(0.85, 0.00, -EXT / 2, 2.05, 0.95, EXT / 2)
-    b.add_box(0.85, 2.05, -EXT / 2, 2.05, H, EXT / 2)
-    b.add_box(2.05, 0.00, -EXT / 2, 3.35, H, EXT / 2)
+    # Muro Norte Y = 0.00 (V4 Estudio 1.35..2.55, V1 Living 3.35..4.55, V2 Living 4.90..6.00)
+    b.add_box(0.00, 0.00, -EXT / 2, 1.35, H, EXT / 2)
+    b.add_box(1.35, 0.00, -EXT / 2, 2.55, 0.95, EXT / 2)
+    b.add_box(1.35, 2.05, -EXT / 2, 2.55, H, EXT / 2)
+    b.add_box(2.55, 0.00, -EXT / 2, 3.35, H, EXT / 2)
     b.add_box(3.35, 0.00, -EXT / 2, 4.55, 0.95, EXT / 2)
     b.add_box(3.35, 2.05, -EXT / 2, 4.55, H, EXT / 2)
     b.add_box(4.55, 0.00, -EXT / 2, 4.90, H, EXT / 2)
@@ -169,7 +169,7 @@ def build_apartment():
 
     # Vidrios de las 7 ventanas
     b.set_group("01B_Ventanas_Aluminio", "Window_Glass")
-    b.add_box(0.85, 0.95, -0.02, 2.05, 2.05, 0.02)
+    b.add_box(1.35, 0.95, -0.02, 2.55, 2.05, 0.02)
     b.add_box(3.35, 0.95, -0.02, 4.55, 2.05, 0.02)
     b.add_box(4.90, 0.95, -0.02, 6.00, 2.05, 0.02)
     b.add_box(6.28, 0.95, 0.55, 6.32, 2.05, 1.55)
@@ -239,7 +239,6 @@ def build_apartment():
     b.add_box(6.05, 0.05, 1.62, 6.23, 0.65, 2.18)  # Calefactor Living (al Norte del Rack de TV)
     b.add_box(6.10, 0.65, 1.85, 6.20, 2.80, 1.95)  # Caño tiraje vertical Living
     b.add_box(2.24, 0.05, 6.78, 2.72, 0.65, 6.94)  # Calefactor Cuarto (esquina Sur-Este)
-    b.add_box(0.06, 0.05, 0.80, 0.22, 0.65, 1.25)  # Calefactor Estudio
 
     b.set_group("04_Equipamiento_Cocina_Bano", "Kitchen_Granite")
     b.add_box(4.58, 0.00, 5.35, 5.15, 0.86, 6.94)  # Mesada tramo derecho (sobre muro Este)

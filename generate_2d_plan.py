@@ -208,9 +208,6 @@ def main():
     # 2) Cuarto Sur-Este (X=2.25 a 2.72, Y=6.78 a 6.96)
     draw.rectangle([*px(2.25, 6.78), *px(2.72, 6.96)], fill=heater_fill, outline=heater_border, width=2)
     draw.text(px(2.48, 6.66), "CALEF.", fill=heater_border, font=load_font(10, bold=True), anchor="mm")
-    # 3) Estudio Oeste (X=0.04 a 0.22, Y=0.80 a 1.25)
-    draw.rectangle([*px(0.04, 0.80), *px(0.22, 1.25)], fill=heater_fill, outline=heater_border, width=2)
-    draw.text(px(0.48, 1.02), "CALEF.", fill=heater_border, font=load_font(10, bold=True), anchor="mm")
 
     # --- MUEBLES, ELECTRODOMÉSTICOS Y DECORACIÓN EXTRAÍDOS DEL 2° VIDEO ---
     f_furn = load_font(10, bold=True)
@@ -300,8 +297,8 @@ def main():
     draw_window_h(draw, px, 4.90, 6.00, 0.00, EXT_W)
     # V3: Ventana lateral Este del Living (X=6.30, Y=0.55 a 1.55)
     draw_window_v(draw, px, 6.30, 0.55, 1.55, EXT_W)
-    # V4: Ventana Norte del Estudio Ampliado (Y=0.00, X=0.85 a 2.05)
-    draw_window_h(draw, px, 0.85, 2.05, 0.00, EXT_W)
+    # V4: Ventana Norte del Estudio Ampliado (Y=0.00, X=1.35 a 2.55, encuadrada sobre el ala Norte del escritorio en L)
+    draw_window_h(draw, px, 1.35, 2.55, 0.00, EXT_W)
     # V5: Ventana Sur del Cuarto Ampliado (Y=7.00, X=0.90 a 2.10)
     draw_window_h(draw, px, 0.90, 2.10, 7.00, EXT_W)
     # V6: Ventana Sur de la Cocina sobre bacha (Y=7.00, X=3.55 a 4.55)

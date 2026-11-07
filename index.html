@@ -1043,14 +1043,20 @@
             mullion.scale.set(0.035, winH, 0.065);
             mullion.position.set(0, sillH + winH / 2, 0);
             holder.add(mullion);
-            // Marcos horizontales superior e inferior de la ventana
+            // Marcos horizontales (superior/inferior) y jambas verticales (izquierda/derecha) de la ventana
             const topBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
             topBar.scale.set(len, 0.04, 0.065);
             topBar.position.set(0, sillH + winH - 0.02, 0);
             const botBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
             botBar.scale.set(len, 0.04, 0.065);
             botBar.position.set(0, sillH + 0.02, 0);
-            holder.add(topBar, botBar);
+            const leftBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+            leftBar.scale.set(0.04, winH, 0.065);
+            leftBar.position.set(-len / 2 + 0.02, sillH + winH / 2, 0);
+            const rightBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+            rightBar.scale.set(0.04, winH, 0.065);
+            rightBar.position.set(len / 2 - 0.02, sillH + winH / 2, 0);
+            holder.add(topBar, botBar, leftBar, rightBar);
 
             // Símbolo 2D en la tapa superior (para que en vista 2D se vea igual al plano técnico)
             const capBg = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0xdbeafe));
@@ -1130,11 +1136,11 @@
         // 3. PERÍMETRO EXTERIOR CON LAS 7 VENTANAS REALES DEL VIDEO
         // ============================================================================
         // Muro Superior (Norte, Y = 0.00):
-        // - Ventana Estudio V4 (X = 0.85 a 2.05)
+        // - Ventana Estudio V4 (X = 1.35 a 2.55, encuadrada sobre el ala Norte del escritorio en L)
         // - Ventanas gemelas Living V1 (X = 3.35 a 4.55) y V2 (X = 4.90 a 6.00)
-        addWallSegment(0.00, 0.00, 0.85, 0.00, EXT_T, exteriorWallsGroup, true);
-        addWindowSegment(0.85, 0.00, 2.05, 0.00, 0.95, 1.10);
-        addWallSegment(2.05, 0.00, 3.35, 0.00, EXT_T, exteriorWallsGroup, true);
+        addWallSegment(0.00, 0.00, 1.35, 0.00, EXT_T, exteriorWallsGroup, true);
+        addWindowSegment(1.35, 0.00, 2.55, 0.00, 0.95, 1.10);
+        addWallSegment(2.55, 0.00, 3.35, 0.00, EXT_T, exteriorWallsGroup, true);
         addWindowSegment(3.35, 0.00, 4.55, 0.00, 0.95, 1.10);
         addWallSegment(4.55, 0.00, 4.90, 0.00, EXT_T, exteriorWallsGroup, true);
         addWindowSegment(4.90, 0.00, 6.00, 0.00, 0.95, 1.10);
@@ -1201,10 +1207,6 @@
         // Calefactor Cuarto Ampliado (Muro Sur Y=7.00, X=2.25 a 2.72, a la derecha de la ventana)
         addBoxFixture(2.48, 0.34, 6.86, 0.46, 0.62, 0.14, 0x9ca3af);
         addBoxFixture(2.48, 0.66, 6.86, 0.48, 0.03, 0.16, 0xf97316);
-
-        // Calefactor Estudio Ampliado (Muro Oeste X=0.00, Y=0.80 a 1.25)
-        addBoxFixture(0.14, 0.34, 1.02, 0.14, 0.62, 0.45, 0x9ca3af);
-        addBoxFixture(0.14, 0.66, 1.02, 0.16, 0.03, 0.47, 0xf97316);
 
         // 2) COCINA: Mesada en "L" Granito Rosa + Termotanque Sherman + Cocina 4H + Bacha Doble (sobre muro Este X=5.20 y Sur Y=7.00)
         // Bajo mesada de madera
@@ -1796,8 +1798,8 @@
             addDecorBox(0.35, 0.36, 1.96, 0.44, 0.72, 0.44, 0xd4a373, 0.55); // Mesita plegable madera clara
             addDecorBox(0.35, 0.74, 1.96, 0.42, 0.04, 0.42, 0x1e293b, 0.3);  // Tablero de Ajedrez LOTR
 
-            // 5. Cortina gris oscura con visillo blanco en la ventana Norte del Estudio (V4: X=0.85..2.05, Z=0.00)
-            addCurtainAssembly(0.85, 0.00, 2.05, 0.00, 0, 0.12, 0x57534e);
+            // 5. Cortina gris oscura con visillo blanco en la ventana Norte del Estudio (V4: X=1.35..2.55, Z=0.00, encuadrada sobre el ala Norte del escritorio en L)
+            addCurtainAssembly(1.35, 0.00, 2.55, 0.00, 0, 0.12, 0x57534e);
         }
         buildFurnishedVideoDecor();
 
@@ -2267,7 +2269,7 @@
             cocina: { pos: [4.10, 3.4, 4.10], target: [4.10, 0.6, 5.80] },
             cuarto: { pos: [2.40, 3.4, 4.60], target: [1.35, 0.5, 5.80] },
             bano:   { pos: [2.70, 3.4, 3.40], target: [1.15, 0.5, 3.40] },
-            estudio:{ pos: [2.40, 3.4, 2.60], target: [1.35, 0.5, 1.00] }
+            estudio:{ pos: [1.55, 3.6, 3.30], target: [1.65, 0.7, 0.85] }
         };
 
         function switchTo2D() {
