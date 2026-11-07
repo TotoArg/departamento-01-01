@@ -163,7 +163,6 @@ def main():
     draw.rectangle([*px(4.58, 5.22), *px(5.16, 5.62)], fill=granite_fill, outline=granite_border, width=2)
     # Calefón mural a gas blanco (Orbis) colgado sobre el 1° tramo de mesada (X=4.84 a 5.15, Y=5.25 a 5.59)
     draw.rounded_rectangle([*px(4.84, 5.25), *px(5.15, 5.59)], radius=4, fill=(255, 255, 255), outline=(100, 116, 139), width=2)
-    draw.text(px(4.84, 5.42), "CALEFÓN", fill=(71, 85, 105), font=load_font(9, bold=True), anchor="mm")
 
     # Cocina a gas blanca de 4 hornallas sobre muro Este (X=4.58 a 5.16, Y=5.62 a 6.16)
     draw.rectangle([*px(4.58, 5.62), *px(5.16, 6.16)], fill=(255, 255, 255), outline=(100, 116, 139), width=2)
@@ -192,7 +191,6 @@ def main():
     # --- BAÑO (según fotos #23 a #29): Bañera (X=0.05..0.75), Lavatorio + Botiquín (X=1.18..1.64, Y=2.84..3.20), Bidet (X=1.02..1.38, Y=3.56..3.95) e Inodoro (X=1.56..1.94, Y=3.56..3.95) ---
     draw.rectangle([*px(0.05, 2.84), *px(0.75, 3.96)], fill=(255, 255, 255), outline=(148, 163, 184), width=2)
     draw.rounded_rectangle([*px(0.12, 2.92), *px(0.68, 3.88)], radius=12, fill=(241, 245, 249), outline=(148, 163, 184), width=1)
-    draw.text(px(0.40, 3.40), "BAÑERA", fill=(100, 116, 139), font=load_font(10, bold=True), anchor="mm")
 
     # Lavatorio (Norte)
     draw.rounded_rectangle([*px(1.18, 2.84), *px(1.64, 3.20)], radius=8, fill=(255, 255, 255), outline=(148, 163, 184), width=2)
@@ -205,33 +203,25 @@ def main():
     heater_border = (234, 88, 12)
     # 1) Living Este (X=6.06 a 6.26, Y=1.64 a 2.16, entre ventana V3 y el Rack de TV)
     draw.rectangle([*px(6.06, 1.64), *px(6.26, 2.16)], fill=heater_fill, outline=heater_border, width=2)
-    draw.text(px(5.78, 1.90), "CALEFACTOR", fill=heater_border, font=load_font(10, bold=True), anchor="mm")
     # 2) Cuarto Sur-Este (X=2.25 a 2.72, Y=6.78 a 6.96)
     draw.rectangle([*px(2.25, 6.78), *px(2.72, 6.96)], fill=heater_fill, outline=heater_border, width=2)
-    draw.text(px(2.48, 6.66), "CALEF.", fill=heater_border, font=load_font(10, bold=True), anchor="mm")
     # 3) Estudio Norte (X=0.68 a 1.16, Y=0.05 a 0.20, a la izquierda de la ventana V4, foto #33)
     draw.rectangle([*px(0.68, 0.05), *px(1.16, 0.20)], fill=heater_fill, outline=heater_border, width=2)
-    draw.text(px(0.92, 0.30), "CALEF.", fill=heater_border, font=load_font(10, bold=True), anchor="mm")
 
-    # --- MUEBLES, ELECTRODOMÉSTICOS Y DECORACIÓN EXTRAÍDOS DEL 2° VIDEO ---
-    f_furn = load_font(10, bold=True)
+    # --- MUEBLES, ELECTRODOMÉSTICOS Y DECORACIÓN (SIN TEXTOS SOBRE MUEBLES) ---
     # A) LIVING Y ENTRADA (Futón, Mesa Ratona y Rack + TV 50" alineados sobre el mismo eje Y = 2.80):
     # - Perchero + Zapatero Entrada (X=5.92..6.22, Y=4.06..4.70) y Maceta Sansevieria (X=6.05, Y=3.75)
     draw.rounded_rectangle([*px(5.92, 4.06), *px(6.22, 4.70)], radius=5, fill=(226, 232, 240), outline=(71, 85, 105), width=2)
-    draw.text(px(5.65, 4.38), "PERCHERO", fill=(71, 85, 105), font=f_furn, anchor="mm")
     cx_p, cy_p = px(6.05, 3.75)
     draw.ellipse([cx_p - 12, cy_p - 12, cx_p + 12, cy_p + 12], fill=(187, 247, 208), outline=(22, 101, 52), width=2)
 
     # - Rack TV de madera + Smart TV 50" + 2 Torres Home Theater LG (X=5.78..6.22, Y=2.14..3.46, centrado en Y=2.80)
     draw.rounded_rectangle([*px(5.78, 2.14), *px(6.22, 3.46)], radius=6, fill=(254, 226, 226), outline=(153, 27, 27), width=2)
-    draw.text(px(5.52, 2.80), "RACK + TV 50\"", fill=(153, 27, 27), font=f_furn, anchor="mm")
 
     # - Futón 3 Cuerpos Azul Petróleo (X=3.06..3.92, Y=1.84..3.76, centrado en Y=2.80)
     draw.rounded_rectangle([*px(3.06, 1.84), *px(3.92, 3.76)], radius=8, fill=(219, 234, 254), outline=(30, 64, 175), width=2)
-    draw.text(px(3.49, 2.80), "FUTÓN 3C", fill=(30, 64, 175), font=f_furn, anchor="mm")
     # - Mesa Ratona Elevable frente al futón y alineada con la TV (X=4.10..4.64, Y=2.29..3.31, centrada en Y=2.80)
     draw.rounded_rectangle([*px(4.10, 2.29), *px(4.64, 3.31)], radius=6, fill=(241, 245, 249), outline=(71, 85, 105), width=2)
-    draw.text(px(4.37, 2.80), "MESA\nRATONA", fill=(71, 85, 105), font=f_furn, anchor="mm")
 
     # - Mesa de Comedor Redonda (X=4.55, Y=1.22, Ø 1.08m) + 4 Sillas con almohadón verde lima + Cuchas perros
     cx_m, cy_m = px(4.55, 1.22)
@@ -239,44 +229,32 @@ def main():
     for sx, sy in [(4.55, 0.58), (4.55, 1.85), (3.92, 1.22), (5.18, 1.22)]:
         draw.rounded_rectangle([*px(sx - 0.18, sy - 0.18), *px(sx + 0.18, sy + 0.18)], radius=5, fill=(217, 249, 157), outline=(101, 163, 13), width=2)
     draw.ellipse([cx_m - r_m, cy_m - r_m, cx_m + r_m, cy_m + r_m], fill=(254, 226, 226), outline=(153, 27, 27), width=2)
-    draw.text(px(4.55, 1.22), "MESA REDONDA\n+ PLANTAS", fill=(153, 27, 27), font=f_furn, anchor="mm")
-    # - Cuchas grises de los perros bajo ventanas Norte (X=5.10..6.00, Y=0.10..0.66 y X=3.10..3.94, Y=0.10..0.64)
+    # - Cuchas grises de los perros bajo ventanas Norte (X=5.10..6.00, Y=0.10..0.66)
     draw.rounded_rectangle([*px(5.10, 0.10), *px(6.00, 0.66)], radius=8, fill=(226, 232, 240), outline=(100, 116, 139), width=2)
-    draw.text(px(5.55, 0.38), "CUCHA PERRO", fill=(71, 85, 105), font=f_furn, anchor="mm")
 
     # B) COCINA: Heladera con Freezer + Bodega al Noreste (X=4.55..5.15, Y=4.56..5.20), Lavarropas + Estación Café bajo ventana Sur (X=3.24..3.86, Y=6.38..6.94) y Cestos en fila sobre pared Oeste (X=3.06..3.42, Y=5.30..6.26)
     draw.rounded_rectangle([*px(4.55, 4.56), *px(5.15, 5.20)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
-    draw.text(px(4.85, 4.88), "HELADERA", fill=(51, 65, 85), font=f_furn, anchor="mm")
     draw.rounded_rectangle([*px(3.24, 6.38), *px(3.86, 6.94)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
-    draw.text(px(3.55, 6.66), "LAVARR.\n+ CAFÉ", fill=(51, 65, 85), font=f_furn, anchor="mm")
     draw.rounded_rectangle([*px(3.06, 5.30), *px(3.42, 6.26)], radius=5, fill=(226, 232, 240), outline=(100, 116, 139), width=2)
-    draw.text(px(3.24, 5.78), "CESTOS", fill=(71, 85, 105), font=f_furn, anchor="mm")
 
     # C) CUARTO AMPLIADO: Cama 2 Plazas (X=0.10..2.00, Y=5.12..6.52) + Respaldo Ancho Nogal y 2 Mesas de Luz sobre pared Oeste (X=0.00) + Cesto Ropa al Este
     draw.rounded_rectangle([*px(0.10, 5.12), *px(2.00, 6.52)], radius=8, fill=(226, 232, 240), outline=(71, 85, 105), width=2)
     draw.rectangle([*px(0.05, 4.68), *px(0.14, 6.92)], fill=(120, 53, 15), outline=(69, 26, 3), width=2)
     draw.rounded_rectangle([*px(0.08, 4.68), *px(0.50, 5.08)], radius=4, fill=(254, 243, 199), outline=(120, 53, 15), width=2)
     draw.rounded_rectangle([*px(0.08, 6.54), *px(0.50, 6.92)], radius=4, fill=(254, 243, 199), outline=(120, 53, 15), width=2)
-    draw.text(px(1.10, 6.02), "CAMA 2 PLAZAS\n+ 2 MESAS DE LUZ", fill=(51, 65, 85), font=f_furn, anchor="mm")
     draw.rounded_rectangle([*px(2.48, 6.12), *px(2.88, 6.58)], radius=5, fill=(226, 232, 240), outline=(71, 85, 105), width=2)
-    draw.text(px(2.68, 6.35), "CESTO", fill=(71, 85, 105), font=f_furn, anchor="mm")
 
     # D) ESTUDIO AMPLIADO (según fotos #31 a #40): Escritorio en "L" + PC Gamer + 3 Estantes + Silla Gamer + Mesa Ajedrez NO + Biblioteca 6 Estantes + Mesa redonda Ajedrez LOTR SO
     draw.polygon([px(1.35, 0.09), px(2.95, 0.09), px(2.95, 1.78), px(2.32, 1.78), px(2.32, 0.67), px(1.35, 0.67)], fill=(254, 226, 226), outline=(153, 27, 27), width=2)
-    draw.text(px(2.63, 1.00), "ESCRITORIO\nEN L + PC", fill=(153, 27, 27), font=f_furn, anchor="mm")
     cx_sg, cy_sg = px(1.95, 1.12)
     draw.ellipse([cx_sg - 22, cy_sg - 22, cx_sg + 22, cy_sg + 22], fill=(254, 202, 202), outline=(185, 28, 28), width=2)
-    draw.text(px(1.95, 1.12), "SILLA", fill=(185, 28, 28), font=f_furn, anchor="mm")
     # Mesa plegable cuadrada con ajedrez clásico en esquina Noroeste (foto #33)
     draw.rounded_rectangle([*px(0.08, 0.08), *px(0.50, 0.50)], radius=4, fill=(254, 243, 199), outline=(120, 53, 15), width=2)
-    draw.text(px(0.29, 0.29), "AJEDREZ", fill=(120, 53, 15), font=load_font(9, bold=True), anchor="mm")
     # Biblioteca alta de 6 estantes en pared Oeste (foto #35)
     draw.rounded_rectangle([*px(0.06, 0.74), *px(0.38, 1.60)], radius=4, fill=(254, 243, 199), outline=(120, 53, 15), width=2)
-    draw.text(px(0.22, 1.17), "BIBLIO.", fill=(120, 53, 15), font=f_furn, anchor="mm")
     # Mesita redonda con Ajedrez LOTR en esquina Suroeste junto al placard (foto #37)
     cx_aj, cy_aj = px(0.30, 2.02)
     draw.ellipse([cx_aj - 30, cy_aj - 30, cx_aj + 30, cy_aj + 30], fill=(254, 243, 199), outline=(120, 53, 15), width=2)
-    draw.text(px(0.30, 2.02), "AJEDREZ\nLOTR", fill=(120, 53, 15), font=load_font(9, bold=True), anchor="mm")
 
     # -------------------------------------------------------------------------
     # 2. PERÍMETRO EXTERIOR (Polígono en "L": 6.30 m x 7.00 m)
