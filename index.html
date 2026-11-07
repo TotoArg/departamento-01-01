@@ -574,6 +574,7 @@
             <button class="mode-btn" id="btn-mode-3d"><span>🧊</span> 3D Muros</button>
             <button class="mode-btn" id="btn-mode-cut"><span>✂️</span> Bajas</button>
             <button class="mode-btn" id="btn-mode-nowalls"><span>🚫</span> Sin Paredes</button>
+            <button class="mode-btn active" id="btn-toggle-video-decor" title="Mostrar/Ocultar Muebles, Electrodomésticos y Decoración del Video"><span>🛋️</span> Amoblado</button>
             <button class="mode-btn" id="btn-toggle-roof" title="Mostrar/Ocultar Techo de Madera y Vigas"><span>🪵</span> Techo</button>
             <div style="display:flex; gap:3px; margin-left:2px; border-left:1px solid rgba(255,255,255,0.15); padding-left:4px;">
                 <button class="icon-btn" id="btn-zoom-in" title="Acercar plano" style="padding:4px 6px; font-size:11px; font-weight:700;">🔍 +</button>
@@ -622,12 +623,17 @@
             <div class="toggle-switch"></div>
         </label>
         <label class="toggle-row">
+            <span>Muebles y Decorados (Video)</span>
+            <input type="checkbox" id="chk-video-decor" checked>
+            <div class="toggle-switch"></div>
+        </label>
+        <label class="toggle-row">
             <span>Techo Madera y Vigas</span>
             <input type="checkbox" id="chk-roof">
             <div class="toggle-switch"></div>
         </label>
         <label class="toggle-row">
-            <span>Mobiliario 3D</span>
+            <span>Mobiliario Editable</span>
             <input type="checkbox" id="chk-furniture" checked>
             <div class="toggle-switch"></div>
         </label>
@@ -650,7 +656,8 @@
                 <span>🛋️</span> Muebles (<span id="lbl-count">0</span>)
             </div>
             <div style="display: flex; gap: 5px;">
-                <button class="icon-btn" id="btn-add-modal" style="background:#059669; border-color:#10b981; color:#fff;">+ Añadir Mueble</button>
+                <button class="icon-btn" id="btn-load-video-furniture" title="Cargar los 14 muebles principales del video para moverlos o medirlos" style="background:#0284c7; border-color:#38bdf8; color:#fff;">📥 Del Video</button>
+                <button class="icon-btn" id="btn-add-modal" style="background:#059669; border-color:#10b981; color:#fff;">+ Añadir</button>
                 <button class="icon-btn" id="btn-min-editor" title="Expandir/Minimizar">▲</button>
             </div>
         </div>
@@ -942,12 +949,14 @@
         const doors3DGroup = new THREE.Group();
         doors3DGroup.visible = false; // Oculto en vista 2D ortogonal para no tapar arcos CAD; visible automáticamente en 3D
         const fixturesGroup = new THREE.Group();
+        const decorVideoGroup = new THREE.Group(); // Muebles, electrodomésticos, cortinas y decoración extraídos del 2do video
+        decorVideoGroup.visible = true;
         const roofGroup = new THREE.Group();
         roofGroup.visible = false; // Oculto al inicio para ver el plano interior limpio
         const furnitureGroup = new THREE.Group();
         const lines2DGroup = new THREE.Group();
 
-        apartmentGroup.add(floorGroup, exteriorWallsGroup, interiorWallsGroup, doors3DGroup, fixturesGroup, roofGroup, furnitureGroup, lines2DGroup);
+        apartmentGroup.add(floorGroup, exteriorWallsGroup, interiorWallsGroup, doors3DGroup, fixturesGroup, decorVideoGroup, roofGroup, furnitureGroup, lines2DGroup);
         scene.add(apartmentGroup);
 
         const WALL_H = 2.60;
@@ -1546,19 +1555,277 @@
         addSlidingPlacardFront3D(0.15, 2.18, 4.50, 1);
 
         // ============================================================================
-        // 5. ETIQUETAS DE AMBIENTES EN COORDENADAS EXACTAS
+        // 4C. MUEBLES, ELECTRODOMÉSTICOS, CORTINAS Y DECORACIÓN EXTRAÍDOS DEL 2° VIDEO
+        //     (https://photos.app.goo.gl/8k4MQeY4BcyoqhDK8 - video_34)
+        // ============================================================================
+        function addDecorBox(x, y, z, w, h, d, color, rough = 0.45, rotY = 0) {
+            const m = new THREE.Mesh(
+                new THREE.BoxGeometry(w, h, d),
+                new THREE.MeshStandardMaterial({ color, roughness: rough })
+            );
+            m.position.set(x, y, z);
+            if (rotY) m.rotation.y = rotY;
+            m.castShadow = true;
+            m.receiveShadow = true;
+            decorVideoGroup.add(m);
+            return m;
+        }
+
+        function addDecorCyl(x, y, z, rTop, rBot, h, color, rough = 0.4) {
+            const m = new THREE.Mesh(
+                new THREE.CylinderGeometry(rTop, rBot, h, 24),
+                new THREE.MeshStandardMaterial({ color, roughness: rough })
+            );
+            m.position.set(x, y, z);
+            m.castShadow = true;
+            m.receiveShadow = true;
+            decorVideoGroup.add(m);
+            return m;
+        }
+
+        // Constructor de Cortinas con barral de madera y paños laterales atados
+        function addCurtainAssembly(x1, z1, x2, z2, offsetInwardX, offsetInwardZ, drapeColor = 0xc8beb4) {
+            const dx = x2 - x1;
+            const dz = z2 - z1;
+            const len = Math.hypot(dx, dz) + 0.16;
+            const angle = Math.atan2(dz, dx);
+            const g = new THREE.Group();
+            g.position.set((x1 + x2) / 2 + offsetInwardX, 0, (z1 + z2) / 2 + offsetInwardZ);
+            g.rotation.y = -angle;
+
+            // Barral de madera tono cedro a Y = 2.12m
+            const rod = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.014, 0.014, len, 12),
+                new THREE.MeshStandardMaterial({ color: 0x7c3aed ? 0x7c2d12 : 0x7c2d12, roughness: 0.5 })
+            );
+            rod.rotation.z = Math.PI / 2;
+            rod.position.set(0, 2.12, 0);
+            g.add(rod);
+
+            // Visillo blanco translúcido central
+            const sheer = new THREE.Mesh(
+                new THREE.BoxGeometry(len - 0.12, 1.22, 0.015),
+                new THREE.MeshStandardMaterial({ color: 0xf8fafc, transparent: true, opacity: 0.55 })
+            );
+            sheer.position.set(0, 1.48, 0);
+            g.add(sheer);
+
+            // 2 Paños de cortina laterales con alzapaños
+            const panelMat = new THREE.MeshStandardMaterial({ color: drapeColor, roughness: 0.75 });
+            const leftPanel = new THREE.Mesh(new THREE.BoxGeometry(0.26, 1.32, 0.035), panelMat);
+            leftPanel.position.set(-len / 2 + 0.16, 1.44, 0.015);
+            const rightPanel = new THREE.Mesh(new THREE.BoxGeometry(0.26, 1.32, 0.035), panelMat);
+            rightPanel.position.set(len / 2 - 0.16, 1.44, 0.015);
+            g.add(leftPanel, rightPanel);
+
+            decorVideoGroup.add(g);
+        }
+
+        function buildFurnishedVideoDecor() {
+            // ------------------------------------------------------------------------
+            // A) ENTRADA Y LIVING-COMEDOR ([3.00, 0.00] a [6.30, 5.70])
+            // ------------------------------------------------------------------------
+            // 1. Entrada (X = 5.20..6.30, Z = 4.50..5.70):
+            // - Crucifijo de madera oscura sobre dintel puerta principal + retablo dorado + tablero eléctrico
+            addDecorBox(5.75, 2.26, 5.62, 0.14, 0.24, 0.02, 0x3b2314);
+            addDecorBox(6.18, 1.48, 5.62, 0.08, 0.13, 0.02, 0xd4af37);
+            addDecorBox(5.26, 1.45, 5.22, 0.02, 0.22, 0.26, 0x1e293b);
+            // - Perchero de hierro negro con estante superior de madera y camperas + Zapatero de 3 niveles abajo (Muro Este Z=4.70..5.35)
+            addDecorBox(6.08, 0.26, 5.02, 0.30, 0.52, 0.64, 0x1e293b); // Zapatero 3 niveles con calzados
+            addDecorBox(6.08, 1.35, 5.02, 0.24, 0.85, 0.62, 0x334155); // Camperas colgadas (negra / gris / azul)
+            addDecorBox(6.08, 1.86, 5.02, 0.26, 0.03, 0.66, 0x9a5b32); // Estante superior madera perchero
+            // - Maceta blanca redonda sobre pie nórdico de madera con Sansevieria (Lengua de suegra) en X=6.05, Z=4.48
+            addDecorBox(6.05, 0.14, 4.48, 0.24, 0.28, 0.24, 0xc2844f); // Pie nórdico madera
+            addDecorCyl(6.05, 0.28, 4.48, 0.13, 0.11, 0.24, 0xf8fafc); // Maceta cerámica blanca
+            addDecorCyl(6.05, 0.58, 4.48, 0.04, 0.09, 0.45, 0x3f6212); // Hojas Sansevieria
+
+            // 2. Sector Rack TV, Audio Home Theater y Decoración (Muro Este X=6.30, Z=3.15..4.42):
+            // - Rack / Aparador de madera rojiza lustrada (caoba/cedro)
+            addDecorBox(6.00, 0.39, 3.82, 0.44, 0.78, 1.32, 0x7c2d12, 0.4);
+            addDecorBox(6.00, 0.79, 3.82, 0.46, 0.03, 1.36, 0x8f3818, 0.35); // Tapa superior lustrada
+            // - Smart TV 50" colgado en pared e inclinado hacia el sillón
+            const tvMesh = addDecorBox(6.16, 1.38, 3.82, 0.05, 0.66, 1.14, 0x0f172a, 0.2);
+            tvMesh.rotation.z = 0.08;
+            // - 2 Torres de sonido altas negras LG Home Theater flanqueando el rack + barra central + Google Home Mini
+            addDecorBox(6.04, 0.96, 4.40, 0.22, 0.36, 0.22, 0x0f172a, 0.25); // Base torre sur
+            addDecorBox(6.04, 1.32, 4.40, 0.10, 1.05, 0.10, 0x111827, 0.25); // Columna torre sur
+            addDecorBox(6.04, 1.28, 3.20, 0.10, 0.96, 0.10, 0x111827, 0.25); // Columna torre norte
+            addDecorBox(6.06, 0.87, 3.82, 0.09, 0.11, 0.38, 0x1e293b);       // Parlante central bajo TV
+            addDecorCyl(5.96, 0.82, 4.18, 0.05, 0.05, 0.03, 0xcbd5e1);       // Google Home Mini gris
+            // - Camino de mesa naranja/rojo + velas verdes + cuarzos + arbolito bonsái rosado sobre el rack
+            addDecorBox(5.98, 0.81, 3.75, 0.18, 0.01, 0.68, 0xc2410c);       // Camino tejido
+            addDecorCyl(5.98, 0.85, 3.85, 0.04, 0.04, 0.08, 0x14532d);       // Vela verde 1
+            addDecorCyl(5.98, 0.85, 3.65, 0.04, 0.04, 0.08, 0x1e3a8a);       // Vela azul 2
+            addDecorCyl(5.98, 0.92, 3.30, 0.14, 0.05, 0.22, 0xf472b6);       // Arbolito bonsái flores rosadas
+
+            // 3. Sector Sillón Futón 3 Cuerpos, Mesa Ratona Elevable y Lámpara de Pie (Muro Central X=3.00, Z=1.65..3.70):
+            // - Futón de 3 cuerpos con estructura de madera clara y colchón tapizado azul petróleo (#23486a)
+            addDecorBox(3.48, 0.18, 2.72, 0.88, 0.26, 1.92, 0xc28a52, 0.55); // Base y apoyabrazos de madera
+            addDecorBox(3.52, 0.36, 2.72, 0.80, 0.18, 1.82, 0x23486a, 0.75); // Asiento azul petróleo
+            addDecorBox(3.18, 0.64, 2.72, 0.22, 0.52, 1.82, 0x23486a, 0.75); // Respaldo azul petróleo
+            // - 2 Almohadones cilíndricos (bolsters) azules en los apoyabrazos + 4 almohadones claros + mantas tejidas
+            const bol1 = addDecorCyl(3.52, 0.49, 1.88, 0.09, 0.09, 0.72, 0x295680, 0.7);
+            bol1.rotation.z = Math.PI / 2;
+            const bol2 = addDecorCyl(3.52, 0.49, 3.56, 0.09, 0.09, 0.72, 0x295680, 0.7);
+            bol2.rotation.z = Math.PI / 2;
+            addDecorBox(3.34, 0.56, 2.25, 0.18, 0.28, 0.34, 0xe2e8f0, 0.8);  // Almohadón claro 1
+            addDecorBox(3.34, 0.56, 2.65, 0.18, 0.28, 0.34, 0xf1f5f9, 0.8);  // Almohadón claro 2
+            addDecorBox(3.34, 0.56, 3.05, 0.18, 0.28, 0.34, 0xe5e7eb, 0.8);  // Almohadón claro 3
+            addDecorBox(3.20, 0.88, 2.72, 0.24, 0.06, 0.58, 0xeab308, 0.8);  // Manta estampada amarilla/roja en respaldo
+            addDecorBox(3.20, 0.88, 2.15, 0.24, 0.06, 0.48, 0x84cc16, 0.8);  // Manta tejida a cuadros en respaldo
+            // - Torre parlante trasera negra (satélite Home Theater) al sur del sillón (X=3.20, Z=3.66)
+            addDecorBox(3.20, 0.52, 3.66, 0.12, 1.04, 0.12, 0x111827, 0.25);
+            // - Lámpara de pie metálica con pantalla cónica blanca al norte del sillón (X=3.28, Z=1.64)
+            addDecorCyl(3.28, 0.02, 1.64, 0.15, 0.15, 0.04, 0x94a3b8);
+            addDecorCyl(3.28, 0.78, 1.64, 0.015, 0.015, 1.50, 0x94a3b8);
+            addDecorCyl(3.28, 1.52, 1.64, 0.10, 0.22, 0.24, 0xf8fafc, 0.6);
+            // - Mesa ratona blanca con tapa elevable color madera wengué frente al sillón (X=4.38, Z=2.72)
+            addDecorBox(4.38, 0.22, 2.72, 0.54, 0.42, 1.02, 0xf8fafc, 0.4);  // Cuerpo blanco con compartimento interno
+            addDecorBox(4.18, 0.56, 2.72, 0.48, 0.03, 1.04, 0x3e2723, 0.4);  // Tapa elevada wengué hacia el sillón
+            // - Tablet en soporte, termo de acero, mate y anotador amarillo sobre la mesa ratona
+            addDecorBox(4.18, 0.66, 2.68, 0.08, 0.16, 0.24, 0x1e293b);       // Tablet con funda
+            addDecorCyl(4.15, 0.68, 2.38, 0.045, 0.045, 0.22, 0x64748b);     // Termo acero
+            addDecorBox(4.18, 0.58, 3.02, 0.16, 0.015, 0.20, 0xfacc15);      // Anotador amarillo
+
+            // 4. Sector Comedor: Mesa Redonda de Madera Caoba + 4 Sillas con Almohadones Verde Lima + Plantas + Cuchas Perros (Z=0.35..2.00):
+            // - Mesa redonda de madera rojiza lustrada (X=4.55, Z=1.22, Ø 1.08m)
+            addDecorCyl(4.55, 0.37, 1.22, 0.24, 0.28, 0.72, 0x7c2d12, 0.4);  // Pedestal central madera
+            addDecorCyl(4.55, 0.75, 1.22, 0.54, 0.54, 0.04, 0x882915, 0.32); // Tapa redonda lustrada
+            // - Centro de mesa: camino rojo + macetas con plantas (anturio verde y trébol morado Oxalis)
+            addDecorBox(4.55, 0.775, 1.22, 0.85, 0.01, 0.24, 0xb91c1c);
+            addDecorCyl(4.55, 0.86, 1.22, 0.12, 0.09, 0.16, 0x7c2d12);
+            addDecorCyl(4.55, 1.04, 1.22, 0.24, 0.12, 0.28, 0x15803d);       // Follaje plantas centro de mesa
+            // - 4 Sillas de madera natural con almohadón verde lima (#84cc16)
+            const chairCoords = [
+                { x: 4.55, z: 1.85, rot: 0 },
+                { x: 4.55, z: 0.58, rot: Math.PI },
+                { x: 3.92, z: 1.22, rot: -Math.PI / 2 },
+                { x: 5.18, z: 1.22, rot: Math.PI / 2 }
+            ];
+            chairCoords.forEach(c => {
+                const cg = new THREE.Group();
+                cg.position.set(c.x, 0, c.z);
+                cg.rotation.y = c.rot;
+                const seat = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.44, 0.44), new THREE.MeshStandardMaterial({ color: 0xc28a52, roughness: 0.55 }));
+                seat.position.set(0, 0.22, 0);
+                const cushion = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.06, 0.42), new THREE.MeshStandardMaterial({ color: 0x84cc16, roughness: 0.7 }));
+                cushion.position.set(0, 0.46, 0);
+                const back = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.46, 0.05), new THREE.MeshStandardMaterial({ color: 0xc28a52, roughness: 0.55 }));
+                back.position.set(0, 0.69, 0.20);
+                cg.add(seat, cushion, back);
+                decorVideoGroup.add(cg);
+            });
+            // - 2 Cuchas / colchonetas grises para los perros bajo las ventanas Norte + bebedero celeste
+            addDecorBox(5.55, 0.05, 0.38, 0.92, 0.10, 0.62, 0x94a3b8, 0.85); // Cucha gris esquina NE
+            addDecorBox(3.52, 0.05, 0.38, 0.85, 0.10, 0.58, 0x94a3b8, 0.85); // Cucha gris esquina NO
+            addDecorCyl(5.96, 0.08, 0.86, 0.13, 0.15, 0.14, 0x38bdf8, 0.4);  // Bebedero celeste con dispensador
+            // - Cortinas beige con barral de madera en las 3 ventanas del Living (V1, V2 y V3)
+            addCurtainAssembly(3.35, 0.00, 4.55, 0.00, 0, 0.12, 0xd6ccc2);
+            addCurtainAssembly(4.90, 0.00, 6.00, 0.00, 0, 0.12, 0xd6ccc2);
+            addCurtainAssembly(6.30, 1.00, 6.30, 2.50, -0.12, 0, 0xd6ccc2);
+
+            // ------------------------------------------------------------------------
+            // B) COCINA ([3.00, 4.50] a [5.20, 7.00])
+            // ------------------------------------------------------------------------
+            // 1. Heladera blanca con freezer superior (X=3.35, Z=4.95) + alacena bodega portabotellas arriba
+            addDecorBox(3.35, 0.86, 4.95, 0.60, 1.72, 0.62, 0xf8fafc, 0.25); // Heladera blanca con imanes
+            addDecorBox(3.35, 1.98, 4.95, 0.58, 0.44, 0.58, 0xd6ccc2, 0.5);  // Alacena y botellero sobre heladera
+            // 2. Alacenas superiores de melamina clara sobre la mesada izquierda + estante esquinero madera
+            addDecorBox(3.22, 1.85, 5.95, 0.34, 0.68, 1.35, 0xe5dec9, 0.45);
+            addDecorBox(3.22, 1.90, 6.76, 0.34, 0.62, 0.28, 0x9a5b32, 0.5);  // Estante esquinero abierto con plantas
+            // 3. Lavarropas automático blanco de carga frontal bajo mesada derecha (X=4.84, Z=6.66) + tapa de madera
+            addDecorBox(4.84, 0.42, 6.66, 0.58, 0.84, 0.56, 0xf8fafc, 0.3);  // Cuerpo lavarropas
+            const drum = addDecorCyl(4.84, 0.44, 6.37, 0.18, 0.18, 0.04, 0x334155, 0.2); // Ojo de buey frontal
+            drum.rotation.x = Math.PI / 2;
+            addDecorBox(4.84, 0.86, 6.66, 0.62, 0.04, 0.60, 0xb47b48, 0.45); // Mesada de madera sobre lavarropas
+            // 4. Estación de café sobre el lavarropas: Cafetera expreso automática plateada/negra + pava eléctrica negra + escurridor negro
+            addDecorBox(4.78, 1.04, 6.68, 0.28, 0.32, 0.28, 0x334155, 0.3);  // Cafetera expreso con molinillo
+            addDecorCyl(5.04, 0.98, 6.68, 0.08, 0.09, 0.20, 0x0f172a, 0.3);  // Pava eléctrica negra
+            addDecorBox(4.42, 0.92, 6.68, 0.32, 0.08, 0.36, 0x1e293b, 0.4);  // Escurridor de platos negro
+            // 5. 2 Cestos de residuos rectangulares (gris y blanco con tapa) junto al muro Este de la cocina (X=4.94, Z=5.55 y 5.95) + portero eléctrico
+            addDecorBox(4.94, 0.26, 5.52, 0.32, 0.52, 0.36, 0x64748b, 0.5);  // Tacho gris
+            addDecorBox(4.94, 0.26, 5.92, 0.32, 0.52, 0.36, 0xf1f5f9, 0.5);  // Tacho blanco
+            addDecorBox(5.13, 1.42, 5.35, 0.05, 0.22, 0.10, 0xfef3c7, 0.4);  // Teléfono portero eléctrico en pared
+
+            // ------------------------------------------------------------------------
+            // C) CUARTO AMPLIADO ([0.00, 4.50] a [3.00, 7.00])
+            // ------------------------------------------------------------------------
+            // 1. Amplio respaldo horizontal de madera oscura nogal/wengué en Muro Este X=3.00 (Z=4.68..6.90)
+            addDecorBox(2.92, 0.68, 5.80, 0.06, 1.15, 2.22, 0x4a3222, 0.5);
+            // 2. Cama de 2 plazas (1.45m ancho × 1.90m largo) con cabecera en X=2.90 extendiéndose hasta X=1.00, centrada en Z=5.80
+            addDecorBox(1.95, 0.24, 5.80, 1.90, 0.46, 1.45, 0x475569, 0.7);  // Colchón + acolchado a rayas gris topo
+            addDecorBox(1.95, 0.48, 5.80, 1.86, 0.03, 1.40, 0x64748b, 0.75); // Franjas claras del acolchado
+            addDecorBox(2.68, 0.53, 5.48, 0.34, 0.10, 0.52, 0xe2e8f0, 0.8);  // Almohada norte
+            addDecorBox(2.68, 0.53, 6.12, 0.34, 0.10, 0.52, 0xe2e8f0, 0.8);  // Almohada sur
+            // 3. 2 Mesas de luz de madera nogal oscuro a ambos lados de la cama:
+            // - Mesa de luz Norte (X=2.72, Z=4.86) con humidificador cilíndrico blanco y parlante inteligente
+            addDecorBox(2.72, 0.31, 4.86, 0.42, 0.62, 0.44, 0x4a3222, 0.5);
+            addDecorCyl(2.72, 0.72, 4.94, 0.07, 0.07, 0.18, 0xffffff, 0.2);  // Humidificador blanco
+            // - Mesa de luz Sur (X=2.72, Z=6.72) con reloj digital blanco, peluches y bolso naranja
+            addDecorBox(2.72, 0.31, 6.72, 0.42, 0.62, 0.42, 0x4a3222, 0.5);
+            addDecorBox(2.72, 0.74, 6.84, 0.26, 0.24, 0.14, 0xea580c, 0.6);  // Bolso naranja en esquina SE
+            // 4. Panel calefactor eléctrico negro en muro Sur (X=0.52, Z=6.88) + Cesto de ropa sucia gris en esquina SO (X=0.32, Z=6.35)
+            addDecorBox(0.52, 0.42, 6.88, 0.52, 0.52, 0.05, 0x0f172a, 0.2);  // Panel calefactor vidrio negro
+            addDecorBox(0.32, 0.35, 6.35, 0.40, 0.70, 0.44, 0x334155, 0.8);  // Cesto ropa sucia gris oscuro
+            // 5. Cortina gris topo con barral de madera en la ventana Sur del Cuarto (V5: X=0.90..2.10, Z=7.00)
+            addCurtainAssembly(0.90, 7.00, 2.10, 7.00, 0, -0.12, 0x78716c);
+
+            // ------------------------------------------------------------------------
+            // D) ESTUDIO AMPLIADO ([0.00, 0.00] a [3.00, 2.30])
+            // ------------------------------------------------------------------------
+            // 1. Escritorio en "L" de madera lustrada caoba/cedro rojizo (#8f3818):
+            // - Tramo principal sobre Muro Este (X=2.64, Z=0.14..1.78)
+            addDecorBox(2.64, 0.38, 0.96, 0.64, 0.76, 1.64, 0x8f3818, 0.38);
+            // - Ala en "L" bajo la ventana Norte (X=1.35..2.32, Z=0.38)
+            addDecorBox(1.84, 0.38, 0.38, 0.98, 0.76, 0.58, 0x8f3818, 0.38);
+            // - Gabinete PC Gamer negro bajo el extremo sur del escritorio (X=2.66, Z=1.54) + impresora bajo el ala norte
+            addDecorBox(2.66, 0.24, 1.54, 0.44, 0.46, 0.22, 0x0f172a, 0.3);  // PC Gamer negra Thermaltake
+            addDecorBox(1.92, 0.22, 0.38, 0.42, 0.28, 0.36, 0x1e293b, 0.4);  // Impresora multifunción abajo
+            // - Equipamiento sobre el escritorio: Deskmat negro XXL + Monitor 27" + Teclado/Mouse + Parlantes + Bandeja blanca + Lámpara aro LED
+            addDecorBox(2.54, 0.77, 1.02, 0.42, 0.01, 0.88, 0x111827, 0.6);  // Deskmat negro
+            addDecorBox(2.80, 1.06, 0.98, 0.05, 0.38, 0.62, 0x0f172a, 0.2);  // Monitor 27" con webcam y barra LED
+            addDecorBox(2.74, 0.92, 1.50, 0.16, 0.26, 0.22, 0x111827, 0.3);  // Parlantes 2.1 + auriculares en soporte
+            addDecorBox(2.58, 0.81, 1.58, 0.26, 0.08, 0.32, 0xf8fafc, 0.3);  // Bandeja organizadora blanca
+            addDecorCyl(2.12, 1.05, 0.42, 0.10, 0.10, 0.02, 0x1e293b);       // Lámpara articulada con aro LED / lupa
+            addDecorCyl(2.12, 0.84, 0.48, 0.05, 0.06, 0.14, 0x10b981);       // Escultura impresa en 3D resina verde
+
+            // 2. Silla Gamer ergonómica negra con detalles rojos frente al escritorio (X=1.95, Z=1.12)
+            addDecorCyl(1.95, 0.22, 1.12, 0.26, 0.26, 0.42, 0x111827, 0.5);  // Base giratoria y asiento negro
+            addDecorBox(1.75, 0.72, 1.12, 0.12, 0.68, 0.48, 0x111827, 0.5);  // Respaldo alto negro
+            addDecorBox(1.74, 0.72, 1.12, 0.13, 0.64, 0.50, 0xdc2626, 0.5);  // Bordes rojos silla gamer
+
+            // 3. 2 Estantes flotantes largos de madera sobre Muro Este (X=2.84, Z=0.22..1.80, Y=1.45 y Y=1.82) con libros, consolas y potus
+            addDecorBox(2.84, 1.45, 1.02, 0.22, 0.03, 1.58, 0x9a441e, 0.45); // Estante flotante inferior (Consolas Nintendo / Globo / Estuches)
+            addDecorBox(2.84, 1.82, 1.02, 0.22, 0.03, 1.58, 0x9a441e, 0.45); // Estante flotante superior (Colección Libros Tolkien + Potus)
+            addDecorBox(2.84, 1.96, 1.08, 0.18, 0.24, 1.10, 0x7f1d1d, 0.6);  // Hilera de libros encuadernados
+            addDecorCyl(2.84, 1.96, 0.32, 0.09, 0.08, 0.24, 0x16a34a, 0.6);  // Planta Potus colgante en el extremo norte
+
+            // 4. Biblioteca alta de madera oscura de 5 estantes en Muro Oeste (X=0.20, Z=0.88) + Funda Guitarra + Mesa con Ajedrez LOTR (X=0.35, Z=1.96)
+            addDecorBox(0.20, 0.92, 0.88, 0.32, 1.84, 0.82, 0x3b2314, 0.55); // Biblioteca 5 estantes (libros, figuras Toy Story, peluches Pokémon, Switch 2, Torre Eiffel)
+            addDecorCyl(0.22, 0.52, 1.48, 0.12, 0.18, 1.02, 0x1e293b, 0.7);  // Funda negra de guitarra acústica
+            // - Mesita plegable de madera clara con Tablero de Ajedrez de El Señor de los Anillos en la esquina SO junto al placard (X=0.35, Z=1.96)
+            addDecorBox(0.35, 0.36, 1.96, 0.44, 0.72, 0.44, 0xd4a373, 0.55); // Mesita plegable madera clara
+            addDecorBox(0.35, 0.74, 1.96, 0.42, 0.04, 0.42, 0x1e293b, 0.3);  // Tablero de Ajedrez LOTR
+
+            // 5. Cortina gris oscura con visillo blanco en la ventana Norte del Estudio (V4: X=0.85..2.05, Z=0.00)
+            addCurtainAssembly(0.85, 0.00, 2.05, 0.00, 0, 0.12, 0x57534e);
+        }
+        buildFurnishedVideoDecor();
+
+        // ============================================================================
+        // 5. ETIQUETAS DE AMBIENTES Y MUEBLES EN COORDENADAS EXACTAS
         // ============================================================================
         const labelElements = [];
-        function addPlanLabel(x, z, text, cls = 'arch-label') {
+        function addPlanLabel(x, z, text, cls = 'arch-label', isDecor = false) {
             const el = document.createElement('div');
             el.className = cls;
             el.innerText = text;
             document.getElementById('labels-container').appendChild(el);
-            labelElements.push({ el, pos: new THREE.Vector3(x, 0.1, z) });
+            labelElements.push({ el, pos: new THREE.Vector3(x, 0.1, z), isDecor });
         }
 
         // Estudio Ampliado: [0.00, 0.00] a [3.00, 2.30]
-        addPlanLabel(1.35, 1.15, "ESTUDIO AMPLIADO");
+        addPlanLabel(1.15, 1.35, "ESTUDIO AMPLIADO");
         // Placard Superior: [0.00, 2.30] a [2.30, 2.80]
         addPlanLabel(1.15, 2.55, "PLACARD", "arch-label sm");
         // Baño Amplio: [0.00, 2.80] a [2.30, 4.00]
@@ -1568,24 +1835,39 @@
         // Pasillo Distribuidor: [2.30, 2.30] a [3.00, 4.50]
         addPlanLabel(2.70, 3.30, "PASILLO", "arch-label vertical");
         // Cuarto Ampliado: [0.00, 4.50] a [3.00, 7.00]
-        addPlanLabel(1.35, 5.65, "CUARTO AMPLIADO");
+        addPlanLabel(1.15, 5.20, "CUARTO AMPLIADO");
         // Living: [3.00, 0.00] a [6.30, 4.50]
-        addPlanLabel(4.55, 1.95, "LIVING");
-        addPlanLabel(4.45, 2.25, "(Techo madera en pendiente + vigas vistas)", "arch-label sub");
+        addPlanLabel(5.05, 2.20, "LIVING");
         // Cocina: [3.00, 4.50] a [5.20, 7.00]
-        addPlanLabel(4.32, 5.42, "COCINA");
-        addPlanLabel(4.32, 5.70, "(Acceso junto al pasillo)", "arch-label sub");
+        addPlanLabel(4.22, 5.15, "COCINA");
+        addPlanLabel(4.22, 5.42, "(Acceso junto al pasillo)", "arch-label sub");
         // Entrada: [5.20, 4.50] a [6.30, 5.70]
-        addPlanLabel(5.75, 5.20, "ENTRADA", "arch-label sm");
+        addPlanLabel(5.65, 5.20, "ENTRADA", "arch-label sm");
         // Palier Edificio (Exterior): [5.20, 5.70] a [6.30, 7.00]
         addPlanLabel(5.75, 6.35, "PALIER\nEDIFICIO", "arch-label palier");
 
         // Etiquetas de Calefactores e Instalaciones del video
         addPlanLabel(5.75, 3.05, "🔥 CALEFACTOR", "arch-label sub");
         addPlanLabel(0.48, 6.62, "🔥 CALEF.", "arch-label sub");
-        addPlanLabel(0.48, 1.02, "🔥 CALEF.", "arch-label sub");
         addPlanLabel(0.40, 3.40, "BAÑERA", "arch-label sub");
         addPlanLabel(3.32, 5.62, "TERMO", "arch-label sub");
+
+        // Etiquetas de Muebles y Decoración extraídos del 2° video (se ocultan si se desactiva "🛋️ Amoblado")
+        addPlanLabel(3.52, 2.72, "🛋️ FUTÓN 3C", "arch-label sub", true);
+        addPlanLabel(4.38, 2.72, "MESA RATONA", "arch-label sub", true);
+        addPlanLabel(5.96, 3.82, "📺 TV 50\" + RACK", "arch-label sub", true);
+        addPlanLabel(6.02, 5.02, "🧥 PERCHERO/ZAP.", "arch-label sub", true);
+        addPlanLabel(4.55, 1.22, "🍽️ MESA + 4 SILLAS", "arch-label sub", true);
+        addPlanLabel(5.55, 0.38, "🐕 CUCHA PERRO", "arch-label sub", true);
+        addPlanLabel(3.35, 4.95, "❄️ HELADERA", "arch-label sub", true);
+        addPlanLabel(4.84, 6.66, "🧺 LAVARR. + CAFÉ", "arch-label sub", true);
+        addPlanLabel(1.95, 5.80, "🛏️ CAMA 2P + RESPALDO", "arch-label sub", true);
+        addPlanLabel(2.72, 4.86, "MESA LUZ", "arch-label sub", true);
+        addPlanLabel(2.72, 6.72, "MESA LUZ", "arch-label sub", true);
+        addPlanLabel(2.58, 0.96, "🖥️ ESCRITORIO EN L + PC", "arch-label sub", true);
+        addPlanLabel(1.95, 1.12, "💺 SILLA GAMER", "arch-label sub", true);
+        addPlanLabel(0.32, 0.88, "📚 BIBLIOTECA", "arch-label sub", true);
+        addPlanLabel(0.42, 1.96, "♟️ AJEDREZ LOTR", "arch-label sub", true);
 
         // Cotas Exteriores
         addPlanLabel(3.15, -0.30, "6.30 m", "arch-label dim");
@@ -1601,6 +1883,10 @@
             const halfW = window.innerWidth / 2;
             const halfH = window.innerHeight / 2;
             for (const item of labelElements) {
+                if (item.isDecor && !decorVideoGroup.visible) {
+                    item.el.style.display = 'none';
+                    continue;
+                }
                 const p = item.pos.clone().project(activeCamera);
                 if (p.z > 1.0) {
                     item.el.style.display = 'none';
@@ -1827,6 +2113,33 @@
             });
         });
 
+        // Cargar los 14 muebles principales relevados del 2° video en el editor interactivo
+        const VIDEO_FURNITURE_PRESET_LIST = [
+            { id: 'vid_futon', name: 'Futón 3 Cuerpos Azul', room: 'Living', x: 3.48, z: 2.72, y: 0.41, w: 0.88, d: 1.92, h: 0.82, rot: 0, color: 0x23486a },
+            { id: 'vid_ratona', name: 'Mesa Ratona Elevable', room: 'Living', x: 4.38, z: 2.72, y: 0.28, w: 0.54, d: 1.02, h: 0.56, rot: 0, color: 0x3e2723 },
+            { id: 'vid_rack_tv', name: 'Rack TV + Home Theater', room: 'Living', x: 6.00, z: 3.82, y: 0.40, w: 0.44, d: 1.36, h: 0.80, rot: 0, color: 0x7c2d12 },
+            { id: 'vid_perchero', name: 'Perchero + Zapatero Entrada', room: 'Entrada', x: 6.08, z: 5.02, y: 0.93, w: 0.30, d: 0.64, h: 1.86, rot: 0, color: 0x1e293b },
+            { id: 'vid_mesa_red', name: 'Mesa Comedor Redonda + 4 Sillas', room: 'Living', x: 4.55, z: 1.22, y: 0.38, w: 1.10, d: 1.10, h: 0.76, rot: 0, color: 0x882915 },
+            { id: 'vid_cucha_ne', name: 'Cucha Perro Esquina NE', room: 'Living', x: 5.55, z: 0.38, y: 0.05, w: 0.92, d: 0.62, h: 0.10, rot: 0, color: 0x94a3b8 },
+            { id: 'vid_heladera', name: 'Heladera c/ Freezer + Bodega', room: 'Cocina', x: 3.35, z: 4.95, y: 0.86, w: 0.60, d: 0.62, h: 1.72, rot: 0, color: 0xe2e8f0 },
+            { id: 'vid_lavarropas', name: 'Lavarropas + Estación Café', room: 'Cocina', x: 4.84, z: 6.66, y: 0.43, w: 0.60, d: 0.58, h: 0.86, rot: 0, color: 0xcbd5e1 },
+            { id: 'vid_cama_2p', name: 'Cama 2 Plazas + Respaldo Nogal', room: 'Cuarto', x: 1.95, z: 5.80, y: 0.24, w: 1.90, d: 1.45, h: 0.48, rot: 0, color: 0x475569 },
+            { id: 'vid_luz_n', name: 'Mesa de Luz Norte', room: 'Cuarto', x: 2.72, z: 4.86, y: 0.31, w: 0.42, d: 0.44, h: 0.62, rot: 0, color: 0x4a3222 },
+            { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 2.72, z: 6.72, y: 0.31, w: 0.42, d: 0.42, h: 0.62, rot: 0, color: 0x4a3222 },
+            { id: 'vid_escr_l', name: 'Escritorio en L + PC Gamer', room: 'Estudio', x: 2.64, z: 0.96, y: 0.38, w: 0.64, d: 1.64, h: 0.76, rot: 0, color: 0x8f3818 },
+            { id: 'vid_biblio', name: 'Biblioteca 5 Estantes', room: 'Estudio', x: 0.20, z: 0.88, y: 0.92, w: 0.32, d: 0.82, h: 1.84, rot: 0, color: 0x3b2314 },
+            { id: 'vid_ajedrez', name: 'Mesa Ajedrez El Señor de los Anillos', room: 'Estudio', x: 0.35, z: 1.96, y: 0.37, w: 0.44, d: 0.44, h: 0.74, rot: 0, color: 0xd4a373 }
+        ];
+
+        document.getElementById('btn-load-video-furniture').addEventListener('click', () => {
+            furnitureList = JSON.parse(JSON.stringify(VIDEO_FURNITURE_PRESET_LIST));
+            selectedId = furnitureList[0].id;
+            renderFurniture3D();
+            const ed = document.getElementById('furniture-editor');
+            ed.classList.remove('minimized');
+            document.getElementById('btn-min-editor').innerText = '▼';
+        });
+
         // JSON Modal
         const jsonModal = document.getElementById('json-modal');
         document.getElementById('btn-copy-json').addEventListener('click', () => {
@@ -1893,6 +2206,16 @@
         document.getElementById('chk-fixtures').addEventListener('change', (e) => {
             fixturesGroup.visible = e.target.checked;
         });
+        document.getElementById('chk-video-decor').addEventListener('change', (e) => {
+            decorVideoGroup.visible = e.target.checked;
+            document.getElementById('btn-toggle-video-decor').classList.toggle('active', e.target.checked);
+        });
+        document.getElementById('btn-toggle-video-decor').addEventListener('click', () => {
+            const nextState = !decorVideoGroup.visible;
+            decorVideoGroup.visible = nextState;
+            document.getElementById('chk-video-decor').checked = nextState;
+            document.getElementById('btn-toggle-video-decor').classList.toggle('active', nextState);
+        });
         document.getElementById('chk-roof').addEventListener('change', (e) => {
             roofGroup.visible = e.target.checked;
             document.getElementById('btn-toggle-roof').classList.toggle('active', e.target.checked);
@@ -1930,7 +2253,7 @@
         });
 
         function setActiveTopBtn(id) {
-            document.querySelectorAll('.mode-btn:not(#btn-toggle-roof)').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.mode-btn:not(#btn-toggle-roof):not(#btn-toggle-video-decor)').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 

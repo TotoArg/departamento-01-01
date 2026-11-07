@@ -98,3 +98,31 @@ Ks 0.080 0.080 0.080
 Ns 30.0
 d 1.0
 
+newmtl Furniture_Sofa_Blue
+Ka 0.200 0.200 0.200
+Kd 0.140 0.280 0.420
+Ks 0.080 0.080 0.080
+Ns 30.0
+d 1.0
+
+newmtl Furniture_Wood_Mahogany
+Ka 0.200 0.200 0.200
+Kd 0.560 0.220 0.090
+Ks 0.080 0.080 0.080
+Ns 30.0
+d 1.0
+
+newmtl Furniture_Wood_Walnut
+Ka 0.200 0.200 0.200
+Kd 0.290 0.200 0.130
+Ks 0.080 0.080 0.080
+Ns 30.0
+d 1.0
+
+newmtl Electronics_Black
+Ka 0.200 0.200 0.200
+Kd 0.080 0.100 0.140
+Ks 0.080 0.080 0.080
+Ns 30.0
+d 1.0
+

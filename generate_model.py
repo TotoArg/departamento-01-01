@@ -69,6 +69,10 @@ class OBJBuilder:
             "Door_Wood_Cedar": (0.74, 0.47, 0.25),
             "Door_Main_Grey": (0.55, 0.57, 0.60),
             "Placard_Wood": (0.77, 0.49, 0.27),
+            "Furniture_Sofa_Blue": (0.14, 0.28, 0.42),
+            "Furniture_Wood_Mahogany": (0.56, 0.22, 0.09),
+            "Furniture_Wood_Walnut": (0.29, 0.20, 0.13),
+            "Electronics_Black": (0.08, 0.10, 0.14),
         }
 
         with open(mtl_path, "w", encoding="utf-8") as mf:
@@ -246,6 +250,33 @@ def build_apartment():
     b.add_box(0.05, 0.00, 2.84, 0.75, 0.48, 3.96)  # Bañera
     b.add_box(1.12, 0.00, 2.84, 1.58, 0.82, 3.20)  # Lavatorio
     b.add_box(1.68, 0.00, 3.56, 2.06, 0.75, 3.95)  # Inodoro
+    b.add_box(3.05, 0.00, 4.64, 3.65, 1.72, 5.26)  # Heladera con freezer en Cocina
+    b.add_box(4.55, 0.00, 6.38, 5.13, 0.85, 6.94)  # Lavarropas carga frontal en Cocina
+
+    # 5. MUEBLES Y DECORACIÓN EXTRAÍDOS DEL SEGUNDO VIDEO
+    b.set_group("05_Muebles_Living_Comedor", "Furniture_Sofa_Blue")
+    b.add_box(3.06, 0.05, 1.76, 3.92, 0.82, 3.68)  # Futón 3 cuerpos azul petróleo
+
+    b.set_group("05B_Muebles_Madera_Caoba", "Furniture_Wood_Mahogany")
+    b.add_box(5.78, 0.00, 3.16, 6.22, 0.80, 4.48)  # Rack TV madera rojiza
+    b.add_box(4.11, 0.00, 2.21, 4.65, 0.56, 3.23)  # Mesa ratona elevable frente al futón
+    b.add_box(4.01, 0.00, 0.68, 5.09, 0.76, 1.76)  # Mesa comedor redonda + sillas
+    b.add_box(2.32, 0.00, 0.14, 2.96, 0.76, 1.78)  # Escritorio en L tramo principal (Estudio)
+    b.add_box(1.35, 0.00, 0.09, 2.32, 0.76, 0.67)  # Escritorio en L ala ventana (Estudio)
+    b.add_box(2.73, 1.43, 0.22, 2.95, 1.85, 1.80)  # Estantes flotantes sobre escritorio
+
+    b.set_group("05C_Muebles_Madera_Nogal", "Furniture_Wood_Walnut")
+    b.add_box(2.89, 0.10, 4.69, 2.95, 1.25, 6.91)  # Respaldo ancho de cama (Cuarto)
+    b.add_box(1.00, 0.00, 5.07, 2.90, 0.48, 6.53)  # Cama 2 plazas (Cuarto)
+    b.add_box(2.51, 0.00, 4.64, 2.93, 0.62, 5.08)  # Mesa de luz Norte (Cuarto)
+    b.add_box(2.51, 0.00, 6.51, 2.93, 0.62, 6.93)  # Mesa de luz Sur (Cuarto)
+    b.add_box(0.04, 0.00, 0.47, 0.36, 1.84, 1.29)  # Biblioteca 5 estantes (Estudio)
+    b.add_box(0.13, 0.00, 1.74, 0.57, 0.74, 2.18)  # Mesa con Ajedrez LOTR (Estudio)
+
+    b.set_group("05D_Electronica_Y_Perchero", "Electronics_Black")
+    b.add_box(5.93, 0.00, 4.70, 6.23, 1.86, 5.34)  # Perchero + Zapatero Entrada
+    b.add_box(6.13, 1.05, 3.25, 6.19, 1.71, 4.39)  # Smart TV 50" en pared
+    b.add_box(1.68, 0.00, 0.88, 2.18, 1.06, 1.36)  # Silla Gamer (Estudio)
 
     b.save("Departamento_01-01.obj", "Departamento_01-01.mtl", "Departamento_01-01.mtl")
     print("Modelo 3D completo (.obj y .mtl) con detalles de video generado exitosamente.")
