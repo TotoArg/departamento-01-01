@@ -568,10 +568,11 @@
 
         <!-- Top Mode Switcher -->
         <div id="top-toolbar" class="glass-panel">
-            <button class="mode-btn active" id="btn-mode-2d" title="Plano 2D Ortogonal"><span>📐</span> 2D</button>
-            <button class="mode-btn" id="btn-mode-sims" title="Paredes estilo Los Sims: bajan dinámicamente las paredes que tapan la cámara al rotar"><span>🏠</span> Corte Sims</button>
-            <button class="mode-btn" id="btn-mode-3d" title="Paredes Completas (Todas Arriba)"><span>🧱</span> Arriba</button>
-            <button class="mode-btn" id="btn-mode-cut" title="Paredes Bajas estilo Los Sims (Todas Abajo)"><span>📐</span> Abajo</button>
+            <button class="mode-btn active" id="btn-mode-2d" title="Plano 2D Técnico Ortogonal"><span>📐</span> 2D</button>
+            <button class="mode-btn" id="btn-mode-3d" title="3D Normal con muros completos como antes"><span>🧊</span> 3D</button>
+            <button class="mode-btn" id="btn-mode-sims" title="Paredes estilo Los Sims (Corte Dinámico que baja las paredes al rotar)"><span>🏡</span> Sims</button>
+            <button class="mode-btn" id="btn-mode-cut" title="Paredes Bajas a media altura"><span>✂️</span> Bajas</button>
+            <button class="mode-btn" id="btn-mode-nowalls" title="Ocultar todas las paredes"><span>🚫</span> Sin Muros</button>
             <button class="mode-btn active" id="btn-toggle-labels" title="Mostrar/Ocultar Nombres de los Ambientes"><span>🏷️</span> Nombres</button>
             <button class="mode-btn active" id="btn-toggle-video-decor" title="Mostrar/Ocultar Muebles, Electrodomésticos y Decoración"><span>🛋️</span> Amoblado</button>
             <button class="mode-btn" id="btn-toggle-roof" title="Mostrar/Ocultar Techo de Madera y Vigas"><span>🪵</span> Techo</button>
@@ -2534,9 +2535,9 @@
         });
 
         // ============================================================================
-        // 8. CONTROLES DE VISIBILIDAD, NOMBRES Y PAREDES ESTILO LOS SIMS (2D / 3D)
+        // 8. CONTROLES DE VISIBILIDAD, NOMBRES Y PAREDES (3D NORMAL, SIMS Y 2D)
         // ============================================================================
-        let wallMode = 'sims'; // 'sims' (Corte Dinámico) | 'up' (Paredes Arriba) | 'down' (Paredes Abajo)
+        let wallMode = 'up'; // 'up' (3D Normal con paredes completas) | 'sims' (Corte Dinámico) | 'down' (Paredes Bajas)
         let current3DPreset = 'isom';
 
         function applyWallHeight(w, h) {
@@ -2797,7 +2798,7 @@
             controlsPersp.enabled = true;
             ambLight.intensity = 0.85;
             applyWallsVisibility(true, true);
-            setWallMode(mode || 'sims');
+            setWallMode(mode || 'up');
             if (moveCam) {
                 const v = get3DPreset(presetName);
                 perspCam.position.set(v.pos[0], v.pos[1], v.pos[2]);
@@ -2812,14 +2813,24 @@
             applyWallsVisibility(true, true);
             switchTo2D();
         });
-        document.getElementById('btn-mode-sims').addEventListener('click', () => {
-            switchTo3D(current3DPreset, 'sims', activeCamera === orthoCam);
-        });
         document.getElementById('btn-mode-3d').addEventListener('click', () => {
+            applyWallsVisibility(true, true);
             switchTo3D(current3DPreset, 'up', activeCamera === orthoCam);
         });
+        document.getElementById('btn-mode-sims').addEventListener('click', () => {
+            applyWallsVisibility(true, true);
+            switchTo3D(current3DPreset, 'sims', activeCamera === orthoCam);
+        });
         document.getElementById('btn-mode-cut').addEventListener('click', () => {
+            applyWallsVisibility(true, true);
             switchTo3D(current3DPreset, 'down', activeCamera === orthoCam);
+        });
+        document.getElementById('btn-mode-nowalls').addEventListener('click', () => {
+            if (activeCamera === orthoCam) {
+                switchTo3D(current3DPreset, 'up', true);
+            }
+            applyWallsVisibility(false, false);
+            setActiveTopBtn('btn-mode-nowalls');
         });
 
         // Botones de Zoom rápido (+ / - / Reset)
