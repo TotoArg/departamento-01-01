@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Plano Arquitectónico 2D y 3D (7.00m × 6.20m)</title>
+    <title>Plano Arquitectónico 2D y 3D (6.30m × 6.20m)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/OBJExporter.js"></script>
@@ -540,15 +540,15 @@
             <div class="header-top">
                 <div class="badge" style="background: linear-gradient(135deg, #10b981, #059669);">Escritura: 54,16 m²</div>
                 <div class="header-actions">
-                    <a href="plano_arquitectonico_2d.png" download="Plano_2D_7x62.png" class="icon-btn">⬇️ PNG 2D</a>
+                    <a href="plano_arquitectonico_2d.png" download="Plano_2D_63x62.png" class="icon-btn">⬇️ PNG 2D</a>
                     <button class="icon-btn" id="btn-toggle-layers">⚙️ Capas</button>
                 </div>
             </div>
-            <h1>Plano Arquitectónico Exacto (2D y 3D)</h1>
+            <h1>Plano Arquitectónico Exacto (6.30m × 6.20m)</h1>
             <div class="metrics-row">
                 <div class="metric"><span class="metric-val">54,16 m²</span><span class="metric-lbl">Escritura Oficial</span></div>
-                <div class="metric"><span class="metric-val">43,40 m²</span><span class="metric-lbl">Planta Libre (7×6.20)</span></div>
-                <div class="metric"><span class="metric-val">7.00 m</span><span class="metric-lbl">Ancho (X)</span></div>
+                <div class="metric"><span class="metric-val">39,06 m²</span><span class="metric-lbl">Planta Libre (6.30×6.20)</span></div>
+                <div class="metric"><span class="metric-val">6.30 m</span><span class="metric-lbl">Ancho (X)</span></div>
                 <div class="metric"><span class="metric-val">6.20 m</span><span class="metric-lbl">Alto (Y)</span></div>
             </div>
         </div>
@@ -767,9 +767,9 @@
             const aspect = window.innerWidth / window.innerHeight;
             // En pantallas verticales móviles (aspect < 1.0), dejamos margen para que barras arriba y abajo no tapen nada
             if (aspect < 1.0) {
-                return 10.5 / aspect;
+                return 10.2 / aspect;
             }
-            return 9.2;
+            return 8.8;
         }
 
         function createOrthoCam() {
@@ -783,9 +783,9 @@
                 0.1,
                 100
             );
-            cam.position.set(3.50, 20, 3.10);
+            cam.position.set(3.15, 20, 3.10);
             cam.up.set(0, 0, -1); // Norte (Y=0) arriba en pantalla, Sur (Y=6.20) abajo
-            cam.lookAt(3.50, 0, 3.10);
+            cam.lookAt(3.15, 0, 3.10);
             return cam;
         }
         const orthoCam = createOrthoCam();
@@ -801,7 +801,7 @@
         container.appendChild(renderer.domElement);
 
         const controlsPersp = new THREE.OrbitControls(perspCam, renderer.domElement);
-        controlsPersp.target.set(3.50, 0.3, 3.10);
+        controlsPersp.target.set(3.15, 0.3, 3.10);
         controlsPersp.enableDamping = true;
         controlsPersp.dampingFactor = 0.06;
         controlsPersp.maxPolarAngle = Math.PI / 2 - 0.02;
@@ -809,7 +809,7 @@
 
         // Controles para 2D Ortográfico (Zoom con rueda / pellizco táctil y Pan / desplazamiento)
         const controlsOrtho = new THREE.OrbitControls(orthoCam, renderer.domElement);
-        controlsOrtho.target.set(3.50, 0, 3.10);
+        controlsOrtho.target.set(3.15, 0, 3.10);
         controlsOrtho.enableDamping = true;
         controlsOrtho.dampingFactor = 0.08;
         controlsOrtho.enableRotate = false; // Solo zoom y pan en 2D plano
@@ -846,11 +846,11 @@
         const INT_T = 0.08;
 
         // ============================================================================
-        // 2. PISO RECTANGULAR SIMPLE: 7.00 m (X: 0.00 a 7.00) × 6.20 m (Y: 0.00 a 6.20)
+        // 2. PISO RECTANGULAR SIMPLE: 6.30 m (X: 0.00 a 6.30) × 6.20 m (Y: 0.00 a 6.20)
         // ============================================================================
-        const floorGeo = new THREE.BoxGeometry(7.00, 0.06, 6.20);
+        const floorGeo = new THREE.BoxGeometry(6.30, 0.06, 6.20);
         const floorMesh = new THREE.Mesh(floorGeo, floorMat);
-        floorMesh.position.set(3.50, -0.03, 3.10);
+        floorMesh.position.set(3.15, -0.03, 3.10);
         floorMesh.receiveShadow = true;
         floorGroup.add(floorMesh);
 
@@ -903,34 +903,35 @@
         }
 
         // ============================================================================
-        // 3. REGLA 1: PERÍMETRO EXTERIOR (Rectángulo simple 7.00 m × 6.20 m)
+        // 3. REGLA 1: PERÍMETRO EXTERIOR (Rectángulo simple 6.30 m × 6.20 m)
         // ============================================================================
-        // Muro superior continuo: Y = 0.00 (X = 0.00 a 7.00)
-        addWallSegment(0.00, 0.00, 7.00, 0.00, EXT_T, exteriorWallsGroup, true);
+        // Muro superior continuo: Y = 0.00 (X = 0.00 a 6.30)
+        addWallSegment(0.00, 0.00, 6.30, 0.00, EXT_T, exteriorWallsGroup, true);
         // Muro izquierdo continuo: X = 0.00 (Y = 0.00 a 6.20)
         addWallSegment(0.00, 0.00, 0.00, 6.20, EXT_T, exteriorWallsGroup, true);
-        // Muro derecho continuo: X = 7.00 (Y = 0.00 a 6.20)
-        addWallSegment(7.00, 0.00, 7.00, 6.20, EXT_T, exteriorWallsGroup, true);
-        // Muro inferior continuo: Y = 6.20 (X = 0.00 a 7.00) con Puerta de Entrada en X = 5.40 a 6.20
-        addWallSegment(0.00, 6.20, 5.40, 6.20, EXT_T, exteriorWallsGroup, true);
-        addWallSegment(6.20, 6.20, 7.00, 6.20, EXT_T, exteriorWallsGroup, true);
+        // Muro derecho continuo: X = 6.30 (Y = 0.00 a 6.20)
+        addWallSegment(6.30, 0.00, 6.30, 6.20, EXT_T, exteriorWallsGroup, true);
+        // Muro inferior continuo: Y = 6.20 (X = 0.00 a 6.30) con Puerta de Entrada en X = 5.20 a 6.10
+        addWallSegment(0.00, 6.20, 5.20, 6.20, EXT_T, exteriorWallsGroup, true);
+        addWallSegment(6.10, 6.20, 6.30, 6.20, EXT_T, exteriorWallsGroup, true);
 
-        // Jambas de Puerta de Entrada en X = 5.40 y X = 6.20 sobre Y = 6.20
-        addWallSegment(5.40, 6.07, 5.40, 6.33, 0.04, exteriorWallsGroup, true);
-        addWallSegment(6.20, 6.07, 6.20, 6.33, 0.04, exteriorWallsGroup, true);
+        // Jambas de Puerta de Entrada en X = 5.20 y X = 6.10 sobre Y = 6.20 (vano de 0.90 m)
+        addWallSegment(5.20, 6.07, 5.20, 6.33, 0.04, exteriorWallsGroup, true);
+        addWallSegment(6.10, 6.07, 6.10, 6.33, 0.04, exteriorWallsGroup, true);
         const entranceThreshold = new THREE.Mesh(
-            new THREE.BoxGeometry(0.80, 0.01, 0.02),
+            new THREE.BoxGeometry(0.90, 0.01, 0.02),
             new THREE.MeshBasicMaterial({ color: 0x94a3b8 })
         );
-        entranceThreshold.position.set(5.80, 0.01, 6.20);
+        entranceThreshold.position.set(5.65, 0.01, 6.20);
         lines2DGroup.add(entranceThreshold);
 
         // ============================================================================
         // 4. REGLA 2: EJES VERTICALES PRINCIPALES
         // ============================================================================
         // X = 1.70: Cerramiento de Baño y Placards (desde Y = 2.00 hasta Y = 4.20)
-        // Puerta de acceso al Baño en el centro (entre Y = 2.80 y Y = 3.40)
+        // Puerta de acceso al Baño en el centro (entre Y = 2.80 y Y = 3.40) abriendo desde el Pasillo
         addWallSegment(1.70, 2.00, 1.70, 2.80, INT_T, interiorWallsGroup, false);
+        addDashedLine(1.70, 2.80, 1.70, 3.40);
         addWallSegment(1.70, 3.40, 1.70, 4.20, INT_T, interiorWallsGroup, false);
 
         // X = 3.00: Eje central divisorio
@@ -942,8 +943,8 @@
         // 2) Separa el Cuarto de la Cocina (desde Y = 4.20 hasta Y = 6.20)
         addWallSegment(3.00, 4.20, 3.00, 6.20, INT_T, interiorWallsGroup, false);
 
-        // X = 4.60: Pared derecha de la Cocina (desde Y = 4.20 hasta Y = 6.20)
-        addWallSegment(4.60, 4.20, 4.60, 6.20, INT_T, interiorWallsGroup, false);
+        // X = 5.00: Pared derecha de la Cocina (desde Y = 4.20 hasta Y = 6.20)
+        addWallSegment(5.00, 4.20, 5.00, 6.20, INT_T, interiorWallsGroup, false);
 
         // ============================================================================
         // 5. REGLA 3: LÍNEAS HORIZONTALES Y ALINEACIONES CRÍTICAS (SIMETRÍA ESTUDIO = CUARTO)
@@ -951,10 +952,10 @@
         // Y = 2.00: Línea de cierre del Estudio (2.00 m de alto)
         // De X = 0.00 a X = 1.70: Muro cerrado que divide el Estudio del Placard 1
         addWallSegment(0.00, 2.00, 1.70, 2.00, INT_T, interiorWallsGroup, false);
-        // De X = 1.70 a X = 3.00: Vano/puerta de entrada al Estudio (remate superior del Pasillo)
-        addWallSegment(1.70, 2.00, 1.86, 2.00, INT_T, interiorWallsGroup, false);
-        addDashedLine(1.86, 2.00, 2.82, 2.00);
-        addWallSegment(2.82, 2.00, 3.00, 2.00, INT_T, interiorWallsGroup, false);
+        // De X = 1.70 a X = 3.00: Vano/puerta de entrada al Estudio (X = 1.90 a 2.80)
+        addWallSegment(1.70, 2.00, 1.90, 2.00, INT_T, interiorWallsGroup, false);
+        addDashedLine(1.90, 2.00, 2.80, 2.00);
+        addWallSegment(2.80, 2.00, 3.00, 2.00, INT_T, interiorWallsGroup, false);
 
         // Y = 2.50: Muro horizontal que divide el Placard 1 (0.50 m de alto) del Baño (de X = 0.00 a X = 1.70)
         addWallSegment(0.00, 2.50, 1.70, 2.50, INT_T, interiorWallsGroup, false);
@@ -965,14 +966,14 @@
         // Y = 4.20: Línea horizontal unificada de Cuarto y Cocina (2.00 m desde la base)
         // 1) Muro inferior del Placard 2 (0.50 m de alto, de X = 0.00 a X = 1.70)
         addWallSegment(0.00, 4.20, 1.70, 4.20, INT_T, interiorWallsGroup, false);
-        // 2) Vano/puerta de entrada al Cuarto (de X = 1.70 a X = 3.00, cerrando el pasillo por abajo)
-        addWallSegment(1.70, 4.20, 1.86, 4.20, INT_T, interiorWallsGroup, false);
-        addDashedLine(1.86, 4.20, 2.82, 4.20);
-        addWallSegment(2.82, 4.20, 3.00, 4.20, INT_T, interiorWallsGroup, false);
-        // 3) Frente superior de la Cocina con su abertura de acceso (de X = 3.00 a X = 4.60)
-        addWallSegment(3.00, 4.20, 3.18, 4.20, INT_T, interiorWallsGroup, false);
-        addDashedLine(3.18, 4.20, 4.38, 4.20);
-        addWallSegment(4.38, 4.20, 4.60, 4.20, INT_T, interiorWallsGroup, false);
+        // 2) Vano/puerta de entrada al Cuarto (X = 1.90 a 2.80)
+        addWallSegment(1.70, 4.20, 1.90, 4.20, INT_T, interiorWallsGroup, false);
+        addDashedLine(1.90, 4.20, 2.80, 4.20);
+        addWallSegment(2.80, 4.20, 3.00, 4.20, INT_T, interiorWallsGroup, false);
+        // 3) Frente superior de la Cocina con su vano amplio de acceso (de X = 3.25 a X = 4.65)
+        addWallSegment(3.00, 4.20, 3.25, 4.20, INT_T, interiorWallsGroup, false);
+        addDashedLine(3.25, 4.20, 4.65, 4.20);
+        addWallSegment(4.65, 4.20, 5.00, 4.20, INT_T, interiorWallsGroup, false);
 
         // ============================================================================
         // 6. ETIQUETAS DE AMBIENTES EN COORDENADAS EXACTAS
@@ -998,15 +999,15 @@
         addPlanLabel(2.35, 3.10, "PASILLO", "arch-label vertical");
         // Cuarto: [0.00, 4.20] a [3.00, 6.20] (3.00 m × 2.00 m — idéntico al Estudio)
         addPlanLabel(1.50, 5.20, "CUARTO");
-        // Cocina: [3.00, 4.20] a [4.60, 6.20] (1.60 m × 2.00 m)
-        addPlanLabel(3.80, 5.20, "COCINA");
-        // Living: [3.00, 0.00] a [7.00, 4.20] + [4.60, 4.20] a [7.00, 6.20]
-        addPlanLabel(5.00, 2.15, "LIVING");
-        // Entrada: X = 5.40 a 6.20 sobre Y = 6.20
-        addPlanLabel(5.80, 6.55, "ENTRADA", "arch-label sm");
+        // Cocina: [3.00, 4.20] a [5.00, 6.20] (2.00 m × 2.00 m)
+        addPlanLabel(4.00, 5.20, "COCINA");
+        // Living: [3.00, 0.00] a [6.30, 4.20] + [5.00, 4.20] a [6.30, 6.20]
+        addPlanLabel(4.65, 2.10, "LIVING");
+        // Entrada: X = 5.20 a 6.10 sobre Y = 6.20
+        addPlanLabel(5.65, 6.55, "ENTRADA", "arch-label sm");
 
         // Cotas Exteriores
-        addPlanLabel(3.50, -0.32, "7.00 m", "arch-label dim");
+        addPlanLabel(3.15, -0.32, "6.30 m", "arch-label dim");
         addPlanLabel(-0.32, 3.10, "6.20 m", "arch-label dim-v");
 
         function updateLabels() {
@@ -1327,9 +1328,9 @@
         }
 
         const viewPresets = {
-            isom:   { pos: [3.50, 9.8, 8.80], target: [3.50, 0.3, 3.10] },
-            living: { pos: [5.30, 3.4, 5.80], target: [5.00, 0.6, 2.00] },
-            cocina: { pos: [3.80, 3.4, 3.80], target: [3.80, 0.6, 5.50] },
+            isom:   { pos: [3.15, 9.8, 8.80], target: [3.15, 0.3, 3.10] },
+            living: { pos: [4.90, 3.4, 5.80], target: [4.65, 0.6, 2.00] },
+            cocina: { pos: [4.00, 3.4, 3.80], target: [4.00, 0.6, 5.50] },
             cuarto: { pos: [2.40, 3.4, 4.30], target: [1.20, 0.5, 5.50] },
             bano:   { pos: [2.60, 3.4, 3.40], target: [0.85, 0.5, 3.40] },
             estudio:{ pos: [2.40, 3.4, 2.50], target: [1.20, 0.5, 0.90] }
@@ -1404,8 +1405,8 @@
         document.getElementById('btn-zoom-reset').addEventListener('click', () => {
             if (activeCamera === orthoCam) {
                 orthoCam.zoom = 1.0;
-                orthoCam.position.set(3.50, 20, 3.10);
-                controlsOrtho.target.set(3.50, 0, 3.10);
+                orthoCam.position.set(3.15, 20, 3.10);
+                controlsOrtho.target.set(3.15, 0, 3.10);
                 orthoCam.updateProjectionMatrix();
                 controlsOrtho.update();
             } else {
@@ -1434,7 +1435,7 @@
             const blob = new Blob([result], { type: 'text/plain' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'Departamento_7x62_Exacto.obj';
+            link.download = 'Departamento_63x62_Exacto.obj';
             link.click();
         });
 
