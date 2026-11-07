@@ -1,35 +1,30 @@
-newmtl Piso
-Kd 0.950 0.960 0.980
-Ka 0.200 0.200 0.200
-Ks 0.100 0.100 0.100
-Ns 30.0
+# Materiales Arquitectónicos Departamento 6.30m x 7.00m (Planta en L)
 
-newmtl Muro_Exterior
-Kd 0.880 0.910 0.940
+newmtl Floor_Light
 Ka 0.200 0.200 0.200
-Ks 0.100 0.100 0.100
+Kd 0.960 0.960 0.970
+Ks 0.080 0.080 0.080
 Ns 30.0
+d 1.0
 
-newmtl Muro_Interior
-Kd 0.780 0.830 0.880
+newmtl Palier_Ext
 Ka 0.200 0.200 0.200
-Ks 0.100 0.100 0.100
+Kd 0.910 0.920 0.940
+Ks 0.080 0.080 0.080
 Ns 30.0
+d 1.0
 
-newmtl Mueble_Madera
-Kd 0.700 0.420 0.220
+newmtl Wall_Exterior
 Ka 0.200 0.200 0.200
-Ks 0.100 0.100 0.100
+Kd 0.850 0.880 0.920
+Ks 0.080 0.080 0.080
 Ns 30.0
+d 1.0
 
-newmtl Mueble_Tapizado
-Kd 0.200 0.300 0.450
+newmtl Wall_Interior
 Ka 0.200 0.200 0.200
-Ks 0.100 0.100 0.100
+Kd 0.780 0.820 0.880
+Ks 0.080 0.080 0.080
 Ns 30.0
+d 1.0
 
-newmtl Sanitario
-Kd 0.980 0.980 1.000
-Ka 0.200 0.200 0.200
-Ks 0.100 0.100 0.100
-Ns 30.0

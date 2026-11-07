@@ -1,205 +1,252 @@
+"""
+Generador del Plano 2D Esquemático Exacto (6.30 m x 7.00 m, Planta en "L").
+Coordenadas exactas desde [0.00, 0.00] (Esquina Superior Izquierda / Noroeste):
+1. PERÍMETRO EXTERIOR (Polígono en "L"):
+   - Muro Superior (Norte): [0.00, 0.00] a [6.30, 0.00] (6.30 m)
+   - Muro Derecho (Este): [6.30, 0.00] a [6.30, 5.70]
+   - Retranqueo Palier (Puerta Principal en Y=5.70): [6.30, 5.70] a [5.20, 5.70]
+   - Muro Derecho Cocina: [5.20, 5.70] a [5.20, 7.00]
+   - Muro Inferior (Sur): [5.20, 7.00] a [0.00, 7.00]
+   - Muro Izquierdo (Oeste): [0.00, 7.00] a [0.00, 0.00] (7.00 m)
+   - Palier Edificio (Exterior): [5.20, 5.70] a [6.30, 7.00]
+2. AMBIENTES Y COORDENADAS EXACTAS:
+   - ESTUDIO AMPLIADO: [0.00, 0.00] a [3.00, 2.30]
+   - PLACARD SUPERIOR: [0.00, 2.30] a [2.30, 2.80]
+   - BAÑO AMPLIO: [0.00, 2.80] a [2.30, 4.00]
+   - PLACARD INFERIOR: [0.00, 4.00] a [2.30, 4.50]
+   - CUARTO AMPLIADO: [0.00, 4.50] a [3.00, 7.00]
+   - PASILLO DISTRIBUIDOR: [2.30, 2.30] a [3.00, 4.50]
+   - LIVING: [3.00, 0.00] a [6.30, 4.50] (Abierto, sin columnas)
+   - ENTRADA: [5.20, 4.50] a [6.30, 5.70]
+   - COCINA: [3.00, 4.50] a [5.20, 7.00]
+"""
+
 from PIL import Image, ImageDraw, ImageFont
 import math
 
-def generate_2d_plan(output_path="plano_arquitectonico_2d.png"):
-    # Escala alta definición: 1 metro = 200 píxeles
-    scale = 200
-    margin_x = 160
-    margin_y = 150
 
-    W_m = 6.30
-    H_m = 6.20
+def load_font(size, bold=False):
+    candidates = (
+        ["arialbd.ttf", "segoeuib.ttf", "calibrib.ttf", "DejaVuSans-Bold.ttf"]
+        if bold
+        else ["arial.ttf", "segoeui.ttf", "calibri.ttf", "DejaVuSans.ttf"]
+    )
+    for name in candidates:
+        try:
+            return ImageFont.truetype(name, size)
+        except Exception:
+            continue
+    return ImageFont.load_default()
 
-    img_w = int(round(W_m * scale + margin_x * 2))
-    img_h = int(round(H_m * scale + margin_y * 2))
 
-    img = Image.new("RGB", (img_w, img_h), "#ffffff")
+def draw_dashed_line(draw, x1, y1, x2, y2, fill, width=3, dash_len=10, gap_len=9):
+    total_len = math.hypot(x2 - x1, y2 - y1)
+    if total_len == 0:
+        return
+    dx = (x2 - x1) / total_len
+    dy = (y2 - y1) / total_len
+    curr = 0
+    while curr < total_len:
+        end = min(curr + dash_len, total_len)
+        sx = x1 + dx * curr
+        sy = y1 + dy * curr
+        ex = x1 + dx * end
+        ey = y1 + dy * end
+        draw.line([(sx, sy), (ex, ey)], fill=fill, width=width)
+        curr += dash_len + gap_len
+
+
+def draw_door_symbol(draw, px_fn, hinge, leaf, ctrl, end, color, width=3):
+    hx, hy = px_fn(*hinge)
+    lx, ly = px_fn(*leaf)
+    cx, cy = px_fn(*ctrl)
+    ex, ey = px_fn(*end)
+    # Hoja de la puerta
+    draw.line([(hx, hy), (lx, ly)], fill=color, width=width)
+    # Arco cuadrático suave
+    steps = 24
+    pts = []
+    for i in range(steps + 1):
+        t = i / steps
+        mt = 1.0 - t
+        qx = mt * mt * lx + 2 * mt * t * cx + t * t * ex
+        qy = mt * mt * ly + 2 * mt * t * cy + t * t * ey
+        pts.append((qx, qy))
+    draw.line(pts, fill=color, width=max(2, width - 1))
+
+
+def main():
+    SCALE = 150  # 1 metro = 150 px
+    PAD_X = 135
+    PAD_Y = 120
+
+    PLAN_W = 6.30
+    PLAN_H = 7.00
+
+    W = int(PLAN_W * SCALE + PAD_X * 2)
+    H = int(PLAN_H * SCALE + PAD_Y * 2)
+
+    img = Image.new("RGB", (W, H), (255, 255, 255))
     draw = ImageDraw.Draw(img)
 
-    def to_px(x_m, y_m):
-        return (int(round(margin_x + x_m * scale)), int(round(margin_y + y_m * scale)))
+    def px(xm, ym):
+        return int(round(PAD_X + xm * SCALE)), int(round(PAD_Y + ym * SCALE))
 
-    def draw_wall(x1, y1, x2, y2, width_px=8, color="#212529"):
-        p1 = to_px(x1, y1)
-        p2 = to_px(x2, y2)
-        draw.line([p1, p2], fill=color, width=width_px)
+    WALL_COLOR = (38, 45, 52)       # Gris carbón oscuro para muros
+    DASH_COLOR = (130, 142, 155)    # Gris medio para líneas punteadas
+    DOOR_COLOR = (60, 70, 82)       # Trazo de puertas y arcos
+    TEXT_COLOR = (35, 42, 50)
+    SUB_COLOR = (82, 92, 105)
+    PALIER_BG = (233, 236, 239)     # #e9ecef
+    PALIER_TEXT = (108, 117, 125)
+    EXT_W = 11                      # Espesor de muro perimetral exterior
+    INT_W = 6                       # Espesor de tabiques interiores
 
-    def draw_dashed(x1, y1, x2, y2, dash_m=0.06, gap_m=0.06, width_px=2, color="#94a3b8"):
-        dist = math.hypot(x2 - x1, y2 - y1)
-        if dist == 0:
-            return
-        dx = (x2 - x1) / dist
-        dy = (y2 - y1) / dist
-        curr = 0.0
-        while curr < dist:
-            end_d = min(curr + dash_m, dist)
-            p1 = to_px(x1 + dx * curr, y1 + dy * curr)
-            p2 = to_px(x1 + dx * end_d, y1 + dy * end_d)
-            draw.line([p1, p2], fill=color, width=width_px)
-            curr += dash_m + gap_m
+    # -------------------------------------------------------------------------
+    # 0. SOMBRA / BLOQUE EXTERIOR DEL PALIER ([5.20, 5.70] a [6.30, 7.00])
+    # -------------------------------------------------------------------------
+    p1x, p1y = px(5.20, 5.70)
+    p2x, p2y = px(6.30, 7.00)
+    draw.rectangle([p1x, p1y, p2x, p2y], fill=PALIER_BG)
 
-    EXT_W = 10
-    INT_W = 6
+    # -------------------------------------------------------------------------
+    # 1. PERÍMETRO EXTERIOR (Polígono en "L": 6.30 m x 7.00 m)
+    # -------------------------------------------------------------------------
+    # Muro Superior: [0.00, 0.00] a [6.30, 0.00]
+    draw.line([px(0.00, 0.00), px(6.30, 0.00)], fill=WALL_COLOR, width=EXT_W)
+    # Muro Derecho: [6.30, 0.00] a [6.30, 5.70]
+    draw.line([px(6.30, 0.00), px(6.30, 5.70)], fill=WALL_COLOR, width=EXT_W)
+    # Muro Derecho Cocina (baja al fondo): [5.20, 5.70] a [5.20, 7.00]
+    draw.line([px(5.20, 5.70), px(5.20, 7.00)], fill=WALL_COLOR, width=EXT_W)
+    # Muro Inferior: [0.00, 7.00] a [5.20, 7.00]
+    draw.line([px(0.00, 7.00), px(5.20, 7.00)], fill=WALL_COLOR, width=EXT_W)
+    # Muro Izquierdo: [0.00, 0.00] a [0.00, 7.00]
+    draw.line([px(0.00, 0.00), px(0.00, 7.00)], fill=WALL_COLOR, width=EXT_W)
 
-    # =========================================================================
-    # 1. PERÍMETRO EXTERIOR (6.30 m x 6.20 m)
-    # =========================================================================
-    # Superior (Y = 0.00): [0.00, 0.00] a [6.30, 0.00]
-    draw_wall(0.00, 0.00, 6.30, 0.00, EXT_W)
-    # Izquierdo (X = 0.00): [0.00, 0.00] a [0.00, 6.20]
-    draw_wall(0.00, 0.00, 0.00, 6.20, EXT_W)
-    # Derecho (X = 6.30): [6.30, 0.00] a [6.30, 6.20]
-    draw_wall(6.30, 0.00, 6.30, 6.20, EXT_W)
-    # Inferior (Y = 6.20): [0.00, 6.20] a [6.30, 6.20] con vano de entrada entre 5.20 y 6.10
-    draw_wall(0.00, 6.20, 5.20, 6.20, EXT_W)
-    draw_wall(6.10, 6.20, 6.30, 6.20, EXT_W)
+    # Tapar esquinas exteriores para unión perfecta
+    r_ext = EXT_W // 2
+    for cx, cy in [(0.00, 0.00), (6.30, 0.00), (6.30, 5.70), (5.20, 7.00), (0.00, 7.00)]:
+        x, y = px(cx, cy)
+        draw.rectangle([x - r_ext, y - r_ext, x + r_ext, y + r_ext], fill=WALL_COLOR)
 
-    # Detalle vano puerta principal en base Y = 6.20 (X=5.20 a 6.10, vano de 0.90m)
-    draw_wall(5.20, 6.08, 5.20, 6.32, 4, "#212529")
-    draw_wall(6.10, 6.08, 6.10, 6.32, 4, "#212529")
-    draw_wall(5.20, 6.20, 6.10, 6.20, 2, "#cbd5e1")
+    # Retranqueo Palier / Puerta Principal en Y = 5.70 (X = 5.20 a 6.30)
+    # Mochetas laterales (5.20 a 5.38 y 6.12 a 6.30) + barra de umbral + jambas verticales
+    draw.line([px(5.20, 5.70), px(5.38, 5.70)], fill=WALL_COLOR, width=EXT_W - 2)
+    draw.line([px(6.12, 5.70), px(6.30, 5.70)], fill=WALL_COLOR, width=EXT_W - 2)
+    draw.line([px(5.38, 5.70), px(6.12, 5.70)], fill=(195, 202, 210), width=7)
+    draw.line([px(5.38, 5.58), px(5.38, 5.82)], fill=WALL_COLOR, width=5)
+    draw.line([px(6.12, 5.58), px(6.12, 5.82)], fill=WALL_COLOR, width=5)
 
-    # =========================================================================
-    # 2. DIVISIONES HORIZONTALES SECTOR IZQUIERDO (X = 0.00 a 1.70)
-    # =========================================================================
-    # Y = 2.00: Muro cerrado que divide Estudio de Placard 1
-    draw_wall(0.00, 2.00, 1.70, 2.00, INT_W)
-    # Y = 2.50: Muro cerrado que divide Placard 1 de Baño
-    draw_wall(0.00, 2.50, 1.70, 2.50, INT_W)
-    # Y = 3.70: Muro cerrado que divide Baño de Placard 2
-    draw_wall(0.00, 3.70, 1.70, 3.70, INT_W)
-    # Y = 4.20: Muro cerrado que divide Placard 2 de Cuarto
-    draw_wall(0.00, 4.20, 1.70, 4.20, INT_W)
+    # -------------------------------------------------------------------------
+    # 2. MUROS INTERNOS, PUERTAS (CON ARCOS) Y VANOS ABIERTOS
+    # -------------------------------------------------------------------------
+    # Eje Vertical X = 2.30 (Cierre de Placards y Baño):
+    # - Muro sólido de Y = 2.30 a Y = 2.80 (Placard Sup.)
+    draw.line([px(2.30, 2.30), px(2.30, 2.80)], fill=WALL_COLOR, width=INT_W)
+    # - PUERTA BAÑO: Entre Y = 2.80 e Y = 3.70 (abre hacia el pasillo)
+    draw_dashed_line(draw, *px(2.30, 2.80), *px(2.30, 3.70), fill=DASH_COLOR, width=3)
+    draw_door_symbol(draw, px, (2.30, 3.55), (2.48, 3.35), (2.52, 3.12), (2.30, 2.95), DOOR_COLOR, width=3)
+    # - Muro sólido de Y = 3.70 a Y = 4.50 (tramo Baño 3.70-4.00 + Placard Inf. 4.00-4.50)
+    draw.line([px(2.30, 3.70), px(2.30, 4.50)], fill=WALL_COLOR, width=INT_W)
 
-    # =========================================================================
-    # 3. MURO IZQUIERDO DEL PASILLO (X = 1.70) Y PUERTA DEL BAÑO
-    # =========================================================================
-    # X = 1.70: de Y = 2.00 a 2.80 (muro)
-    draw_wall(1.70, 2.00, 1.70, 2.80, INT_W)
-    # Vano puerta del Baño: de Y = 2.80 a 3.40 (abertura hacia el pasillo)
-    draw_dashed(1.70, 2.80, 1.70, 3.40)
-    # X = 1.70: de Y = 3.40 a 4.20 (muro)
-    draw_wall(1.70, 3.40, 1.70, 4.20, INT_W)
+    # Eje Vertical Central X = 3.00:
+    # - Muro sólido de Y = 0.00 a Y = 3.70 (separa Estudio y parte del Pasillo del Living)
+    draw.line([px(3.00, 0.00), px(3.00, 3.70)], fill=WALL_COLOR, width=INT_W)
+    # - VANO ABIERTO (Paso Living-Pasillo): Sin muro entre Y = 3.70 e Y = 4.50
+    draw_dashed_line(draw, *px(3.00, 3.70), *px(3.00, 4.50), fill=DASH_COLOR, width=3)
+    # - Muro sólido de Y = 4.50 a Y = 7.00 (separa Cuarto de Cocina)
+    draw.line([px(3.00, 4.50), px(3.00, 7.00)], fill=WALL_COLOR, width=INT_W)
 
-    # =========================================================================
-    # 4. ENTRADA AL ESTUDIO (Y = 2.00, remate superior del Pasillo)
-    # =========================================================================
-    # Muros extremos del vano:
-    draw_wall(1.70, 2.00, 1.90, 2.00, INT_W)
-    # Vano entre X = 1.90 y X = 2.80
-    draw_dashed(1.90, 2.00, 2.80, 2.00)
-    draw_wall(2.80, 2.00, 3.00, 2.00, INT_W)
+    # Eje Vertical X = 5.20 (separa Cocina de Entrada): de Y = 4.50 a Y = 5.70
+    draw.line([px(5.20, 4.50), px(5.20, 5.70)], fill=WALL_COLOR, width=INT_W)
 
-    # =========================================================================
-    # 5. EJE CENTRAL VERTICAL (X = 3.00)
-    # =========================================================================
-    # Muro divisorio Living con Estudio y Pasillo: de Y = 0.00 a Y = 3.50
-    draw_wall(3.00, 0.00, 3.00, 3.50, INT_W)
-    draw_wall(2.91, 3.50, 3.09, 3.50, 4, "#212529") # remate de mocheta
-    # Paso totalmente abierto de 0.70 m entre Living y Pasillo: de Y = 3.50 a Y = 4.20
-    draw_dashed(3.00, 3.50, 3.00, 4.20)
-    # Muro divisorio entre Cuarto y Cocina: de Y = 4.20 a Y = 6.20
-    draw_wall(3.00, 4.20, 3.00, 6.20, INT_W)
+    # Eje Horizontal Y = 2.30 (Base Estudio):
+    # - Muro sólido de X = 0.00 a X = 2.30
+    draw.line([px(0.00, 2.30), px(2.30, 2.30)], fill=WALL_COLOR, width=INT_W)
+    # - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (abre hacia abajo, al pasillo)
+    draw_dashed_line(draw, *px(2.30, 2.30), *px(3.00, 2.30), fill=DASH_COLOR, width=3)
+    draw_door_symbol(draw, px, (2.35, 2.30), (2.55, 2.48), (2.75, 2.48), (2.85, 2.30), DOOR_COLOR, width=3)
 
-    # =========================================================================
-    # 6. LÍNEA HORIZONTAL UNIFICADA CRÍTICA (Y = 4.20)
-    # =========================================================================
-    # Entrada Cuarto (entre Pasillo y Cuarto):
-    draw_wall(1.70, 4.20, 1.90, 4.20, INT_W)
-    draw_dashed(1.90, 4.20, 2.80, 4.20)
-    draw_wall(2.80, 4.20, 3.00, 4.20, INT_W)
+    # Eje Horizontal Y = 2.80 (Divide Placard Superior y Baño): de X = 0.00 a X = 2.30
+    draw.line([px(0.00, 2.80), px(2.30, 2.80)], fill=WALL_COLOR, width=INT_W)
 
-    # Frente Cocina (de X = 3.00 a X = 5.00 en Y = 4.20):
-    # Vano/abertura amplia entre X = 3.25 y X = 4.65
-    draw_wall(3.00, 4.20, 3.25, 4.20, INT_W)
-    draw_dashed(3.25, 4.20, 4.65, 4.20)
-    draw_wall(4.65, 4.20, 5.00, 4.20, INT_W)
+    # Eje Horizontal Y = 4.00 (Divide Baño y Placard Inferior): de X = 0.00 a X = 2.30
+    draw.line([px(0.00, 4.00), px(2.30, 4.00)], fill=WALL_COLOR, width=INT_W)
 
-    # =========================================================================
-    # 7. COCINA SECTOR DERECHO (X = 5.00)
-    # =========================================================================
-    # Muro divisorio entre Cocina y Sector Entrada: de Y = 4.20 a Y = 6.20
-    draw_wall(5.00, 4.20, 5.00, 6.20, INT_W)
+    # Eje Horizontal Y = 4.50 (Línea Cuarto y Cocina):
+    # - Muro sólido de X = 0.00 a X = 2.30
+    draw.line([px(0.00, 4.50), px(2.30, 4.50)], fill=WALL_COLOR, width=INT_W)
+    # - PUERTA CUARTO: De X = 2.30 a X = 3.00 (abre hacia arriba, al pasillo)
+    draw_dashed_line(draw, *px(2.30, 4.50), *px(3.00, 4.50), fill=DASH_COLOR, width=3)
+    draw_door_symbol(draw, px, (2.35, 4.50), (2.55, 4.32), (2.75, 4.32), (2.85, 4.50), DOOR_COLOR, width=3)
+    # - VANO ABIERTO COCINA: Sin muro de X = 3.00 a X = 3.85 (acceso libre pegado al pasillo)
+    draw_dashed_line(draw, *px(3.00, 4.50), *px(3.85, 4.50), fill=DASH_COLOR, width=3)
+    # - Muro sólido frontal de Cocina: De X = 3.85 a X = 5.20
+    draw.line([px(3.85, 4.50), px(5.20, 4.50)], fill=WALL_COLOR, width=INT_W)
 
-    # =========================================================================
-    # 8. ETIQUETAS TIPOGRÁFICAS ARQUITECTÓNICAS
-    # =========================================================================
-    try:
-        font_lg = ImageFont.truetype("consolab.ttf", 30)
-        font_md = ImageFont.truetype("consolab.ttf", 24)
-        font_sm = ImageFont.truetype("consolab.ttf", 18)
-        font_dim = ImageFont.truetype("consola.ttf", 22)
-    except:
-        try:
-            font_lg = ImageFont.truetype("arialbd.ttf", 28)
-            font_md = ImageFont.truetype("arialbd.ttf", 22)
-            font_sm = ImageFont.truetype("arialbd.ttf", 16)
-            font_dim = ImageFont.truetype("arial.ttf", 20)
-        except:
-            font_lg = ImageFont.load_default()
-            font_md = font_lg
-            font_sm = font_lg
-            font_dim = font_lg
+    # -------------------------------------------------------------------------
+    # 3. TIPOGRAFÍA Y ETIQUETAS DE AMBIENTES
+    # -------------------------------------------------------------------------
+    f_living = load_font(30, bold=True)
+    f_room = load_font(23, bold=True)
+    f_bano = load_font(20, bold=True)
+    f_sm = load_font(16, bold=True)
+    f_sub = load_font(15, bold=False)
+    f_palier = load_font(14, bold=True)
+    f_dim = load_font(19, bold=False)
 
-    def draw_centered_text(x_m, y_m, text, font, color="#1e293b"):
-        px, py = to_px(x_m, y_m)
-        bbox = draw.textbbox((0, 0), text, font=font)
-        tw = bbox[2] - bbox[0]
-        th = bbox[3] - bbox[1]
-        draw.text((px - tw / 2, py - th / 2), text, fill=color, font=font)
+    # Estudio Ampliado: [0.00, 0.00] a [3.00, 2.30]
+    draw.text(px(1.22, 1.05), "ESTUDIO AMPLIADO", fill=TEXT_COLOR, font=f_room, anchor="mm")
 
-    # Ambientes principales centrados en sus cajas
-    # Estudio: [0.00, 0.00] a [3.00, 2.00] (centro 1.50, 1.00)
-    draw_centered_text(1.50, 1.00, "ESTUDIO", font_md)
+    # Placard Superior: [0.00, 2.30] a [2.30, 2.80]
+    draw.text(px(1.15, 2.55), "PLACARD", fill=TEXT_COLOR, font=f_sm, anchor="mm")
 
-    # Placard 1: [0.00, 2.00] a [1.70, 2.50] (centro 0.85, 2.25)
-    draw_centered_text(0.85, 2.25, "PLACARD", font_sm)
+    # Baño Amplio: [0.00, 2.80] a [2.30, 4.00]
+    draw.text(px(1.15, 3.40), "BAÑO AMPLIO", fill=TEXT_COLOR, font=f_bano, anchor="mm")
 
-    # Baño: [0.00, 2.50] a [1.70, 3.70] (centro 0.85, 3.10)
-    draw_centered_text(0.85, 3.10, "BAÑO", font_md)
+    # Placard Inferior: [0.00, 4.00] a [2.30, 4.50]
+    draw.text(px(1.15, 4.25), "PLACARD", fill=TEXT_COLOR, font=f_sm, anchor="mm")
 
-    # Placard 2: [0.00, 3.70] a [1.70, 4.20] (centro 0.85, 3.95)
-    draw_centered_text(0.85, 3.95, "PLACARD", font_sm)
+    # Cuarto Ampliado: [0.00, 4.50] a [3.00, 7.00]
+    draw.text(px(1.22, 5.65), "CUARTO AMPLIADO", fill=TEXT_COLOR, font=f_room, anchor="mm")
 
-    # Cuarto: [0.00, 4.20] a [3.00, 6.20] (centro 1.50, 5.20)
-    draw_centered_text(1.50, 5.20, "CUARTO", font_md)
+    # Living: [3.00, 0.00] a [6.30, 4.50]
+    draw.text(px(4.65, 2.00), "LIVING", fill=TEXT_COLOR, font=f_living, anchor="mm")
 
-    # Cocina: [3.00, 4.20] a [5.00, 6.20] (centro 4.00, 5.20)
-    draw_centered_text(4.00, 5.20, "COCINA", font_md)
+    # Cocina: [3.00, 4.50] a [5.20, 7.00]
+    draw.text(px(4.10, 5.65), "COCINA", fill=TEXT_COLOR, font=f_room, anchor="mm")
+    draw.text(px(4.10, 5.95), "(Acceso junto al pasillo)", fill=SUB_COLOR, font=f_sub, anchor="mm")
 
-    # Living: [3.00, 0.00] a [6.30, 4.20] (centro 4.65, 2.10)
-    draw_centered_text(4.65, 2.10, "LIVING", font_lg)
+    # Entrada: [5.20, 4.50] a [6.30, 5.70]
+    draw.text(px(5.75, 5.20), "ENTRADA", fill=TEXT_COLOR, font=f_sm, anchor="mm")
 
-    # Entrada: X = 5.20 a 6.10 en Y = 6.20
-    draw_centered_text(5.65, 6.55, "ENTRADA", font_sm)
+    # Palier Edificio: [5.20, 5.70] a [6.30, 7.00]
+    draw.text(px(5.75, 6.23), "PALIER", fill=PALIER_TEXT, font=f_palier, anchor="mm")
+    draw.text(px(5.75, 6.42), "EDIFICIO", fill=PALIER_TEXT, font=f_palier, anchor="mm")
 
-    # Pasillo vertical: [1.70, 2.00] a [3.00, 4.20] (centro 2.35, 3.10)
-    pasillo_img = Image.new("RGBA", (200, 48), (255, 255, 255, 0))
+    # Texto vertical: PASILLO en (2.68, 3.25)
+    pasillo_img = Image.new("RGBA", (200, 50), (255, 255, 255, 0))
     p_draw = ImageDraw.Draw(pasillo_img)
-    bbox = p_draw.textbbox((0, 0), "PASILLO", font=font_sm)
-    p_draw.text((100 - (bbox[2]-bbox[0])/2, 24 - (bbox[3]-bbox[1])/2), "PASILLO", fill="#1e293b", font=font_sm)
+    p_draw.text((100, 25), "PASILLO", fill=(108, 117, 125), font=load_font(15, bold=True), anchor="mm")
     pasillo_rot = pasillo_img.rotate(90, expand=True)
-    px_pas, py_pas = to_px(2.35, 3.10)
-    img.paste(pasillo_rot, (int(px_pas - pasillo_rot.width / 2), int(py_pas - pasillo_rot.height / 2)), pasillo_rot)
+    px_pas, py_pas = px(2.68, 3.25)
+    img.paste(pasillo_rot, (px_pas - pasillo_rot.width // 2, py_pas - pasillo_rot.height // 2), pasillo_rot)
 
-    # =========================================================================
-    # 9. COTAS GENERALES EXTERIORES
-    # =========================================================================
-    # Cota Horizontal Superior: 6.30 m
-    draw_centered_text(3.15, -0.28, "6.30 m", font_dim, "#475569")
-    draw_dashed(0.00, -0.15, 6.30, -0.15, dash_m=0.1, gap_m=0.05, width_px=1, color="#94a3b8")
+    # Cota superior: 6.30 m
+    draw.text(px(3.15, -0.22), "6.30 m", fill=SUB_COLOR, font=f_dim, anchor="mm")
 
-    # Cota Vertical Izquierda: 6.20 m
-    dim_v_img = Image.new("RGBA", (180, 48), (255, 255, 255, 0))
+    # Cota izquierda vertical: 7.00 m
+    dim_v_img = Image.new("RGBA", (200, 50), (255, 255, 255, 0))
     dv_draw = ImageDraw.Draw(dim_v_img)
-    bbox = dv_draw.textbbox((0, 0), "6.20 m", font=font_dim)
-    dv_draw.text((90 - (bbox[2]-bbox[0])/2, 24 - (bbox[3]-bbox[1])/2), "6.20 m", fill="#475569", font=font_dim)
+    dv_draw.text((100, 25), "7.00 m", fill=SUB_COLOR, font=f_dim, anchor="mm")
     dim_v_rot = dim_v_img.rotate(90, expand=True)
-    px_dv, py_dv = to_px(-0.28, 3.10)
-    img.paste(dim_v_rot, (int(px_dv - dim_v_rot.width / 2), int(py_dv - dim_v_rot.height / 2)), dim_v_rot)
+    px_dv, py_dv = px(-0.24, 3.50)
+    img.paste(dim_v_rot, (px_dv - dim_v_rot.width // 2, py_dv - dim_v_rot.height // 2), dim_v_rot)
 
-    img.save(output_path)
-    print(f"Plano 2D exacto guardado exitosamente en: {output_path}")
+    output_path = "plano_arquitectonico_2d.png"
+    img.save(output_path, "PNG", optimize=True)
+    print(f"Plano 2D exacto generado exitosamente en: {output_path} ({W}x{H} px)")
+
 
 if __name__ == "__main__":
-    generate_2d_plan()
+    main()
