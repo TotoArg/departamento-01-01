@@ -1331,29 +1331,29 @@
         addBoxFixture(2.48, 0.34, 6.86, 0.46, 0.62, 0.14, 0x9ca3af);
         addBoxFixture(2.48, 0.66, 6.86, 0.48, 0.03, 0.16, 0xf97316);
 
-        // 2) COCINA (según fotos reales): Sobre muro Oeste (X=3.00) van Heladera -> 1° tramo mesada + Calefón mural Orbis/Bosch -> Cocina 4H -> 2° tramo mesada con Bacha + esquina en "L" bajo ventana Sur (Y=7.00). Muro Este (X=5.20) queda libre con portero y cestos.
-        // - 1° tramo de bajo mesada y mesada de granito entre Heladera y Cocina (Z=5.15..5.55, X=3.30)
-        addBoxFixture(3.30, 0.42, 5.35, 0.56, 0.84, 0.40, 0xb48a64);
-        addBoxFixture(3.30, 0.86, 5.35, 0.60, 0.04, 0.40, 0xc8b2a6);
-        // - Calefón a gas mural blanco (Orbis/Bosch) colgado en pared Oeste sobre el 1° tramo de mesada (X=3.16, Y=1.44, Z=5.35) + caño amarillo
-        setMountWall(3.00, 5.35, false);
-        addBoxFixture(3.16, 1.44, 5.35, 0.22, 0.56, 0.36, 0xf8fafc, fixturesGroup, 0.25);
-        addBoxFixture(3.28, 1.28, 5.35, 0.02, 0.08, 0.12, 0x334155); // Visor/botonera calefón
-        addBoxFixture(3.12, 1.08, 5.22, 0.03, 0.22, 0.03, 0xeab308); // Caño de gas amarillo
+        // 2) COCINA (según fotos reales): Sobre muro Este (X=5.20) van Heladera -> 1° tramo mesada + Calefón mural Orbis/Bosch -> Cocina 4H -> 2° tramo mesada con Bacha + esquina en "L" bajo ventana Sur (Y=7.00). Muro Oeste (X=3.00) queda libre con portero y cestos.
+        // - 1° tramo de bajo mesada y mesada de granito entre Heladera y Cocina (Z=5.22..5.62, X=4.87)
+        addBoxFixture(4.87, 0.42, 5.42, 0.56, 0.84, 0.40, 0xb48a64);
+        addBoxFixture(4.86, 0.86, 5.42, 0.60, 0.04, 0.40, 0xc8b2a6);
+        // - Calefón a gas mural blanco (Orbis/Bosch) colgado en pared Este sobre el 1° tramo de mesada (X=5.04, Y=1.44, Z=5.42) + caño amarillo
+        setMountWall(5.20, 5.42, false);
+        addBoxFixture(5.04, 1.44, 5.42, 0.22, 0.56, 0.36, 0xf8fafc, fixturesGroup, 0.25);
+        addBoxFixture(4.92, 1.28, 5.42, 0.02, 0.08, 0.12, 0x334155); // Visor/botonera calefón
+        addBoxFixture(5.08, 1.08, 5.28, 0.03, 0.22, 0.03, 0xeab308); // Caño de gas amarillo
         setMountWall(null);
-        // - Cocina a gas blanca de 4 hornallas con horno visor negro sobre muro Oeste (X=3.30, Z=5.85, entre los dos tramos de mesada)
-        addBoxFixture(3.30, 0.43, 5.85, 0.58, 0.86, 0.54, 0xffffff, fixturesGroup, 0.25);
-        addBoxFixture(3.30, 0.87, 5.85, 0.52, 0.02, 0.48, 0x1e293b); // Rejilla 4 hornallas negra
-        addBoxFixture(3.60, 0.38, 5.85, 0.02, 0.44, 0.42, 0x0f172a); // Visor negro puerta del horno
-        // - 2° tramo de bajo mesada y mesada en "L" de granito gris/rosado (Muro Oeste Z=6.12..6.96 + retorno Sur X=3.60..4.30)
-        addBoxFixture(3.30, 0.42, 6.54, 0.56, 0.84, 0.84, 0xb48a64);
-        addBoxFixture(3.95, 0.42, 6.68, 0.70, 0.84, 0.56, 0xb48a64);
-        addBoxFixture(3.30, 0.86, 6.54, 0.60, 0.04, 0.84, 0xc8b2a6);
-        addBoxFixture(3.95, 0.86, 6.68, 0.68, 0.04, 0.58, 0xc8b2a6);
-        // - Bacha doble esquinera de acero inoxidable + grifería monocomando + filtro purificador negro PSA (X=3.35, Z=6.50)
-        addBoxFixture(3.35, 0.875, 6.46, 0.40, 0.02, 0.44, 0x94a3b8, fixturesGroup, 0.25);
-        addBoxFixture(3.70, 0.875, 6.66, 0.40, 0.02, 0.38, 0x94a3b8, fixturesGroup, 0.25);
-        addBoxFixture(3.30, 1.00, 6.66, 0.09, 0.24, 0.09, 0x0f172a, fixturesGroup, 0.2); // Filtro purificador de agua negro PSA
+        // - Cocina a gas blanca de 4 hornallas con horno visor negro sobre muro Este (X=4.86, Z=5.89, entre los dos tramos de mesada)
+        addBoxFixture(4.86, 0.43, 5.89, 0.58, 0.86, 0.54, 0xffffff, fixturesGroup, 0.25);
+        addBoxFixture(4.86, 0.87, 5.89, 0.52, 0.02, 0.48, 0x1e293b); // Rejilla 4 hornallas negra
+        addBoxFixture(4.56, 0.38, 5.89, 0.02, 0.44, 0.42, 0x0f172a); // Visor negro puerta del horno
+        // - 2° tramo de bajo mesada y mesada en "L" de granito gris/rosado (Muro Este Z=6.16..6.96 + retorno Sur X=3.88..4.58)
+        addBoxFixture(4.87, 0.42, 6.56, 0.56, 0.84, 0.80, 0xb48a64);
+        addBoxFixture(4.23, 0.42, 6.68, 0.70, 0.84, 0.56, 0xb48a64);
+        addBoxFixture(4.86, 0.86, 6.56, 0.60, 0.04, 0.80, 0xc8b2a6);
+        addBoxFixture(4.23, 0.86, 6.68, 0.68, 0.04, 0.58, 0xc8b2a6);
+        // - Bacha doble esquinera de acero inoxidable + grifería monocomando + filtro purificador negro PSA (X=4.68, Z=6.55)
+        addBoxFixture(4.82, 0.875, 6.46, 0.40, 0.02, 0.44, 0x94a3b8, fixturesGroup, 0.25);
+        addBoxFixture(4.48, 0.875, 6.66, 0.40, 0.02, 0.38, 0x94a3b8, fixturesGroup, 0.25);
+        addBoxFixture(4.88, 1.00, 6.66, 0.09, 0.24, 0.09, 0x0f172a, fixturesGroup, 0.2); // Filtro purificador de agua negro PSA
 
         // 3) BAÑO AMPLIO (según fotos #23 a #29): Bañera con mampara/cortina floral al Oeste + Lavatorio con botiquín espejo al Norte + Inodoro, Bidet y Alacena al Sur
         // Bañera blanca (X=0.05..0.75, Z=2.84..3.96) + esquinero ducha + cortina de baño blanca
@@ -1473,9 +1473,9 @@
         // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Cuarto sobre muro Este, fotos #17 y #22)
         addDashedLine(2.30, 4.50, 3.00, 4.50);
         addDoorSymbol2D(2.95, 4.50, 2.75, 4.72, 2.55, 4.72, 2.42, 4.50);
-        // - VANO ABIERTO COCINA (SIN PUERTA): Mocheta frontal de Cocina de X = 3.00 a X = 3.65 (cubre el lateral de la heladera); paso libre hacia la cocina de X = 3.65 a X = 5.20
-        addWallSegment(3.00, 4.50, 3.65, 4.50, INT_T, interiorWallsGroup, false);
-        addDashedLine(3.65, 4.50, 5.20, 4.50);
+        // - VANO ABIERTO COCINA (SIN PUERTA): Paso libre de X = 3.00 a X = 4.45 alineado con el pasillo de la cocina; mocheta de X = 4.45 a X = 5.20 delante del lateral de la heladera
+        addDashedLine(3.00, 4.50, 4.45, 4.50);
+        addWallSegment(4.45, 4.50, 5.20, 4.50, INT_T, interiorWallsGroup, false);
 
         // ============================================================================
         // 4B. PUERTAS 3D REALES EXTRAÍDAS DEL VIDEO (MARCOS DE CHAPA, HOJAS MADERA,
@@ -1716,14 +1716,14 @@
             if (extras3DBuilt) return;
             extras3DBuilt = true;
             buildWoodenRoof();
-            // Dintel sobre el Vano Abierto de Cocina (X = 3.65 a 5.20)
-            const wCocinaVano = 1.55;
+            // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 4.45)
+            const wCocinaVano = 1.45;
             const lintelH = WALL_H - DOOR_H;
             const cocinaLintel = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
             cocinaLintel.scale.set(wCocinaVano, lintelH, INT_T);
-            cocinaLintel.position.set(4.425, DOOR_H + lintelH / 2, 4.50);
+            cocinaLintel.position.set(3.725, DOOR_H + lintelH / 2, 4.50);
             doors3DGroup.add(cocinaLintel);
-            attachWallMount(cocinaLintel, 4.425, 4.50, true);
+            attachWallMount(cocinaLintel, 4.60, 4.50, true);
             // Instanciar puertas 3D relevadas de las fotos (#17, #23, #39, #40):
             // - Puerta Estudio: bisagra en X=3.00 (hingeAtStart=false), abre hacia adentro sobre muro Este (swingSign=-1)
             // - Puerta Baño: bisagra en Z=3.65 (hingeAtStart=false), abre hacia adentro al Sur (swingSign=1)
@@ -1925,61 +1925,61 @@
             addCurtainAssembly(6.30, 0.55, 6.30, 1.55, -0.12, 0, 0xd6ccc2);
 
             // ------------------------------------------------------------------------
-            // B) COCINA ([3.00, 4.50] a [5.20, 7.00]) - Relevamiento exacto de las fotos
+            // B) COCINA ([3.00, 4.50] a [5.20, 7.00]) - Relevamiento exacto de las fotos reales
             // ------------------------------------------------------------------------
-            // 1. Mueble envolvente de heladera en esquina Noroeste (X=3.35, Z=4.88, detrás de la mocheta de acceso):
-            // - Heladera blanca con freezer superior mirando al Este + imanes en la puerta
-            addDecorBox(3.35, 0.84, 4.88, 0.60, 1.68, 0.62, 0xf8fafc, 0.25, 0, 'Heladera con Freezer');
+            // 1. Mueble envolvente de heladera en esquina Noreste (X=4.85, Z=4.88, detrás de la mocheta de acceso):
+            // - Heladera blanca con freezer superior mirando al Oeste + imanes en la puerta
+            addDecorBox(4.85, 0.84, 4.88, 0.60, 1.68, 0.62, 0xf8fafc, 0.25, 0, 'Heladera con Freezer');
             // - Bodega portabotellas de 8 nichos (4x2) + Alacena superior de 2 puertas en melamina roble claro hasta arriba
-            setMountWall(3.00, 4.88, false);
-            addDecorBox(3.35, 1.78, 4.88, 0.60, 0.16, 0.62, 0xd6ccc2, 0.5, 0, 'Bodega Portabotellas');  // Bodega portabotellas
-            addDecorBox(3.35, 2.12, 4.88, 0.60, 0.52, 0.62, 0xd6ccc2, 0.45, 0, 'Alacena sobre Heladera'); // Alacena alta sobre heladera
-            // 2. Alacenas superiores sobre Muro Oeste (X=3.00):
-            // - Alacena sobre el calefón Orbis/Bosch (Z=5.35) + caño corrugado de aluminio arriba + plumero extensible violeta en el hueco
-            addDecorBox(3.24, 1.98, 5.35, 0.34, 0.48, 0.40, 0xd6ccc2, 0.45, 0, 'Alacena sobre Calefón');
-            addDecorCyl(3.18, 2.30, 5.40, 0.05, 0.05, 0.22, 0x94a3b8, 0.3, 'Conducto Ventilación Calefón');    // Conducto aluminio calefón
-            addDecorCyl(3.58, 1.65, 5.15, 0.012, 0.012, 1.45, 0xf8fafc, 0.4, 'Cabo Plumero Extensible');  // Cabo extensible blanco del plumero
-            addDecorCyl(3.58, 2.40, 5.15, 0.09, 0.05, 0.18, 0x7e22ce, 0.7, 'Plumero Violeta');    // Plumero violeta arriba de la heladera
-            // - Alacena larga de 3 puertas sobre cocina y bacha (Z=5.60..6.65) + estante especiero inferior abierto + 2 latas negras Bagley arriba + imán portacuchillos
-            setMountWall(3.00, 6.15, false);
-            addDecorBox(3.24, 1.84, 6.12, 0.34, 0.64, 1.04, 0xd6ccc2, 0.45, 0, 'Alacena Cocina 3 Puertas');
-            addDecorBox(3.24, 1.44, 6.12, 0.26, 0.14, 1.04, 0xb48a64, 0.5, 0, 'Estante Especiero Cocina');    // Estante especiero inferior con tazas y Moka roja
-            addDecorCyl(3.24, 2.24, 5.80, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4, 'Lata Redonda Alacena 1');    // Lata redonda negra 1 sobre alacena
-            addDecorCyl(3.24, 2.24, 6.24, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4, 'Lata Redonda Alacena 2');    // Lata redonda negra 2 sobre alacena
-            addDecorBox(3.09, 1.24, 6.18, 0.02, 0.16, 0.28, 0x334155, 0.3, 0, 'Imán Portacuchillos');    // Imán portacuchillos en pared azulejada
-            // - Estante esquinero abierto de madera de 3 niveles en esquina Suroeste (Z=6.82) con planta y cafetera Moka
-            addDecorBox(3.24, 1.74, 6.82, 0.30, 0.62, 0.26, 0x9a5b32, 0.5, 0, 'Estante Esquinero Madera');
-            addDecorCyl(3.24, 2.12, 6.82, 0.06, 0.05, 0.16, 0x15803d, 0.6, 'Planta Estante Esquina');    // Plantita en estante superior
+            setMountWall(5.20, 4.88, false);
+            addDecorBox(4.85, 1.78, 4.88, 0.60, 0.16, 0.62, 0xd6ccc2, 0.5, 0, 'Bodega Portabotellas');  // Bodega portabotellas
+            addDecorBox(4.85, 2.12, 4.88, 0.60, 0.52, 0.62, 0xd6ccc2, 0.45, 0, 'Alacena sobre Heladera'); // Alacena alta sobre heladera
+            // 2. Alacenas superiores sobre Muro Este (X=5.20):
+            // - Alacena sobre el calefón Orbis/Bosch (Z=5.42) + caño corrugado de aluminio arriba + plumero extensible violeta en el hueco
+            addDecorBox(4.96, 1.98, 5.42, 0.34, 0.48, 0.40, 0xd6ccc2, 0.45, 0, 'Alacena sobre Calefón');
+            addDecorCyl(5.02, 2.30, 5.48, 0.05, 0.05, 0.22, 0x94a3b8, 0.3, 'Conducto Ventilación Calefón');    // Conducto aluminio calefón
+            addDecorCyl(4.62, 1.65, 5.20, 0.012, 0.012, 1.45, 0xf8fafc, 0.4, 'Cabo Plumero Extensible');  // Cabo extensible blanco del plumero
+            addDecorCyl(4.62, 2.40, 5.20, 0.09, 0.05, 0.18, 0x7e22ce, 0.7, 'Plumero Violeta');    // Plumero violeta arriba de la heladera
+            // - Alacena larga de 3 puertas sobre cocina y bacha (Z=5.64..6.68) + estante especiero inferior abierto + 2 latas negras Bagley arriba + imán portacuchillos
+            setMountWall(5.20, 6.20, false);
+            addDecorBox(4.96, 1.84, 6.16, 0.34, 0.64, 1.04, 0xd6ccc2, 0.45, 0, 'Alacena Cocina 3 Puertas');
+            addDecorBox(4.96, 1.44, 6.16, 0.26, 0.14, 1.04, 0xb48a64, 0.5, 0, 'Estante Especiero Cocina');    // Estante especiero inferior con tazas y Moka roja
+            addDecorCyl(4.96, 2.24, 5.82, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4, 'Lata Redonda Alacena 1');    // Lata redonda negra 1 sobre alacena
+            addDecorCyl(4.96, 2.24, 6.26, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4, 'Lata Redonda Alacena 2');    // Lata redonda negra 2 sobre alacena
+            addDecorBox(5.11, 1.24, 6.22, 0.02, 0.16, 0.28, 0x334155, 0.3, 0, 'Imán Portacuchillos');    // Imán portacuchillos en pared azulejada
+            // - Estante esquinero abierto de madera de 3 niveles en esquina Sureste (Z=6.82) con planta y cafetera Moka
+            addDecorBox(4.96, 1.74, 6.82, 0.30, 0.62, 0.26, 0x9a5b32, 0.5, 0, 'Estante Esquinero Madera');
+            addDecorCyl(4.96, 2.12, 6.82, 0.06, 0.05, 0.16, 0x15803d, 0.6, 'Planta Estante Esquina');    // Plantita en estante superior
             setMountWall(null);
-            // - Rollo de cocina y termo sobre el 1° tramo de mesada (Z=5.25..5.45) + contenedor celeste sobre mesada
-            addDecorCyl(3.48, 0.98, 5.25, 0.06, 0.06, 0.22, 0xffffff, 0.4, 'Rollo de Cocina');    // Rollo de papel de cocina
-            addDecorCyl(3.46, 0.98, 5.45, 0.045, 0.045, 0.24, 0x475569, 0.3, 'Termo Acero Inox');  // Termo acero
-            addDecorBox(3.46, 0.92, 6.20, 0.18, 0.09, 0.22, 0x0284c7, 0.3, 0, 'Tupper Celeste Mesada');    // Recipiente celeste sobre mesada
+            // - Rollo de cocina y termo sobre el 1° tramo de mesada (Z=5.32..5.52) + contenedor celeste sobre mesada
+            addDecorCyl(4.68, 0.98, 5.30, 0.06, 0.06, 0.22, 0xffffff, 0.4, 'Rollo de Cocina');    // Rollo de papel de cocina
+            addDecorCyl(4.72, 0.98, 5.52, 0.045, 0.045, 0.24, 0x475569, 0.3, 'Termo Acero Inox');  // Termo acero
+            addDecorBox(4.74, 0.92, 6.24, 0.18, 0.09, 0.22, 0x0284c7, 0.3, 0, 'Tupper Celeste Mesada');    // Recipiente celeste sobre mesada
             // 3. Sector bajo Ventana Sur (Y=7.00):
             // - Cortina roller blanca en ventana Sur (X=3.25..4.55, Z=6.94)
             setMountWall(3.90, 7.00, true);
             addDecorBox(3.90, 1.82, 6.94, 1.28, 0.36, 0.03, 0xf8fafc, 0.3, 0, 'Cortina Roller Ventana');
             setMountWall(null);
-            // - Escurridor de platos negro sobre el retorno Sur de la mesada (mitad izquierda bajo la ventana: X=3.95, Z=6.68)
-            addDecorBox(3.95, 0.93, 6.68, 0.38, 0.10, 0.36, 0x1e293b, 0.4, 0, 'Escurridor de Platos Negro');
-            // - Lavarropas automático blanco de carga frontal bajo la mitad derecha de la ventana Sur (X=4.65, Z=6.67, mirando al Norte) + tapa de madera
-            addDecorBox(4.65, 0.42, 6.67, 0.60, 0.84, 0.58, 0xf8fafc, 0.3, 0, 'Lavarropas Automático');  // Cuerpo lavarropas
-            const drum = addDecorCyl(4.65, 0.44, 6.37, 0.18, 0.18, 0.04, 0x334155, 0.2, 'Puerta Lavarropas'); // Ojo de buey mirando al Norte
+            // - Escurridor de platos negro sobre el retorno Sur de la mesada (mitad izquierda bajo la ventana: X=4.22, Z=6.68)
+            addDecorBox(4.22, 0.93, 6.68, 0.38, 0.10, 0.36, 0x1e293b, 0.4, 0, 'Escurridor de Platos Negro');
+            // - Lavarropas automático blanco de carga frontal bajo la mitad derecha de la ventana Sur (lado Oeste: X=3.54, Z=6.67, mirando al Norte) + tapa de madera
+            addDecorBox(3.54, 0.42, 6.67, 0.60, 0.84, 0.58, 0xf8fafc, 0.3, 0, 'Lavarropas Automático');  // Cuerpo lavarropas
+            const drum = addDecorCyl(3.54, 0.44, 6.37, 0.18, 0.18, 0.04, 0x334155, 0.2, 'Puerta Lavarropas'); // Ojo de buey mirando al Norte
             drum.rotation.x = Math.PI / 2;
-            addDecorBox(4.65, 0.86, 6.67, 0.64, 0.04, 0.60, 0xb47b48, 0.45, 0, 'Tapa Madera Lavarropas'); // Tapa de madera sobre lavarropas
+            addDecorBox(3.54, 0.86, 6.67, 0.64, 0.04, 0.60, 0xb47b48, 0.45, 0, 'Tapa Madera Lavarropas'); // Tapa de madera sobre lavarropas
             // - Estación de café sobre la tapa de madera del lavarropas (frente a la ventana): Cafetera expreso + Pava eléctrica negra
-            addDecorBox(4.58, 1.04, 6.68, 0.28, 0.32, 0.28, 0x334155, 0.3, 0, 'Cafetera Espresso');  // Cafetera expreso plateada/negra
-            addDecorCyl(4.88, 0.98, 6.68, 0.08, 0.09, 0.20, 0x0f172a, 0.3, 'Pava Eléctrica Negra');  // Pava eléctrica negra
-            // 4. Pared Este de la Cocina (X=5.20): 2 Cestos de basura en fila + bolso térmico + escoba azul con pala + portero eléctrico + aplique luz
-            addDecorBox(4.96, 0.26, 6.08, 0.34, 0.52, 0.34, 0xf8fafc, 0.4, 0, 'Cesto Basura Blanco');  // Cesto blanco (más cercano al lavarropas)
-            addDecorBox(4.96, 0.53, 6.08, 0.30, 0.03, 0.30, 0x1e293b, 0.4, 0, 'Tapa Cesto Blanco');  // Tapa vaivén negra del cesto blanco
-            addDecorBox(4.96, 0.28, 5.68, 0.34, 0.56, 0.36, 0x64748b, 0.5, 0, 'Cesto Basura Gris');  // Cesto gris con tapa
-            addDecorBox(4.96, 0.14, 5.32, 0.28, 0.26, 0.26, 0x1e1b4b, 0.7, 0, 'Bolso Térmico');  // Bolso térmico negro/rosa delante del cesto gris
-            addDecorCyl(5.13, 0.65, 5.68, 0.015, 0.015, 1.25, 0x1d4ed8, 0.4, 'Escoba Azul'); // Escoba cabo azul apoyada en pared Este
-            addDecorBox(5.12, 0.36, 5.68, 0.08, 0.22, 0.20, 0xf8fafc, 0.4, 0, 'Pala de Basura');  // Pala blanca colgada en la escoba
-            setMountWall(5.20, 5.50, false);
-            addDecorBox(5.14, 1.42, 5.15, 0.05, 0.22, 0.10, 0xfef3c7, 0.4, 0, 'Portero Eléctrico Intercom');  // Teléfono portero eléctrico beige
-            addDecorBox(5.14, 2.15, 5.35, 0.06, 0.16, 0.24, 0xffffff, 0.3, 0, 'Aplique de Pared Cocina');  // Aplique de pared medialuna blanco
+            addDecorBox(3.62, 1.04, 6.68, 0.28, 0.32, 0.28, 0x334155, 0.3, 0, 'Cafetera Espresso');  // Cafetera expreso plateada/negra
+            addDecorCyl(3.32, 0.98, 6.68, 0.08, 0.09, 0.20, 0x0f172a, 0.3, 'Pava Eléctrica Negra');  // Pava eléctrica negra
+            // 4. Pared Oeste de la Cocina (X=3.00): 2 Cestos de basura en fila + bolso térmico + escoba azul con pala + portero eléctrico + aplique luz
+            addDecorBox(3.24, 0.26, 6.08, 0.34, 0.52, 0.34, 0xf8fafc, 0.4, 0, 'Cesto Basura Blanco');  // Cesto blanco (más cercano al lavarropas)
+            addDecorBox(3.24, 0.53, 6.08, 0.30, 0.03, 0.30, 0x1e293b, 0.4, 0, 'Tapa Cesto Blanco');  // Tapa vaivén negra del cesto blanco
+            addDecorBox(3.24, 0.28, 5.68, 0.34, 0.56, 0.36, 0x64748b, 0.5, 0, 'Cesto Basura Gris');  // Cesto gris con tapa
+            addDecorBox(3.24, 0.14, 5.32, 0.28, 0.26, 0.26, 0x1e1b4b, 0.7, 0, 'Bolso Térmico');  // Bolso térmico negro/rosa delante del cesto gris
+            addDecorCyl(3.07, 0.65, 5.68, 0.015, 0.015, 1.25, 0x1d4ed8, 0.4, 'Escoba Azul'); // Escoba cabo azul apoyada en pared Oeste
+            addDecorBox(3.08, 0.36, 5.68, 0.08, 0.22, 0.20, 0xf8fafc, 0.4, 0, 'Pala de Basura');  // Pala blanca colgada en la escoba
+            setMountWall(3.00, 5.50, false);
+            addDecorBox(3.06, 1.42, 5.15, 0.05, 0.22, 0.10, 0xfef3c7, 0.4, 0, 'Portero Eléctrico Intercom');  // Teléfono portero eléctrico beige
+            addDecorBox(3.06, 2.15, 5.35, 0.06, 0.16, 0.24, 0xffffff, 0.3, 0, 'Aplique de Pared Cocina');  // Aplique de pared medialuna blanco
             setMountWall(null);
 
             // ------------------------------------------------------------------------
@@ -2457,7 +2457,7 @@
             mesa: { name: "Mesa Comedor", room: "Living", x: 5.00, z: 2.80, w: 1.40, d: 0.80, h: 0.76, color: 0xb46b38 },
             escritorio: { name: "Escritorio", room: "Estudio", x: 1.50, z: 0.60, w: 1.40, d: 0.65, h: 0.75, color: 0x1e293b },
             placard: { name: "Placard", room: "Placard", x: 0.85, z: 2.55, w: 1.60, d: 0.45, h: 2.30, color: 0xb46b38 },
-            heladera: { name: "Heladera", room: "Cocina", x: 3.35, z: 4.88, w: 0.60, d: 0.60, h: 1.70, color: 0x94a3b8 },
+            heladera: { name: "Heladera", room: "Cocina", x: 4.85, z: 4.95, w: 0.60, d: 0.60, h: 1.70, color: 0x94a3b8 },
             cubo: { name: "Mueble a Medida", room: "General", x: 5.00, z: 3.00, w: 1.00, d: 1.00, h: 0.80, color: 0x0284c7 }
         };
 
@@ -2487,8 +2487,8 @@
             { id: 'vid_perchero', name: 'Perchero + Zapatero Entrada', room: 'Entrada', x: 6.08, z: 4.38, y: 0.93, w: 0.30, d: 0.64, h: 1.86, rot: 0, color: 0x1e293b },
             { id: 'vid_mesa_red', name: 'Mesa Comedor Redonda + 4 Sillas', room: 'Living', x: 4.55, z: 1.22, y: 0.38, w: 1.10, d: 1.10, h: 0.76, rot: 0, color: 0x882915 },
             { id: 'vid_cucha_ne', name: 'Cucha Perro Esquina NE', room: 'Living', x: 5.55, z: 0.38, y: 0.05, w: 0.92, d: 0.62, h: 0.10, rot: 0, color: 0x94a3b8 },
-            { id: 'vid_heladera', name: 'Heladera c/ Freezer + Bodega', room: 'Cocina', x: 3.35, z: 4.88, y: 0.84, w: 0.60, d: 0.62, h: 1.68, rot: 0, color: 0xe2e8f0 },
-            { id: 'vid_lavarropas', name: 'Lavarropas + Estación Café (Bajo Ventana)', room: 'Cocina', x: 4.65, z: 6.67, y: 0.43, w: 0.60, d: 0.58, h: 0.86, rot: 0, color: 0xcbd5e1 },
+            { id: 'vid_heladera', name: 'Heladera c/ Freezer + Bodega', room: 'Cocina', x: 4.85, z: 4.88, y: 0.84, w: 0.60, d: 0.62, h: 1.68, rot: 0, color: 0xe2e8f0 },
+            { id: 'vid_lavarropas', name: 'Lavarropas + Estación Café (Bajo Ventana)', room: 'Cocina', x: 3.54, z: 6.67, y: 0.43, w: 0.60, d: 0.58, h: 0.86, rot: 0, color: 0xcbd5e1 },
             { id: 'vid_cama_2p', name: 'Cama 2 Plazas + Respaldo Nogal', room: 'Cuarto', x: 1.05, z: 5.80, y: 0.24, w: 1.90, d: 1.45, h: 0.48, rot: 0, color: 0x475569 },
             { id: 'vid_luz_n', name: 'Mesa de Luz Norte', room: 'Cuarto', x: 0.28, z: 4.84, y: 0.31, w: 0.42, d: 0.44, h: 0.62, rot: 0, color: 0x4a3222 },
             { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.28, z: 6.72, y: 0.31, w: 0.42, d: 0.42, h: 0.62, rot: 0, color: 0x4a3222 },
