@@ -152,13 +152,13 @@ def build_apartment():
     # Muro Derecho Cocina X = 5.20 (Y = 5.70..7.00)
     b.add_box(5.20 - EXT / 2, 0.00, 5.70, 5.20 + EXT / 2, H, 7.00)
 
-    # Muro Sur Y = 7.00 (V5 Cuarto 0.90..2.10, V6 Cocina 3.55..4.55)
+    # Muro Sur Y = 7.00 (V5 Cuarto 0.90..2.10, V6 Cocina 3.25..4.55)
     b.add_box(0.00, 0.00, 7.00 - EXT / 2, 0.90, H, 7.00 + EXT / 2)
     b.add_box(0.90, 0.00, 7.00 - EXT / 2, 2.10, 0.95, 7.00 + EXT / 2)
     b.add_box(0.90, 2.05, 7.00 - EXT / 2, 2.10, H, 7.00 + EXT / 2)
-    b.add_box(2.10, 0.00, 7.00 - EXT / 2, 3.55, H, 7.00 + EXT / 2)
-    b.add_box(3.55, 0.00, 7.00 - EXT / 2, 4.55, 1.05, 7.00 + EXT / 2)
-    b.add_box(3.55, 2.00, 7.00 - EXT / 2, 4.55, H, 7.00 + EXT / 2)
+    b.add_box(2.10, 0.00, 7.00 - EXT / 2, 3.25, H, 7.00 + EXT / 2)
+    b.add_box(3.25, 0.00, 7.00 - EXT / 2, 4.55, 1.05, 7.00 + EXT / 2)
+    b.add_box(3.25, 2.00, 7.00 - EXT / 2, 4.55, H, 7.00 + EXT / 2)
     b.add_box(4.55, 0.00, 7.00 - EXT / 2, 5.20, H, 7.00 + EXT / 2)
 
     # Muro Oeste X = 0.00 (V7 Ventiluz Baño Y = 3.05..3.75)
@@ -174,7 +174,7 @@ def build_apartment():
     b.add_box(4.90, 0.95, -0.02, 6.00, 2.05, 0.02)
     b.add_box(6.28, 0.95, 0.55, 6.32, 2.05, 1.55)
     b.add_box(0.90, 0.95, 6.98, 2.10, 2.05, 7.02)
-    b.add_box(3.55, 1.05, 6.98, 4.55, 2.00, 7.02)
+    b.add_box(3.25, 1.05, 6.98, 4.55, 2.00, 7.02)
     b.add_box(-0.02, 1.35, 3.05, 0.02, 2.00, 3.75)
 
     # 3. TABIQUES INTERIORES
@@ -196,8 +196,8 @@ def build_apartment():
 
     b.add_box(0.00, 0.00, 4.50 - INT / 2, 2.30, H, 4.50 + INT / 2)
     b.add_box(2.30, 2.05, 4.50 - INT / 2, 3.00, H, 4.50 + INT / 2)
-    b.add_box(3.00, 2.05, 4.50 - INT / 2, 3.85, H, 4.50 + INT / 2)  # Dintel sobre vano abierto Cocina
-    b.add_box(3.85, 0.00, 4.50 - INT / 2, 5.20, H, 4.50 + INT / 2)
+    b.add_box(3.00, 2.05, 4.50 - INT / 2, 4.45, H, 4.50 + INT / 2)  # Dintel sobre vano abierto Cocina
+    b.add_box(4.45, 0.00, 4.50 - INT / 2, 5.20, H, 4.50 + INT / 2)  # Mocheta delante de la heladera
 
     # 3B. PUERTAS 3D Y PLACARDS EXTRAÍDOS DEL VIDEO
     # Marcos de chapa gris oscuro
@@ -241,16 +241,18 @@ def build_apartment():
     b.add_box(2.24, 0.05, 6.78, 2.72, 0.65, 6.94)  # Calefactor Cuarto (esquina Sur-Este)
 
     b.set_group("04_Equipamiento_Cocina_Bano", "Kitchen_Granite")
-    b.add_box(4.58, 0.00, 5.35, 5.15, 0.86, 6.94)  # Mesada tramo derecho (sobre muro Este)
-    b.add_box(3.58, 0.00, 6.40, 4.58, 0.86, 6.94)  # Mesada tramo sur bajo ventana
+    b.add_box(4.58, 0.00, 5.22, 5.15, 0.86, 5.62)  # 1° tramo mesada entre Heladera y Cocina 4H
+    b.add_box(4.58, 0.00, 6.16, 5.15, 0.86, 6.94)  # 2° tramo mesada con bacha (sobre muro Este)
+    b.add_box(3.88, 0.00, 6.40, 4.58, 0.86, 6.94)  # Retorno en L bajo ventana Sur
 
     b.set_group("04B_Sanitarios_Y_Termo", "Sanitary_White")
-    b.add_box(4.68, 0.86, 5.42, 5.08, 1.90, 5.82)  # Termotanque Sherman sobre mesada derecha
+    b.add_box(4.92, 1.16, 5.24, 5.15, 1.72, 5.60)  # Calefón mural a gas Orbis sobre 1° tramo de mesada
+    b.add_box(4.58, 0.00, 5.62, 5.15, 0.86, 6.16)  # Cocina a gas blanca 4 hornallas
     b.add_box(0.05, 0.00, 2.84, 0.75, 0.48, 3.96)  # Bañera
     b.add_box(1.12, 0.00, 2.84, 1.58, 0.82, 3.20)  # Lavatorio
     b.add_box(1.68, 0.00, 3.56, 2.06, 0.75, 3.95)  # Inodoro
-    b.add_box(4.55, 0.00, 4.64, 5.15, 1.72, 5.26)  # Heladera con freezer en esquina Noreste de Cocina
-    b.add_box(3.07, 0.00, 6.38, 3.65, 0.85, 6.94)  # Lavarropas carga frontal en esquina Suroeste de Cocina
+    b.add_box(4.55, 0.00, 4.57, 5.15, 1.68, 5.19)  # Heladera con freezer en esquina Noreste de Cocina
+    b.add_box(3.24, 0.00, 6.38, 3.84, 0.86, 6.94)  # Lavarropas carga frontal bajo ventana Sur (mirando al Norte)
 
     # 5. MUEBLES Y DECORACIÓN EXTRAÍDOS DEL SEGUNDO VIDEO
     b.set_group("05_Muebles_Living_Comedor", "Furniture_Sofa_Blue")

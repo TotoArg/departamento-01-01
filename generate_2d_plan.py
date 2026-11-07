@@ -156,38 +156,37 @@ def main():
     # -------------------------------------------------------------------------
     f_tiny = load_font(12, bold=True)
 
-    # --- COCINA: Mesada en "L" de granito rosa + Bacha doble + Cocina 4H + Termo Sherman (sobre muro Este X=5.20 y Sur Y=7.00) ---
-    # Tramo vertical mesada (X=4.58 a 5.17, Y=5.35 a 6.96) y tramo horizontal (X=3.58 a 5.17, Y=6.40 a 6.96)
+    # --- COCINA (según las 4 fotos): Heladera -> 1° tramo mesada + Calefón mural -> Cocina 4H -> 2° tramo mesada en "L" con Bacha -> Lavarropas bajo ventana Sur ---
     granite_fill = (228, 208, 200)
     granite_border = (160, 135, 125)
+    # 1° tramo de mesada entre Heladera y Cocina 4H (X=4.58 a 5.16, Y=5.22 a 5.62)
+    draw.rectangle([*px(4.58, 5.22), *px(5.16, 5.62)], fill=granite_fill, outline=granite_border, width=2)
+    # Calefón mural a gas blanco (Orbis) colgado sobre el 1° tramo de mesada (X=4.84 a 5.15, Y=5.25 a 5.59)
+    draw.rounded_rectangle([*px(4.84, 5.25), *px(5.15, 5.59)], radius=4, fill=(255, 255, 255), outline=(100, 116, 139), width=2)
+    draw.text(px(4.84, 5.42), "CALEFÓN", fill=(71, 85, 105), font=load_font(9, bold=True), anchor="mm")
+
+    # Cocina a gas blanca de 4 hornallas sobre muro Este (X=4.58 a 5.16, Y=5.62 a 6.16)
+    draw.rectangle([*px(4.58, 5.62), *px(5.16, 6.16)], fill=(255, 255, 255), outline=(100, 116, 139), width=2)
+    for bx, by in [(4.75, 5.76), (5.00, 5.76), (4.75, 6.02), (5.00, 6.02)]:
+        cx_b, cy_b = px(bx, by)
+        draw.ellipse([cx_b - 6, cy_b - 6, cx_b + 6, cy_b + 6], outline=(71, 85, 105), width=2)
+
+    # 2° tramo de mesada en "L" (X=4.58 a 5.16, Y=6.16 a 6.96 + retorno Sur X=3.88 a 5.16, Y=6.40 a 6.96)
     draw.polygon(
         [
-            px(4.58, 5.35),
-            px(5.17, 5.35),
-            px(5.17, 6.96),
-            px(3.58, 6.96),
-            px(3.58, 6.40),
+            px(4.58, 6.16),
+            px(5.16, 6.16),
+            px(5.16, 6.96),
+            px(3.88, 6.96),
+            px(3.88, 6.40),
             px(4.58, 6.40),
         ],
         fill=granite_fill,
         outline=granite_border,
     )
-    # Termotanque Sherman (círculo blanco en X=4.88, Y=5.65)
-    tx, ty = px(4.88, 5.65)
-    r_termo = int(0.21 * SCALE)
-    draw.ellipse([tx - r_termo, ty - r_termo, tx + r_termo, ty + r_termo], fill=(255, 255, 255), outline=(100, 116, 139), width=2)
-    draw.text((tx, ty), "TERMO", fill=(71, 85, 105), font=load_font(10, bold=True), anchor="mm")
-
-    # Cocina 4 hornallas sobre muro Este (X=4.60 a 5.15, Y=5.92 a 6.38)
-    draw.rectangle([*px(4.60, 5.92), *px(5.15, 6.38)], fill=(255, 255, 255), outline=(100, 116, 139), width=2)
-    for bx, by in [(4.76, 6.04), (5.00, 6.04), (4.76, 6.26), (5.00, 6.26)]:
-        cx_b, cy_b = px(bx, by)
-        draw.ellipse([cx_b - 6, cy_b - 6, cx_b + 6, cy_b + 6], outline=(71, 85, 105), width=2)
-
-    # Bacha doble de acero inoxidable bajo ventana cocina (X=3.78 a 4.48, Y=6.48 a 6.88)
-    draw.rectangle([*px(3.78, 6.48), *px(4.48, 6.88)], fill=(226, 232, 240), outline=(100, 116, 139), width=2)
-    draw.rectangle([*px(3.83, 6.53), *px(4.11, 6.83)], fill=(241, 245, 249), outline=(148, 163, 184), width=1)
-    draw.rectangle([*px(4.16, 6.53), *px(4.44, 6.83)], fill=(241, 245, 249), outline=(148, 163, 184), width=1)
+    # Bacha de acero inoxidable sobre el tramo Este antes de la esquina (X=4.64 a 5.10, Y=6.22 a 6.68)
+    draw.rectangle([*px(4.64, 6.22), *px(5.10, 6.68)], fill=(226, 232, 240), outline=(100, 116, 139), width=2)
+    draw.rectangle([*px(4.69, 6.27), *px(5.05, 6.63)], fill=(241, 245, 249), outline=(148, 163, 184), width=1)
 
     # --- BAÑO: Bañera (X=0.04..0.74, Y=2.84..3.96), Lavatorio (X=1.10..1.55, Y=2.84..3.22), Inodoro (X=1.65..2.05, Y=3.55..3.96) ---
     draw.rectangle([*px(0.05, 2.84), *px(0.75, 3.96)], fill=(255, 255, 255), outline=(148, 163, 184), width=2)
@@ -240,13 +239,13 @@ def main():
     draw.rounded_rectangle([*px(5.10, 0.10), *px(6.00, 0.66)], radius=8, fill=(226, 232, 240), outline=(100, 116, 139), width=2)
     draw.text(px(5.55, 0.38), "CUCHA PERRO", fill=(71, 85, 105), font=f_furn, anchor="mm")
 
-    # B) COCINA: Heladera con Freezer + Bodega al Este (X=4.55..5.15, Y=4.64..5.26), Lavarropas + Estación Café al Suroeste (X=3.06..3.66, Y=6.38..6.94) y Cestos al Oeste (X=3.08..3.42, Y=5.34..6.10)
-    draw.rounded_rectangle([*px(4.55, 4.64), *px(5.15, 5.26)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
-    draw.text(px(4.85, 4.95), "HELADERA", fill=(51, 65, 85), font=f_furn, anchor="mm")
-    draw.rounded_rectangle([*px(3.06, 6.38), *px(3.66, 6.94)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
-    draw.text(px(3.36, 6.66), "LAVARR.\n+ CAFÉ", fill=(51, 65, 85), font=f_furn, anchor="mm")
-    draw.rounded_rectangle([*px(3.08, 5.34), *px(3.42, 6.10)], radius=5, fill=(226, 232, 240), outline=(100, 116, 139), width=2)
-    draw.text(px(3.25, 5.72), "CESTOS", fill=(71, 85, 105), font=f_furn, anchor="mm")
+    # B) COCINA: Heladera con Freezer + Bodega al Noreste (X=4.55..5.15, Y=4.56..5.20), Lavarropas + Estación Café bajo ventana Sur (X=3.24..3.86, Y=6.38..6.94) y Cestos en fila sobre pared Oeste (X=3.06..3.42, Y=5.30..6.26)
+    draw.rounded_rectangle([*px(4.55, 4.56), *px(5.15, 5.20)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
+    draw.text(px(4.85, 4.88), "HELADERA", fill=(51, 65, 85), font=f_furn, anchor="mm")
+    draw.rounded_rectangle([*px(3.24, 6.38), *px(3.86, 6.94)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
+    draw.text(px(3.55, 6.66), "LAVARR.\n+ CAFÉ", fill=(51, 65, 85), font=f_furn, anchor="mm")
+    draw.rounded_rectangle([*px(3.06, 5.30), *px(3.42, 6.26)], radius=5, fill=(226, 232, 240), outline=(100, 116, 139), width=2)
+    draw.text(px(3.24, 5.78), "CESTOS", fill=(71, 85, 105), font=f_furn, anchor="mm")
 
     # C) CUARTO AMPLIADO: Cama 2 Plazas (X=0.10..2.00, Y=5.12..6.52) + Respaldo Ancho Nogal y 2 Mesas de Luz sobre pared Oeste (X=0.00) + Cesto Ropa al Este
     draw.rounded_rectangle([*px(0.10, 5.12), *px(2.00, 6.52)], radius=8, fill=(226, 232, 240), outline=(71, 85, 105), width=2)
@@ -301,8 +300,8 @@ def main():
     draw_window_h(draw, px, 1.35, 2.55, 0.00, EXT_W)
     # V5: Ventana Sur del Cuarto Ampliado (Y=7.00, X=0.90 a 2.10)
     draw_window_h(draw, px, 0.90, 2.10, 7.00, EXT_W)
-    # V6: Ventana Sur de la Cocina sobre bacha (Y=7.00, X=3.55 a 4.55)
-    draw_window_h(draw, px, 3.55, 4.55, 7.00, EXT_W)
+    # V6: Ventana Sur de la Cocina sobre escurridor y lavarropas (Y=7.00, X=3.25 a 4.55)
+    draw_window_h(draw, px, 3.25, 4.55, 7.00, EXT_W)
     # V7: Ventiluz Oeste del Baño sobre bañera (X=0.00, Y=3.05 a 3.75)
     draw_window_v(draw, px, 0.00, 3.05, 3.75, EXT_W)
 
@@ -343,9 +342,9 @@ def main():
     # - Puerta Cuarto (de X = 2.30 a X = 3.00): abre HACIA ADENTRO del Cuarto (hacia abajo Y > 4.50)
     draw_dashed_line(draw, *px(2.30, 4.50), *px(3.00, 4.50), fill=DASH_COLOR, width=3)
     draw_door_symbol(draw, px, (2.35, 4.50), (2.55, 4.72), (2.75, 4.72), (2.88, 4.50), DOOR_COLOR, width=3)
-    # - Cocina SIN PUERTA (vano abierto libre de X = 3.00 a X = 3.85)
-    draw_dashed_line(draw, *px(3.00, 4.50), *px(3.85, 4.50), fill=DASH_COLOR, width=3)
-    draw.line([px(3.85, 4.50), px(5.20, 4.50)], fill=WALL_COLOR, width=INT_W)
+    # - Cocina SIN PUERTA (vano abierto libre de X = 3.00 a X = 4.45; mocheta de X = 4.45 a X = 5.20 delante de la heladera)
+    draw_dashed_line(draw, *px(3.00, 4.50), *px(4.45, 4.50), fill=DASH_COLOR, width=3)
+    draw.line([px(4.45, 4.50), px(5.20, 4.50)], fill=WALL_COLOR, width=INT_W)
 
     # -------------------------------------------------------------------------
     # 5. TIPOGRAFÍA Y ETIQUETAS DE AMBIENTES
