@@ -242,16 +242,16 @@ def build_apartment():
     b.add_box(0.06, 0.05, 0.80, 0.22, 0.65, 1.25)  # Calefactor Estudio
 
     b.set_group("04_Equipamiento_Cocina_Bano", "Kitchen_Granite")
-    b.add_box(3.05, 0.00, 5.35, 3.62, 0.86, 6.94)  # Mesada tramo izquierdo
-    b.add_box(3.62, 0.00, 6.40, 4.62, 0.86, 6.94)  # Mesada tramo sur bajo ventana
+    b.add_box(4.58, 0.00, 5.35, 5.15, 0.86, 6.94)  # Mesada tramo derecho (sobre muro Este)
+    b.add_box(3.58, 0.00, 6.40, 4.58, 0.86, 6.94)  # Mesada tramo sur bajo ventana
 
     b.set_group("04B_Sanitarios_Y_Termo", "Sanitary_White")
-    b.add_box(3.12, 0.86, 5.42, 3.52, 1.90, 5.82)  # Termotanque Sherman
+    b.add_box(4.68, 0.86, 5.42, 5.08, 1.90, 5.82)  # Termotanque Sherman sobre mesada derecha
     b.add_box(0.05, 0.00, 2.84, 0.75, 0.48, 3.96)  # Bañera
     b.add_box(1.12, 0.00, 2.84, 1.58, 0.82, 3.20)  # Lavatorio
     b.add_box(1.68, 0.00, 3.56, 2.06, 0.75, 3.95)  # Inodoro
-    b.add_box(3.05, 0.00, 4.64, 3.65, 1.72, 5.26)  # Heladera con freezer en Cocina
-    b.add_box(4.55, 0.00, 6.38, 5.13, 0.85, 6.94)  # Lavarropas carga frontal en Cocina
+    b.add_box(4.55, 0.00, 4.64, 5.15, 1.72, 5.26)  # Heladera con freezer en esquina Noreste de Cocina
+    b.add_box(3.07, 0.00, 6.38, 3.65, 0.85, 6.94)  # Lavarropas carga frontal en esquina Suroeste de Cocina
 
     # 5. MUEBLES Y DECORACIÓN EXTRAÍDOS DEL SEGUNDO VIDEO
     b.set_group("05_Muebles_Living_Comedor", "Furniture_Sofa_Blue")

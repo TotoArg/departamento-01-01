@@ -156,38 +156,38 @@ def main():
     # -------------------------------------------------------------------------
     f_tiny = load_font(12, bold=True)
 
-    # --- COCINA: Mesada en "L" de granito rosa + Bacha doble + Cocina 4H + Termo Sherman ---
-    # Tramo vertical mesada (X=3.00 a 3.60, Y=5.35 a 7.00) y tramo horizontal (X=3.00 a 4.65, Y=6.40 a 7.00)
+    # --- COCINA: Mesada en "L" de granito rosa + Bacha doble + Cocina 4H + Termo Sherman (sobre muro Este X=5.20 y Sur Y=7.00) ---
+    # Tramo vertical mesada (X=4.58 a 5.17, Y=5.35 a 6.96) y tramo horizontal (X=3.58 a 5.17, Y=6.40 a 6.96)
     granite_fill = (228, 208, 200)
     granite_border = (160, 135, 125)
     draw.polygon(
         [
-            px(3.03, 5.35),
-            px(3.62, 5.35),
-            px(3.62, 6.40),
-            px(4.62, 6.40),
-            px(4.62, 6.96),
-            px(3.03, 6.96),
+            px(4.58, 5.35),
+            px(5.17, 5.35),
+            px(5.17, 6.96),
+            px(3.58, 6.96),
+            px(3.58, 6.40),
+            px(4.58, 6.40),
         ],
         fill=granite_fill,
         outline=granite_border,
     )
-    # Termotanque Sherman (círculo blanco en X=3.32, Y=5.65)
-    tx, ty = px(3.32, 5.65)
+    # Termotanque Sherman (círculo blanco en X=4.88, Y=5.65)
+    tx, ty = px(4.88, 5.65)
     r_termo = int(0.21 * SCALE)
     draw.ellipse([tx - r_termo, ty - r_termo, tx + r_termo, ty + r_termo], fill=(255, 255, 255), outline=(100, 116, 139), width=2)
     draw.text((tx, ty), "TERMO", fill=(71, 85, 105), font=load_font(10, bold=True), anchor="mm")
 
-    # Cocina 4 hornallas (X=3.05 a 3.60, Y=5.92 a 6.38)
-    draw.rectangle([*px(3.05, 5.92), *px(3.60, 6.38)], fill=(255, 255, 255), outline=(100, 116, 139), width=2)
-    for bx, by in [(3.20, 6.04), (3.44, 6.04), (3.20, 6.26), (3.44, 6.26)]:
+    # Cocina 4 hornallas sobre muro Este (X=4.60 a 5.15, Y=5.92 a 6.38)
+    draw.rectangle([*px(4.60, 5.92), *px(5.15, 6.38)], fill=(255, 255, 255), outline=(100, 116, 139), width=2)
+    for bx, by in [(4.76, 6.04), (5.00, 6.04), (4.76, 6.26), (5.00, 6.26)]:
         cx_b, cy_b = px(bx, by)
         draw.ellipse([cx_b - 6, cy_b - 6, cx_b + 6, cy_b + 6], outline=(71, 85, 105), width=2)
 
-    # Bacha doble de acero inoxidable bajo ventana cocina (X=3.72 a 4.42, Y=6.48 a 6.88)
-    draw.rectangle([*px(3.72, 6.48), *px(4.42, 6.88)], fill=(226, 232, 240), outline=(100, 116, 139), width=2)
-    draw.rectangle([*px(3.76, 6.53), *px(4.04, 6.83)], fill=(241, 245, 249), outline=(148, 163, 184), width=1)
-    draw.rectangle([*px(4.09, 6.53), *px(4.37, 6.83)], fill=(241, 245, 249), outline=(148, 163, 184), width=1)
+    # Bacha doble de acero inoxidable bajo ventana cocina (X=3.78 a 4.48, Y=6.48 a 6.88)
+    draw.rectangle([*px(3.78, 6.48), *px(4.48, 6.88)], fill=(226, 232, 240), outline=(100, 116, 139), width=2)
+    draw.rectangle([*px(3.83, 6.53), *px(4.11, 6.83)], fill=(241, 245, 249), outline=(148, 163, 184), width=1)
+    draw.rectangle([*px(4.16, 6.53), *px(4.44, 6.83)], fill=(241, 245, 249), outline=(148, 163, 184), width=1)
 
     # --- BAÑO: Bañera (X=0.04..0.74, Y=2.84..3.96), Lavatorio (X=1.10..1.55, Y=2.84..3.22), Inodoro (X=1.65..2.05, Y=3.55..3.96) ---
     draw.rectangle([*px(0.05, 2.84), *px(0.75, 3.96)], fill=(255, 255, 255), outline=(148, 163, 184), width=2)
@@ -243,13 +243,13 @@ def main():
     draw.rounded_rectangle([*px(5.10, 0.10), *px(6.00, 0.66)], radius=8, fill=(226, 232, 240), outline=(100, 116, 139), width=2)
     draw.text(px(5.55, 0.38), "CUCHA PERRO", fill=(71, 85, 105), font=f_furn, anchor="mm")
 
-    # B) COCINA: Heladera con Freezer + Bodega (X=3.05..3.65, Y=4.64..5.26), Lavarropas + Estación Café (X=4.54..5.14, Y=6.38..6.94) y Cestos (X=4.78..5.12, Y=5.34..6.10)
-    draw.rounded_rectangle([*px(3.05, 4.64), *px(3.65, 5.26)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
-    draw.text(px(3.35, 4.95), "HELADERA", fill=(51, 65, 85), font=f_furn, anchor="mm")
-    draw.rounded_rectangle([*px(4.54, 6.38), *px(5.14, 6.94)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
-    draw.text(px(4.84, 6.66), "LAVARR.\n+ CAFÉ", fill=(51, 65, 85), font=f_furn, anchor="mm")
-    draw.rounded_rectangle([*px(4.78, 5.34), *px(5.12, 6.10)], radius=5, fill=(226, 232, 240), outline=(100, 116, 139), width=2)
-    draw.text(px(4.95, 5.72), "CESTOS", fill=(71, 85, 105), font=f_furn, anchor="mm")
+    # B) COCINA: Heladera con Freezer + Bodega al Este (X=4.55..5.15, Y=4.64..5.26), Lavarropas + Estación Café al Suroeste (X=3.06..3.66, Y=6.38..6.94) y Cestos al Oeste (X=3.08..3.42, Y=5.34..6.10)
+    draw.rounded_rectangle([*px(4.55, 4.64), *px(5.15, 5.26)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
+    draw.text(px(4.85, 4.95), "HELADERA", fill=(51, 65, 85), font=f_furn, anchor="mm")
+    draw.rounded_rectangle([*px(3.06, 6.38), *px(3.66, 6.94)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
+    draw.text(px(3.36, 6.66), "LAVARR.\n+ CAFÉ", fill=(51, 65, 85), font=f_furn, anchor="mm")
+    draw.rounded_rectangle([*px(3.08, 5.34), *px(3.42, 6.10)], radius=5, fill=(226, 232, 240), outline=(100, 116, 139), width=2)
+    draw.text(px(3.25, 5.72), "CESTOS", fill=(71, 85, 105), font=f_furn, anchor="mm")
 
     # C) CUARTO AMPLIADO: Cama 2 Plazas (X=0.10..2.00, Y=5.12..6.52) + Respaldo Ancho Nogal y 2 Mesas de Luz sobre pared Oeste (X=0.00) + Cesto Ropa al Este
     draw.rounded_rectangle([*px(0.10, 5.12), *px(2.00, 6.52)], radius=8, fill=(226, 232, 240), outline=(71, 85, 105), width=2)
@@ -368,8 +368,8 @@ def main():
     draw.text(px(1.72, 4.88), "CUARTO AMPLIADO", fill=TEXT_COLOR, font=f_room, anchor="mm")
     draw.text(px(4.92, 3.68), "LIVING", fill=TEXT_COLOR, font=f_living, anchor="mm")
     draw.text(px(4.92, 3.94), "(Techo madera + vigas vistas)", fill=SUB_COLOR, font=f_sub, anchor="mm")
-    draw.text(px(4.25, 5.42), "COCINA", fill=TEXT_COLOR, font=f_room, anchor="mm")
-    draw.text(px(4.25, 5.70), "(Acceso junto al pasillo)", fill=SUB_COLOR, font=f_sub, anchor="mm")
+    draw.text(px(3.98, 5.42), "COCINA", fill=TEXT_COLOR, font=f_room, anchor="mm")
+    draw.text(px(3.98, 5.70), "(Acceso junto al pasillo)", fill=SUB_COLOR, font=f_sub, anchor="mm")
     draw.text(px(5.58, 5.38), "ENTRADA", fill=TEXT_COLOR, font=f_sm, anchor="mm")
     draw.text(px(5.75, 6.23), "PALIER", fill=PALIER_TEXT, font=f_palier, anchor="mm")
     draw.text(px(5.75, 6.42), "EDIFICIO", fill=PALIER_TEXT, font=f_palier, anchor="mm")
