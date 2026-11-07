@@ -844,11 +844,12 @@
         controlsOrtho.maxZoom = 4.0;
         controlsOrtho.enabled = true; // Activo para zoom y arrastre desde el inicio
 
-        // Iluminación
-        scene.add(new THREE.AmbientLight(0xffffff, 0.85));
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.45);
+        // Iluminación (En 2D arranca sin sombras proyectadas para que el plano se vea 100% limpio sin manchas grises)
+        const ambLight = new THREE.AmbientLight(0xffffff, 0.96);
+        scene.add(ambLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.35);
         dirLight.position.set(6, 15, 8);
-        dirLight.castShadow = true;
+        dirLight.castShadow = false;
         scene.add(dirLight);
 
         // Textura procedural para el piso cerámico esmaltado beige de 33×33 cm relevado del video
@@ -1239,16 +1240,16 @@
         buildWoodenRoof();
 
         // ============================================================================
-        // 4. MUROS INTERNOS, PUERTAS (CON ARCOS) Y VANOS ABIERTOS
+        // 4. MUROS INTERNOS, PUERTAS (HACIA ADENTRO DE BAÑO Y HABITACIONES) Y VANOS ABIERTOS
         // ============================================================================
         // Eje Vertical X = 2.30 (Cierre de Placards y Baño):
-        // - Muro sólido de Y = 2.30 a Y = 2.80 (Placard Superior)
-        addWallSegment(2.30, 2.30, 2.30, 2.80, INT_T, interiorWallsGroup, false);
-        // - PUERTA BAÑO: Entre Y = 2.80 e Y = 3.70 (abre hacia el pasillo)
-        addDashedLine(2.30, 2.80, 2.30, 3.70);
-        addDoorSymbol2D(2.30, 3.55, 2.48, 3.35, 2.52, 3.12, 2.30, 2.95);
-        // - Muro sólido de Y = 3.70 a Y = 4.50 (tramo de Baño de 3.70 a 4.00 + Placard Inferior de 4.00 a 4.50)
-        addWallSegment(2.30, 3.70, 2.30, 4.50, INT_T, interiorWallsGroup, false);
+        // - Muro sólido más largo arriba: de Y = 2.30 a Y = 3.02 (cubre Placard Sup. 2.30..2.80 + mocheta superior del Baño 2.80..3.02)
+        addWallSegment(2.30, 2.30, 2.30, 3.02, INT_T, interiorWallsGroup, false);
+        // - PUERTA BAÑO: Entre Y = 3.02 e Y = 3.65 (abre HACIA ADENTRO del Baño, hacia la izquierda X < 2.30)
+        addDashedLine(2.30, 3.02, 2.30, 3.65);
+        addDoorSymbol2D(2.30, 3.05, 2.08, 3.25, 2.04, 3.46, 2.30, 3.62);
+        // - Muro sólido abajo: de Y = 3.65 a Y = 4.50 (mocheta inferior del Baño 3.65..4.00 + Placard Inf. 4.00..4.50)
+        addWallSegment(2.30, 3.65, 2.30, 4.50, INT_T, interiorWallsGroup, false);
 
         // Eje Vertical Central X = 3.00:
         // - Muro sólido de Y = 0.00 a Y = 3.70 (separa Estudio y parte del Pasillo del Living)
@@ -1264,9 +1265,9 @@
         // Eje Horizontal Y = 2.30 (Base Estudio):
         // - Muro sólido de X = 0.00 a X = 2.30
         addWallSegment(0.00, 2.30, 2.30, 2.30, INT_T, interiorWallsGroup, false);
-        // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (abre hacia abajo, al pasillo)
+        // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (abre HACIA ADENTRO del Estudio, hacia arriba Y < 2.30)
         addDashedLine(2.30, 2.30, 3.00, 2.30);
-        addDoorSymbol2D(2.35, 2.30, 2.55, 2.48, 2.75, 2.48, 2.85, 2.30);
+        addDoorSymbol2D(2.35, 2.30, 2.55, 2.08, 2.75, 2.08, 2.88, 2.30);
 
         // Eje Horizontal Y = 2.80 (Divide Placard Superior y Baño): de X = 0.00 a X = 2.30
         addWallSegment(0.00, 2.80, 2.30, 2.80, INT_T, interiorWallsGroup, false);
@@ -1277,10 +1278,10 @@
         // Eje Horizontal Y = 4.50 (Línea Cuarto y Cocina):
         // - Muro sólido de X = 0.00 a X = 2.30 (divide Placard Inferior y Cuarto)
         addWallSegment(0.00, 4.50, 2.30, 4.50, INT_T, interiorWallsGroup, false);
-        // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (abre hacia arriba, al pasillo)
+        // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (abre HACIA ADENTRO del Cuarto, hacia abajo Y > 4.50)
         addDashedLine(2.30, 4.50, 3.00, 4.50);
-        addDoorSymbol2D(2.35, 4.50, 2.55, 4.32, 2.75, 4.32, 2.85, 4.50);
-        // - VANO ABIERTO COCINA: Sin muro de X = 3.00 a X = 3.85 (acceso libre pegado al pasillo)
+        addDoorSymbol2D(2.35, 4.50, 2.55, 4.72, 2.75, 4.72, 2.88, 4.50);
+        // - VANO ABIERTO COCINA (SIN PUERTA): Paso libre de X = 3.00 a X = 3.85 pegado al pasillo
         addDashedLine(3.00, 4.50, 3.85, 4.50);
         // - Muro sólido frontal de Cocina: De X = 3.85 a X = 5.20
         addWallSegment(3.85, 4.50, 5.20, 4.50, INT_T, interiorWallsGroup, false);
@@ -1677,6 +1678,8 @@
             activeCamera = orthoCam;
             controlsPersp.enabled = false;
             controlsOrtho.enabled = true;
+            dirLight.castShadow = false;
+            ambLight.intensity = 0.96;
             roofGroup.visible = false;
             document.getElementById('chk-roof').checked = false;
             document.getElementById('btn-toggle-roof').classList.remove('active');
@@ -1701,6 +1704,8 @@
             activeCamera = perspCam;
             controlsOrtho.enabled = false;
             controlsPersp.enabled = true;
+            dirLight.castShadow = true;
+            ambLight.intensity = 0.85;
             if (hideWalls) {
                 applyWallsVisibility(false, false);
                 setActiveTopBtn('btn-mode-nowalls');

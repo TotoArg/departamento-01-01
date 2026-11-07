@@ -171,9 +171,9 @@ def build_apartment():
 
     # 3. TABIQUES INTERIORES
     b.set_group("02_Tabiques_Interiores", "Wall_Interior")
-    b.add_box(2.30 - INT / 2, 0.00, 2.30, 2.30 + INT / 2, H, 2.80)
-    b.add_box(2.30 - INT / 2, 2.05, 2.80, 2.30 + INT / 2, H, 3.70)
-    b.add_box(2.30 - INT / 2, 0.00, 3.70, 2.30 + INT / 2, H, 4.50)
+    b.add_box(2.30 - INT / 2, 0.00, 2.30, 2.30 + INT / 2, H, 3.02)
+    b.add_box(2.30 - INT / 2, 2.05, 3.02, 2.30 + INT / 2, H, 3.65)
+    b.add_box(2.30 - INT / 2, 0.00, 3.65, 2.30 + INT / 2, H, 4.50)
 
     b.add_box(3.00 - INT / 2, 0.00, 0.00, 3.00 + INT / 2, H, 3.70)
     b.add_box(3.00 - INT / 2, 0.00, 4.50, 3.00 + INT / 2, H, 7.00)

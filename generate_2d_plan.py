@@ -251,13 +251,16 @@ def main():
     draw_window_v(draw, px, 0.00, 3.05, 3.75, EXT_W)
 
     # -------------------------------------------------------------------------
-    # 4. MUROS INTERNOS, PUERTAS (CON ARCOS) Y VANOS ABIERTOS
+    # 4. MUROS INTERNOS, PUERTAS (HACIA ADENTRO DE HABITACIONES Y BAÑO) Y VANOS
     # -------------------------------------------------------------------------
     # Eje Vertical X = 2.30 (Cierre de Placards y Baño):
-    draw.line([px(2.30, 2.30), px(2.30, 2.80)], fill=WALL_COLOR, width=INT_W)
-    draw_dashed_line(draw, *px(2.30, 2.80), *px(2.30, 3.70), fill=DASH_COLOR, width=3)
-    draw_door_symbol(draw, px, (2.30, 3.55), (2.48, 3.35), (2.52, 3.12), (2.30, 2.95), DOOR_COLOR, width=3)
-    draw.line([px(2.30, 3.70), px(2.30, 4.50)], fill=WALL_COLOR, width=INT_W)
+    # - Muro sólido superior más largo (de Y = 2.30 a Y = 3.02: Placard Sup. + mocheta superior del Baño)
+    draw.line([px(2.30, 2.30), px(2.30, 3.02)], fill=WALL_COLOR, width=INT_W)
+    # - Puerta Baño (de Y = 3.02 a Y = 3.65): abre HACIA ADENTRO del Baño (hacia la izquierda X < 2.30)
+    draw_dashed_line(draw, *px(2.30, 3.02), *px(2.30, 3.65), fill=DASH_COLOR, width=3)
+    draw_door_symbol(draw, px, (2.30, 3.05), (2.08, 3.25), (2.04, 3.46), (2.30, 3.62), DOOR_COLOR, width=3)
+    # - Muro sólido inferior (de Y = 3.65 a Y = 4.50: mocheta inferior del Baño + Placard Inf.)
+    draw.line([px(2.30, 3.65), px(2.30, 4.50)], fill=WALL_COLOR, width=INT_W)
 
     # Eje Vertical Central X = 3.00:
     draw.line([px(3.00, 0.00), px(3.00, 3.70)], fill=WALL_COLOR, width=INT_W)
@@ -269,8 +272,9 @@ def main():
 
     # Eje Horizontal Y = 2.30 (Base Estudio):
     draw.line([px(0.00, 2.30), px(2.30, 2.30)], fill=WALL_COLOR, width=INT_W)
+    # - Puerta Estudio (de X = 2.30 a X = 3.00): abre HACIA ADENTRO del Estudio (hacia arriba Y < 2.30)
     draw_dashed_line(draw, *px(2.30, 2.30), *px(3.00, 2.30), fill=DASH_COLOR, width=3)
-    draw_door_symbol(draw, px, (2.35, 2.30), (2.55, 2.48), (2.75, 2.48), (2.85, 2.30), DOOR_COLOR, width=3)
+    draw_door_symbol(draw, px, (2.35, 2.30), (2.55, 2.08), (2.75, 2.08), (2.88, 2.30), DOOR_COLOR, width=3)
 
     # Eje Horizontal Y = 2.80 (Divide Placard Superior y Baño): de X = 0.00 a X = 2.30
     draw.line([px(0.00, 2.80), px(2.30, 2.80)], fill=WALL_COLOR, width=INT_W)
@@ -280,8 +284,10 @@ def main():
 
     # Eje Horizontal Y = 4.50 (Línea Cuarto y Cocina):
     draw.line([px(0.00, 4.50), px(2.30, 4.50)], fill=WALL_COLOR, width=INT_W)
+    # - Puerta Cuarto (de X = 2.30 a X = 3.00): abre HACIA ADENTRO del Cuarto (hacia abajo Y > 4.50)
     draw_dashed_line(draw, *px(2.30, 4.50), *px(3.00, 4.50), fill=DASH_COLOR, width=3)
-    draw_door_symbol(draw, px, (2.35, 4.50), (2.55, 4.32), (2.75, 4.32), (2.85, 4.50), DOOR_COLOR, width=3)
+    draw_door_symbol(draw, px, (2.35, 4.50), (2.55, 4.72), (2.75, 4.72), (2.88, 4.50), DOOR_COLOR, width=3)
+    # - Cocina SIN PUERTA (vano abierto libre de X = 3.00 a X = 3.85)
     draw_dashed_line(draw, *px(3.00, 4.50), *px(3.85, 4.50), fill=DASH_COLOR, width=3)
     draw.line([px(3.85, 4.50), px(5.20, 4.50)], fill=WALL_COLOR, width=INT_W)
 
