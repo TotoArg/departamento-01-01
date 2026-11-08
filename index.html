@@ -1462,15 +1462,15 @@
         // Retranqueo Palier (Puerta Principal en Z = 6.30): de [5.20, 6.30] a [6.30, 6.30] a 2.98 m
         addWallSegment(5.20, 6.30, 5.38, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
         addWallSegment(6.12, 6.30, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
-        // Jambas de Puerta Principal en X = 5.38 y X = 6.12 sobre Z = 6.30
-        addWallSegment(5.38, 6.18, 5.38, 6.42, 0.04, exteriorWallsGroup, true, 2.98);
-        addWallSegment(6.12, 6.18, 6.12, 6.42, 0.04, exteriorWallsGroup, true, 2.98);
+        // Umbral y símbolo arquitectónico 2D de Puerta Principal (abre 90° hacia el Norte dentro de Entrada)
         const entranceThreshold = new THREE.Mesh(
             new THREE.BoxGeometry(0.74, 0.01, 0.06),
             new THREE.MeshBasicMaterial({ color: 0xcbd5e1 })
         );
         entranceThreshold.position.set(5.75, 0.01, 6.30);
         lines2DGroup.add(entranceThreshold);
+        addDashedLine(5.38, 6.30, 6.12, 6.30);
+        addDoorSymbol2D(5.42, 6.30, 5.42, 5.64, 6.08, 5.64, 6.08, 6.30);
 
         // Muro Derecho Cocina (Límite con Palier): baja de [5.20, 6.30] a [5.20, 8.00] a 3.18 m
         addWallSegment(5.20, 6.30, 5.20, 8.00, EXT_T, exteriorWallsGroup, true, 3.18);
@@ -1635,12 +1635,25 @@
             const lenSlopeRight = Math.hypot(dxRight, dyRight); // ~3.354 m
             const angSlopeRight = -Math.atan2(dyRight, dxRight); // ~ -10.30°
 
-            // Cubierta machimbrada unificada para todo el bloque derecho (elimina huecos y desniveles)
-            const roofRight = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
-            roofRight.scale.set(lenSlopeRight, 0.04, totalDepth);
-            roofRight.position.set(3.00 + dxRight / 2, 3.60 - dyRight / 2, totalDepth / 2);
-            roofRight.rotation.z = angSlopeRight;
-            roofGroup.add(roofRight);
+            // 1. Cubierta machimbrada Living + Entrada (de Z = 0.00 a 6.30 m, X = 3.00 a 6.30 m)
+            const depthLivingEnt = 6.30;
+            const roofLivingEnt = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofLivingEnt.scale.set(lenSlopeRight, 0.04, depthLivingEnt);
+            roofLivingEnt.position.set(3.00 + dxRight / 2, 3.60 - dyRight / 2, depthLivingEnt / 2);
+            roofLivingEnt.rotation.z = angSlopeRight;
+            roofGroup.add(roofLivingEnt);
+
+            // 2. Cubierta machimbrada Cocina (de Z = 6.30 a 8.00 m, X = 3.00 a 5.20 m)
+            //    Termina en X = 5.20 m sin invadir el Palier exterior del edificio
+            const dxCocina = 2.20;
+            const dyCocina = (dxCocina / dxRight) * dyRight; // 0.40 m
+            const lenSlopeCocina = Math.hypot(dxCocina, dyCocina);
+            const depthCocinaSouth = 8.00 - 6.30; // 1.70 m
+            const roofCocinaSouth = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofCocinaSouth.scale.set(lenSlopeCocina, 0.04, depthCocinaSouth);
+            roofCocinaSouth.position.set(3.00 + dxCocina / 2, 3.60 - dyCocina / 2, 6.30 + depthCocinaSouth / 2);
+            roofCocinaSouth.rotation.z = angSlopeRight;
+            roofGroup.add(roofCocinaSouth);
 
             // Tirantes de madera vistos en Living (Z = 0.00 a 4.80 m, corren de X = 3.00 a 6.30 m)
             for (let zBeam = 0.35; zBeam <= 4.65; zBeam += 0.55) {
@@ -1651,7 +1664,7 @@
                 roofGroup.add(beamL);
             }
 
-            // Tirantes de madera en Entrada / Pasillo Este (Z = 4.80 a 6.30 m, X = 5.20 a 6.30 m)
+            // Tirantes de madera en Entrada (Z = 4.80 a 6.30 m, X = 5.20 a 6.30 m)
             const dxEnt = 1.10;
             const dyEnt = (dxEnt / dxRight) * dyRight; // 0.20 m
             const lenSlopeEnt = Math.hypot(dxEnt, dyEnt);
@@ -1664,9 +1677,6 @@
             }
 
             // Tirantes de madera en Cocina (Z = 4.80 a 8.00 m, X = 3.00 a 5.20 m)
-            const dxCocina = 2.20;
-            const dyCocina = (dxCocina / dxRight) * dyRight; // 0.40 m
-            const lenSlopeCocina = Math.hypot(dxCocina, dyCocina);
             for (let zBeam = 4.95; zBeam <= 7.75; zBeam += 0.55) {
                 const beamC = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
                 beamC.scale.set(lenSlopeCocina, 0.11, 0.07);
@@ -1675,10 +1685,10 @@
                 roofGroup.add(beamC);
             }
 
-            // Viga solera de remate sobre muro Este (X = 6.30 m)
+            // Viga solera de remate sobre muro Este (X = 6.30 m, de Z = 0.00 a 6.30 m sobre la fachada)
             const eaveBeamEast = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-            eaveBeamEast.scale.set(0.10, 0.14, totalDepth);
-            eaveBeamEast.position.set(6.25, 2.93, totalDepth / 2);
+            eaveBeamEast.scale.set(0.10, 0.14, depthLivingEnt);
+            eaveBeamEast.position.set(6.25, 2.93, depthLivingEnt / 2);
             roofGroup.add(eaveBeamEast);
 
             // Viga solera de remate sobre muro Oeste (X = 0.00 m)
@@ -1845,7 +1855,7 @@
             attachWallMount(holder, (x1 + x2) / 2, (z1 + z2) / 2, Math.abs(dx) >= Math.abs(dz));
         }
 
-        // 2) Constructor de Puerta Principal de Entrada (Y = 5.70, X = 5.38 a 6.12)
+        // 2) Constructor de Puerta Principal de Entrada (Z = 6.30, X = 5.38 a 6.12)
         //    Extraído de sec_000 y video_34_s00:
         //    Puerta gris satinada con 2 tableros moldurados (superior con arco rebajado + inferior),
         //    marco de chapa oscuro y manijón vertical cromado interior
@@ -1859,12 +1869,19 @@
             holder.position.set((x1 + x2) / 2, 0, (z1 + z2) / 2);
             holder.rotation.y = -angle;
 
-            // Dintel superior en muro exterior (de 2.05m a 2.60m)
-            const lintelH = WALL_H - DOOR_H;
+            // Dintel superior en muro exterior adaptado exactamente a la cota del muro a 2.98 m (cierra el hueco superior)
+            const wallHAtEntrance = 2.98;
+            const lintelH = wallHAtEntrance - DOOR_H; // 0.93 m
             const lintelMesh = new THREE.Mesh(new THREE.BoxGeometry(w, lintelH, EXT_T), extWallMat);
             lintelMesh.position.set(0, DOOR_H + lintelH / 2, 0);
             lintelMesh.castShadow = true;
+            lintelMesh.receiveShadow = true;
             holder.add(lintelMesh);
+
+            const capMesh = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            capMesh.scale.set(w + 0.01, 0.02, EXT_T + 0.01);
+            capMesh.position.set(0, wallHAtEntrance + 0.01, 0);
+            holder.add(capMesh);
 
             // Marco pesado de chapa gris grafito oscuro
             const frameDepth = EXT_T + 0.028;
@@ -1877,16 +1894,16 @@
             topJamb.position.set(0, DOOR_H - jambW / 2, 0);
             holder.add(leftJamb, rightJamb, topJamb);
 
-            // Hoja principal gris con tableros moldurados (abre hacia adentro de ENTRADA, Z < 5.70)
+            // Hoja principal gris con tableros moldurados (abre hacia adentro de ENTRADA, Z < 6.30)
             const leafW = w - jambW * 2;
             const leafH = DOOR_H - jambW - 0.01;
             const leafT = 0.048;
 
             const pivot = new THREE.Group();
             pivot.position.set(-w / 2 + jambW, 0, 0);
-            const openAngleRad = 72 * Math.PI / 180;
-            const initAngleRad = 34 * Math.PI / 180;
-            pivot.rotation.y = initAngleRad; // Entreabierta hacia adentro de Entrada
+            const openAngleRad = 75 * Math.PI / 180;
+            const initAngleRad = 0; // Inicialmente cerrada para prolijidad
+            pivot.rotation.y = initAngleRad;
 
             const leafMesh = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, leafT), mainDoorMat);
             leafMesh.position.set(leafW / 2, leafH / 2 + 0.005, 0);
@@ -1911,6 +1928,12 @@
             extLever.position.set(leafW - 0.11, 0.98, leafT / 2 + 0.018);
             pivot.add(barHandle, extLever);
 
+            // Mirilla óptica cromada en el centro de la puerta
+            const peephole = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, leafT + 0.02, 16), chromeMat);
+            peephole.rotation.x = Math.PI / 2;
+            peephole.position.set(leafW / 2, 1.48, 0);
+            pivot.add(peephole);
+
             // Registrar en sistema de puertas animadas
             const animEntry = {
                 name: "Puerta Principal",
@@ -1920,8 +1943,8 @@
                 targetVal: initAngleRad,
                 openVal: openAngleRad,
                 closedVal: 0,
-                isOpen: true,
-                interactiveMeshes: [leafMesh, topPanel, topArch, botPanel, barHandle, extLever],
+                isOpen: false,
+                interactiveMeshes: [leafMesh, topPanel, topArch, botPanel, barHandle, extLever, peephole],
                 toggle: function() {
                     this.isOpen = !this.isOpen;
                     this.targetVal = this.isOpen ? this.openVal : this.closedVal;
@@ -1930,14 +1953,14 @@
                 }
             };
             animDoors.push(animEntry);
-            [leafMesh, topPanel, topArch, botPanel, barHandle, extLever].forEach(m => {
+            [leafMesh, topPanel, topArch, botPanel, barHandle, extLever, peephole].forEach(m => {
                 m.userData.animDoor = animEntry;
                 doorClickCandidates.push(m);
             });
 
             holder.add(pivot);
             doors3DGroup.add(holder);
-            attachWallMount(holder, (x1 + x2) / 2, (z1 + z2) / 2, true);
+            // El marco y la puerta permanecen siempre visibles (no se ocultan en corte Sims)
         }
 
         // 3) Constructor de Frentes de Placard (Fotos reales Cuarto y Estudio):
@@ -2328,12 +2351,15 @@
             // ------------------------------------------------------------------------
             // A) ENTRADA Y LIVING-COMEDOR ([3.00, 0.00] a [6.30, 5.70])
             // ------------------------------------------------------------------------
-            // 1. Entrada (X = 5.20..6.30, Z = 4.00..5.70):
-            // - Crucifijo de madera oscura sobre dintel puerta principal + retablo dorado + tablero eléctrico
-            setMountWall(5.75, 5.70, true);
-            addDecorBox(5.75, 2.26, 5.62, 0.14, 0.24, 0.02, 0x3b2314);
-            addDecorBox(6.18, 1.48, 5.62, 0.08, 0.13, 0.02, 0xd4af37);
+            // 1. Entrada (X = 5.20..6.30, Z = 4.00..6.30):
+            // - Crucifijo de madera oscura sobre dintel de puerta principal + retablo dorado sobre muro + tablero eléctrico
+            setMountWall(5.75, 6.30, true);
+            // Crucifijo montado sobre el dintel interior de la puerta (Z = 6.23 pegado a la cara interna del muro en Z = 6.30)
+            addDecorBox(5.75, 2.30, 6.23, 0.14, 0.24, 0.02, 0x3b2314);
+            // Retablo dorado montado sobre el muro derecho junto a la puerta (X = 6.21, Z = 6.23)
+            addDecorBox(6.21, 1.48, 6.23, 0.08, 0.13, 0.02, 0xd4af37);
             setMountWall(5.20, 5.22, false);
+            // Tablero eléctrico sobre pared divisoria con Cocina (X = 5.20)
             addDecorBox(5.26, 1.45, 5.22, 0.02, 0.22, 0.26, 0x1e293b);
             setMountWall(null);
             // - Perchero de hierro negro con estante superior de madera y camperas + Zapatero de 3 niveles abajo (Muro Este Z=4.06..4.70)
