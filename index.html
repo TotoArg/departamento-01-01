@@ -1452,25 +1452,25 @@
         //    - Mocheta derecha de cierre (X = 2.95 a 3.00 m, cota 3.58 m)
         addWallSegment(2.95, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 3.58);
 
-        // 2) SECTOR LIVING (X = 3.00 a 6.30 m):
-        //    - Muro inicial junto al eje central (X = 3.00 a 3.35 m, baja de 3.58 m a 3.51 m)
-        addSlopedWallSegment(3.00, 0.00, 3.35, 0.00, 3.58, 3.51, EXT_T, exteriorWallsGroup, true);
-        //    - Ventana Norte Living V1 (X = 3.35 a 4.55 m, baja de 3.51 m a 3.30 m)
-        addWindowSegment(3.35, 0.00, 4.55, 0.00, 0.90, 1.15, 3.51, 3.30);
-        //    - Muro intermedio entre ventanales (X = 4.55 a 4.85 m, baja de 3.30 m a 3.24 m)
-        addSlopedWallSegment(4.55, 0.00, 4.85, 0.00, 3.30, 3.24, EXT_T, exteriorWallsGroup, true);
-        //    - Ventana Norte Living V2 (X = 4.85 a 6.15 m, baja de 3.24 m a 3.01 m, llega al final de la pared en esquina)
-        addWindowSegment(4.85, 0.00, 6.15, 0.00, 0.90, 1.15, 3.24, 3.01);
-        //    - Muro esquinero Este (X = 6.15 a 6.30 m, baja de 3.01 m a 2.98 m)
-        addSlopedWallSegment(6.15, 0.00, 6.30, 0.00, 3.01, 2.98, EXT_T, exteriorWallsGroup, true);
+        // 2) SECTOR LIVING (X = 3.00 a 6.30 m, verificado con video 2024 depto vacío):
+        //    - Muro inicial junto al eje central (X = 3.00 a 3.25 m, baja de 3.58 m a 3.53 m)
+        addSlopedWallSegment(3.00, 0.00, 3.25, 0.00, 3.58, 3.53, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Living V1 (X = 3.25 a 4.35 m, baja de 3.53 m a 3.33 m, ancho 1.10 m)
+        addWindowSegment(3.25, 0.00, 4.35, 0.00, 0.95, 1.10, 3.53, 3.33);
+        //    - Muro intermedio entre ventanales (X = 4.35 a 4.95 m, baja de 3.33 m a 3.22 m, pilar central 60 cm)
+        addSlopedWallSegment(4.35, 0.00, 4.95, 0.00, 3.33, 3.22, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Living V2 (X = 4.95 a 6.05 m, baja de 3.22 m a 3.03 m, ancho 1.10 m)
+        addWindowSegment(4.95, 0.00, 6.05, 0.00, 0.95, 1.10, 3.22, 3.03);
+        //    - Muro esquinero Este (X = 6.05 a 6.30 m, baja de 3.03 m a 2.98 m, columna esquina 25 cm)
+        addSlopedWallSegment(6.05, 0.00, 6.30, 0.00, 3.03, 2.98, EXT_T, exteriorWallsGroup, true);
 
         // Muro Derecho (Este, X = 6.30): remata en 2.98 m bajo la solera del techo
-        // - Columna esquinera Norte (Z = 0.00 a 0.15 m)
-        addWallSegment(6.30, 0.00, 6.30, 0.15, EXT_T, exteriorWallsGroup, true, 2.98);
-        // - Ventana lateral Living V3 (Z = 0.15 a 1.55 m, encuentro en L con ventana Norte sobre la mesa)
-        addWindowSegment(6.30, 0.15, 6.30, 1.55, 0.90, 1.15, 2.98);
-        // - Muro sólido Este (Z = 1.55 a 6.30 m, aloja Calefactor, Rack TV y Perchero Entrada)
-        addWallSegment(6.30, 1.55, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
+        // - Columna esquinera Norte (Z = 0.00 a 0.25 m)
+        addWallSegment(6.30, 0.00, 6.30, 0.25, EXT_T, exteriorWallsGroup, true, 2.98);
+        // - Ventana lateral Living V3 (Z = 0.25 a 1.45 m, ancho 1.20 m, 2 hojas corredizas)
+        addWindowSegment(6.30, 0.25, 6.30, 1.45, 0.95, 1.10, 2.98);
+        // - Muro sólido Este (Z = 1.45 a 6.30 m, aloja Calefactor en Z=1.85, Rack TV y Perchero Entrada)
+        addWallSegment(6.30, 1.45, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
 
         // Retranqueo Palier (Puerta Principal en Z = 6.30): de [4.85, 6.30] a [6.30, 6.30] a 2.98 m
         addWallSegment(4.85, 6.30, 5.38, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
@@ -2605,10 +2605,10 @@
             addDecorBox(5.55, 0.05, 0.36, 0.85, 0.10, 0.54, 0x94a3b8, 0.85); // Cucha gris esquina NE
             addDecorBox(3.52, 0.05, 0.36, 0.80, 0.10, 0.52, 0x94a3b8, 0.85); // Cucha gris esquina NO
             addDecorCyl(5.96, 0.08, 0.78, 0.13, 0.15, 0.14, 0x38bdf8, 0.4);  // Bebedero celeste con dispensador
-            // - Cortinas beige con barral de madera en las 3 ventanas del Living (V1, V2 y V3, encuentro en L en esquina)
-            addCurtainAssembly(3.35, 0.00, 4.55, 0.00, 0, 0.12, 0xd6ccc2);
-            addCurtainAssembly(4.85, 0.00, 6.15, 0.00, 0, 0.12, 0xd6ccc2);
-            addCurtainAssembly(6.30, 0.15, 6.30, 1.55, -0.12, 0, 0xd6ccc2);
+            // - Cortinas beige con barral de madera en las 3 ventanas del Living (V1, V2 y V3)
+            addCurtainAssembly(3.25, 0.00, 4.35, 0.00, 0, 0.12, 0xd6ccc2);
+            addCurtainAssembly(4.95, 0.00, 6.05, 0.00, 0, 0.12, 0xd6ccc2);
+            addCurtainAssembly(6.30, 0.25, 6.30, 1.45, -0.12, 0, 0xd6ccc2);
 
             // ------------------------------------------------------------------------
             // B) COCINA ([3.00, 4.80] a [5.20, 8.00]) - Relevamiento exacto de las fotos reales

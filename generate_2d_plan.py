@@ -283,10 +283,10 @@ def main():
     # 3. VENTANAS EXTERIORES EXTRAÍDAS DEL VIDEO (7 ABERTURAS)
     # -------------------------------------------------------------------------
     # V1 y V2: Dos ventanas gemelas en pared Norte del Living (Y=0.00)
-    draw_window_h(draw, px, 3.35, 4.55, 0.00, EXT_W)
-    draw_window_h(draw, px, 4.85, 6.15, 0.00, EXT_W)
+    draw_window_h(draw, px, 3.25, 4.35, 0.00, EXT_W)
+    draw_window_h(draw, px, 4.95, 6.05, 0.00, EXT_W)
     # V3: Ventana lateral corrida Este del Living (X=6.30, Y=0.50 a 4.60)
-    draw_window_v(draw, px, 6.30, 0.15, 1.55, EXT_W)
+    draw_window_v(draw, px, 6.30, 0.25, 1.45, EXT_W)
     # V4: Ventana Norte del Estudio Ampliado (Y=0.00, X=1.35 a 2.55, encuadrada sobre el ala Norte del escritorio en L)
     draw_window_h(draw, px, 1.35, 2.55, 0.00, EXT_W)
     # V5: Ventana Sur del Cuarto Ampliado (Y=7.00, X=0.90 a 2.10)
