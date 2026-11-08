@@ -1233,6 +1233,50 @@
         // SISTEMA DE ILUMINACIÓN CINEMATOGRÁFICA Y REBOTE GLOBAL (PBR ARCHVIZ)
         // ============================================================================
         // 1. Cielo y Rebote Terrestre (HemisphereLight para sombreado realista sin zonas negras)
+        // ============================================================================
+        // MAPA DE ENTORNO FOTOGRÁFICO IBL (IMAGE-BASED LIGHTING CON PMREM)
+        // ============================================================================
+        function createStudioEquirectangularEnvironment() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // Gradiente fotográfico de cielo, horizonte y tierra
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, 512);
+            skyGrad.addColorStop(0.0, '#b0d2f8');  // Cenit celeste
+            skyGrad.addColorStop(0.48, '#eaf2ff'); // Horizonte luminoso
+            skyGrad.addColorStop(0.52, '#d6c4b0'); // Tierra cálida de maqueta
+            skyGrad.addColorStop(1.0, '#a58d72');  // Suelo inferior
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, 1024, 512);
+
+            // Reflejo del sol cálido directo de alta intensidad
+            const sunGrad = ctx.createRadialGradient(280, 110, 4, 280, 110, 160);
+            sunGrad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+            sunGrad.addColorStop(0.25, 'rgba(255, 246, 225, 0.85)');
+            sunGrad.addColorStop(0.70, 'rgba(255, 235, 195, 0.25)');
+            sunGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
+            ctx.fillStyle = sunGrad;
+            ctx.fillRect(0, 0, 1024, 512);
+
+            // Reflejo de ventana / cielo secundario suave
+            const fillGrad = ctx.createRadialGradient(780, 160, 10, 780, 160, 240);
+            fillGrad.addColorStop(0.0, 'rgba(255, 248, 235, 0.45)');
+            fillGrad.addColorStop(1.0, 'rgba(255, 248, 235, 0.0)');
+            ctx.fillStyle = fillGrad;
+            ctx.fillRect(0, 0, 1024, 512);
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.mapping = THREE.EquirectangularReflectionMapping;
+            return tex;
+        }
+
+        const pmremGen = new THREE.PMREMGenerator(renderer);
+        pmremGen.compileEquirectangularShader();
+        const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
+        scene.environment = studioEnvTarget.texture;
+
         const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0xc49a6c, 0.60);
         scene.add(hemiLight);
 
@@ -1315,15 +1359,15 @@
             canvas.height = 1024;
             const ctx = canvas.getContext('2d');
 
-            // Junta de pastina / cemento gris claro suave
-            ctx.fillStyle = '#d5ccc0';
+            // Junta de pastina cementicia gris cálida suave (foto real)
+            ctx.fillStyle = '#d1c7ba';
             ctx.fillRect(0, 0, 1024, 1024);
 
-            const numTiles = 3; // 3 baldosas de 33.33 cm entran exactamente en 1 metro
+            const numTiles = 3; // 3 baldosas de 33.33 cm en 1 metro lineal
             const tileSize = 1024 / numTiles; // ~341.33 px por baldosa
-            const grout = 5; // Ancho de la pastina
+            const grout = 4.5; // Junta de 3 a 4 mm a escala
 
-            const tileVariations = ['#f5f0e6', '#f2ece0', '#f6f1e8', '#efe9dd', '#f4eee4', '#f1ebe0'];
+            const tileShades = ['#f5f0e6', '#f2ece0', '#f6f1e8', '#eee8dc', '#f4eee4', '#f1ebe0'];
 
             for (let ty = 0; ty < numTiles; ty++) {
                 for (let tx = 0; tx < numTiles; tx++) {
@@ -1332,24 +1376,24 @@
                     const w = tileSize - grout * 2;
                     const h = tileSize - grout * 2;
 
-                    // Tonalidad sutilmente variable entre baldosas cerámicas
-                    const baseColor = tileVariations[(tx + ty * 3) % tileVariations.length];
+                    // Color de base del esmalte con sutil destonificado artesanal
+                    const baseColor = tileShades[(tx + ty * 3) % tileShades.length];
                     ctx.fillStyle = baseColor;
                     ctx.fillRect(x, y, w, h);
 
-                    // Bisel / borde redondeado suave (cushion edge) del cerámico esmaltado
-                    const grad = ctx.createRadialGradient(x + w / 2, y + h / 2, w * 0.35, x + w / 2, y + h / 2, w * 0.52);
-                    grad.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
+                    // Bisel / cushion edge perimetral de la baldosa (gradiente suave en los 4 bordes)
+                    const grad = ctx.createRadialGradient(x + w / 2, y + h / 2, w * 0.36, x + w / 2, y + h / 2, w * 0.51);
+                    grad.addColorStop(0, 'rgba(255, 255, 255, 0.09)');
                     grad.addColorStop(0.85, 'rgba(255, 255, 255, 0)');
-                    grad.addColorStop(1, 'rgba(120, 105, 90, 0.12)');
+                    grad.addColorStop(1, 'rgba(110, 95, 80, 0.14)');
                     ctx.fillStyle = grad;
                     ctx.fillRect(x, y, w, h);
 
-                    // Micro-texturado de esmalte brillante
-                    for (let p = 0; p < 80; p++) {
+                    // Micro-moteado y esmalte cerámico fino
+                    for (let p = 0; p < 90; p++) {
                         const px = x + Math.random() * w;
                         const py = y + Math.random() * h;
-                        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.04)' : 'rgba(140, 120, 100, 0.03)';
+                        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.05)' : 'rgba(130, 110, 90, 0.035)';
                         ctx.fillRect(px, py, 2, 2);
                     }
                 }
@@ -1362,13 +1406,14 @@
             return tex;
         }
 
-        // Bump map para que las juntas de las baldosas 33×33 cm tengan profundidad física real bajo el sol
-        function createCeramic33BumpTexture(repeatX, repeatY) {
+        // Mapa de Rugosidad (Roughness Map): Esmalte cerámico liso y brillante (0.18), juntas de cemento rugosas y mates (0.90)
+        function createCeramic33RoughnessTexture(repeatX, repeatY) {
             const canvas = document.createElement('canvas');
             canvas.width = 512;
             canvas.height = 512;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#101010'; // Juntas hundidas oscuras
+            // Juntas rugosas mates
+            ctx.fillStyle = '#e5e5e5'; // 90% rugoso
             ctx.fillRect(0, 0, 512, 512);
 
             const numTiles = 3;
@@ -1376,7 +1421,8 @@
             const grout = 3;
             for (let ty = 0; ty < numTiles; ty++) {
                 for (let tx = 0; tx < numTiles; tx++) {
-                    ctx.fillStyle = '#ffffff'; // Superficie de la baldosa elevada
+                    // Baldosa esmaltada brillante suave (18% rugoso)
+                    ctx.fillStyle = '#2f2f2f';
                     ctx.fillRect(tx * tileSize + grout, ty * tileSize + grout, tileSize - grout * 2, tileSize - grout * 2);
                 }
             }
@@ -1387,6 +1433,90 @@
             return tex;
         }
 
+        // Bump map para profundidad física real de las juntas
+        function createCeramic33BumpTexture(repeatX, repeatY) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#080808'; // Junta oscura hundida
+            ctx.fillRect(0, 0, 512, 512);
+
+            const numTiles = 3;
+            const tileSize = 512 / numTiles;
+            const grout = 3;
+            for (let ty = 0; ty < numTiles; ty++) {
+                for (let tx = 0; tx < numTiles; tx++) {
+                    ctx.fillStyle = '#ffffff'; // Baldosa elevada
+                    ctx.fillRect(tx * tileSize + grout, ty * tileSize + grout, tileSize - grout * 2, tileSize - grout * 2);
+                }
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(repeatX, repeatY);
+            return tex;
+        }
+
+        // Micro-grano de yeso y pintura látex para muros interiores
+        function createPlasterBumpTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#808080';
+            ctx.fillRect(0, 0, 512, 512);
+            for (let i = 0; i < 30000; i++) {
+                const px = Math.random() * 512;
+                const py = Math.random() * 512;
+                ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.07)';
+                ctx.fillRect(px, py, 2, 2);
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(8, 4);
+            return tex;
+        }
+        const proceduralPlasterBumpTex = createPlasterBumpTexture();
+
+        // Acero inoxidable cepillado para electrodomésticos
+        function createBrushedMetalTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#d8dee9';
+            ctx.fillRect(0, 0, 512, 512);
+            for (let i = 0; i < 10000; i++) {
+                const y = Math.random() * 512;
+                const x = Math.random() * 512;
+                const w = 40 + Math.random() * 180;
+                ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+                ctx.fillRect(x, y, w, 1);
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            return tex;
+        }
+        const proceduralBrushedMetalTex = createBrushedMetalTexture();
+
+        // Sombra de contacto / Oclusión ambiental (Contact Shadow) para asentar muebles
+        function createContactShadowTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            const rad = ctx.createRadialGradient(64, 64, 8, 64, 64, 64);
+            rad.addColorStop(0, 'rgba(0, 0, 0, 0.48)');
+            rad.addColorStop(0.45, 'rgba(0, 0, 0, 0.20)');
+            rad.addColorStop(1, 'rgba(0, 0, 0, 0.0)');
+            ctx.fillStyle = rad;
+            ctx.fillRect(0, 0, 128, 128);
+            const tex = new THREE.CanvasTexture(canvas);
+            return tex;
+        }
+        const contactShadowTex = createContactShadowTexture();
+
         function createCeramicTexture(bgHex, lineHex, repeatX, repeatY) {
             return createRealisticCeramic33Texture(repeatX, repeatY);
         }
@@ -1396,14 +1526,16 @@
             map: createRealisticCeramic33Texture(6.30, 6.30),
             bumpMap: createCeramic33BumpTexture(6.30, 6.30),
             bumpScale: 0.003,
-            roughness: 0.26,
+            roughnessMap: createCeramic33RoughnessTexture(6.30, 6.30),
+            roughness: 0.22,
             metalness: 0.04
         });
         const floorMatSouth = new THREE.MeshStandardMaterial({
             map: createRealisticCeramic33Texture(4.85, 1.70),
             bumpMap: createCeramic33BumpTexture(4.85, 1.70),
             bumpScale: 0.003,
-            roughness: 0.26,
+            roughnessMap: createCeramic33RoughnessTexture(4.85, 1.70),
+            roughness: 0.22,
             metalness: 0.04
         });
         const bathFloorMat = new THREE.MeshStandardMaterial({
@@ -1417,8 +1549,18 @@
         const topCapMat = new THREE.MeshStandardMaterial({ color: 0x252d35, roughness: 0.60, metalness: 0.05 }); // Trazo arquitectónico oscuro
         const winFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e242b, roughness: 0.35, metalness: 0.4 });
         const winGlassMat = new THREE.MeshBasicMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.42 });
-        const woodRoofMat = new THREE.MeshStandardMaterial({ color: 0xb87a3d, roughness: 0.65, side: THREE.DoubleSide });
-        const woodBeamMat = new THREE.MeshStandardMaterial({ color: 0x854d1e, roughness: 0.6 });
+        const woodRoofMat = new THREE.MeshStandardMaterial({
+            map: proceduralWoodTex,
+            roughness: 0.42,
+            metalness: 0.04,
+            side: THREE.DoubleSide
+        });
+        const woodBeamMat = new THREE.MeshStandardMaterial({
+            color: 0x935726,
+            map: proceduralWoodTex,
+            roughness: 0.40,
+            metalness: 0.04
+        });
 
         // Materiales de las puertas extraídas del video (sin bloqueo de canvas al inicio)
         const doorFrameMat = new THREE.MeshStandardMaterial({ color: 0x2b3036, roughness: 0.45, metalness: 0.35 }); // Marco de chapa gris grafito oscuro
@@ -2890,6 +3032,34 @@
             const lampRight = new THREE.Mesh(lampShadeGeo, lampShadeMat);
             lampRight.position.set(0.35, 0.95, 7.05);
             decorVideoGroup.add(lampRight);
+
+            // 6. Oclusión Ambiental y Sombras de Contacto Suaves bajo Muebles (Photoreal Grounding)
+            const contactShadowGeo = new THREE.PlaneGeometry(1, 1);
+            function addContactShadowPlane(x, z, w, d, opacity = 0.52) {
+                const mat = new THREE.MeshBasicMaterial({
+                    map: contactShadowTex,
+                    transparent: true,
+                    opacity: opacity,
+                    depthWrite: false
+                });
+                const m = new THREE.Mesh(contactShadowGeo, mat);
+                m.rotation.x = -Math.PI / 2;
+                m.position.set(x, 0.003, z);
+                m.scale.set(w, d, 1);
+                m.name = "contactShadow";
+                decorVideoGroup.add(m);
+            }
+
+            // Sombras de contacto para asentar físicamente cada mueble en el suelo:
+            addContactShadowPlane(3.44, 3.10, 1.25, 2.25, 0.55); // Futón / Sillón en Living
+            addContactShadowPlane(4.65, 3.10, 0.90, 1.20, 0.45); // Mesa ratona
+            addContactShadowPlane(4.65, 1.20, 1.45, 1.90, 0.48); // Mesa de comedor y sillas
+            addContactShadowPlane(1.65, 0.85, 1.25, 2.30, 0.52); // Escritorio gamer en Estudio
+            addContactShadowPlane(1.35, 6.00, 2.25, 2.40, 0.58); // Cama matrimonial en Cuarto
+            addContactShadowPlane(0.35, 4.95, 0.65, 0.65, 0.45); // Mesa de luz izquierda
+            addContactShadowPlane(0.35, 7.05, 0.65, 0.65, 0.45); // Mesa de luz derecha
+            addContactShadowPlane(3.85, 6.50, 1.50, 2.60, 0.54); // Muebles bajo mesada y cocina
+            addContactShadowPlane(6.10, 5.40, 0.65, 1.25, 0.48); // Perchero y zapatero en Entrada
 
             // Activar sombras arrojadas y recibidas en toda la arquitectura y mobiliario
             apartmentGroup.traverse(child => {
@@ -4787,8 +4957,8 @@
         // 12. MOTOR DE ESTILOS GRÁFICOS INTERACTIVOS (SIMS, REALISTA, CLAY, BLUEPRINT, BOCETO, NOCHE)
         // ============================================================================
         let currentGraphicStyle = 'archviz'; // Por defecto ArchViz Diorama (idéntico a la foto de referencia)
-        if (localStorage.getItem('dep_graphic_style_v4')) {
-            currentGraphicStyle = localStorage.getItem('dep_graphic_style_v4');
+        if (localStorage.getItem('dep_graphic_style_v5')) {
+            currentGraphicStyle = localStorage.getItem('dep_graphic_style_v5');
         }
 
         const nightLightsGroup = new THREE.Group();
@@ -4814,14 +4984,16 @@
             map: createRealisticCeramic33Texture(6.30, 6.30),
             bumpMap: createCeramic33BumpTexture(6.30, 6.30),
             bumpScale: 0.003,
-            roughness: 0.26,
+            roughnessMap: createCeramic33RoughnessTexture(6.30, 6.30),
+            roughness: 0.22,
             metalness: 0.04
         });
         const archvizCeramicSouthFloorMat = new THREE.MeshStandardMaterial({
             map: createRealisticCeramic33Texture(4.85, 1.70),
             bumpMap: createCeramic33BumpTexture(4.85, 1.70),
             bumpScale: 0.003,
-            roughness: 0.26,
+            roughnessMap: createCeramic33RoughnessTexture(4.85, 1.70),
+            roughness: 0.22,
             metalness: 0.04
         });
         const archvizBathTileFloorMat = new THREE.MeshStandardMaterial({
@@ -4843,6 +5015,8 @@
         });
         const archvizIntWallMat = new THREE.MeshStandardMaterial({
             color: 0xf4efe6, // Yeso blanco cálido mate
+            bumpMap: proceduralPlasterBumpTex,
+            bumpScale: 0.0012,
             roughness: 0.85,
             metalness: 0.02
         });
@@ -4870,7 +5044,8 @@
         // 4. Metales, Electrodomésticos y Granito
         const archvizStainlessSteelMat = new THREE.MeshStandardMaterial({
             color: 0xdce2ec,
-            metalness: 0.85,
+            map: proceduralBrushedMetalTex,
+            metalness: 0.88,
             roughness: 0.22
         });
         const archvizPolishedChromeMat = new THREE.MeshStandardMaterial({
@@ -4937,7 +5112,7 @@
         function applyGraphicStyle(style) {
             ensureOriginalMaterialsCached();
             currentGraphicStyle = style;
-            localStorage.setItem('dep_graphic_style_v4', style);
+            localStorage.setItem('dep_graphic_style_v5', style);
 
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
