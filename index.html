@@ -426,6 +426,9 @@
             justify-content: center;
             padding: 16px;
         }
+        .modal-overlay.active, .modal-overlay.show, .modal-overlay[style*="display: flex"] {
+            display: flex !important;
+        }
         .modal-box {
             max-width: 720px;
             width: 100%;
@@ -631,7 +634,17 @@
             <button class="mode-btn" id="btn-mode-sims" title="Paredes estilo Los Sims (Corte Dinámico que baja las paredes al rotar)"><span>🏡</span> Sims</button>
             <button class="mode-btn" id="btn-mode-cut" title="Paredes Bajas a media altura"><span>✂️</span> Bajas</button>
             <button class="mode-btn" id="btn-mode-nowalls" title="Ocultar todas las paredes"><span>🚫</span> Sin Muros</button>
-            <button class="mode-btn" id="btn-toggle-styles" title="Elegir Estilo Gráfico (Realista, Maqueta, Blueprint, Sims, Noche, Boceto)"><span>🎨</span> Estilos</button>
+            <button class="mode-btn" id="btn-toggle-styles" style="background:rgba(56,189,248,0.2); border:1px solid #38bdf8; color:#f8fafc; font-weight:700;" title="Abrir selector visual con todos los estilos gráficos">
+                <span id="btn-styles-icon">🎨</span> <span id="btn-styles-text">Estilos</span>
+            </button>
+            <select id="select-quick-style" class="mode-btn" style="background:#0f172a; border:1px solid #38bdf8; color:#38bdf8; padding:5px 8px; border-radius:8px; font-weight:700; cursor:pointer;" title="Cambiar estilo gráfico al instante">
+                <option value="sims">🎨 Sims (Color Real)</option>
+                <option value="realist">✨ Realista Cálido</option>
+                <option value="clay">🏛️ Maqueta Blanca</option>
+                <option value="blueprint">📐 Blueprint Técnico</option>
+                <option value="sketch">✒️ Boceto / Tinta</option>
+                <option value="night">🌙 Noche Acogedora</option>
+            </select>
             <button class="mode-btn active" id="btn-toggle-labels" title="Mostrar/Ocultar Nombres de los Ambientes"><span>🏷️</span> Nombres</button>
             <button class="mode-btn active" id="btn-toggle-video-decor" title="Mostrar/Ocultar Muebles, Electrodomésticos y Decoración"><span>🛋️</span> Amoblado</button>
             <button class="mode-btn" id="btn-toggle-roof" title="Mostrar/Ocultar Techo de Madera y Vigas"><span>🪵</span> Techo</button>
@@ -4326,6 +4339,15 @@
         const sketchWallMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95 });
         const sketchFloorMat = new THREE.MeshStandardMaterial({ color: 0xf1ebe1, roughness: 0.95 });
 
+        const STYLE_METADATA = {
+            sims: { icon: '🎨', name: 'Sims' },
+            realist: { icon: '✨', name: 'Realista' },
+            clay: { icon: '🏛️', name: 'Maqueta' },
+            blueprint: { icon: '📐', name: 'Blueprint' },
+            sketch: { icon: '✒️', name: 'Boceto' },
+            night: { icon: '🌙', name: 'Noche' }
+        };
+
         function ensureOriginalMaterialsCached() {
             apartmentGroup.traverse(child => {
                 if (child.isMesh && child.material && !child.userData.origMat) {
@@ -4350,31 +4372,31 @@
                 nightLightsGroup.visible = false;
             } else if (style === 'realist') {
                 scene.background = new THREE.Color(0xf1f5f9);
-                ambLight.color.setHex(0xe0f2fe); // Luz de cielo celeste suave
+                ambLight.color.setHex(0xe0f2fe);
                 ambLight.intensity = 0.58;
-                dirLight.color.setHex(0xfef3c7); // Sol dorado cálido rasante
+                dirLight.color.setHex(0xfef3c7);
                 dirLight.intensity = 0.92;
                 fillLight.color.setHex(0xffedd5);
                 fillLight.intensity = 0.28;
                 nightLightsGroup.visible = false;
             } else if (style === 'clay') {
-                scene.background = new THREE.Color(0xdbe4ee); // Fondo estudio gris azulado
+                scene.background = new THREE.Color(0xdbe4ee);
                 ambLight.color.setHex(0xffffff);
                 ambLight.intensity = 0.46;
                 dirLight.color.setHex(0xffffff);
-                dirLight.intensity = 0.88; // Sombras geométricas marcadas de maqueta física
+                dirLight.intensity = 0.88;
                 fillLight.intensity = 0.14;
                 nightLightsGroup.visible = false;
             } else if (style === 'blueprint') {
-                scene.background = new THREE.Color(0x061122); // Fondo cianotipia profundo
+                scene.background = new THREE.Color(0x061122);
                 ambLight.color.setHex(0x1e3a5f);
                 ambLight.intensity = 0.80;
-                dirLight.color.setHex(0x38bdf8); // Iluminación cian técnica
+                dirLight.color.setHex(0x38bdf8);
                 dirLight.intensity = 0.65;
                 fillLight.intensity = 0.25;
                 nightLightsGroup.visible = false;
             } else if (style === 'sketch') {
-                scene.background = new THREE.Color(0xfbf8f1); // Papel pergamino claro
+                scene.background = new THREE.Color(0xfbf8f1);
                 ambLight.color.setHex(0xffffff);
                 ambLight.intensity = 1.15;
                 dirLight.color.setHex(0x475569);
@@ -4382,18 +4404,19 @@
                 fillLight.intensity = 0.15;
                 nightLightsGroup.visible = false;
             } else if (style === 'night') {
-                scene.background = new THREE.Color(0x050814); // Noche crepuscular
+                scene.background = new THREE.Color(0x050814);
                 ambLight.color.setHex(0x1e293b);
                 ambLight.intensity = 0.24;
-                dirLight.color.setHex(0x1d4ed8); // Luz lunar azul
+                dirLight.color.setHex(0x1d4ed8);
                 dirLight.intensity = 0.22;
                 fillLight.intensity = 0.08;
-                nightLightsGroup.visible = true; // Activar luces interiores
+                nightLightsGroup.visible = true;
             }
 
-            // 2. Modificación de Materiales en Mallas
+            // 2. Modificación de Materiales en Mallas (sin alterar líneas 2D)
             apartmentGroup.traverse(child => {
                 if (!child.isMesh || !child.userData.origMat) return;
+                if (child.parent === lines2DGroup || child.userData.is2DLine) return;
 
                 const isWall = (child.parent === exteriorWallsGroup || child.parent === interiorWallsGroup || child.userData.isWall);
                 const isFloor = (child.parent === floorGroup || child.userData.isFloor || child.name?.includes('Floor'));
@@ -4415,60 +4438,97 @@
                     else child.material = child.userData.origMat;
                 } else if (style === 'realist') {
                     child.material = child.userData.origMat;
-                    // En realista mantenemos materiales originales pero con brillo PBR
                     if (child.material.roughness !== undefined && isFloor) {
-                        child.material.roughness = 0.28; // Suelo con reflejo cerámico suave
+                        child.material.roughness = 0.28;
                     }
                 } else if (style === 'night') {
                     child.material = child.userData.origMat;
                 }
             });
 
-            // 3. Actualizar UI de Tarjetas
+            // 3. Sincronizar UI (Tarjetas del Modal, Dropdown y Botón)
             document.querySelectorAll('.style-card').forEach(card => {
                 card.classList.toggle('active', card.dataset.style === style);
             });
 
+            const selectQuick = document.getElementById('select-quick-style');
+            if (selectQuick) selectQuick.value = style;
+
+            const btnIcon = document.getElementById('btn-styles-icon');
+            const btnText = document.getElementById('btn-styles-text');
+            const meta = STYLE_METADATA[style];
+            if (meta && btnIcon && btnText) {
+                btnIcon.innerText = meta.icon;
+                btnText.innerText = meta.name;
+            }
+
             wakeRenderer();
         }
 
-        // Eventos UI del Selector de Estilos
+        // Control y apertura/cierre del Modal de Estilos
         const stylesModal = document.getElementById('styles-modal');
         const btnToggleStyles = document.getElementById('btn-toggle-styles');
         const btnCloseStyles = document.getElementById('btn-close-styles');
+        const selectQuickStyle = document.getElementById('select-quick-style');
 
-        if (btnToggleStyles && stylesModal) {
-            btnToggleStyles.addEventListener('click', () => {
+        function openStylesModal() {
+            if (stylesModal) {
                 stylesModal.classList.add('active');
-            });
+                stylesModal.style.display = 'flex';
+            }
         }
-        if (btnCloseStyles && stylesModal) {
-            btnCloseStyles.addEventListener('click', () => {
+
+        function closeStylesModal() {
+            if (stylesModal) {
                 stylesModal.classList.remove('active');
+                stylesModal.style.display = 'none';
+            }
+        }
+
+        if (btnToggleStyles) {
+            btnToggleStyles.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openStylesModal();
             });
         }
+
+        if (btnCloseStyles) {
+            btnCloseStyles.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeStylesModal();
+            });
+        }
+
         if (stylesModal) {
             stylesModal.addEventListener('click', (e) => {
-                if (e.target === stylesModal) stylesModal.classList.remove('active');
+                if (e.target === stylesModal) closeStylesModal();
+            });
+        }
+
+        if (selectQuickStyle) {
+            selectQuickStyle.addEventListener('change', (e) => {
+                applyGraphicStyle(e.target.value);
             });
         }
 
         document.querySelectorAll('.style-card').forEach(card => {
-            card.addEventListener('click', () => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const styleId = card.dataset.style;
                 if (styleId) {
                     applyGraphicStyle(styleId);
-                    // Feedback sutil antes de cerrar
-                    setTimeout(() => {
-                        if (stylesModal) stylesModal.classList.remove('active');
-                    }, 240);
+                    showToast(`🎨 Estilo aplicado: ${STYLE_METADATA[styleId]?.name || styleId}`);
+                    setTimeout(closeStylesModal, 260);
                 }
             });
         });
 
         // Inicializar estilo guardado tras el render inicial
         setTimeout(() => {
-            if (currentGraphicStyle && currentGraphicStyle !== 'sims') {
+            if (currentGraphicStyle) {
                 applyGraphicStyle(currentGraphicStyle);
             }
         }, 120);
