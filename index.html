@@ -3096,62 +3096,13 @@
                 }
             });
 
-            // 7. Plantas Arquitectónicas de Interior en Macetas Cilíndricas Blancas (Estilo Revista / Foto Referencia)
-            const indoorPlantsGroup = new THREE.Group();
-            indoorPlantsGroup.name = 'indoorPlants';
-            const potGeo = new THREE.CylinderGeometry(0.16, 0.13, 0.38, 20);
-            const potMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25, metalness: 0.05 }); // Maceta blanca satinada
-            const soilGeo = new THREE.CylinderGeometry(0.155, 0.155, 0.04, 16);
-            const soilMat = new THREE.MeshStandardMaterial({ color: 0x3e2723, roughness: 0.95 }); // Tierra fértil oscura
-            const leafGeo = new THREE.DodecahedronGeometry(0.12, 1);
-            const leafColors = [0x15803d, 0x166534, 0x14532d, 0x22c55e];
-
-            function addIndoorPlant(px, pz) {
-                const pGroup = new THREE.Group();
-                pGroup.name = 'Planta de Interior en Maceta';
-                pGroup.userData.name = 'Planta de Interior en Maceta';
-                pGroup.userData.isAssembly = true;
-                pGroup.userData.isDecor = true;
-                pGroup.position.set(px, 0.19, pz);
-
-                const pot = new THREE.Mesh(potGeo, potMat);
-                pot.castShadow = true;
-                pot.receiveShadow = true;
-                pGroup.add(pot);
-
-                const soil = new THREE.Mesh(soilGeo, soilMat);
-                soil.position.y = 0.17;
-                pGroup.add(soil);
-
-                // Ramas y hojas estilizadas (Monstera / Ficus)
-                for (let l = 0; l < 9; l++) {
-                    const lMat = new THREE.MeshStandardMaterial({
-                        color: leafColors[l % leafColors.length],
-                        roughness: 0.65,
-                        flatShading: true
-                    });
-                    const leaf = new THREE.Mesh(leafGeo, lMat);
-                    const ang = (l / 9) * Math.PI * 2;
-                    const r = 0.14 + (l % 3) * 0.06;
-                    const h = 0.26 + (l * 0.04);
-                    leaf.scale.set(0.85, 1.4, 0.35);
-                    leaf.position.set(Math.cos(ang) * r, h, Math.sin(ang) * r);
-                    leaf.rotation.set(0.4 * Math.sin(ang), ang, -0.4 * Math.cos(ang));
-                    leaf.castShadow = true;
-                    pGroup.add(leaf);
-                }
-
-                indoorPlantsGroup.add(pGroup);
-            }
-
-            // Ubicación en esquinas estratégicas de las habitaciones (como en la foto de referencia):
-            addIndoorPlant(3.25, 0.35); // Living: Esquina Norte junto al sillón
-            addIndoorPlant(6.05, 0.35); // Living: Esquina Noreste junto al ventanal
-            addIndoorPlant(3.25, 4.45); // Living: Esquina divisoria con pasillo
-            addIndoorPlant(0.35, 0.35); // Estudio: Esquina Noroeste
-            addIndoorPlant(0.35, 7.65); // Dormitorio: Esquina Suroeste
-            addIndoorPlant(5.95, 6.05); // Entrada: Hall de acceso
-            decorVideoGroup.add(indoorPlantsGroup);
+            // 7. Plantas reales relevadas: se eliminaron las 6 macetas genéricas ficticias que bloqueaban pasos, puertas y mesas.
+            // Se conservan exclusivamente las plantas reales del departamento en sus posiciones exactas:
+            // - Sansevieria en pie nórdico (entre el perchero y el rack de TV en Entrada)
+            // - Calathea en maceta de terracota (junto al futón en Living)
+            // - Plantas del centro de mesa de comedor (sobre la mesa redonda)
+            // - Potus colgante (en el estante flotante superior del estudio)
+            // - Macetita en estante de cocina
 
             // 8. Alfombra felpudo exterior en la puerta de entrada (como en la foto de referencia)
             const entranceMatGeo = new THREE.BoxGeometry(0.95, 0.012, 0.55);
