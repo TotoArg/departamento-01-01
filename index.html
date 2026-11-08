@@ -8,6 +8,14 @@
     <!-- Carga local offline con fallback a CDN -->
     <script src="libs/three.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'"></script>
     <script src="libs/OrbitControls.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js'"></script>
+    <!-- Post-processing SSAO (Screen Space Ambient Occlusion) PBR -->
+    <script src="libs/postprocessing/EffectComposer.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js'"></script>
+    <script src="libs/postprocessing/RenderPass.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js'"></script>
+    <script src="libs/shaders/CopyShader.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js'"></script>
+    <script src="libs/postprocessing/ShaderPass.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js'"></script>
+    <script src="libs/math/SimplexNoise.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/math/SimplexNoise.js'"></script>
+    <script src="libs/shaders/SSAOShader.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/SSAOShader.js'"></script>
+    <script src="libs/postprocessing/SSAOPass.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/SSAOPass.js'"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -1284,35 +1292,36 @@
         const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
         scene.environment = studioEnvTarget.texture;
 
-        const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0xc49a6c, 0.60);
+        // 1. Rebote natural cielo-suelo (HemisphereLight suave)
+        const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0xb88850, 0.58);
         scene.add(hemiLight);
 
-        // 2. Luz de Relleno Ambiental Suave
-        const ambLight = new THREE.AmbientLight(0xe0e7ff, 0.40);
+        // 2. Luz Ambiental reducida al mínimo para evitar lavado plano
+        const ambLight = new THREE.AmbientLight(0xdbeafe, 0.16);
         scene.add(ambLight);
 
-        // 3. Sol Dorado Rasante con Sombras Suaves de Alta Resolución (2048x2048)
-        const dirLight = new THREE.DirectionalLight(0xfff6ea, 1.15);
-        dirLight.position.set(-6.8, 17.5, -4.8);
+        // 3. Sol Fotorrealista Potente en Ángulo Diagonal [35, 70, 35] con Sombras Suaves de 2048x2048
+        const dirLight = new THREE.DirectionalLight(0xfff8ee, 1.42);
+        dirLight.position.set(35.0, 70.0, 35.0);
         dirLight.target.position.set(3.15, 0.80, 4.00);
         scene.add(dirLight.target);
         dirLight.castShadow = true;
         dirLight.shadow.mapSize.width = 2048;
         dirLight.shadow.mapSize.height = 2048;
-        dirLight.shadow.camera.near = 0.5;
-        dirLight.shadow.camera.far = 42;
+        dirLight.shadow.camera.near = 15.0;
+        dirLight.shadow.camera.far = 140.0;
         dirLight.shadow.camera.left = -9.5;
         dirLight.shadow.camera.right = 9.5;
         dirLight.shadow.camera.top = 9.5;
         dirLight.shadow.camera.bottom = -9.5;
-        dirLight.shadow.bias = -0.0004;
-        dirLight.shadow.normalBias = 0.02;
-        dirLight.shadow.radius = 2.4;
+        dirLight.shadow.bias = -0.0003;
+        dirLight.shadow.normalBias = 0.025;
+        dirLight.shadow.radius = 2.0;
         scene.add(dirLight);
 
         // 4. Luz de Relleno Suave Posterior
-        const fillLight = new THREE.DirectionalLight(0xffeedd, 0.28);
-        fillLight.position.set(7.5, 12, 9.0);
+        const fillLight = new THREE.DirectionalLight(0xffeedd, 0.25);
+        fillLight.position.set(-15, 20, -15);
         scene.add(fillLight);
 
         // 5. Tiras LED Cian Eléctrico Gamer (Detrás de monitores en Estudio y Smart TV en Living)
@@ -1351,12 +1360,7 @@
             return m;
         }
         function getBasicMat(color) {
-            let m = basicMatCache.get(color);
-            if (!m) {
-                m = new THREE.MeshBasicMaterial({ color });
-                basicMatCache.set(color, m);
-            }
-            return m;
+            return getStdMat(color, 0.55);
         }
 
         // Textura procedural PBR de alta fidelidad para el piso cerámico esmaltado beige 33.33×33.33 cm real
@@ -1528,34 +1532,43 @@
             return createRealisticCeramic33Texture(repeatX, repeatY);
         }
 
-        // Materiales arquitectónicos y del relevamiento en video
-        const floorMatMain = new THREE.MeshStandardMaterial({
-            map: createRealisticCeramic33Texture(6.30, 6.30),
-            bumpMap: createCeramic33BumpTexture(6.30, 6.30),
-            bumpScale: 0.003,
-            roughnessMap: createCeramic33RoughnessTexture(6.30, 6.30),
-            roughness: 0.22,
-            metalness: 0.04
+        // Material PBR Pisos de Madera (color madera cálido, roughness: 0.4, metalness: 0.1 para reflejos reales)
+        const pbrWoodFloorMat = new THREE.MeshStandardMaterial({
+            map: proceduralWoodTex,
+            color: 0xfcf8f2,
+            roughness: 0.40,
+            metalness: 0.10
         });
-        const floorMatSouth = new THREE.MeshStandardMaterial({
-            map: createRealisticCeramic33Texture(4.85, 1.70),
-            bumpMap: createCeramic33BumpTexture(4.85, 1.70),
-            bumpScale: 0.003,
-            roughnessMap: createCeramic33RoughnessTexture(4.85, 1.70),
-            roughness: 0.22,
-            metalness: 0.04
+
+        // Material PBR Paredes de Yeso Mate (blanco crema, roughness: 0.9)
+        const wallPlasterMat = new THREE.MeshStandardMaterial({
+            color: 0xf6f3ed, // Blanco crema yeso
+            bumpMap: proceduralPlasterBumpTex,
+            bumpScale: 0.0010,
+            roughness: 0.90, // Mate yeso
+            metalness: 0.0
         });
+
+        // Material PBR Albardillas de Corte Superior de Muros (Gris oscuro grafito para contraste de maqueta)
+        const wallCapCutMat = new THREE.MeshStandardMaterial({
+            color: 0x22262d,
+            roughness: 0.55,
+            metalness: 0.12
+        });
+
+        const floorMatMain = pbrWoodFloorMat;
+        const floorMatSouth = pbrWoodFloorMat;
         const bathFloorMat = new THREE.MeshStandardMaterial({
             map: proceduralTileTex,
-            roughness: 0.20,
-            metalness: 0.05
+            roughness: 0.35,
+            metalness: 0.08
         });
-        const palierMat = new THREE.MeshBasicMaterial({ color: 0xe9ecef });
-        const extWallMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.55 });
-        const intWallMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.55 });
-        const topCapMat = new THREE.MeshStandardMaterial({ color: 0x252d35, roughness: 0.60, metalness: 0.05 }); // Trazo arquitectónico oscuro
+        const palierMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.60, metalness: 0.10 });
+        const extWallMat = wallPlasterMat;
+        const intWallMat = wallPlasterMat;
+        const topCapMat = wallCapCutMat; // Trazo arquitectónico oscuro de corte
         const winFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e242b, roughness: 0.35, metalness: 0.4 });
-        const winGlassMat = new THREE.MeshBasicMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.42 });
+        const winGlassMat = new THREE.MeshPhysicalMaterial({ color: 0xcfe2ff, transparent: true, opacity: 0.35, roughness: 0.08, metalness: 0.15, transmission: 0.85, ior: 1.5 });
         const woodRoofMat = new THREE.MeshStandardMaterial({
             map: proceduralWoodTex,
             roughness: 0.42,
@@ -3282,7 +3295,7 @@
             return tg;
         }
 
-        const sheerCurtainMat = new THREE.MeshBasicMaterial({ color: 0xf8fafc, transparent: true, opacity: 0.55 });
+        const sheerCurtainMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, transparent: true, opacity: 0.65, roughness: 0.90, metalness: 0.0 });
         // Constructor de Cortinas con barral de madera y paños laterales atados
         function addCurtainAssembly(x1, z1, x2, z2, offsetInwardX, offsetInwardZ, drapeColor = 0xc8beb4) {
             const dx = x2 - x1;
@@ -3317,6 +3330,30 @@
 
             decorVideoGroup.add(g);
             attachWallMount(g, (x1 + x2) / 2, (z1 + z2) / 2, Math.abs(dx) >= Math.abs(dz));
+        }
+
+        
+        // ============================================================================
+        // CONFIGURADOR UNIVERSAL DE SOMBRAS FOTORREALISTAS (castShadow + receiveShadow)
+        // ============================================================================
+        function applyShadowsRecursively(root = apartmentGroup) {
+            if (!root) return;
+            root.traverse((child) => {
+                if (child.isMesh) {
+                    if (child.name === 'contactShadow') {
+                        child.castShadow = false;
+                        child.receiveShadow = false;
+                        return;
+                    }
+                    if (child.material && child.material.transparent && child.material.opacity < 0.25) {
+                        child.castShadow = false;
+                        child.receiveShadow = false;
+                        return;
+                    }
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
         }
 
         function buildFurnishedVideoDecor() {
@@ -3875,6 +3912,7 @@
             addDecorBox(1.98, 2.20 + 0.09, 2.44, 0.26, 0.18, 0.26, 0xb5bda0, 0.7); // Manta verde salvia
         }
         buildFurnishedVideoDecor();
+        applyShadowsRecursively(apartmentGroup);
         resolveWallMounts();
 
         // ============================================================================
@@ -4048,6 +4086,7 @@
             updateSelectionVisual();
             populateSelectOptions();
             syncFormWithSelected();
+            applyShadowsRecursively(furnitureGroup);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
         }
 
@@ -5030,7 +5069,10 @@
             // ACTIVAR SOMBRAS FOTORREALISTAS OBLIGATORIAMENTE EN 3D
             dirLight.castShadow = true;
             renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.shadowMap.needsUpdate = true;
+            applyShadowsRecursively(apartmentGroup);
+            if (ssaoPass) ssaoPass.camera = perspCam;
             
             // Re-aplicar estilo gráfico para asegurar materiales PBR activos
             if (currentGraphicStyle) {
@@ -5180,6 +5222,37 @@
             return moving;
         }
 
+        // ============================================================================
+        // MOTOR DE POST-PROCESAMIENTO SSAO (Screen Space Ambient Occlusion)
+        // ============================================================================
+        let composer = null;
+        let ssaoPass = null;
+        function initPostProcessing() {
+            try {
+                if (typeof THREE.EffectComposer !== 'undefined' && typeof THREE.SSAOPass !== 'undefined') {
+                    const width = window.innerWidth;
+                    const height = window.innerHeight;
+                    composer = new THREE.EffectComposer(renderer);
+
+                    const renderPass = new THREE.RenderPass(scene, activeCamera);
+                    composer.addPass(renderPass);
+
+                    ssaoPass = new THREE.SSAOPass(scene, activeCamera, width, height);
+                    ssaoPass.kernelRadius = 0.55; // Radio en metros para oclusión arquitectónica en esquinas
+                    ssaoPass.minDistance = 0.001;
+                    ssaoPass.maxDistance = 0.18;
+                    ssaoPass.output = THREE.SSAOPass.OUTPUT.Default;
+                    composer.addPass(ssaoPass);
+                    console.log("SSAO Post-processing initialized successfully!");
+                }
+            } catch (err) {
+                console.warn("SSAO initialization warning (fallback to native WebGL renderer):", err);
+                composer = null;
+                ssaoPass = null;
+            }
+        }
+        initPostProcessing();
+
         function animate() {
             requestAnimationFrame(animate);
             const movedPersp = controlsPersp.enabled && controlsPersp.update();
@@ -5192,7 +5265,16 @@
                 dirtyFrames--;
                 updateLabels();
                 if (selectionBox) selectionBox.update();
-                renderer.render(scene, activeCamera);
+                
+                if (composer && activeCamera === perspCam) {
+                    try {
+                        composer.render();
+                    } catch (e) {
+                        renderer.render(scene, activeCamera);
+                    }
+                } else {
+                    renderer.render(scene, activeCamera);
+                }
             }
         }
         animate();
@@ -5210,6 +5292,10 @@
             orthoCam.updateProjectionMatrix();
 
             renderer.setSize(window.innerWidth, window.innerHeight);
+            if (composer) {
+                composer.setSize(window.innerWidth, window.innerHeight);
+                if (ssaoPass) ssaoPass.setSize(window.innerWidth, window.innerHeight);
+            }
             wakeRenderer();
         });
     
@@ -5239,27 +5325,12 @@
         // ============================================================================
         // MATERIALES PBR REALISTAS DE ALTA FIDELIDAD (ARCHVIZ DIORAMA)
         // ============================================================================
-        // 1. Pisos Cerámicos Reales 33×33 cm y Baño (Esmaltados PBR)
-        const archvizCeramicMainFloorMat = new THREE.MeshStandardMaterial({
-            map: createRealisticCeramic33Texture(6.30, 6.30),
-            bumpMap: createCeramic33BumpTexture(6.30, 6.30),
-            bumpScale: 0.003,
-            roughnessMap: createCeramic33RoughnessTexture(6.30, 6.30),
-            roughness: 0.22,
-            metalness: 0.04
-        });
-        const archvizCeramicSouthFloorMat = new THREE.MeshStandardMaterial({
-            map: createRealisticCeramic33Texture(4.85, 1.70),
-            bumpMap: createCeramic33BumpTexture(4.85, 1.70),
-            bumpScale: 0.003,
-            roughnessMap: createCeramic33RoughnessTexture(4.85, 1.70),
-            roughness: 0.22,
-            metalness: 0.04
-        });
+        // 1. Pisos PBR Madera y Baño (roughness: 0.4, metalness: 0.1 para reflejos reales)
+        const archvizWoodFloorMat = pbrWoodFloorMat;
         const archvizBathTileFloorMat = new THREE.MeshStandardMaterial({
             map: proceduralTileTex,
-            roughness: 0.20,
-            metalness: 0.05
+            roughness: 0.35,
+            metalness: 0.08
         });
         const archvizWoodFurnitureMat = new THREE.MeshStandardMaterial({
             color: 0xc49760, // Roble miel satinado
@@ -5267,31 +5338,15 @@
             metalness: 0.04
         });
 
-        // 2. Muros y Albardillas
+        // 2. Muros y Albardillas PBR (Yeso mate roughness: 0.9 y remate de corte grafito oscuro)
         const archvizBrickWallMat = new THREE.MeshStandardMaterial({
             map: proceduralBrickTex,
             roughness: 0.78,
             metalness: 0.02
         });
-        const archvizWhiteWallMat = new THREE.MeshStandardMaterial({
-            color: 0xffffff, // Muros blancos puros (Foto Referencia)
-            bumpMap: proceduralPlasterBumpTex,
-            bumpScale: 0.0010,
-            roughness: 0.88,
-            metalness: 0.01
-        });
-        const archvizCleanCapMat = new THREE.MeshStandardMaterial({
-            color: 0xf8fafc, // Albardilla superior blanca integrada
-            roughness: 0.85,
-            metalness: 0.01
-        });
-        const archvizIntWallMat = new THREE.MeshStandardMaterial({
-            color: 0xf4efe6, // Yeso blanco cálido mate
-            bumpMap: proceduralPlasterBumpTex,
-            bumpScale: 0.0012,
-            roughness: 0.85,
-            metalness: 0.02
-        });
+        const archvizWhiteWallMat = wallPlasterMat;
+        const archvizCleanCapMat = wallCapCutMat; // Remate de corte gris oscuro de maqueta
+        const archvizIntWallMat = wallPlasterMat;
 
         // 3. Tapizados y Textiles
         const archvizSofaMat = new THREE.MeshStandardMaterial({
@@ -5375,19 +5430,20 @@
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
             const studioGround = floorGroup.getObjectByName('studioGround');
             
-            // 1. Configuración de Iluminación y Cielo según Estilo
+            // 1. Configuración de Iluminación y Cielo según Estilo (Sol Fotorrealista en Diagonal)
+            dirLight.castShadow = true;
+            dirLight.position.set(35.0, 70.0, 35.0);
             if (style === 'archviz') {
                 scene.background = new THREE.Color(0xffffff); // Fondo de estudio blanco puro
-                hemiLight.color.setHex(0xf8fafc);
-                hemiLight.groundColor.setHex(0xe2e8f0);
-                hemiLight.intensity = 0.70;
-                ambLight.color.setHex(0xffffff);
-                ambLight.intensity = 0.50;
-                dirLight.color.setHex(0xffffff);
-                dirLight.intensity = 1.10;
-                dirLight.position.set(-6.5, 17.0, -4.5);
+                hemiLight.color.setHex(0xe0f2fe);
+                hemiLight.groundColor.setHex(0xb88850);
+                hemiLight.intensity = 0.65;
+                ambLight.color.setHex(0xdbeafe);
+                ambLight.intensity = 0.16; // Luz ambiental reducida para evitar aspecto plano
+                dirLight.color.setHex(0xfff8ee);
+                dirLight.intensity = 1.40;
                 fillLight.color.setHex(0xf1f5f9);
-                fillLight.intensity = 0.32;
+                fillLight.intensity = 0.25;
                 cyanLedStudy.intensity = 1.2;
                 cyanLedLiving.intensity = 1.0;
                 bedsideLampLeft.intensity = 1.2;
@@ -5399,32 +5455,34 @@
                 if (studioGround) studioGround.visible = false;
             } else if (style === 'sims') {
                 scene.background = new THREE.Color(0xffffff);
-                hemiLight.intensity = 0.35;
-                ambLight.color.setHex(0xffffff);
-                ambLight.intensity = 0.96;
-                dirLight.color.setHex(0xffffff);
-                dirLight.intensity = 0.38;
-                dirLight.position.set(6, 15, 8);
-                fillLight.intensity = 0.18;
-                cyanLedStudy.intensity = 0;
-                cyanLedLiving.intensity = 0;
-                bedsideLampLeft.intensity = 0;
-                bedsideLampRight.intensity = 0;
-                kitchenLed.intensity = 0;
+                hemiLight.color.setHex(0xe0f2fe);
+                hemiLight.groundColor.setHex(0xb88850);
+                hemiLight.intensity = 0.60;
+                ambLight.color.setHex(0xdbeafe);
+                ambLight.intensity = 0.18; // Reducida para no borrar sombras
+                dirLight.color.setHex(0xfff8ee);
+                dirLight.intensity = 1.35; // Potente luz solar con sombras suaves
+                fillLight.intensity = 0.20;
+                cyanLedStudy.intensity = 0.6;
+                cyanLedLiving.intensity = 0.6;
+                bedsideLampLeft.intensity = 0.8;
+                bedsideLampRight.intensity = 0.8;
+                kitchenLed.intensity = 0.8;
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = false;
                 if (dioramaFlora) dioramaFlora.visible = false;
                 if (studioGround) studioGround.visible = false;
             } else if (style === 'realist') {
                 scene.background = new THREE.Color(0xf1f5f9);
-                hemiLight.intensity = 0.55;
-                ambLight.color.setHex(0xe0f2fe);
-                ambLight.intensity = 0.50;
-                dirLight.color.setHex(0xfef3c7);
-                dirLight.intensity = 1.05;
-                dirLight.position.set(-6.8, 17.5, -4.8);
+                hemiLight.color.setHex(0xe0f2fe);
+                hemiLight.groundColor.setHex(0xb88850);
+                hemiLight.intensity = 0.58;
+                ambLight.color.setHex(0xdbeafe);
+                ambLight.intensity = 0.15;
+                dirLight.color.setHex(0xfffaec);
+                dirLight.intensity = 1.45;
                 fillLight.color.setHex(0xffedd5);
-                fillLight.intensity = 0.28;
+                fillLight.intensity = 0.25;
                 cyanLedStudy.intensity = 1.8;
                 cyanLedLiving.intensity = 1.6;
                 bedsideLampLeft.intensity = 1.2;
@@ -5436,12 +5494,14 @@
                 if (dioramaFlora) dioramaFlora.visible = true;
             } else if (style === 'night') {
                 scene.background = new THREE.Color(0x050814);
-                hemiLight.intensity = 0.15;
+                hemiLight.color.setHex(0x1e293b);
+                hemiLight.groundColor.setHex(0x0f172a);
+                hemiLight.intensity = 0.18;
                 ambLight.color.setHex(0x1e293b);
-                ambLight.intensity = 0.24;
-                dirLight.color.setHex(0x1d4ed8);
-                dirLight.intensity = 0.22;
-                fillLight.intensity = 0.08;
+                ambLight.intensity = 0.08;
+                dirLight.color.setHex(0x3b82f6);
+                dirLight.intensity = 0.30;
+                fillLight.intensity = 0.10;
                 cyanLedStudy.intensity = 2.5;
                 cyanLedLiving.intensity = 2.2;
                 bedsideLampLeft.intensity = 2.0;
@@ -5451,7 +5511,6 @@
                 if (studioGround) studioGround.visible = false;
                 if (dioramaGround) dioramaGround.visible = true;
                 if (dioramaFlora) dioramaFlora.visible = true;
-                
             }
 
             // 2. Modificación de Materiales en Mallas según Estilo (PBR Universal)
@@ -5492,10 +5551,8 @@
                     } else if (isFloor) {
                         if (child.name === 'bathFloorMesh' || isBathFloor) {
                             child.material = archvizBathTileFloorMat;
-                        } else if (child.name === 'floorSouthMesh' || child.position.z > 5.0) {
-                            child.material = archvizCeramicSouthFloorMat;
                         } else {
-                            child.material = archvizCeramicMainFloorMat;
+                            child.material = archvizWoodFloorMat;
                         }
                     } else if (isSofa) {
                         child.material = archvizSofaMat;
