@@ -540,6 +540,63 @@
                 font-size: 8.5px;
             }
         }
+    
+        /* Estilos Gráficos Selector */
+        .style-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 11px 13px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .style-card:hover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.10);
+            transform: translateY(-2px);
+        }
+        .style-card.active {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.18);
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.28);
+        }
+        .style-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .style-icon {
+            font-size: 16px;
+        }
+        .style-title {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #f8fafc;
+            flex: 1;
+        }
+        .style-badge {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .badge-default { background: #334155; color: #cbd5e1; }
+        .badge-rec { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+        .badge-arch { background: #475569; color: #f1f5f9; }
+        .badge-eng { background: #0284c7; color: #fff; }
+        .badge-art { background: #d97706; color: #fff; }
+        .badge-night { background: #6366f1; color: #fff; }
+        .style-desc {
+            font-size: 11px;
+            color: #94a3b8;
+            line-height: 1.35;
+        }
+
     </style>
 </head>
 <body>
@@ -574,6 +631,7 @@
             <button class="mode-btn" id="btn-mode-sims" title="Paredes estilo Los Sims (Corte Dinámico que baja las paredes al rotar)"><span>🏡</span> Sims</button>
             <button class="mode-btn" id="btn-mode-cut" title="Paredes Bajas a media altura"><span>✂️</span> Bajas</button>
             <button class="mode-btn" id="btn-mode-nowalls" title="Ocultar todas las paredes"><span>🚫</span> Sin Muros</button>
+            <button class="mode-btn" id="btn-toggle-styles" title="Elegir Estilo Gráfico (Realista, Maqueta, Blueprint, Sims, Noche, Boceto)"><span>🎨</span> Estilos</button>
             <button class="mode-btn active" id="btn-toggle-labels" title="Mostrar/Ocultar Nombres de los Ambientes"><span>🏷️</span> Nombres</button>
             <button class="mode-btn active" id="btn-toggle-video-decor" title="Mostrar/Ocultar Muebles, Electrodomésticos y Decoración"><span>🛋️</span> Amoblado</button>
             <button class="mode-btn" id="btn-toggle-roof" title="Mostrar/Ocultar Techo de Madera y Vigas"><span>🪵</span> Techo</button>
@@ -3982,6 +4040,278 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             wakeRenderer();
         });
-    </script>
+    
+        // ============================================================================
+        // 12. MOTOR DE ESTILOS GRÁFICOS INTERACTIVOS (SIMS, REALISTA, CLAY, BLUEPRINT, BOCETO, NOCHE)
+        // ============================================================================
+        let currentGraphicStyle = localStorage.getItem('dep_graphic_style') || 'sims';
+        const nightLightsGroup = new THREE.Group();
+        nightLightsGroup.name = "nightLights";
+        scene.add(nightLightsGroup);
+
+        // Luces interiores para el modo noche:
+        const nightLightLiving = new THREE.PointLight(0xf59e0b, 1.8, 6.5, 1.4);
+        nightLightLiving.position.set(4.50, 2.40, 2.80);
+        const nightLightKitchen = new THREE.PointLight(0xfbbf24, 1.4, 4.5, 1.5);
+        nightLightKitchen.position.set(4.10, 1.60, 6.50);
+        const nightLightBed = new THREE.PointLight(0xf97316, 1.2, 3.8, 1.5);
+        nightLightBed.position.set(0.40, 0.90, 5.20);
+        const nightLightDesk = new THREE.PointLight(0x38bdf8, 1.6, 4.2, 1.5);
+        nightLightDesk.position.set(2.40, 1.10, 1.10);
+        nightLightsGroup.add(nightLightLiving, nightLightKitchen, nightLightBed, nightLightDesk);
+        nightLightsGroup.visible = false;
+
+        // Caché de materiales especiales por estilo
+        const clayWallMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.88, metalness: 0.05 });
+        const clayFloorMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.85, metalness: 0.05 });
+        const clayFurnMat = new THREE.MeshStandardMaterial({ color: 0xedebe8, roughness: 0.72, metalness: 0.08 });
+
+        const bpWallMat = new THREE.MeshStandardMaterial({ color: 0x0f2a4a, roughness: 0.45, transparent: true, opacity: 0.88 });
+        const bpFloorMat = new THREE.MeshStandardMaterial({ color: 0x071526, roughness: 0.65 });
+        const bpFurnMat = new THREE.MeshStandardMaterial({ color: 0x133863, roughness: 0.50 });
+
+        const sketchWallMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95 });
+        const sketchFloorMat = new THREE.MeshStandardMaterial({ color: 0xf1ebe1, roughness: 0.95 });
+
+        function ensureOriginalMaterialsCached() {
+            apartmentGroup.traverse(child => {
+                if (child.isMesh && child.material && !child.userData.origMat) {
+                    child.userData.origMat = child.material;
+                }
+            });
+        }
+
+        function applyGraphicStyle(style) {
+            ensureOriginalMaterialsCached();
+            currentGraphicStyle = style;
+            localStorage.setItem('dep_graphic_style', style);
+
+            // 1. Configuración de Escena y Fondo
+            if (style === 'sims') {
+                scene.background = new THREE.Color(0xffffff);
+                ambLight.color.setHex(0xffffff);
+                ambLight.intensity = 0.96;
+                dirLight.color.setHex(0xffffff);
+                dirLight.intensity = 0.38;
+                fillLight.intensity = 0.18;
+                nightLightsGroup.visible = false;
+            } else if (style === 'realist') {
+                scene.background = new THREE.Color(0xf1f5f9);
+                ambLight.color.setHex(0xe0f2fe); // Luz de cielo celeste suave
+                ambLight.intensity = 0.58;
+                dirLight.color.setHex(0xfef3c7); // Sol dorado cálido rasante
+                dirLight.intensity = 0.92;
+                fillLight.color.setHex(0xffedd5);
+                fillLight.intensity = 0.28;
+                nightLightsGroup.visible = false;
+            } else if (style === 'clay') {
+                scene.background = new THREE.Color(0xdbe4ee); // Fondo estudio gris azulado
+                ambLight.color.setHex(0xffffff);
+                ambLight.intensity = 0.46;
+                dirLight.color.setHex(0xffffff);
+                dirLight.intensity = 0.88; // Sombras geométricas marcadas de maqueta física
+                fillLight.intensity = 0.14;
+                nightLightsGroup.visible = false;
+            } else if (style === 'blueprint') {
+                scene.background = new THREE.Color(0x061122); // Fondo cianotipia profundo
+                ambLight.color.setHex(0x1e3a5f);
+                ambLight.intensity = 0.80;
+                dirLight.color.setHex(0x38bdf8); // Iluminación cian técnica
+                dirLight.intensity = 0.65;
+                fillLight.intensity = 0.25;
+                nightLightsGroup.visible = false;
+            } else if (style === 'sketch') {
+                scene.background = new THREE.Color(0xfbf8f1); // Papel pergamino claro
+                ambLight.color.setHex(0xffffff);
+                ambLight.intensity = 1.15;
+                dirLight.color.setHex(0x475569);
+                dirLight.intensity = 0.30;
+                fillLight.intensity = 0.15;
+                nightLightsGroup.visible = false;
+            } else if (style === 'night') {
+                scene.background = new THREE.Color(0x050814); // Noche crepuscular
+                ambLight.color.setHex(0x1e293b);
+                ambLight.intensity = 0.24;
+                dirLight.color.setHex(0x1d4ed8); // Luz lunar azul
+                dirLight.intensity = 0.22;
+                fillLight.intensity = 0.08;
+                nightLightsGroup.visible = true; // Activar luces interiores
+            }
+
+            // 2. Modificación de Materiales en Mallas
+            apartmentGroup.traverse(child => {
+                if (!child.isMesh || !child.userData.origMat) return;
+
+                const isWall = (child.parent === exteriorWallsGroup || child.parent === interiorWallsGroup || child.userData.isWall);
+                const isFloor = (child.parent === floorGroup || child.userData.isFloor || child.name?.includes('Floor'));
+                const isRoof = (child.parent === roofGroup || child.userData.isRoof);
+
+                if (style === 'sims') {
+                    child.material = child.userData.origMat;
+                } else if (style === 'clay') {
+                    if (isWall || isRoof) child.material = clayWallMat;
+                    else if (isFloor) child.material = clayFloorMat;
+                    else child.material = clayFurnMat;
+                } else if (style === 'blueprint') {
+                    if (isWall || isRoof) child.material = bpWallMat;
+                    else if (isFloor) child.material = bpFloorMat;
+                    else child.material = bpFurnMat;
+                } else if (style === 'sketch') {
+                    if (isWall || isRoof) child.material = sketchWallMat;
+                    else if (isFloor) child.material = sketchFloorMat;
+                    else child.material = child.userData.origMat;
+                } else if (style === 'realist') {
+                    child.material = child.userData.origMat;
+                    // En realista mantenemos materiales originales pero con brillo PBR
+                    if (child.material.roughness !== undefined && isFloor) {
+                        child.material.roughness = 0.28; // Suelo con reflejo cerámico suave
+                    }
+                } else if (style === 'night') {
+                    child.material = child.userData.origMat;
+                }
+            });
+
+            // 3. Actualizar UI de Tarjetas
+            document.querySelectorAll('.style-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.style === style);
+            });
+
+            wakeRenderer();
+        }
+
+        // Eventos UI del Selector de Estilos
+        const stylesModal = document.getElementById('styles-modal');
+        const btnToggleStyles = document.getElementById('btn-toggle-styles');
+        const btnCloseStyles = document.getElementById('btn-close-styles');
+
+        if (btnToggleStyles && stylesModal) {
+            btnToggleStyles.addEventListener('click', () => {
+                stylesModal.classList.add('active');
+            });
+        }
+        if (btnCloseStyles && stylesModal) {
+            btnCloseStyles.addEventListener('click', () => {
+                stylesModal.classList.remove('active');
+            });
+        }
+        if (stylesModal) {
+            stylesModal.addEventListener('click', (e) => {
+                if (e.target === stylesModal) stylesModal.classList.remove('active');
+            });
+        }
+
+        document.querySelectorAll('.style-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const styleId = card.dataset.style;
+                if (styleId) {
+                    applyGraphicStyle(styleId);
+                    // Feedback sutil antes de cerrar
+                    setTimeout(() => {
+                        if (stylesModal) stylesModal.classList.remove('active');
+                    }, 240);
+                }
+            });
+        });
+
+        // Inicializar estilo guardado tras el render inicial
+        setTimeout(() => {
+            if (currentGraphicStyle && currentGraphicStyle !== 'sims') {
+                applyGraphicStyle(currentGraphicStyle);
+            }
+        }, 120);
+
+</script>
+
+    <!-- Modal Selector de Estilos Gráficos -->
+    <div class="modal-overlay" id="styles-modal">
+        <div class="modal-box glass-panel" style="max-width:580px; max-height:88vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div>
+                    <h3 style="font-size:15px; font-weight:700; color:#38bdf8; margin:0; display:flex; align-items:center; gap:8px;">
+                        <span>🎨</span> Selector de Estilos Gráficos
+                    </h3>
+                    <p style="font-size:11.5px; color:#94a3b8; margin:3px 0 0 0;">
+                        Elegí cómo querés ver el departamento en 3D y 2D en tiempo real:
+                    </p>
+                </div>
+                <button class="icon-btn" id="btn-close-styles" style="font-size:16px; padding:4px 10px;">✕</button>
+            </div>
+
+            <div class="styles-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:10px;">
+                <!-- 1. Sims Color Vivo -->
+                <div class="style-card active" data-style="sims">
+                    <div class="style-card-header">
+                        <span class="style-icon">🎨</span>
+                        <span class="style-title">Sims / Color Real</span>
+                        <span class="style-badge badge-default">Actual</span>
+                    </div>
+                    <div class="style-desc">
+                        Colores reales diferenciados, maderas cálidas, piso cerámico beige y materiales contrastados.
+                    </div>
+                </div>
+
+                <!-- 2. Realista Cálido PBR -->
+                <div class="style-card" data-style="realist">
+                    <div class="style-card-header">
+                        <span class="style-icon">✨</span>
+                        <span class="style-title">Realista Cálido</span>
+                        <span class="style-badge badge-rec">Recomendado</span>
+                    </div>
+                    <div class="style-desc">
+                        Luz solar dorada rasante, cielo suave, sombras volumétricas y reflejos especulares en pisos y granito.
+                    </div>
+                </div>
+
+                <!-- 3. Maqueta Blanca Clay -->
+                <div class="style-card" data-style="clay">
+                    <div class="style-card-header">
+                        <span class="style-icon">🏛️</span>
+                        <span class="style-title">Maqueta Clay Blanca</span>
+                        <span class="style-badge badge-arch">Estudio Arq.</span>
+                    </div>
+                    <div class="style-desc">
+                        Monocromático en yeso y alabastro blanco. Resalta las proporciones y la espacialidad pura.
+                    </div>
+                </div>
+
+                <!-- 4. Blueprint Técnico -->
+                <div class="style-card" data-style="blueprint">
+                    <div class="style-card-header">
+                        <span class="style-icon">📐</span>
+                        <span class="style-title">Blueprint Técnico</span>
+                        <span class="style-badge badge-eng">Ingeniería</span>
+                    </div>
+                    <div class="style-desc">
+                        Cianotipia azul marino profundo (#071326) con líneas cian fluorescentes y muros translúcidos.
+                    </div>
+                </div>
+
+                <!-- 5. Boceto a Mano / Tinta -->
+                <div class="style-card" data-style="sketch">
+                    <div class="style-card-header">
+                        <span class="style-icon">✒️</span>
+                        <span class="style-title">Boceto / Tinta</span>
+                        <span class="style-badge badge-art">Ilustración</span>
+                    </div>
+                    <div class="style-desc">
+                        Papel pergamino cálido (#faf7f2) con líneas de tinta negra en bordes y estética cómic / acuarela.
+                    </div>
+                </div>
+
+                <!-- 6. Noche Cálida -->
+                <div class="style-card" data-style="night">
+                    <div class="style-card-header">
+                        <span class="style-icon">🌙</span>
+                        <span class="style-title">Noche Acogedora</span>
+                        <span class="style-badge badge-night">Nocturno</span>
+                    </div>
+                    <div class="style-desc">
+                        Exterior crepuscular y luces cálidas interiores encendidas (living, cocina, velador y PC gamer).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
