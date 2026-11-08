@@ -4306,30 +4306,43 @@
                 addDecorCyl(tableX, 0.16, tableZ - 0.18, 0.11, 0.11, 0.06, 0x831843, 0.7);
                 // Tapa superior de madera maciza nogal oscuro con cantos biselados (foto #2)
                 addDecorBox(tableX, tableH - 0.015, tableZ, tableW, 0.03, tableL, 0x4a2c18, 0.4);
+            });
 
-                // Objetos sobre la mesa ratona relevados al milímetro de las fotos #1 y #2:
-                // 1. Vaso térmico negro mate tipo Stanley (foto #2):
+            // Elementos individuales sobre la mesa ratona (editables, movibles y borrables por separado):
+            createCompoundAssembly('Vaso Térmico Stanley (Mesa Ratona)', () => {
+                const tableX = 4.38, tableZ = 3.10, tableH = 0.42;
                 addDecorCyl(tableX - 0.06, tableH + 0.09, tableZ - 0.28, 0.042, 0.036, 0.18, 0x18181b, 0.4);
                 addDecorCyl(tableX - 0.06, tableH + 0.182, tableZ - 0.28, 0.038, 0.038, 0.012, 0xd1d5db, 0.2); // Anillo plateado de tapa
-                // 2. Tableta gráfica / digitalizadora negra con lápiz óptico blanco (foto #2):
+            });
+
+            createCompoundAssembly('Tableta Gráfica y Stylus (Mesa Ratona)', () => {
+                const tableX = 4.38, tableZ = 3.10, tableH = 0.42;
                 addDecorBox(tableX, tableH + 0.006, tableZ - 0.02, 0.22, 0.010, 0.30, 0x111827, 0.5);
                 addDecorBox(tableX - 0.02, tableH + 0.015, tableZ, 0.010, 0.008, 0.14, 0xf8fafc, 0.3); // Stylus blanco
-                // 3. Dos controles remotos negros alineados (TV y audio LG):
+            });
+
+            createCompoundAssembly('Controles Remotos TV y Audio (Mesa Ratona)', () => {
+                const tableX = 4.38, tableZ = 3.10, tableH = 0.42;
                 addDecorBox(tableX + 0.09, tableH + 0.008, tableZ + 0.22, 0.048, 0.014, 0.18, 0x0f172a, 0.3);
                 addDecorBox(tableX + 0.09, tableH + 0.008, tableZ + 0.38, 0.044, 0.014, 0.15, 0x1e293b, 0.3);
-                // 4. Cinta métrica amarilla Stanley con gancho metálico (foto #2):
+            });
+
+            createCompoundAssembly('Cinta Métrica Stanley (Mesa Ratona)', () => {
+                const tableX = 4.38, tableZ = 3.10, tableH = 0.42;
                 addDecorBox(tableX - 0.09, tableH + 0.016, tableZ + 0.26, 0.055, 0.030, 0.055, 0xeab308, 0.35);
                 addDecorBox(tableX - 0.12, tableH + 0.016, tableZ + 0.26, 0.010, 0.015, 0.020, 0xd1d5db, 0.2); // Gancho metálico
-                // 5. Billetera / llaves en el extremo sur:
+            });
+
+            createCompoundAssembly('Billetera y Llaves (Mesa Ratona)', () => {
+                const tableX = 4.38, tableZ = 3.10, tableH = 0.42;
                 addDecorBox(tableX - 0.08, tableH + 0.008, tableZ + 0.42, 0.08, 0.012, 0.10, 0x334155, 0.6); // Billetera
             });
 
-            // 4. Sector Comedor: Mesa con Patas Metálicas Oscuras (metalness: 0.8) y Sillas con Respaldo Curvo
-            createCompoundAssembly('Juego de Comedor (Mesa + Sillas)', () => {
+            // 4. Sector Comedor: Mesa con Patas Metálicas Oscuras (separada de centros de mesa y sillas)
+            createCompoundAssembly('Mesa de Comedor Redonda', () => {
                 const tableDiningZ = 0.95;
                 const tableMetalMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.30, metalness: 0.85 });
                 const tableWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.70, metalness: 0.05 });
-                const chairCushionMat = new THREE.MeshStandardMaterial({ color: 0x84cc16, roughness: 1.0, metalness: 0.0 }); // Almohadón verde oliva mate
 
                 // Tapa de madera maciza veteada
                 const topGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.04, 32);
@@ -4349,16 +4362,30 @@
                     leg.castShadow = true; leg.receiveShadow = true;
                     (currentAssemblyGroup || decorVideoGroup).add(leg);
                 }
+            });
 
-                // Centro de mesa: Camino rústico y planta en maceta cerámica
+            // Elementos individuales sobre la mesa de comedor (editables, movibles y borrables):
+            createCompoundAssembly('Camino de Mesa Rojo (Comedor)', () => {
+                const tableDiningZ = 0.95;
                 const runnerMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 1.0, metalness: 0.0 });
                 const runner = new THREE.Mesh(UNIT_BOX_GEO, runnerMat);
                 runner.scale.set(0.70, 0.006, 0.22);
                 runner.position.set(4.55, 0.763, tableDiningZ);
                 (currentAssemblyGroup || decorVideoGroup).add(runner);
-                addDecorPlantCeramic(4.55, 0.765, tableDiningZ, 0.09, 0.07, 0.14, 0.15, 0.18, 0.15, 0.22, 'Centro de Mesa Comedor');
+            });
 
-                // 4 Sillas ergonómicas con respaldo curvo envolvente
+            createCompoundAssembly('Centro de Mesa y Planta (Comedor)', () => {
+                const tableDiningZ = 0.95;
+                addDecorPlantCeramic(4.55, 0.765, tableDiningZ, 0.09, 0.07, 0.14, 0.15, 0.18, 0.15, 0.22, 'Centro de Mesa Comedor');
+            });
+
+            // 4 Sillas ergonómicas de comedor con respaldo curvo
+            createCompoundAssembly('Sillas de Comedor (4)', () => {
+                const tableDiningZ = 0.95;
+                const tableMetalMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.30, metalness: 0.85 });
+                const tableWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.70, metalness: 0.05 });
+                const chairCushionMat = new THREE.MeshStandardMaterial({ color: 0x84cc16, roughness: 1.0, metalness: 0.0 });
+
                 const chairCoords = [
                     { x: 4.55, z: tableDiningZ + 0.55, rot: 0 },
                     { x: 4.55, z: tableDiningZ - 0.55, rot: Math.PI },
@@ -4382,14 +4409,14 @@
                         cg.add(cl);
                     });
 
-                    // Asiento tapizado verde oliva (roughness: 1.0)
+                    // Asiento tapizado verde oliva
                     const seatMesh = new THREE.Mesh(UNIT_BOX_GEO, chairCushionMat);
                     seatMesh.scale.set(0.40, 0.05, 0.40);
                     seatMesh.position.set(0, 0.45, 0);
                     seatMesh.castShadow = true; seatMesh.receiveShadow = true;
                     cg.add(seatMesh);
 
-                    // Respaldo curvo ergonómico envolvente (5 segmentos en abanico)
+                    // Respaldo curvo ergonómico envolvente
                     const backGroup = new THREE.Group();
                     backGroup.position.set(0, 0.68, 0.18);
                     const segCount = 5;
@@ -4408,6 +4435,7 @@
                     (currentAssemblyGroup || decorVideoGroup).add(cg);
                 });
             });
+
             // - Espejo Panorámico Horizontal (Comedor, Muro Norte Y=0.00, ref. Francisco Alles)
             createCompoundAssembly('Espejo Panorámico Horizontal (Comedor)', () => {
                 setMountWall(4.55, 0.00, true);
@@ -4727,14 +4755,9 @@
             addCurtainAssembly(1.65, 0.00, 2.95, 0.00, 0, 0.12, 0x57534e);
 
             // 2. ESCRITORIO GAMER EN "L" (Setup Detallado con FFVII Rebirth, Rebote LED, Mate y Termo)
-            createCompoundAssembly('Escritorio Gamer en "L" con Setup', () => {
-                const deskWoodMat = new THREE.MeshStandardMaterial({ color: 0xa65e18, roughness: 0.68, metalness: 0.04 }); // Madera rojiza calibrada
+            createCompoundAssembly('Escritorio Gamer en "L"', () => {
+                const deskWoodMat = new THREE.MeshStandardMaterial({ color: 0xa65e18, roughness: 0.68, metalness: 0.04 });
                 const legWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c3a0e, roughness: 0.72, metalness: 0.04 });
-                const monitorBezelMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.10, metalness: 0.75 });
-                const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.30, metalness: 0.60 });
-                const silverMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.15, metalness: 0.95 }); // Virola de mate y bombilla
-                const inoxMat = new THREE.MeshStandardMaterial({ color: 0xcfd8dc, roughness: 0.22, metalness: 0.90 });   // Termo acero inox
-                const mateGourdMat = new THREE.MeshStandardMaterial({ color: 0x271a0c, roughness: 0.80, metalness: 0.0 }); // Calabaza de mate
 
                 // Tramo Largo Principal
                 const mainTop = new THREE.Mesh(UNIT_BOX_GEO, deskWoodMat);
@@ -4757,8 +4780,11 @@
                 wingLeg.position.set(1.77, 0.36, 0.225);
                 wingLeg.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(wingTop, wingLeg);
+            });
 
-                // Gabinete PC Gamer Thermaltake con iluminación interna
+            // Gabinete PC Gamer Thermaltake con iluminación RGB (independiente)
+            createCompoundAssembly('Gabinete PC Gamer Thermaltake', () => {
+                const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.30, metalness: 0.60 });
                 const pcCase = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
                 pcCase.scale.set(0.24, 0.46, 0.42);
                 pcCase.position.set(2.80, 0.24, 1.45);
@@ -4768,15 +4794,19 @@
                 pcWindow.scale.set(0.01, 0.42, 0.38);
                 pcWindow.position.set(2.675, 0.24, 1.45);
                 (currentAssemblyGroup || decorVideoGroup).add(pcCase, pcWindow);
+            });
 
-                // --- MONITOR GAMER ULTRA SLIM CON "FINAL FANTASY VII REBIRTH" Y LED TRASERO ---
+            // Setup de Monitores Gamer Dual (independiente)
+            createCompoundAssembly('Setup Monitores Dual Gamer (FFVII Rebirth)', () => {
+                const monitorBezelMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.10, metalness: 0.75 });
+                const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.30, metalness: 0.60 });
+
+                // Monitor 1 Principal
                 const monGroup = new THREE.Group();
                 monGroup.position.set(2.82, 1.05, 0.80);
-                // Marco ultra delgado negro brillante (roughness: 0.10)
                 const monBezel = new THREE.Mesh(UNIT_BOX_GEO, monitorBezelMat);
                 monBezel.scale.set(0.03, 0.38, 0.64);
                 monBezel.castShadow = true;
-                // Pantalla emisiva con FFVII Rebirth
                 const monDisplayMat = new THREE.MeshStandardMaterial({
                     map: ff7ScreenTex,
                     emissive: 0xffffff,
@@ -4787,8 +4817,7 @@
                 });
                 const monDisplay = new THREE.Mesh(UNIT_BOX_GEO, monDisplayMat);
                 monDisplay.scale.set(0.005, 0.36, 0.62);
-                monDisplay.position.set(-0.015, 0, 0); // Cara hacia el usuario (-X)
-                // Base metálica
+                monDisplay.position.set(-0.015, 0, 0);
                 const monStand = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
                 monStand.scale.set(0.16, 0.012, 0.24);
                 monStand.position.set(-0.06, -0.28, 0);
@@ -4799,16 +4828,15 @@
                 monArm.castShadow = true;
                 monGroup.add(monBezel, monDisplay, monStand, monArm);
 
-                // Luz LED trasera cyan/azul de baja intensidad para rebote LED en la pared este
                 const monBackLed = new THREE.PointLight(0x00e5ff, 0.95, 2.6, 1.6);
                 monBackLed.position.set(0.06, 0, 0);
                 monGroup.add(monBackLed);
                 (currentAssemblyGroup || decorVideoGroup).add(monGroup);
 
-                // --- SEGUNDO MONITOR GAMER SLIM (SETUP DUAL CON REBOTE LED ROJO/CIAN) ---
+                // Monitor 2 Secundario
                 const monGroup2 = new THREE.Group();
                 monGroup2.position.set(2.78, 1.05, 1.25);
-                monGroup2.rotation.y = -0.22; // Inclinado ergonómicamente hacia el usuario
+                monGroup2.rotation.y = -0.22;
                 const monBezel2 = new THREE.Mesh(UNIT_BOX_GEO, monitorBezelMat);
                 monBezel2.scale.set(0.03, 0.38, 0.58);
                 monBezel2.castShadow = true;
@@ -4832,19 +4860,22 @@
                 monArm2.position.set(-0.02, -0.15, 0);
                 monArm2.castShadow = true;
                 monGroup2.add(monBezel2, monDisplay2, monStand2, monArm2);
-                // Rebote LED rojo complementario en la pared este
+
                 const monBackLedRed = new THREE.PointLight(0xff1744, 0.75, 2.2, 1.5);
                 monBackLedRed.position.set(0.06, 0, 0);
                 monGroup2.add(monBackLedRed);
                 (currentAssemblyGroup || decorVideoGroup).add(monGroup2);
 
-                // Barra de luz LED superior (Lightbar) y webcam
+                // Barra LED superior (Lightbar)
                 const lightBar = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
                 lightBar.scale.set(0.04, 0.02, 0.46);
                 lightBar.position.set(2.82, 1.25, 0.80);
                 (currentAssemblyGroup || decorVideoGroup).add(lightBar);
+            });
 
-                // Deskmat XL, teclado gamer y mouse ergonómico
+            // Periféricos de Escritorio (Deskmat, Teclado, Mouse)
+            createCompoundAssembly('Teclado, Mouse Gamer y Deskmat', () => {
+                const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.30, metalness: 0.60 });
                 const deskMat = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.95 }));
                 deskMat.scale.set(0.44, 0.008, 0.84);
                 deskMat.position.set(2.62, 0.765, 0.80);
@@ -4857,42 +4888,43 @@
                 mouse.position.set(2.62, 0.775, 0.98);
                 mouse.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(deskMat, keyboard, mouse);
+            });
 
-                // --- MATE TRADICIONAL ARGENTINO CON VIROLA Y BOMBILLA ---
+            // Mate Tradicional Argentino con Bombilla (editable/borrable)
+            createCompoundAssembly('Mate Tradicional y Bombilla', () => {
+                const mateGourdMat = new THREE.MeshStandardMaterial({ color: 0x271a0c, roughness: 0.80, metalness: 0.0 });
+                const silverMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.15, metalness: 0.95 });
                 const mateGroup = new THREE.Group();
                 mateGroup.position.set(2.52, 0.77, 1.12);
-                // Calabaza de mate
                 const mateBody = new THREE.Mesh(new THREE.SphereGeometry(0.038, 14, 12), mateGourdMat);
                 mateBody.scale.set(1.0, 1.25, 1.0);
                 mateBody.position.set(0, 0.035, 0);
                 mateBody.castShadow = true;
-                // Virola plateada en la boca
                 const virola = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.034, 0.015, 16), silverMat);
                 virola.position.set(0, 0.075, 0);
                 virola.castShadow = true;
-                // Yerba mate en el interior
                 const yerba = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.005, 12), new THREE.MeshStandardMaterial({ color: 0x2e4f20, roughness: 0.95 }));
                 yerba.position.set(0, 0.072, 0);
-                // Bombilla metálica inclinada
                 const bombilla = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.12, 8), silverMat);
                 bombilla.position.set(0.012, 0.11, 0.012);
                 bombilla.rotation.set(0.35, 0.2, -0.35);
                 bombilla.castShadow = true;
                 mateGroup.add(mateBody, virola, yerba, bombilla);
                 (currentAssemblyGroup || decorVideoGroup).add(mateGroup);
+            });
 
-                // --- TERMO DE ACERO INOXIDABLE SATINADO ---
+            // Termo de Acero Inoxidable (editable/borrable)
+            createCompoundAssembly('Termo de Acero Inoxidable', () => {
+                const inoxMat = new THREE.MeshStandardMaterial({ color: 0xcfd8dc, roughness: 0.22, metalness: 0.90 });
+                const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.30, metalness: 0.60 });
                 const termoGroup = new THREE.Group();
                 termoGroup.position.set(2.46, 0.77, 1.24);
-                // Cuerpo cilíndrico de acero
                 const termoBody = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.26, 16), inoxMat);
                 termoBody.position.set(0, 0.13, 0);
                 termoBody.castShadow = true;
-                // Tapa y tapón negro
                 const termoCap = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.045, 0.05, 16), darkMetalMat);
                 termoCap.position.set(0, 0.28, 0);
                 termoCap.castShadow = true;
-                // Manija vertical
                 const termoHandle = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
                 termoHandle.scale.set(0.015, 0.18, 0.025);
                 termoHandle.position.set(-0.048, 0.14, 0);
@@ -4900,6 +4932,7 @@
                 termoGroup.add(termoBody, termoCap, termoHandle);
                 (currentAssemblyGroup || decorVideoGroup).add(termoGroup);
             });
+
             // - Diplomas de Estudio en Muro (5 Cuadros: 3 arriba y 2 abajo, ref. Francisco Alles)
             createCompoundAssembly('Diplomas de Estudio (5 Cuadros)', () => {
                 setMountWall(3.00, 0.85, false);
@@ -4978,86 +5011,48 @@
 
             // 5. MESITAS OCTOGONALES:
             // - Mesita Ajedrez: en esquina superior izquierda [0.25, 0.25] (entre biblioteca y pared Norte):
-            createCompoundAssembly('Mesita de Ajedrez', () => {
+            createCompoundAssembly('Mesita Auxiliar (Ajedrez)', () => {
                 addOctagonalTable(0.25, 0.25, 0.22, 0.72, 0xb47b48, 0x2b3036);
+            });
+
+            createCompoundAssembly('Tablero y Piezas de Ajedrez', () => {
                 addDecorBox(0.25, 0.735, 0.25, 0.30, 0.015, 0.30, 0x1e293b, 0.3); // Tablero ajedrez clásico
                 addDecorCyl(0.20, 0.76, 0.20, 0.012, 0.012, 0.04, 0xf8fafc);      // Pieza blanca
                 addDecorCyl(0.30, 0.76, 0.30, 0.012, 0.012, 0.04, 0x0f172a);      // Pieza negra
             });
 
-            // - Mesita de Pintura de Miniaturas (Frascos Citadel/Vallejo, Pincel Fino y Miniaturas RPG)
-            createCompoundAssembly('Mesita de Miniaturas', () => {
+            createCompoundAssembly('Mesita Auxiliar (Miniaturas)', () => {
                 addOctagonalTable(0.25, 2.00, 0.22, 0.72, 0xd4a373, 0x2b3036);
-                // Base de corte / tapete de pintura verde oscuro
+            });
+
+            createCompoundAssembly('Set de Pintura de Miniaturas y Pinceles', () => {
                 const matMat = new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.85 });
                 const cutMat = new THREE.Mesh(UNIT_BOX_GEO, matMat);
                 cutMat.scale.set(0.30, 0.008, 0.30);
                 cutMat.position.set(0.25, 0.724, 2.00);
                 (currentAssemblyGroup || decorVideoGroup).add(cutMat);
 
-                // Frascos de pintura estilo Citadel con tapas hexagonales de colores
                 const paintColors = [0xdc2626, 0x2563eb, 0x16a34a, 0xfacc15, 0x111827];
                 const potMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.30, metalness: 0.20 });
                 paintColors.forEach((col, idx) => {
                     const px = 0.16 + (idx % 3) * 0.045;
                     const pz = 1.90 + Math.floor(idx / 3) * 0.045;
-                    // Bote
                     const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.024, 12), potMat);
                     pot.position.set(px, 0.74, pz);
                     pot.castShadow = true;
-                    // Tapa hexagonal coloreada
                     const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.012, 6), new THREE.MeshStandardMaterial({ color: col, roughness: 0.4 }));
                     cap.position.set(px, 0.755, pz);
                     cap.castShadow = true;
                     (currentAssemblyGroup || decorVideoGroup).add(pot, cap);
                 });
 
-                // Pincel fino de detalle con virola plateada y pelo
-                const brushGroup = new THREE.Group();
-                brushGroup.position.set(0.32, 0.732, 1.94);
-                brushGroup.rotation.y = 0.5;
-                const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.002, 0.12, 8), new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.7 }));
-                handle.rotation.z = Math.PI / 2;
-                const ferrule = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.02, 8), new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.2, metalness: 0.9 }));
-                ferrule.rotation.z = Math.PI / 2;
-                ferrule.position.set(0.065, 0, 0);
-                brushGroup.add(handle, ferrule);
-                (currentAssemblyGroup || decorVideoGroup).add(brushGroup);
-
-                // 4 Miniaturas de rol / wargame detalladas sobre peanas redondas de 25mm
-                const miniCoords = [
-                    { x: 0.24, z: 2.05, col: 0x475569 },
-                    { x: 0.30, z: 2.06, col: 0xb45309 },
-                    { x: 0.22, z: 2.10, col: 0x1e3a8a },
-                    { x: 0.28, z: 2.11, col: 0x15803d }
-                ];
-                const baseMat = new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.6 });
-                miniCoords.forEach(m => {
-                    const mg = new THREE.Group();
-                    mg.position.set(m.x, 0.728, m.z);
-                    // Peana redonda 25mm
-                    const baseMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.018, 0.006, 14), baseMat);
-                    baseMesh.position.set(0, 0.003, 0);
-                    baseMesh.castShadow = true;
-                    // Torso y piernas
-                    const body = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: m.col, roughness: 0.7 }));
-                    body.scale.set(0.012, 0.022, 0.010);
-                    body.position.set(0, 0.017, 0);
-                    body.castShadow = true;
-                    // Cabeza / casco
-                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.006, 8, 8), new THREE.MeshStandardMaterial({ color: 0xd4d4d8, roughness: 0.4, metalness: 0.5 }));
-                    head.position.set(0, 0.032, 0);
-                    head.castShadow = true;
-                    // Arma / lanza
-                    const weapon = new THREE.Mesh(new THREE.CylinderGeometry(0.0015, 0.0015, 0.035, 6), new THREE.MeshStandardMaterial({ color: 0x71717a, metalness: 0.8 }));
-                    weapon.position.set(0.008, 0.020, 0.006);
-                    weapon.castShadow = true;
-                    mg.add(baseMesh, body, head, weapon);
-                    (currentAssemblyGroup || decorVideoGroup).add(mg);
-                });
+                const brushHandle = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.6 }));
+                brushHandle.scale.set(0.006, 0.006, 0.16);
+                brushHandle.position.set(0.31, 0.732, 2.08);
+                brushHandle.rotation.y = 0.35;
+                (currentAssemblyGroup || decorVideoGroup).add(brushHandle);
             });
 
-            // 6. SILLA GAMER ERGONÓMICA BUTACA (Estrella 5 Ruedas, Pistón Hidráulico, Respaldo Alto Rojo/Negro)
             createCompoundAssembly('Silla Gamer Ergonómica', () => {
                 const chairBlackMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.85, metalness: 0.10 });
                 const chairRedMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.85, metalness: 0.10 });
@@ -5732,6 +5727,7 @@
         function moveSelectedObject(dx, dy, dz) {
             const obj = getSelectedObject();
             if (!obj) return;
+            const fromPos = { x: obj.position.x, y: obj.position.y, z: obj.position.z };
             obj.position.x += dx;
             obj.position.y += dy;
             obj.position.z += dz;
@@ -5758,6 +5754,16 @@
                 }
             }
 
+            const objName = selectedId ? (furnitureList.find(f => f.id === selectedId)?.name || 'Mueble') : (selectedDecorMesh?.userData?.name || selectedDecorMesh?.name || 'Objeto');
+            undoHistoryStack.push({
+                type: 'move',
+                name: objName,
+                target: selectedId ? { kind: 'furniture', id: selectedId } : { kind: 'decor', mesh: selectedDecorMesh, name: objName },
+                from: fromPos,
+                to: { x: obj.position.x, y: obj.position.y, z: obj.position.z }
+            });
+            updateUndoButtonUI();
+
             if (selectionBox) selectionBox.update();
             updateSelectedObjBarPos();
             wakeRenderer();
@@ -5766,6 +5772,7 @@
         function rotateSelectedObject(dAngleDeg = 45) {
             const obj = getSelectedObject();
             if (!obj) return;
+            const prevRot = obj.rotation.y;
             const rad = dAngleDeg * Math.PI / 180;
             obj.rotation.y = (obj.rotation.y + rad) % (Math.PI * 2);
 
@@ -5787,6 +5794,16 @@
                     saveDecorOverrides(false);
                 }
             }
+
+            const objName = selectedId ? (furnitureList.find(f => f.id === selectedId)?.name || 'Mueble') : (selectedDecorMesh?.userData?.name || selectedDecorMesh?.name || 'Objeto');
+            undoHistoryStack.push({
+                type: 'rotate',
+                name: objName,
+                target: selectedId ? { kind: 'furniture', id: selectedId } : { kind: 'decor', mesh: selectedDecorMesh, name: objName },
+                from: prevRot,
+                to: obj.rotation.y
+            });
+            updateUndoButtonUI();
 
             if (selectionBox) selectionBox.update();
             wakeRenderer();
@@ -5832,7 +5849,7 @@
             } else if (selectedDecorMesh) {
                 const obj = selectedDecorMesh;
                 const parent = obj.parent || decorVideoGroup;
-                const name = obj.userData.name || obj.name || 'Objeto';
+                const name = obj.userData?.name || obj.name || 'Objeto';
                 if (name && !decorOverrides.deleted.includes(name)) {
                     decorOverrides.deleted.push(name);
                 }
@@ -5859,7 +5876,62 @@
             const action = undoHistoryStack.pop();
             updateUndoButtonUI();
 
-            if (action.type === 'furniture') {
+            if (action.type === 'move') {
+                if (action.target.kind === 'furniture') {
+                    const item = furnitureList.find(f => f.id === action.target.id);
+                    if (item) {
+                        item.x = action.from.x;
+                        item.y = action.from.y;
+                        item.z = action.from.z;
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
+                        selectedId = item.id;
+                        renderFurniture3D();
+                    }
+                } else if (action.target.kind === 'decor') {
+                    const mesh = action.target.mesh;
+                    if (mesh) {
+                        mesh.position.set(action.from.x, action.from.y, action.from.z);
+                        const name = action.target.name;
+                        if (name) {
+                            if (!decorOverrides.transforms[name]) decorOverrides.transforms[name] = {};
+                            decorOverrides.transforms[name].x = action.from.x;
+                            decorOverrides.transforms[name].y = action.from.y;
+                            decorOverrides.transforms[name].z = action.from.z;
+                            saveDecorOverrides(false);
+                        }
+                        selectDecorObject(mesh);
+                    }
+                }
+                if (selectionBox) selectionBox.update();
+                updateSelectedObjBarPos();
+                showToast(`↩️ Movimiento de "${action.name}" deshecho`);
+                wakeRenderer();
+            } else if (action.type === 'rotate') {
+                if (action.target.kind === 'furniture') {
+                    const item = furnitureList.find(f => f.id === action.target.id);
+                    if (item) {
+                        item.rot = Math.round(action.from * 180 / Math.PI);
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
+                        selectedId = item.id;
+                        renderFurniture3D();
+                    }
+                } else if (action.target.kind === 'decor') {
+                    const mesh = action.target.mesh;
+                    if (mesh) {
+                        mesh.rotation.y = action.from;
+                        const name = action.target.name;
+                        if (name) {
+                            if (!decorOverrides.transforms[name]) decorOverrides.transforms[name] = {};
+                            decorOverrides.transforms[name].rot = action.from;
+                            saveDecorOverrides(false);
+                        }
+                        selectDecorObject(mesh);
+                    }
+                }
+                if (selectionBox) selectionBox.update();
+                showToast(`↩️ Rotación de "${action.name}" deshecha`);
+                wakeRenderer();
+            } else if (action.type === 'furniture') {
                 const insertIdx = (action.index !== undefined && action.index >= 0) ? action.index : furnitureList.length;
                 furnitureList.splice(insertIdx, 0, action.item);
                 selectedId = action.item.id;
@@ -6031,6 +6103,7 @@
         let downTs = 0;
         let downPos = { x: 0, y: 0 };
         let isDraggingSelected = false;
+        let dragStartPos = null;
         const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
         const dragOffset = new THREE.Vector3();
         const dragIntersection = new THREE.Vector3();
@@ -6142,6 +6215,7 @@
 
             if (curObj && hits.length > 0) {
                 isDraggingSelected = true;
+                dragStartPos = { x: curObj.position.x, y: curObj.position.y, z: curObj.position.z };
                 dragPlane.setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 1, 0), curObj.position);
                 if (raycaster.ray.intersectPlane(dragPlane, dragIntersection)) {
                     dragOffset.copy(dragIntersection).sub(curObj.position);
