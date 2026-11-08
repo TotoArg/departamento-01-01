@@ -230,10 +230,14 @@ def build_apartment():
     b.set_group("02D_Puerta_Principal_Gris", "Door_Main_Grey")
     b.add_box(5.42, 0.01, 5.04, 5.47, 2.01, 5.70)
 
-    # Frentes de Placard Corredizos de Madera
+    # Frentes de Placard Corredizos de Madera (2 hojas enteras, riel exterior izquierdo y riel interior derecho)
     b.set_group("02E_Placards_Corredizos_Madera", "Placard_Wood")
-    b.add_box(0.15, 0.06, 2.22, 2.18, 2.45, 2.25)  # Frente Placard Superior (Estudio)
-    b.add_box(0.15, 0.06, 4.55, 2.18, 2.45, 4.58)  # Frente Placard Inferior (Cuarto)
+    # Placard Estudio (Z = 2.30, mirando al Norte hacia Z < 2.30):
+    b.add_box(0.02, 0.08, 2.270, 1.19, 2.20, 2.294)  # Hoja Izquierda (Riel exterior)
+    b.add_box(1.15, 0.08, 2.306, 2.28, 2.20, 2.330)  # Hoja Derecha (Riel interior)
+    # Placard Cuarto (Z = 4.50/4.70, mirando al Sur hacia Z > 4.50):
+    b.add_box(0.02, 0.08, 4.506, 1.19, 2.20, 4.530)  # Hoja Izquierda (Riel exterior)
+    b.add_box(1.15, 0.08, 4.470, 2.28, 2.20, 4.494)  # Hoja Derecha (Riel interior)
 
     # 4. CALEFACTORES E INSTALACIONES FIJAS DEL VIDEO
     b.set_group("03_Calefactores_Tiro_Balanceado", "Heater_Metal")

@@ -1373,9 +1373,9 @@
             railMesh.position.set(midX, 0.012, z);
             lines2DGroup.add(railMesh);
 
-            // Hoja 1 (Izquierda, riel interior): de x1 a x1 + leafW
+            // Hoja 1 (Izquierda, riel exterior hacia la habitación): de x1 a x1 + leafW
             const leftCenterX = x1 + leafW / 2; // ~0.595 m
-            const leftZ = z - facingSign * railOffset;
+            const leftZ = z + facingSign * railOffset; // Riel exterior (adelante)
             const leftLeaf2D = new THREE.Mesh(UNIT_BOX_GEO, woodMat2D);
             leftLeaf2D.scale.set(leafW, 0.018, leafT);
             leftLeaf2D.position.set(leftCenterX, 0.020, leftZ);
@@ -1383,12 +1383,12 @@
 
             const leftEdge = new THREE.Mesh(UNIT_BOX_GEO, edgeMat2D);
             leftEdge.scale.set(leafW, 0.020, 0.005);
-            leftEdge.position.set(leftCenterX, 0.021, leftZ - facingSign * (leafT / 2));
+            leftEdge.position.set(leftCenterX, 0.021, leftZ + facingSign * (leafT / 2));
             lines2DGroup.add(leftEdge);
 
-            // Hoja 2 (Derecha, riel exterior): de x2 - leafW a x2
+            // Hoja 2 (Derecha, riel interior hacia el fondo): de x2 - leafW a x2
             const rightCenterX = x2 - leafW / 2; // ~1.705 m
-            const rightZ = z + facingSign * railOffset;
+            const rightZ = z - facingSign * railOffset; // Riel interior (atrás)
             const rightLeaf2D = new THREE.Mesh(UNIT_BOX_GEO, woodMat2D);
             rightLeaf2D.scale.set(leafW, 0.018, leafT);
             rightLeaf2D.position.set(rightCenterX, 0.020, rightZ);
@@ -1396,7 +1396,7 @@
 
             const rightEdge = new THREE.Mesh(UNIT_BOX_GEO, edgeMat2D);
             rightEdge.scale.set(leafW, 0.020, 0.005);
-            rightEdge.position.set(rightCenterX, 0.021, rightZ + facingSign * (leafT / 2));
+            rightEdge.position.set(rightCenterX, 0.021, rightZ - facingSign * (leafT / 2));
             lines2DGroup.add(rightEdge);
 
             // Tirador 2D embutido en el borde exterior de cada hoja
@@ -2130,46 +2130,46 @@
             // Desplazamiento frontal hacia la habitación para tiradores embutidos:
             const frontFaceOffset = facingSign * (leafT / 2 + 0.003);
 
-            // 1. HOJA IZQUIERDA ENTERA (Riel interior)
+            // 1. HOJA IZQUIERDA ENTERA (Riel exterior hacia la habitación, en primer plano)
             const leftLeafGroup = new THREE.Group();
             leftLeafGroup.position.set(leftClosedX, 0, 0);
 
             const leftLeafMesh = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
             leftLeafMesh.scale.set(leafW, leafH, leafT);
-            leftLeafMesh.position.set(0, 0.08 + leafH / 2 + 0.01, -facingSign * railOffset);
+            leftLeafMesh.position.set(0, 0.08 + leafH / 2 + 0.01, facingSign * railOffset);
             leftLeafMesh.castShadow = true;
             leftLeafMesh.receiveShadow = true;
             leftLeafGroup.add(leftLeafMesh);
 
-            // Tirador circular embutido en la hoja izquierda (sobre el borde exterior izquierdo)
+            // Tirador circular embutido en la hoja izquierda
             const pullLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.008, 24), doorFrameMat);
             pullLeft.rotation.x = Math.PI / 2;
-            pullLeft.position.set(-leafW / 2 + 0.09, 0.08 + 1.05, -facingSign * railOffset + frontFaceOffset);
+            pullLeft.position.set(-leafW / 2 + 0.09, 0.08 + 1.05, facingSign * railOffset + frontFaceOffset);
             leftLeafGroup.add(pullLeft);
 
             holder.add(leftLeafGroup);
 
-            // 2. HOJA DERECHA ENTERA (Riel exterior)
+            // 2. HOJA DERECHA ENTERA (Riel interior hacia el fondo, en segundo plano)
             const rightLeafGroup = new THREE.Group();
             rightLeafGroup.position.set(rightClosedX, 0, 0);
 
             const rightLeafMesh = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
             rightLeafMesh.scale.set(leafW, leafH, leafT);
-            rightLeafMesh.position.set(0, 0.08 + leafH / 2 + 0.01, facingSign * railOffset);
+            rightLeafMesh.position.set(0, 0.08 + leafH / 2 + 0.01, -facingSign * railOffset);
             rightLeafMesh.castShadow = true;
             rightLeafMesh.receiveShadow = true;
             rightLeafGroup.add(rightLeafMesh);
 
-            // Tirador circular embutido en la hoja derecha (sobre el borde exterior derecho)
+            // Tirador circular embutido en la hoja derecha
             const pullRight = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.008, 24), doorFrameMat);
             pullRight.rotation.x = Math.PI / 2;
-            pullRight.position.set(leafW / 2 - 0.09, 0.08 + 1.05, facingSign * railOffset + frontFaceOffset);
+            pullRight.position.set(leafW / 2 - 0.09, 0.08 + 1.05, -facingSign * railOffset + frontFaceOffset);
             rightLeafGroup.add(pullRight);
 
             holder.add(rightLeafGroup);
 
-            // Planos transparentes para interacción natural por click en los vanos
-            const transparentMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
+            // Planos de interacción doble faz en ambos vanos
+            const transparentMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
             const leftVanoClick = new THREE.Mesh(new THREE.PlaneGeometry(leafW, leafH), transparentMat);
             leftVanoClick.position.set(leftClosedX, 0.08 + leafH / 2 + 0.01, facingSign * 0.028);
             holder.add(leftVanoClick);
@@ -2180,7 +2180,7 @@
 
             // Animadores independientes con exclusión mutua
             const leftAnim = {
-                name: `${placardName} (Hoja Izq)`,
+                name: `${placardName} (Hoja Izquierda)`,
                 type: 'slide',
                 group: leftLeafGroup,
                 currentVal: leftClosedX,
@@ -2202,7 +2202,7 @@
             };
 
             const rightAnim = {
-                name: `${placardName} (Hoja Der)`,
+                name: `${placardName} (Hoja Derecha)`,
                 type: 'slide',
                 group: rightLeafGroup,
                 currentVal: rightClosedX,
@@ -2223,13 +2223,29 @@
                 }
             };
 
-            leftLeafMesh.userData.animDoor = leftAnim;
-            pullLeft.userData.animDoor = leftAnim;
-            leftVanoClick.userData.animDoor = leftAnim;
+            // Enrutadores inteligentes de click para que tanto la hoja como el vano abierto respondan al instante:
+            const leftSideTarget = {
+                get name() { return rightAnim.isOpen ? rightAnim.name : leftAnim.name; },
+                toggle: function() {
+                    if (rightAnim.isOpen) return rightAnim.toggle(); // Cierra la hoja derecha que se abrió sobre el lado izquierdo
+                    return leftAnim.toggle();
+                }
+            };
+            const rightSideTarget = {
+                get name() { return leftAnim.isOpen ? leftAnim.name : rightAnim.name; },
+                toggle: function() {
+                    if (leftAnim.isOpen) return leftAnim.toggle(); // Cierra la hoja izquierda que se abrió sobre el lado derecho
+                    return rightAnim.toggle();
+                }
+            };
 
-            rightLeafMesh.userData.animDoor = rightAnim;
-            pullRight.userData.animDoor = rightAnim;
-            rightVanoClick.userData.animDoor = rightAnim;
+            leftLeafMesh.userData.animDoor = leftSideTarget;
+            pullLeft.userData.animDoor = leftSideTarget;
+            leftVanoClick.userData.animDoor = leftSideTarget;
+
+            rightLeafMesh.userData.animDoor = rightSideTarget;
+            pullRight.userData.animDoor = rightSideTarget;
+            rightVanoClick.userData.animDoor = rightSideTarget;
 
             doorClickCandidates.push(leftLeafMesh, pullLeft, leftVanoClick);
             doorClickCandidates.push(rightLeafMesh, pullRight, rightVanoClick);
