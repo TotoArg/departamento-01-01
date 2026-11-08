@@ -2087,12 +2087,43 @@
             addDecorCyl(0.28, 0.74, 2.04, 0.20, 0.20, 0.04, 0x475569, 0.3);  // Tablero de Ajedrez El Señor de los Anillos (LOTR)
             addDecorCyl(1.12, 0.18, 2.04, 0.14, 0.14, 0.34, 0xeab308, 0.3);  // Aspiradora Kärcher amarilla y negra frente al placard del estudio (foto #37 y #38)
             setMountWall(0.11, 2.30, true);
-            // Cosas guardadas HACIA ADENTRO en la baulera abierta sobre el placard del estudio (fotos #37 y #38, entre Z=2.32 y Z=2.78):
-            addDecorCyl(1.78, 2.26, 2.55, 0.26, 0.26, 0.18, 0x27272a, 0.8);  // Rueda de auxilio cubierta con lona
-            addDecorCyl(1.78, 2.42, 2.55, 0.12, 0.12, 0.12, 0xd97706, 0.5);  // Casco de moto arriba
-            addDecorBox(1.25, 2.28, 2.55, 0.42, 0.22, 0.32, 0x1e293b, 0.5);  // Bolso deportivo negro/violeta
-            addDecorBox(0.82, 2.29, 2.55, 0.36, 0.24, 0.30, 0xd4a373, 0.6);  // Caja de cartón marrón de zapatos
-            addDecorBox(0.42, 2.30, 2.55, 0.32, 0.26, 0.26, 0x3b82f6, 0.5);  // Caja de PS5 PlayStation 5 / Mirage
+            // Cosas guardadas HACIA ADENTRO en la baulera abierta del estudio (relevado fielmente de la foto real):
+            // La baulera está a Y=2.17m y se adentra entre Z=2.32 y Z=2.78 (profundidad ~0.46m hacia el muro del baño Z=2.80)
+            
+            // 1. Sector Izquierdo (X=0.25..0.75):
+            // - Caja Sony / tecnología azul abajo
+            addDecorBox(0.44, 2.25, 2.62, 0.34, 0.16, 0.26, 0x1e3a8a, 0.4);
+            // - Caja blanca Mirage L120 (Aerocool) arriba de la caja Sony
+            addDecorBox(0.44, 2.42, 2.62, 0.26, 0.18, 0.22, 0xf8fafc, 0.3);
+            // - Bolso para cámara / morral negro adelante con libreta/papeles en el bolsillo frontal
+            addDecorBox(0.38, 2.27, 2.42, 0.28, 0.20, 0.18, 0x18181b, 0.7);
+            addDecorBox(0.38, 2.23, 2.32, 0.14, 0.10, 0.03, 0xf1f5f9, 0.3); // Libreta blanca en bolsillo
+            // Tira/correa negra del bolso que cuelga sobre el dintel blanco
+            addDecorBox(0.41, 2.08, 2.29, 0.035, 0.18, 0.015, 0x18181b, 0.8);
+
+            // 2. Sector Central-Izquierdo (X=0.75..1.30):
+            // - Bolso deportivo azul marino / lona al fondo
+            addDecorBox(0.92, 2.32, 2.64, 0.42, 0.24, 0.22, 0x1e293b, 0.7);
+            // - Mat / colchoneta de yoga lila/rosa enrollada con correas negras
+            addDecorBox(0.94, 2.33, 2.48, 0.46, 0.13, 0.13, 0xd9779f, 0.6);
+            // - Funda tubular negra alargada adelante (trípode o bolso porta colchoneta)
+            addDecorBox(0.94, 2.22, 2.38, 0.52, 0.10, 0.12, 0x111827, 0.8);
+
+            // 3. Sector Central-Derecho (X=1.30..1.65):
+            // - Caja de zapatos CAT gris grafito abajo con logo amarillo CAT en esquina
+            addDecorBox(1.44, 2.24, 2.52, 0.34, 0.14, 0.28, 0x27272a, 0.5);
+            addDecorBox(1.58, 2.24, 2.37, 0.05, 0.045, 0.01, 0xfacc15, 0.2); // Logo amarillo CAT
+            // - Caja de zapatos de cartón marrón Lippi arriba de la caja CAT
+            addDecorBox(1.42, 2.375, 2.52, 0.32, 0.13, 0.26, 0xb48a64, 0.6);
+
+            // 4. Sector Derecho (X=1.65..2.10):
+            // - Rueda de auxilio de auto apoyada sobre la losa
+            addDecorCyl(1.84, 2.26, 2.56, 0.26, 0.26, 0.18, 0x27272a, 0.9);
+            // - Casco de ciclismo / moto apoyado encima del neumático
+            addDecorBox(1.80, 2.42, 2.54, 0.20, 0.12, 0.24, 0x1e293b, 0.3);
+            // - Manta / lona verde salvia clara doblada al costado del neumático
+            addDecorBox(1.98, 2.27, 2.44, 0.26, 0.18, 0.26, 0xb5bda0, 0.7);
+
             setMountWall(null);
 
             // 6. Cortina gris oscura con visillo blanco en la ventana Norte del Estudio (V4: X=1.35..2.55, Z=0.00, encuadrada sobre el ala Norte del escritorio en L)
