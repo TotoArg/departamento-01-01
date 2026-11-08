@@ -700,33 +700,53 @@
     <!-- Badge Flotante de Gestión en Calidad 4K Ultra-HD -->
     <div id="badge-4k-quality" style="display:none; position:fixed; top:74px; right:16px; z-index:25; background:rgba(15,23,42,0.94); border:1.5px solid #f59e0b; padding:6px 14px; border-radius:30px; align-items:center; gap:10px; backdrop-filter:blur(10px); box-shadow:0 10px 28px rgba(0,0,0,0.65);">
         <span style="font-size:12px; color:#fef08a; font-weight:800; display:flex; align-items:center; gap:6px;">
-            <span>✨</span> 3D en Calidad 4K
+            <span>✨</span> 3D en Calidad 4K (Fiel al Modelo)
         </span>
-        <button id="btn-capture-4k-snapshot" class="mode-btn" style="background:#f59e0b; color:#0f172a; font-size:11px; font-weight:800; padding:4px 12px; border-radius:14px; border:none; cursor:pointer; box-shadow:0 2px 8px rgba(245,158,11,0.4);" title="Descargar foto 4K UHD (3840×2160) de la vista actual">
+        <button id="btn-capture-4k-snapshot" class="mode-btn" style="background:#f59e0b; color:#0f172a; font-size:11px; font-weight:800; padding:4px 12px; border-radius:14px; border:none; cursor:pointer; box-shadow:0 2px 8px rgba(245,158,11,0.4);" title="Descargar foto 4K UHD (3840×2160) de la vista 3D actual">
             📸 Foto 4K UHD
         </button>
-        <button id="btn-view-render-compare" class="mode-btn" style="background:rgba(255,255,255,0.12); color:#f8fafc; font-size:11px; font-weight:700; padding:4px 10px; border-radius:14px; border:1px solid rgba(255,255,255,0.25); cursor:pointer;" title="Ver render fotorrealista Octane de referencia">
-            🖼️ Render Octane
+        <button id="btn-view-render-compare" class="mode-btn" style="background:rgba(255,255,255,0.12); color:#f8fafc; font-size:11px; font-weight:700; padding:4px 10px; border-radius:14px; border:1px solid rgba(255,255,255,0.25); cursor:pointer;" title="Ver galería de renders fotorrealistas con las medidas exactas">
+            🖼️ Renders Fotorrealistas
         </button>
     </div>
 
-    <!-- Modal Comparativa Render Fotorrealista Octane / UE5 -->
-    <div id="modal-render-compare" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:99999; background:rgba(11,17,32,0.96); backdrop-filter:blur(10px); justify-content:center; align-items:center; flex-direction:column; padding:20px; box-sizing:border-box;">
-        <div style="width:100%; max-width:1200px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+    <!-- Modal Galería Renders Fotorrealistas Exactos (Francisco Alles) -->
+    <div id="modal-render-compare" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:99999; background:rgba(11,17,32,0.96); backdrop-filter:blur(10px); justify-content:center; align-items:center; flex-direction:column; padding:16px 20px; box-sizing:border-box;">
+        <div style="width:100%; max-width:1240px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
             <div style="color:#fef08a; font-size:14px; font-weight:800; display:flex; align-items:center; gap:8px;">
-                <span>🖼️</span> Render Isométrico Fotorrealista Cutaway (Referencia Octane / UE5)
+                <span>🖼️</span> Renders Fotorrealistas con Medidas y Geometría Exacta (Blender / IA)
             </div>
-            <div style="display:flex; gap:10px;">
-                <a href="images/render_isom_cutaway.jpg" download="Render_Fotorrealista_Depto_01-01.jpg" style="background:#f59e0b; color:#0f172a; text-decoration:none; font-size:12px; font-weight:800; padding:6px 14px; border-radius:18px; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(245,158,11,0.4);">
-                    ⬇️ Descargar Render
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <div style="display:inline-flex; border:1px solid rgba(245,158,11,0.4); border-radius:16px; overflow:hidden; background:rgba(15,23,42,0.85);">
+                    <button type="button" id="btn-gallery-dia" style="background:#f59e0b; color:#0f172a; font-size:11px; font-weight:800; border:none; padding:5px 12px; cursor:pointer;">☀️ Día</button>
+                    <button type="button" id="btn-gallery-noche" style="background:transparent; color:#f8fafc; font-size:11px; font-weight:700; border:none; padding:5px 12px; cursor:pointer;">🌙 Noche</button>
+                    <button type="button" id="btn-gallery-ia" style="background:transparent; color:#38bdf8; font-size:11px; font-weight:700; border:none; padding:5px 12px; cursor:pointer;">✨ Con IA</button>
+                </div>
+                <a id="btn-gallery-download" href="images/fotorrealista/maqueta_dia.jpg" download="Render_Exacto_Depto.jpg" style="background:#f59e0b; color:#0f172a; text-decoration:none; font-size:11px; font-weight:800; padding:5px 12px; border-radius:14px; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(245,158,11,0.4);">
+                    ⬇️ Descargar
                 </a>
-                <button id="btn-close-render-compare" style="background:rgba(255,255,255,0.18); color:#fff; border:none; padding:6px 14px; border-radius:18px; font-size:12px; font-weight:700; cursor:pointer;">
+                <a href="https://franciscoalles-droid.github.io/render3D/salidas/fotorrealista.html" target="_blank" rel="noopener" style="background:rgba(56,189,248,0.18); color:#38bdf8; border:1px solid rgba(56,189,248,0.4); text-decoration:none; font-size:11px; font-weight:700; padding:4px 10px; border-radius:14px; display:inline-flex; align-items:center; gap:4px;">
+                    🔗 Ver Web Completa
+                </a>
+                <button id="btn-close-render-compare" style="background:rgba(255,255,255,0.18); color:#fff; border:none; padding:5px 14px; border-radius:14px; font-size:11px; font-weight:800; cursor:pointer;">
                     ✕ Volver al 3D
                 </button>
             </div>
         </div>
-        <div style="max-width:1200px; max-height:85vh; width:100%; height:100%; display:flex; justify-content:center; align-items:center;">
-            <img src="images/render_isom_cutaway.jpg" alt="Render Fotorrealista Cutaway" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:12px; box-shadow:0 25px 60px rgba(0,0,0,0.85); border:1px solid rgba(245,158,11,0.3);">
+
+        <!-- Selector de Vistas de Renders Fotorrealistas -->
+        <div style="width:100%; max-width:1240px; display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:8px;">
+            <button class="gallery-tab active" data-view="maqueta" style="background:#f59e0b; color:#0f172a; border:none; border-radius:12px; padding:4px 10px; font-size:11px; font-weight:800; cursor:pointer; white-space:nowrap;">🏠 Maqueta en Corte</button>
+            <button class="gallery-tab" data-view="living" style="background:rgba(255,255,255,0.08); color:#cbd5e1; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">🛋️ Living hacia Ventanal</button>
+            <button class="gallery-tab" data-view="comedor" style="background:rgba(255,255,255,0.08); color:#cbd5e1; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">🍽️ Comedor</button>
+            <button class="gallery-tab" data-view="cocina" style="background:rgba(255,255,255,0.08); color:#cbd5e1; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">🍳 Cocina</button>
+            <button class="gallery-tab" data-view="dormitorio" style="background:rgba(255,255,255,0.08); color:#cbd5e1; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">🛏️ Dormitorio</button>
+            <button class="gallery-tab" data-view="bano" style="background:rgba(255,255,255,0.08); color:#cbd5e1; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">🚿 Baño</button>
+            <button class="gallery-tab" data-view="hall" style="background:rgba(255,255,255,0.08); color:#cbd5e1; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">🚪 Hall Entrada</button>
+        </div>
+
+        <div style="max-width:1240px; max-height:76vh; width:100%; height:100%; display:flex; justify-content:center; align-items:center;">
+            <img id="img-gallery-display" src="images/fotorrealista/maqueta_dia.jpg" alt="Render Fotorrealista Exacto" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:10px; box-shadow:0 20px 50px rgba(0,0,0,0.85); border:1px solid rgba(245,158,11,0.3);">
         </div>
     </div>
 
@@ -7045,7 +7065,7 @@
 
         // ============================================================================
         // ============================================================================
-        // MOTOR DE GESTIÓN Y RENDERIZADO 3D EN CALIDAD 4K ULTRA-HD
+        // MOTOR DE GESTIÓN Y RENDERIZADO 3D EN CALIDAD 4K ULTRA-HD (FIEL AL MODELO 3D)
         // ============================================================================
         let is4KModeActive = false;
 
@@ -7075,7 +7095,7 @@
             setActiveTopBtn('btn-mode-render4k');
 
             is4KModeActive = true;
-            // Calibrar pixelRatio para máxima definición y nitidez visual
+            // Calibrar pixelRatio para máxima definición y nitidez visual sin crash de GPU
             const highPR = isMobileOrLowEnd ? Math.max(window.devicePixelRatio, 2.0) : Math.max(window.devicePixelRatio, 2.25);
             renderer.setPixelRatio(highPR);
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -7098,7 +7118,7 @@
 
             // Modo edición siempre habilitado para gestión interactiva completa en 4K
             setFurnitureEditMode(true);
-            showToast('✨ Modo Calidad 4K Activo: 3D interactivo en máxima resolución con gestión de muebles');
+            showToast('✨ Modo Calidad 4K Activo: 3D interactivo fiel al modelo con gestión de muebles');
             wakeRenderer();
         }
         window.switchTo4KMode = switchTo4KMode;
@@ -7169,15 +7189,42 @@
         }
         window.capture4KSnapshot = capture4KSnapshot;
 
-        // Modal Comparativa Render Octane
+        // Galería Renders Fotorrealistas Exactos (Francisco Alles)
         const modalCompare = document.getElementById('modal-render-compare');
         const btnOpenCompare = document.getElementById('btn-view-render-compare');
         const btnCloseCompare = document.getElementById('btn-close-render-compare');
+        const imgGalleryDisplay = document.getElementById('img-gallery-display');
+        const btnGalleryDownload = document.getElementById('btn-gallery-download');
+
+        let currentGalleryView = 'maqueta';
+        let currentGalleryModo = 'dia'; // 'dia', 'noche', 'ia'
+
+        function updateGalleryImage() {
+            if (!imgGalleryDisplay) return;
+            let filename = '';
+            if (currentGalleryModo === 'ia') {
+                if (currentGalleryView === 'maqueta') filename = 'maqueta_dia_ia.jpg';
+                else if (currentGalleryView === 'living') filename = 'living_dia_ia.jpg';
+                else filename = currentGalleryView + '_dia.jpg';
+            } else if (currentGalleryModo === 'noche') {
+                if (currentGalleryView === 'maqueta') filename = 'maqueta_noche.jpg';
+                else filename = currentGalleryView + '_dia.jpg';
+            } else {
+                filename = currentGalleryView + '_dia.jpg';
+            }
+            const fullPath = 'images/fotorrealista/' + filename;
+            imgGalleryDisplay.src = fullPath;
+            if (btnGalleryDownload) {
+                btnGalleryDownload.href = fullPath;
+                btnGalleryDownload.download = filename;
+            }
+        }
 
         if (btnOpenCompare && modalCompare) {
             btnOpenCompare.addEventListener('click', (e) => {
                 e.preventDefault();
                 modalCompare.style.display = 'flex';
+                updateGalleryImage();
             });
         }
         if (btnCloseCompare && modalCompare) {
@@ -7185,6 +7232,56 @@
                 modalCompare.style.display = 'none';
             });
         }
+
+        document.getElementById('btn-gallery-dia')?.addEventListener('click', () => {
+            currentGalleryModo = 'dia';
+            document.getElementById('btn-gallery-dia').style.background = '#f59e0b';
+            document.getElementById('btn-gallery-dia').style.color = '#0f172a';
+            document.getElementById('btn-gallery-noche').style.background = 'transparent';
+            document.getElementById('btn-gallery-noche').style.color = '#f8fafc';
+            document.getElementById('btn-gallery-ia').style.background = 'transparent';
+            document.getElementById('btn-gallery-ia').style.color = '#38bdf8';
+            updateGalleryImage();
+        });
+
+        document.getElementById('btn-gallery-noche')?.addEventListener('click', () => {
+            currentGalleryModo = 'noche';
+            document.getElementById('btn-gallery-noche').style.background = '#f59e0b';
+            document.getElementById('btn-gallery-noche').style.color = '#0f172a';
+            document.getElementById('btn-gallery-dia').style.background = 'transparent';
+            document.getElementById('btn-gallery-dia').style.color = '#f8fafc';
+            document.getElementById('btn-gallery-ia').style.background = 'transparent';
+            document.getElementById('btn-gallery-ia').style.color = '#38bdf8';
+            updateGalleryImage();
+        });
+
+        document.getElementById('btn-gallery-ia')?.addEventListener('click', () => {
+            currentGalleryModo = 'ia';
+            document.getElementById('btn-gallery-ia').style.background = '#0284c7';
+            document.getElementById('btn-gallery-ia').style.color = '#fff';
+            document.getElementById('btn-gallery-dia').style.background = 'transparent';
+            document.getElementById('btn-gallery-dia').style.color = '#f8fafc';
+            document.getElementById('btn-gallery-noche').style.background = 'transparent';
+            document.getElementById('btn-gallery-noche').style.color = '#f8fafc';
+            updateGalleryImage();
+        });
+
+        document.querySelectorAll('.gallery-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                document.querySelectorAll('.gallery-tab').forEach(t => {
+                    t.classList.remove('active');
+                    t.style.background = 'rgba(255,255,255,0.08)';
+                    t.style.color = '#cbd5e1';
+                    t.style.border = '1px solid rgba(255,255,255,0.15)';
+                });
+                tab.classList.add('active');
+                tab.style.background = '#f59e0b';
+                tab.style.color = '#0f172a';
+                tab.style.border = 'none';
+                currentGalleryView = tab.dataset.view;
+                updateGalleryImage();
+            });
+        });
 
         document.getElementById('btn-capture-4k-snapshot')?.addEventListener('click', (e) => {
             e.preventDefault();
