@@ -810,11 +810,52 @@
     </div>
 
     <!-- Barra flotante de Selección y Eliminación Rápida de Objetos -->
-    <div id="selected-object-bar" class="glass-panel" style="display:none; position:fixed; bottom:74px; left:50%; transform:translateX(-50%); padding:6px 14px; border-radius:24px; border:1px solid #38bdf8; z-index:90; align-items:center; gap:10px; box-shadow:0 10px 25px rgba(0,0,0,0.45); font-size:12px;">
-        <span style="color:#38bdf8; font-size:14px;">🎯</span>
-        <span id="selected-obj-title" style="color:#f8fafc; font-weight:600; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Objeto</span>
-        <button id="btn-quick-del" class="action-btn btn-delete" style="padding:4px 10px; font-size:11px; margin:0;" title="Eliminar objeto (o tecla Supr / Backspace)">🗑️ Eliminar</button>
-        <button id="btn-quick-close" style="background:transparent; border:none; color:#94a3b8; font-size:14px; cursor:pointer; padding:0 4px;" title="Deseleccionar">✕</button>
+    <!-- Barra Flotante de Selección, Movimiento y Edición de Objetos -->
+    <div id="selected-object-bar" class="glass-panel" style="display:none; position:fixed; bottom:74px; left:50%; transform:translateX(-50%); padding:8px 16px; border-radius:24px; border:1.5px solid #38bdf8; z-index:90; align-items:center; gap:8px; box-shadow:0 10px 25px rgba(0,0,0,0.55); font-size:12px; flex-wrap:wrap; justify-content:center; max-width:94vw;">
+        <span style="color:#38bdf8; font-size:15px;">🎯</span>
+        <div style="display:flex; flex-direction:column; min-width:110px; max-width:180px;">
+            <span id="selected-obj-title" style="color:#f8fafc; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px;">Objeto</span>
+            <span id="selected-obj-pos" style="color:#38bdf8; font-size:10px; font-family:monospace; font-weight:600;">X: 0.00 | Z: 0.00</span>
+        </div>
+        
+        <!-- Botón Mover (abre/cierra D-Pad en pantalla) -->
+        <button id="btn-toggle-move-pad" class="action-btn" style="background:rgba(56,189,248,0.22); border:1px solid #38bdf8; color:#38bdf8; padding:6px 12px; font-size:11.5px; border-radius:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;" title="Abrir flechas de movimiento táctiles">
+            🕹️ Mover
+        </button>
+        
+        <!-- Botón Girar 45° -->
+        <button id="btn-quick-rot" class="action-btn" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#f8fafc; padding:6px 12px; font-size:11.5px; border-radius:14px; font-weight:600; cursor:pointer;" title="Girar 45° (o tecla R)">
+            🔄 Girar
+        </button>
+        
+        <!-- Botón Eliminar -->
+        <button id="btn-quick-del" class="action-btn btn-delete" style="padding:6px 12px; font-size:11.5px; margin:0; border-radius:14px; font-weight:600;" title="Eliminar objeto (o tecla Supr / Backspace)">
+            🗑️ Eliminar
+        </button>
+        
+        <!-- Botón Deseleccionar grande y accesible para móviles -->
+        <button id="btn-quick-close" class="action-btn" style="background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.3); color:#f8fafc; font-size:11.5px; cursor:pointer; padding:6px 14px; border-radius:14px; font-weight:700;" title="Deseleccionar (o tocar el piso / tecla Esc)">
+            ✕ Deseleccionar
+        </button>
+
+        <!-- Panel D-Pad desplegable de Flechas para mover con precisión en pantalla -->
+        <div id="move-dpad-panel" style="display:none; width:100%; justify-content:center; align-items:center; gap:12px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.12); margin-top:4px;">
+            <div style="display:grid; grid-template-columns:repeat(3, 38px); grid-template-rows:repeat(3, 36px); gap:5px;">
+                <div></div>
+                <button class="dpad-dir-btn" data-dx="0" data-dz="-0.10" data-dy="0" style="background:#1e293b; border:1px solid #475569; color:#38bdf8; border-radius:8px; font-size:15px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;" title="Mover Norte / Adelante (Z-)">⬆</button>
+                <div></div>
+                <button class="dpad-dir-btn" data-dx="-0.10" data-dz="0" data-dy="0" style="background:#1e293b; border:1px solid #475569; color:#38bdf8; border-radius:8px; font-size:15px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;" title="Mover Oeste / Izquierda (X-)">⬅</button>
+                <button class="dpad-dir-btn" id="btn-dpad-rot-center" style="background:#0284c7; border:1px solid #38bdf8; color:#fff; border-radius:8px; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center;" title="Girar 45°">🔄</button>
+                <button class="dpad-dir-btn" data-dx="0.10" data-dz="0" data-dy="0" style="background:#1e293b; border:1px solid #475569; color:#38bdf8; border-radius:8px; font-size:15px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;" title="Mover Este / Derecha (X+)">➡</button>
+                <div></div>
+                <button class="dpad-dir-btn" data-dx="0" data-dz="0.10" data-dy="0" style="background:#1e293b; border:1px solid #475569; color:#38bdf8; border-radius:8px; font-size:15px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;" title="Mover Sur / Atrás (Z+)">⬇</button>
+                <div></div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <button class="dpad-elev-btn" data-dy="0.05" style="background:#1e293b; border:1px solid #475569; color:#f8fafc; border-radius:6px; font-size:11px; padding:5px 9px; cursor:pointer; font-weight:600;" title="Subir (+5cm)">▲ Alto</button>
+                <button class="dpad-elev-btn" data-dy="-0.05" style="background:#1e293b; border:1px solid #475569; color:#f8fafc; border-radius:6px; font-size:11px; padding:5px 9px; cursor:pointer; font-weight:600;" title="Bajar (-5cm)">▼ Bajo</button>
+            </div>
+        </div>
     </div>
 
     <!-- Bottom Quick Camera Views -->
@@ -3348,16 +3389,38 @@
             }, 1800);
         }
 
+        function getSelectedObject() {
+            if (selectedId) {
+                return furnitureMeshes.find(m => m.userData.id === selectedId);
+            }
+            if (selectedDecorMesh) {
+                return selectedDecorMesh;
+            }
+            return null;
+        }
+
+        function updateSelectedObjBarPos() {
+            const obj = getSelectedObject();
+            const posEl = document.getElementById('selected-obj-pos');
+            if (obj && posEl) {
+                posEl.innerText = `X: ${obj.position.x.toFixed(2)}m | Z: ${obj.position.z.toFixed(2)}m (Y: ${obj.position.y.toFixed(2)}m)`;
+            }
+        }
+
         function showSelectionBar(name) {
             const bar = document.getElementById('selected-object-bar');
             if (!bar) return;
-            document.getElementById('selected-obj-title').innerText = name || 'Objeto';
+            const titleEl = document.getElementById('selected-obj-title');
+            if (titleEl) titleEl.innerText = name || 'Objeto Seleccionado';
+            updateSelectedObjBarPos();
             bar.style.display = 'flex';
         }
 
         function hideSelectionBar() {
             const bar = document.getElementById('selected-object-bar');
             if (bar) bar.style.display = 'none';
+            const dpad = document.getElementById('move-dpad-panel');
+            if (dpad) dpad.style.display = 'none';
         }
 
         function clearSelection() {
@@ -3373,6 +3436,11 @@
         }
 
         function selectDecorObject(mesh, defaultTitle = 'Elemento Relevado') {
+            // Si ya está seleccionado, toggle para deseleccionar
+            if (selectedDecorMesh === mesh) {
+                clearSelection();
+                return;
+            }
             selectedId = null;
             selectedDecorMesh = mesh;
             if (selectionBox) {
@@ -3384,6 +3452,45 @@
             scene.add(selectionBox);
             const title = mesh.userData.name || defaultTitle;
             showSelectionBar(title);
+            wakeRenderer();
+        }
+
+        function moveSelectedObject(dx, dy, dz) {
+            const obj = getSelectedObject();
+            if (!obj) return;
+            obj.position.x += dx;
+            obj.position.y += dy;
+            obj.position.z += dz;
+
+            // Sincronizar en furnitureList si es mueble interactivo
+            if (selectedId) {
+                const item = furnitureList.find(f => f.id === selectedId);
+                if (item) {
+                    item.x = Math.round(obj.position.x * 100) / 100;
+                    item.y = Math.round(obj.position.y * 100) / 100;
+                    item.z = Math.round(obj.position.z * 100) / 100;
+                }
+            }
+
+            if (selectionBox) selectionBox.update();
+            updateSelectedObjBarPos();
+            wakeRenderer();
+        }
+
+        function rotateSelectedObject(dAngleDeg = 45) {
+            const obj = getSelectedObject();
+            if (!obj) return;
+            const rad = dAngleDeg * Math.PI / 180;
+            obj.rotation.y = (obj.rotation.y + rad) % (Math.PI * 2);
+
+            if (selectedId) {
+                const item = furnitureList.find(f => f.id === selectedId);
+                if (item) {
+                    item.rot = Math.round(obj.rotation.y * 180 / Math.PI);
+                }
+            }
+
+            if (selectionBox) selectionBox.update();
             wakeRenderer();
         }
 
@@ -3407,44 +3514,181 @@
             }
         }
 
+        // Listeners de la barra de selección y controles de movimiento
         document.getElementById('btn-del-furniture').addEventListener('click', deleteCurrentSelected);
         document.getElementById('btn-quick-del').addEventListener('click', deleteCurrentSelected);
         document.getElementById('btn-quick-close').addEventListener('click', clearSelection);
 
+        const btnToggleMovePad = document.getElementById('btn-toggle-move-pad');
+        const moveDpadPanel = document.getElementById('move-dpad-panel');
+        if (btnToggleMovePad && moveDpadPanel) {
+            btnToggleMovePad.addEventListener('click', () => {
+                const isShown = moveDpadPanel.style.display === 'flex';
+                moveDpadPanel.style.display = isShown ? 'none' : 'flex';
+            });
+        }
+
+        const btnQuickRot = document.getElementById('btn-quick-rot');
+        if (btnQuickRot) btnQuickRot.addEventListener('click', () => rotateSelectedObject(45));
+        const btnDpadCenter = document.getElementById('btn-dpad-rot-center');
+        if (btnDpadCenter) btnDpadCenter.addEventListener('click', () => rotateSelectedObject(45));
+
+        document.querySelectorAll('.dpad-dir-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dx = parseFloat(btn.dataset.dx) || 0;
+                const dy = parseFloat(btn.dataset.dy) || 0;
+                const dz = parseFloat(btn.dataset.dz) || 0;
+                moveSelectedObject(dx, dy, dz);
+            });
+        });
+
+        document.querySelectorAll('.dpad-elev-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dy = parseFloat(btn.dataset.dy) || 0;
+                moveSelectedObject(0, dy, 0);
+            });
+        });
+
+        // Atajos de teclado: Escape para deseleccionar, Flechas para mover, R para girar, Supr para borrar
         window.addEventListener('keydown', (e) => {
-            if (e.key === 'Delete' || e.key === 'Backspace') {
-                const tag = document.activeElement ? document.activeElement.tagName : '';
-                if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
+            const tag = document.activeElement ? document.activeElement.tagName : '';
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
+
+            if (e.key === 'Escape') {
                 if (selectedId || selectedDecorMesh) {
                     e.preventDefault();
+                    clearSelection();
+                }
+                return;
+            }
+
+            if (selectedId || selectedDecorMesh) {
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    e.preventDefault();
                     deleteCurrentSelected();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    moveSelectedObject(0, 0, -0.10);
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    moveSelectedObject(0, 0, 0.10);
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    moveSelectedObject(-0.10, 0, 0);
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    moveSelectedObject(0.10, 0, 0);
+                } else if (e.key === 'PageUp') {
+                    e.preventDefault();
+                    moveSelectedObject(0, 0.05, 0);
+                } else if (e.key === 'PageDown') {
+                    e.preventDefault();
+                    moveSelectedObject(0, -0.05, 0);
+                } else if (e.key.toLowerCase() === 'r') {
+                    e.preventDefault();
+                    rotateSelectedObject(45);
                 }
             }
         });
 
-        // Selección táctil / click
+        // ============================================================================
+        // SELECCIÓN TÁCTIL, DESELECCIÓN Y ARRASTRE INTERACTIVO (DRAG & DROP)
+        // ============================================================================
         const raycaster = new THREE.Raycaster();
         const pointer = new THREE.Vector2();
         let downTs = 0;
+        let downPos = { x: 0, y: 0 };
+        let isDraggingSelected = false;
+        const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        const dragOffset = new THREE.Vector3();
+        const dragIntersection = new THREE.Vector3();
 
         window.addEventListener('pointerdown', (e) => {
-            if (e.target === renderer.domElement) downTs = Date.now();
+            if (e.target !== renderer.domElement) return;
+            downTs = Date.now();
+            downPos = { x: e.clientX, y: e.clientY };
+
+            // Si hay un objeto seleccionado, comprobar si el cursor está sobre él para arrastrarlo
+            const curObj = getSelectedObject();
+            if (curObj) {
+                const rect = renderer.domElement.getBoundingClientRect();
+                pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+                raycaster.setFromCamera(pointer, activeCamera);
+
+                const hits = raycaster.intersectObject(curObj, true);
+                if (hits.length > 0) {
+                    isDraggingSelected = true;
+                    dragPlane.setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 1, 0), curObj.position);
+                    if (raycaster.ray.intersectPlane(dragPlane, dragIntersection)) {
+                        dragOffset.copy(dragIntersection).sub(curObj.position);
+                    }
+                    controlsPersp.enabled = false;
+                    controlsOrtho.enabled = false;
+                }
+            }
         });
-        window.addEventListener('pointerup', (e) => {
-            if (e.target !== renderer.domElement || Date.now() - downTs > 250) return;
+
+        window.addEventListener('pointermove', (e) => {
+            if (!isDraggingSelected) return;
+            const curObj = getSelectedObject();
+            if (!curObj) return;
+
             const rect = renderer.domElement.getBoundingClientRect();
             pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(pointer, activeCamera);
 
-            // 0. Raycast sobre puertas y hojas de placard animadas (click para abrir/cerrar)
+            if (raycaster.ray.intersectPlane(dragPlane, dragIntersection)) {
+                const targetX = Math.round((dragIntersection.x - dragOffset.x) * 100) / 100;
+                const targetZ = Math.round((dragIntersection.z - dragOffset.z) * 100) / 100;
+                curObj.position.x = targetX;
+                curObj.position.z = targetZ;
+
+                if (selectedId) {
+                    const item = furnitureList.find(f => f.id === selectedId);
+                    if (item) {
+                        item.x = targetX;
+                        item.z = targetZ;
+                    }
+                }
+                if (selectionBox) selectionBox.update();
+                updateSelectedObjBarPos();
+                wakeRenderer();
+            }
+        });
+
+        window.addEventListener('pointerup', (e) => {
+            if (isDraggingSelected) {
+                isDraggingSelected = false;
+                controlsPersp.enabled = true;
+                controlsOrtho.enabled = true;
+                wakeRenderer();
+                return;
+            }
+
+            if (e.target !== renderer.domElement) return;
+
+            // Distancia y duración del toque: si se movió o mantuvo apretado, fue navegación de cámara, no clic
+            const dist = Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y);
+            const duration = Date.now() - downTs;
+            if (dist > 10 || duration > 650) return;
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(pointer, activeCamera);
+
+            // 0. Raycast sobre puertas y hojas de placard animadas (click abre/cierra y muestra toast sin atrapar la selección)
             if (activeCamera === perspCam) {
                 const doorHits = raycaster.intersectObjects(doorClickCandidates, false);
                 if (doorHits.length > 0) {
                     const hitDoor = doorHits[0].object.userData.animDoor;
                     if (hitDoor) {
                         const nextState = hitDoor.toggle();
-                        showSelectionBar(`${hitDoor.name}: ${nextState ? 'Abierta' : 'Cerrada'}`);
+                        showToast(`🚪 ${hitDoor.name}: ${nextState ? 'Abierta' : 'Cerrada'}`);
                         clearSelection();
                         wakeRenderer();
                         return;
@@ -3455,14 +3699,23 @@
             // 1. Raycast sobre muebles interactivos
             const hits = raycaster.intersectObjects(furnitureMeshes, false);
             if (hits.length > 0) {
-                selectedId = hits[0].object.userData.id;
+                const hitId = hits[0].object.userData.id;
+                // Si se hace clic sobre el que ya estaba seleccionado, se deselecciona
+                if (selectedId === hitId) {
+                    clearSelection();
+                    return;
+                }
+                selectedId = hitId;
                 selectedDecorMesh = null;
                 renderFurniture3D();
                 const item = furnitureList.find(f => f.id === selectedId);
                 showSelectionBar(item ? item.name : 'Mueble Interactivo');
                 const ed = document.getElementById('furniture-editor');
-                ed.classList.remove('minimized');
-                document.getElementById('btn-min-editor').innerText = '▼';
+                if (ed) {
+                    ed.classList.remove('minimized');
+                    const minBtn = document.getElementById('btn-min-editor');
+                    if (minBtn) minBtn.innerText = '−';
+                }
                 return;
             }
 
@@ -3488,7 +3741,7 @@
                 return;
             }
 
-            // Clic en el suelo vacío: deseleccionar
+            // 4. Clic en el suelo vacío, paredes o fondo: DESELECCIONAR INMEDIATAMENTE
             clearSelection();
         });
 
