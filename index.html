@@ -956,12 +956,15 @@
     </div>
 
     <script>
+        // Detección de entorno móvil / baja potencia al inicio para evitar errores de inicialización
+        const isMobileOrLowEnd = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 800);
+
         // ============================================================================
         // 1. CÁMARA ORTOGRÁFICA (2D EXACTO SIN DEFORMACIÓN) + CÁMARA PERSPECTIVA (3D)
         // ============================================================================
         const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xffffff);
+        scene.background = new THREE.Color(0xf1f5f9); // Fondo arquitectónico neutro suave
 
         const perspCam = new THREE.PerspectiveCamera(32, window.innerWidth / window.innerHeight, 0.1, 150);
         perspCam.position.set(3.50, 10.5, 9.20);
@@ -6656,10 +6659,9 @@
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
             const studioGround = floorGroup.getObjectByName('studioGround');
-            const isDioramaStyle = (currentGraphicStyle === 'realist' || currentGraphicStyle === 'night');
-            if (dioramaGround) dioramaGround.visible = isDioramaStyle;
-            if (dioramaFlora) dioramaFlora.visible = isDioramaStyle;
-            if (studioGround) studioGround.visible = (currentGraphicStyle === 'archviz');
+            if (dioramaGround) dioramaGround.visible = false;
+            if (dioramaFlora) dioramaFlora.visible = false;
+            if (studioGround) studioGround.visible = true; // Base diorama con sombras
             
             current3DPreset = presetName;
             activeCamera = perspCam;
@@ -6674,10 +6676,7 @@
             applyShadowsRecursively(apartmentGroup);
             if (ssaoPass) ssaoPass.camera = perspCam;
             
-            // Re-aplicar estilo gráfico para asegurar materiales PBR activos
-            if (currentGraphicStyle) {
-                applyGraphicStyle(currentGraphicStyle);
-            }
+
             
             applyWallsVisibility(true, true);
             setWallMode(mode || 'sims');
@@ -6828,7 +6827,7 @@
         let composer = null;
         let ssaoPass = null;
         let fxaaPass = null;
-        const isMobileOrLowEnd = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 800);
+        // isMobileOrLowEnd definido al inicio del script
 
         function initPostProcessing() {
             try {
@@ -6936,399 +6935,14 @@
         });
     
         // ============================================================================
-        // 12. MOTOR DE ESTILOS GRÁFICOS INTERACTIVOS (SIMS, REALISTA, CLAY, BLUEPRINT, BOCETO, NOCHE)
         // ============================================================================
-        const VALID_STYLES = ['archviz', 'sims', 'realist', 'night'];
-        let currentGraphicStyle = 'archviz'; // Por defecto ArchViz Diorama (idéntico a la foto de referencia)
-        try {
-            const savedStyle = localStorage.getItem('dep_graphic_style_v8');
-            if (savedStyle && VALID_STYLES.includes(savedStyle)) {
-                currentGraphicStyle = savedStyle;
-            } else {
-                localStorage.setItem('dep_graphic_style_v8', 'archviz');
-                currentGraphicStyle = 'archviz';
-            }
-        } catch (e) {
-            currentGraphicStyle = 'archviz';
-        }
-
-        const nightLightsGroup = new THREE.Group();
-        nightLightsGroup.name = "nightLights";
-        scene.add(nightLightsGroup);
-
-        const nightLightLiving = new THREE.PointLight(0xf59e0b, 1.8, 6.5, 1.4);
-        nightLightLiving.position.set(4.50, 2.40, 2.80);
-        const nightLightKitchen = new THREE.PointLight(0xfbbf24, 1.4, 4.5, 1.5);
-        nightLightKitchen.position.set(4.10, 1.60, 6.50);
-        const nightLightBed = new THREE.PointLight(0xf97316, 1.2, 3.8, 1.5);
-        nightLightBed.position.set(0.40, 0.90, 5.20);
-        const nightLightDesk = new THREE.PointLight(0x38bdf8, 1.6, 4.2, 1.5);
-        nightLightDesk.position.set(2.40, 1.10, 1.10);
-        nightLightsGroup.add(nightLightLiving, nightLightKitchen, nightLightBed, nightLightDesk);
-        nightLightsGroup.visible = false;
-
+        // 12. INICIALIZACIÓN CANÓNICA FOTORREALISTA PBR (DIORAMA DIGITAL TWIN)
         // ============================================================================
-        // MATERIALES PBR REALISTAS DE ALTA FIDELIDAD (ARCHVIZ DIORAMA)
-        // ============================================================================
-        // 1. Pisos PBR Madera y Baño (roughness: 0.4, metalness: 0.1 para reflejos reales)
-        const archvizWoodFloorMat = pbrWoodFloorMat;
-        const archvizBathTileFloorMat = new THREE.MeshStandardMaterial({
-            map: proceduralTileTex,
-            roughness: 0.35,
-            metalness: 0.08
-        });
-        const archvizWoodFurnitureMat = new THREE.MeshStandardMaterial({
-            color: 0xc49760, // Roble miel satinado
-            roughness: 0.38,
-            metalness: 0.04
-        });
-
-        // 2. Muros y Albardillas PBR (Yeso mate roughness: 0.9 y remate de corte grafito oscuro)
-        const archvizBrickWallMat = new THREE.MeshStandardMaterial({
-            map: proceduralBrickTex,
-            roughness: 0.78,
-            metalness: 0.02
-        });
-        const archvizWhiteWallMat = wallPlasterMat;
-        const archvizCleanCapMat = wallCapCutMat; // Remate de corte gris oscuro de maqueta
-        const archvizIntWallMat = wallPlasterMat;
-
-        // 3. Tapizados y Textiles
-        const archvizSofaMat = new THREE.MeshStandardMaterial({
-            color: 0x495361, // Gris marengo jaspeado moderno (foto referencia)
-            map: proceduralRugTex,
-            roughness: 0.88,
-            metalness: 0.02
-        });
-        const archvizCushionCreamMat = new THREE.MeshStandardMaterial({
-            color: 0xf1ede4,
-            roughness: 0.90
-        });
-        const archvizBedSheetMat = new THREE.MeshStandardMaterial({
-            color: 0xf8fafc,
-            roughness: 0.92
-        });
-        const archvizBedRunnerMat = new THREE.MeshStandardMaterial({
-            color: 0x3b82f6,
-            roughness: 0.86
-        });
-
-        // 4. Metales, Electrodomésticos y Granito
-        const archvizStainlessSteelMat = new THREE.MeshStandardMaterial({
-            color: 0xdce2ec,
-            map: proceduralBrushedMetalTex,
-            metalness: 0.88,
-            roughness: 0.22
-        });
-        const archvizPolishedChromeMat = new THREE.MeshStandardMaterial({
-            color: 0xf8fafc,
-            metalness: 0.95,
-            roughness: 0.10
-        });
-        const archvizBlackGraniteMat = new THREE.MeshStandardMaterial({
-            color: 0x181e24, // Mesada de cocina negro absoluto
-            roughness: 0.20,
-            metalness: 0.12
-        });
-        const archvizWhitePorcelainMat = new THREE.MeshStandardMaterial({
-            color: 0xffffff, // Inodoro y bacha porcelana brillante
-            roughness: 0.12,
-            metalness: 0.05
-        });
-
-        // 5. Vidrios y Pantallas
-        const archvizGlassMat = new THREE.MeshStandardMaterial({
-            color: 0xe0f2fe,
-            transparent: true,
-            opacity: 0.32,
-            roughness: 0.06,
-            metalness: 0.88
-        });
-        const archvizScreenMat = new THREE.MeshStandardMaterial({
-            map: proceduralScreenTex,
-            emissive: 0x00d8f6,
-            emissiveIntensity: 0.28,
-            roughness: 0.20
-        });
-
-        const STYLE_METADATA = {
-            archviz: { icon: '🏢', name: 'Axonométrico' },
-            sims: { icon: '🎨', name: 'Sims' },
-            realist: { icon: '✨', name: 'Realista' },
-            night: { icon: '🌙', name: 'Noche' }
-        };
-
-        function ensureOriginalMaterialsCached() {
-            apartmentGroup.traverse(child => {
-                if (child.isMesh && child.material && !child.userData.origMat) {
-                    child.userData.origMat = child.material;
-                }
-            });
-        }
-
-        function applyGraphicStyle(style) {
-            ensureOriginalMaterialsCached();
-            if (!VALID_STYLES.includes(style)) {
-                console.warn(`Estilo no reconocido '${style}', restableciendo a 'archviz'`);
-                style = 'archviz';
-            }
-            currentGraphicStyle = style;
-            try {
-                localStorage.setItem('dep_graphic_style_v8', style);
-            } catch (e) {}
-
-            const dioramaGround = floorGroup.getObjectByName('dioramaGround');
-            const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
-            const studioGround = floorGroup.getObjectByName('studioGround');
-            
-            // 1. Configuración de Iluminación y Cielo según Estilo (Sol Fotorrealista en Diagonal)
-            dirLight.castShadow = true;
-            dirLight.position.set(35.0, 70.0, 35.0);
-            if (style === 'archviz') {
-                scene.background = new THREE.Color(0xffffff); // Fondo de estudio blanco puro
-                hemiLight.color.setHex(0xe0f2fe);
-                hemiLight.groundColor.setHex(0xb88850);
-                hemiLight.intensity = 0.65;
-                ambLight.color.setHex(0xdbeafe);
-                ambLight.intensity = 0.16; // Luz ambiental reducida para evitar aspecto plano
-                dirLight.color.setHex(0xfff8ee);
-                dirLight.intensity = 1.40;
-                fillLight.color.setHex(0xf1f5f9);
-                fillLight.intensity = 0.25;
-                cyanLedStudy.intensity = 1.2;
-                cyanLedLiving.intensity = 1.0;
-                bedsideLampLeft.intensity = 1.2;
-                bedsideLampRight.intensity = 1.2;
-                kitchenLed.intensity = 1.2;
-                nightLightsGroup.visible = false;
-                if (dioramaGround) dioramaGround.visible = false;
-                if (dioramaFlora) dioramaFlora.visible = false;
-                if (studioGround) studioGround.visible = false;
-            } else if (style === 'sims') {
-                scene.background = new THREE.Color(0xffffff);
-                hemiLight.color.setHex(0xe0f2fe);
-                hemiLight.groundColor.setHex(0xb88850);
-                hemiLight.intensity = 0.60;
-                ambLight.color.setHex(0xdbeafe);
-                ambLight.intensity = 0.18; // Reducida para no borrar sombras
-                dirLight.color.setHex(0xfff8ee);
-                dirLight.intensity = 1.35; // Potente luz solar con sombras suaves
-                fillLight.intensity = 0.20;
-                cyanLedStudy.intensity = 0.6;
-                cyanLedLiving.intensity = 0.6;
-                bedsideLampLeft.intensity = 0.8;
-                bedsideLampRight.intensity = 0.8;
-                kitchenLed.intensity = 0.8;
-                nightLightsGroup.visible = false;
-                if (dioramaGround) dioramaGround.visible = false;
-                if (dioramaFlora) dioramaFlora.visible = false;
-                if (studioGround) studioGround.visible = false;
-            } else if (style === 'realist') {
-                scene.background = new THREE.Color(0xf1f5f9);
-                hemiLight.color.setHex(0xe0f2fe);
-                hemiLight.groundColor.setHex(0xb88850);
-                hemiLight.intensity = 0.58;
-                ambLight.color.setHex(0xdbeafe);
-                ambLight.intensity = 0.15;
-                dirLight.color.setHex(0xfffaec);
-                dirLight.intensity = 1.45;
-                fillLight.color.setHex(0xffedd5);
-                fillLight.intensity = 0.25;
-                cyanLedStudy.intensity = 1.8;
-                cyanLedLiving.intensity = 1.6;
-                bedsideLampLeft.intensity = 1.2;
-                bedsideLampRight.intensity = 1.2;
-                kitchenLed.intensity = 1.2;
-                nightLightsGroup.visible = false;
-                if (studioGround) studioGround.visible = false;
-                if (dioramaGround) dioramaGround.visible = true;
-                if (dioramaFlora) dioramaFlora.visible = true;
-            } else if (style === 'night') {
-                scene.background = new THREE.Color(0x050814);
-                hemiLight.color.setHex(0x1e293b);
-                hemiLight.groundColor.setHex(0x0f172a);
-                hemiLight.intensity = 0.18;
-                ambLight.color.setHex(0x1e293b);
-                ambLight.intensity = 0.08;
-                dirLight.color.setHex(0x3b82f6);
-                dirLight.intensity = 0.30;
-                fillLight.intensity = 0.10;
-                cyanLedStudy.intensity = 2.5;
-                cyanLedLiving.intensity = 2.2;
-                bedsideLampLeft.intensity = 2.0;
-                bedsideLampRight.intensity = 2.0;
-                kitchenLed.intensity = 1.8;
-                nightLightsGroup.visible = true;
-                if (studioGround) studioGround.visible = false;
-                if (dioramaGround) dioramaGround.visible = true;
-                if (dioramaFlora) dioramaFlora.visible = true;
-            }
-
-            // 2. Modificación de Materiales en Mallas según Estilo (PBR Universal)
-            apartmentGroup.traverse(child => {
-                if (!child.isMesh || !child.userData.origMat) return;
-                if (child.parent === lines2DGroup || child.userData.is2DLine) return;
-                if (child.name === "dioramaGround"  || child.name === "accentStudyWall" || child.name === "accentLivingWall") return;
-                if (child.parent === dioramaFlora) return;
-
-                const nameLower = (child.userData.name || '').toLowerCase();
-                const isCap = child.userData.isCap || (child.material === topCapMat);
-                const isExtWall = child.userData.isExtWall || (child.parent && child.parent.parent === exteriorWallsGroup);
-                const isIntWall = child.userData.isIntWall || (child.parent && child.parent.parent === interiorWallsGroup);
-                const isFloor = (child.parent === floorGroup || child.userData.isFloor || child.name?.includes('Floor'));
-                const isBathFloor = isFloor && (child.position.x < 2.4 && child.position.z > 2.5 && child.position.z < 4.5);
-                const isKitchenFloor = isFloor && (child.position.x >= 2.4 && child.position.z >= 6.3);
-                const isTileFloor = isBathFloor || isKitchenFloor;
-                const isRoof = (child.parent === roofGroup || child.userData.isRoof);
-
-                // Clasificación detallada de mobiliario y objetos:
-                const isSofa = nameLower.includes('sillón') || nameLower.includes('futón') || nameLower.includes('sofa') || nameLower.includes('colchón tapizado');
-                const isCushion = nameLower.includes('almohadón') || nameLower.includes('bolster');
-                const isBedSheet = nameLower.includes('sábana') || nameLower.includes('colchón') || nameLower.includes('almohada');
-                const isBedRunner = nameLower.includes('pie de cama') || nameLower.includes('duvet') || nameLower.includes('acolchado');
-                const isWoodFurniture = nameLower.includes('mesa') || nameLower.includes('escritorio') || nameLower.includes('estante') || nameLower.includes('zapatero') || nameLower.includes('pino') || nameLower.includes('madera') || nameLower.includes('respaldo') || nameLower.includes('placard');
-                const isAppliance = nameLower.includes('heladera') || nameLower.includes('lavarropas') || nameLower.includes('microondas') || nameLower.includes('horno') || nameLower.includes('anafe');
-                const isMetalFixture = nameLower.includes('canilla') || nameLower.includes('grifería') || nameLower.includes('barral') || nameLower.includes('picaporte') || nameLower.includes('manija') || nameLower.includes('pata');
-                const isGraniteCounter = nameLower.includes('mesada') || nameLower.includes('mármol') || nameLower.includes('granito');
-                const isSanitaryPorcelain = nameLower.includes('inodoro') || nameLower.includes('bidet') || nameLower.includes('bacha') || nameLower.includes('lavatorio') || nameLower.includes('bañera');
-                const isGlassItem = nameLower.includes('vidrio') || nameLower.includes('ventana') || nameLower.includes('mampara') || nameLower.includes('espejo');
-                const isScreenDisplay = nameLower.includes('pantalla') || nameLower.includes('monitor') || nameLower.includes('tv') || nameLower.includes('televisor');
-
-                if (style === 'archviz') {
-                    if (isCap) {
-                        child.material = archvizCleanCapMat;
-                    } else if (isExtWall || isIntWall) {
-                        child.material = archvizWhiteWallMat;
-                    } else if (isFloor) {
-                        if (child.name === 'bathFloorMesh' || isBathFloor) {
-                            child.material = archvizBathTileFloorMat;
-                        } else {
-                            child.material = archvizWoodFloorMat;
-                        }
-                    } else if (isSofa) {
-                        child.material = archvizSofaMat;
-                    } else if (isCushion) {
-                        child.material = archvizCushionCreamMat;
-                    } else if (isBedSheet) {
-                        child.material = archvizBedSheetMat;
-                    } else if (isBedRunner) {
-                        child.material = archvizBedRunnerMat;
-                    } else if (isAppliance) {
-                        child.material = archvizStainlessSteelMat;
-                    } else if (isMetalFixture) {
-                        child.material = archvizPolishedChromeMat;
-                    } else if (isGraniteCounter) {
-                        child.material = archvizBlackGraniteMat;
-                    } else if (isSanitaryPorcelain) {
-                        child.material = archvizWhitePorcelainMat;
-                    } else if (isGlassItem) {
-                        child.material = archvizGlassMat;
-                    } else if (isScreenDisplay) {
-                        child.material = archvizScreenMat;
-                    } else if (isWoodFurniture) {
-                        child.material = archvizWoodFurnitureMat;
-                    } else {
-                        child.material = child.userData.origMat;
-                    }
-                } else if (style === 'sims') {
-                    child.material = child.userData.origMat;
-                } else if (style === 'realist') {
-                    child.material = child.userData.origMat;
-                    if (child.material.roughness !== undefined && isFloor) {
-                        child.material.roughness = 0.28;
-                    }
-                } else if (style === 'night') {
-                    child.material = child.userData.origMat;
-                }
-            });
-
-            // 3. Sincronizar UI
-            document.querySelectorAll('.style-card').forEach(card => {
-                card.classList.toggle('active', card.dataset.style === style);
-            });
-
-            const selectQuick = document.getElementById('select-quick-style');
-            if (selectQuick) selectQuick.value = style;
-
-            const btnIcon = document.getElementById('btn-styles-icon');
-            const btnText = document.getElementById('btn-styles-text');
-            const meta = STYLE_METADATA[style];
-            if (meta && btnIcon && btnText) {
-                btnIcon.innerText = meta.icon;
-                btnText.innerText = meta.name;
-            }
-
-            wakeRenderer();
-        }// Control del Modal de Estilos
-        const stylesModal = document.getElementById('styles-modal');
-
-        const btnToggleStyles = document.getElementById('btn-toggle-styles');
-        const btnCloseStyles = document.getElementById('btn-close-styles');
-        const selectQuickStyle = document.getElementById('select-quick-style');
-
-        function openStylesModal() {
-            if (stylesModal) {
-                stylesModal.classList.add('active');
-                stylesModal.style.display = 'flex';
-            }
-        }
-
-        function closeStylesModal() {
-            if (stylesModal) {
-                stylesModal.classList.remove('active');
-                stylesModal.style.display = 'none';
-            }
-        }
-
-        if (btnToggleStyles) {
-            btnToggleStyles.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                openStylesModal();
-            });
-        }
-
-        if (btnCloseStyles) {
-            btnCloseStyles.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                closeStylesModal();
-            });
-        }
-
-        if (stylesModal) {
-            stylesModal.addEventListener('click', (e) => {
-                if (e.target === stylesModal) closeStylesModal();
-            });
-        }
-
-        if (selectQuickStyle) {
-            selectQuickStyle.addEventListener('change', (e) => {
-                applyGraphicStyle(e.target.value);
-            });
-        }
-
-        document.querySelectorAll('.style-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const styleId = card.dataset.style;
-                if (styleId) {
-                    applyGraphicStyle(styleId);
-                    showToast(`🎨 Estilo aplicado: ${STYLE_METADATA[styleId]?.name || styleId}`);
-                    setTimeout(closeStylesModal, 260);
-                }
-            });
-        });
-
         // Inicializar en 3D Maqueta Realista al cargar
         setTimeout(() => {
             switchTo3D('isom', 'sims', true);
-            if (currentGraphicStyle) {
-                applyGraphicStyle(currentGraphicStyle);
-            }
+            wakeRenderer();
         }, 120);
-
 
         // Control del Modal de Render 4K Cutaway
         const btnViewRender4K = document.getElementById('btn-view-render4k');
@@ -7353,74 +6967,6 @@
             });
         }
 </script>
-
-    <!-- Modal Selector de Estilos Gráficos -->
-    <div class="modal-overlay" id="styles-modal">
-        <div class="modal-box glass-panel" style="max-width:580px; max-height:88vh; overflow-y:auto;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <div>
-                    <h3 style="font-size:15px; font-weight:700; color:#38bdf8; margin:0; display:flex; align-items:center; gap:8px;">
-                        <span>🎨</span> Selector de Estilos Gráficos
-                    </h3>
-                    <p style="font-size:11.5px; color:#94a3b8; margin:3px 0 0 0;">
-                        Elegí cómo querés ver el departamento en 3D y 2D en tiempo real:
-                    </p>
-                </div>
-                <button class="icon-btn" id="btn-close-styles" style="font-size:16px; padding:4px 10px;">✕</button>
-            </div>
-
-            <div class="styles-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:10px;">
-                <!-- 0. ArchViz Diorama (Foto Referencia) -->
-                <div class="style-card active" data-style="archviz" style="border-color:#38bdf8; background:rgba(56,189,248,0.20);">
-                    <div class="style-card-header">
-                        <span class="style-icon">🏠</span>
-                        <span class="style-title">ArchViz Diorama</span>
-                        <span class="style-badge badge-rec">Tu Referencia</span>
-                    </div>
-                    <div class="style-desc">
-                        Piso cerámico esmaltado beige 33×33 cm real, sin alfombra en living, paredes de ladrillo visto, tira LED cian y sombras solares suaves.
-                    </div>
-                </div>
-                <!-- 1. Sims Color Vivo -->
-                <div class="style-card active" data-style="sims">
-                    <div class="style-card-header">
-                        <span class="style-icon">🎨</span>
-                        <span class="style-title">Sims / Color Real</span>
-                        <span class="style-badge badge-default">Actual</span>
-                    </div>
-                    <div class="style-desc">
-                        Colores reales diferenciados, maderas cálidas, piso cerámico beige y materiales contrastados.
-                    </div>
-                </div>
-
-                <!-- 2. Realista Cálido PBR -->
-                <div class="style-card" data-style="realist">
-                    <div class="style-card-header">
-                        <span class="style-icon">✨</span>
-                        <span class="style-title">Realista Cálido</span>
-                        <span class="style-badge badge-rec">Recomendado</span>
-                    </div>
-                    <div class="style-desc">
-                        Luz solar dorada rasante, cielo suave, sombras volumétricas y reflejos especulares en pisos y granito.
-                    </div>
-                </div>
-
-
-
-                <!-- 6. Noche Cálida -->
-                <div class="style-card" data-style="night">
-                    <div class="style-card-header">
-                        <span class="style-icon">🌙</span>
-                        <span class="style-title">Noche Acogedora</span>
-                        <span class="style-badge badge-night">Nocturno</span>
-                    </div>
-                    <div class="style-desc">
-                        Exterior crepuscular y luces cálidas interiores encendidas (living, cocina, velador y PC gamer).
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
 
 
