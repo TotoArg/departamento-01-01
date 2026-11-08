@@ -576,6 +576,7 @@
             <button class="mode-btn active" id="btn-toggle-labels" title="Mostrar/Ocultar Nombres de los Ambientes"><span>🏷️</span> Nombres</button>
             <button class="mode-btn active" id="btn-toggle-video-decor" title="Mostrar/Ocultar Muebles, Electrodomésticos y Decoración"><span>🛋️</span> Amoblado</button>
             <button class="mode-btn" id="btn-toggle-roof" title="Mostrar/Ocultar Techo de Madera y Vigas"><span>🪵</span> Techo</button>
+            <button class="mode-btn" id="btn-toggle-doors" title="Abrir / Cerrar todas las puertas y placards interactivos (o hacé click directo sobre cualquier puerta)"><span>🚪</span> Puertas</button>
             <div style="display:flex; gap:3px; margin-left:2px; border-left:1px solid rgba(255,255,255,0.15); padding-left:4px;">
                 <button class="icon-btn" id="btn-zoom-in" title="Acercar plano" style="padding:4px 6px; font-size:11px; font-weight:700;">🔍 +</button>
                 <button class="icon-btn" id="btn-zoom-out" title="Alejar plano" style="padding:4px 6px; font-size:11px; font-weight:700;">🔍 −</button>
@@ -1488,10 +1489,14 @@
         // ============================================================================
         const DOOR_H = 2.05;
 
+        // Lista de puertas interactivas animadas (abatibles y corredizas de placards)
+        const animDoors = [];
+        const doorClickCandidates = [];
+
         // 1) Constructor de Puerta Placa Interior de Madera (Estudio, Baño y Cuarto)
         //    Extraído de sec_066, sec_068, sec_084, sec_092 y video_06_s10:
         //    Hoja placa enchapada en madera cedro/haya + marco de chapa gris oscuro + picaporte cromado + dintel superior
-        function addInteriorWoodDoor3D(x1, z1, x2, z2, hingeAtStart = true, swingSign = 1, openAngleDeg = 45) {
+        function addInteriorWoodDoor3D(x1, z1, x2, z2, hingeAtStart = true, swingSign = 1, openAngleDeg = 75, doorName = "Puerta") {
             const dx = x2 - x1;
             const dz = z2 - z1;
             const w = Math.hypot(dx, dz);
@@ -1528,7 +1533,9 @@
             const pivot = new THREE.Group();
             const dir = hingeAtStart ? 1 : -1;
             pivot.position.set(hingeAtStart ? (-w / 2 + jambW) : (w / 2 - jambW), 0, 0);
-            pivot.rotation.y = swingSign * (openAngleDeg * Math.PI / 180);
+
+            const openAngleRad = swingSign * (openAngleDeg * Math.PI / 180);
+            pivot.rotation.y = openAngleRad; // Inicialmente abierta para invitar a recorrer
 
             const leafMesh = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, leafT), woodDoorMat);
             leafMesh.position.set(dir * (leafW / 2), leafH / 2 + 0.005, 0);
@@ -1551,6 +1558,30 @@
             const keyEscutcheon = new THREE.Mesh(new THREE.BoxGeometry(0.024, 0.042, leafT + 0.008), doorFrameMat);
             keyEscutcheon.position.set(handleX, handleY - 0.08, 0);
             pivot.add(spindle, leverFront, leverBack, keyEscutcheon);
+
+            // Registrar en sistema de puertas animadas
+            const animEntry = {
+                name: doorName,
+                type: 'swing',
+                pivot,
+                currentVal: openAngleRad,
+                targetVal: openAngleRad,
+                openVal: openAngleRad,
+                closedVal: 0,
+                isOpen: true,
+                interactiveMeshes: [leafMesh, leverFront, leverBack, keyEscutcheon],
+                toggle: function() {
+                    this.isOpen = !this.isOpen;
+                    this.targetVal = this.isOpen ? this.openVal : this.closedVal;
+                    wakeRenderer();
+                    return this.isOpen;
+                }
+            };
+            animDoors.push(animEntry);
+            [leafMesh, leverFront, leverBack, keyEscutcheon].forEach(m => {
+                m.userData.animDoor = animEntry;
+                doorClickCandidates.push(m);
+            });
 
             holder.add(pivot);
             doors3DGroup.add(holder);
@@ -1596,7 +1627,9 @@
 
             const pivot = new THREE.Group();
             pivot.position.set(-w / 2 + jambW, 0, 0);
-            pivot.rotation.y = 32 * Math.PI / 180; // Entreabierta hacia adentro de Entrada
+            const openAngleRad = 72 * Math.PI / 180;
+            const initAngleRad = 34 * Math.PI / 180;
+            pivot.rotation.y = initAngleRad; // Entreabierta hacia adentro de Entrada
 
             const leafMesh = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, leafT), mainDoorMat);
             leafMesh.position.set(leafW / 2, leafH / 2 + 0.005, 0);
@@ -1621,17 +1654,40 @@
             extLever.position.set(leafW - 0.11, 0.98, leafT / 2 + 0.018);
             pivot.add(barHandle, extLever);
 
+            // Registrar en sistema de puertas animadas
+            const animEntry = {
+                name: "Puerta Principal",
+                type: 'swing',
+                pivot,
+                currentVal: initAngleRad,
+                targetVal: initAngleRad,
+                openVal: openAngleRad,
+                closedVal: 0,
+                isOpen: true,
+                interactiveMeshes: [leafMesh, topPanel, topArch, botPanel, barHandle, extLever],
+                toggle: function() {
+                    this.isOpen = !this.isOpen;
+                    this.targetVal = this.isOpen ? this.openVal : this.closedVal;
+                    wakeRenderer();
+                    return this.isOpen;
+                }
+            };
+            animDoors.push(animEntry);
+            [leafMesh, topPanel, topArch, botPanel, barHandle, extLever].forEach(m => {
+                m.userData.animDoor = animEntry;
+                doorClickCandidates.push(m);
+            });
+
             holder.add(pivot);
             doors3DGroup.add(holder);
             attachWallMount(holder, (x1 + x2) / 2, (z1 + z2) / 2, true);
         }
 
-        // 3) Constructor de Frentes de Placard (Fotos #20, #37, #38):
-        //    Placard embutido de 2 hojas corredizas de madera barnizada con tirador circular oscuro
-        //    + INTERIOR REAL (módulo cajonera blanca de 4 cajones + estantes blancos)
-        //    + BAULERA ABIERTA SUPERIOR HACIA ADENTRO (sin puertas corredizas arriba, nicho profundo
-        //      hacia la pared del baño bajo el techo en pendiente con parapeto frontal blanco).
-        function addSlidingPlacardFront3D(x1, x2, zWall, facingSign = -1) {
+        // 3) Constructor de Frentes de Placard (Fotos reales Cuarto y Estudio, link1 y link2):
+        //    Placard embutido de 2 hojas corredizas de madera barnizada con tiradores circulares oscuros
+        //    + INTERIOR COMPLETO AMBAS ALAS (módulo cajonera blanca + estantes izq; barrales dobles de colgar ropa y perchas der)
+        //    + BAULERA ABIERTA SUPERIOR HACIA ADENTRO (sin puertas ni techo arriba, abierta directamente al techo en pendiente)
+        function addSlidingPlacardFront3D(x1, x2, zWall, facingSign = -1, placardName = "Placard") {
             const w = x2 - x1;
             const holder = new THREE.Group();
             holder.position.set((x1 + x2) / 2, 0, zWall);
@@ -1654,7 +1710,7 @@
             plinth.position.set(0, 0.04, 0);
             holder.add(plinth);
 
-            // Estante superior divisorio interior del placard (a nivel de dintel 2.08m, sin techito exterior que sobresalga)
+            // Estante superior divisorio interior del placard (a nivel de dintel 2.08m, piso de la baulera abierta)
             const interiorDepth = 0.44;
             const interiorZ = -facingSign * (interiorDepth / 2);
             const topShelf = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xf1f5f9, 0.5));
@@ -1662,53 +1718,164 @@
             topShelf.position.set(0, 0.08 + PLACARD_H - 0.01, interiorZ);
             holder.add(topShelf);
 
-            // --- INTERIOR VISIBLE DEL PLACARD (visto en fotos #20 y #38 cuando la hoja izquierda está abierta) ---
-            // Cajonera blanca de 4 cajones amplios en sector izquierdo
+            // --- INTERIOR VISIBLE DEL PLACARD (visto en fotos link1 y link2) ---
+            // Divisor central vertical blanco
             const chestW = (w - 0.10) / 2;
+            const centerDivider = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xffffff, 0.4));
+            centerDivider.scale.set(0.02, PLACARD_H - 0.06, interiorDepth);
+            centerDivider.position.set(0, 0.08 + (PLACARD_H - 0.06) / 2, interiorZ);
+            holder.add(centerDivider);
+
+            // SECTOR IZQUIERDO: Cajonera de 4 cajones + estantes con cajas / juegos
             const chestH = 0.88;
             const chestMesh = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xf8fafc, 0.3));
             chestMesh.scale.set(chestW, chestH, interiorDepth);
             chestMesh.position.set(-w / 4, 0.08 + chestH / 2, interiorZ);
             holder.add(chestMesh);
-            // Ranuras de 4 cajones blancos
             for (let c = 0; c < 4; c++) {
                 const groove = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x64748b));
                 groove.scale.set(chestW - 0.04, 0.015, 0.02);
                 groove.position.set(-w / 4, 0.08 + (c + 1) * (chestH / 4) - 0.01, interiorZ + facingSign * (interiorDepth / 2 + 0.01));
                 holder.add(groove);
             }
-            // Estantes blancos superiores en sector izquierdo (ropa doblada / cajas de juegos de mesa)
             for (let s = 1; s <= 3; s++) {
                 const shelf = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xffffff, 0.4));
                 shelf.scale.set(chestW, 0.02, interiorDepth);
                 shelf.position.set(-w / 4, 0.08 + chestH + s * 0.28, interiorZ);
                 holder.add(shelf);
             }
+            const bin1 = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0xf8fafc));
+            bin1.scale.set(chestW * 0.44, 0.20, interiorDepth * 0.75);
+            bin1.position.set(-w / 4 - chestW * 0.24, 0.08 + chestH + 0.28 + 0.11, interiorZ);
+            const bin2 = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x38bdf8));
+            bin2.scale.set(chestW * 0.44, 0.20, interiorDepth * 0.75);
+            bin2.position.set(-w / 4 + chestW * 0.24, 0.08 + chestH + 0.28 + 0.11, interiorZ);
+            holder.add(bin1, bin2);
 
-            // --- 2 HOJAS CORREDIZAS DE MADERA NATURAL / CEDRO ---
-            // Hoja derecha cerrada (fotos #20 y #38) + Hoja izquierda abierta (corrida detrás hacia la derecha)
+            // SECTOR DERECHO: Barrales y ropa colgada (fotos link1_img2 y link2_img1)
+            const barUpper = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, chestW, 16), chromeMat);
+            barUpper.rotation.z = Math.PI / 2;
+            barUpper.position.set(w / 4, 1.95, interiorZ);
+            holder.add(barUpper);
+
+            for (let h = -chestW * 0.38; h <= chestW * 0.38; h += 0.10) {
+                const coat = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x1e293b));
+                coat.scale.set(0.05, 0.58, 0.32);
+                coat.position.set(w / 4 + h, 1.62, interiorZ);
+                holder.add(coat);
+            }
+
+            if (facingSign === 1) { // Cuarto: barral inferior con camisas
+                const barLower = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, chestW, 16), chromeMat);
+                barLower.rotation.z = Math.PI / 2;
+                barLower.position.set(w / 4, 1.10, interiorZ);
+                holder.add(barLower);
+
+                for (let h = -chestW * 0.38; h <= chestW * 0.38; h += 0.09) {
+                    const shirt = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x64748b));
+                    shirt.scale.set(0.04, 0.52, 0.28);
+                    shirt.position.set(w / 4 + h, 0.80, interiorZ);
+                    holder.add(shirt);
+                }
+            } else { // Estudio: estante medio con caja de herramientas negra y amarilla (foto link2_img1)
+                const midShelf = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xffffff, 0.4));
+                midShelf.scale.set(chestW, 0.02, interiorDepth);
+                midShelf.position.set(w / 4, 0.08 + 0.88, interiorZ);
+                holder.add(midShelf);
+
+                const toolBox = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0x18181b, 0.5));
+                toolBox.scale.set(0.42, 0.26, 0.26);
+                toolBox.position.set(w / 4 - 0.04, 0.08 + 0.14, interiorZ);
+                const toolAccent = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0xfacc15));
+                toolAccent.scale.set(0.43, 0.04, 0.08);
+                toolAccent.position.set(w / 4 - 0.04, 0.08 + 0.18, interiorZ + facingSign * 0.13);
+                holder.add(toolBox, toolAccent);
+            }
+
+            // --- 2 HOJAS CORREDIZAS DE MADERA NATURAL / CEDRO ANIMADAS ---
             const leafW = (w - 0.04) / 2 + 0.035;
             const leafH = PLACARD_H - 0.05;
             const leafT = 0.026;
 
-            // 1. Hoja derecha (exterior, frente cerrado)
-            const rightLeaf = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
-            rightLeaf.scale.set(leafW, leafH, leafT);
-            rightLeaf.position.set(w / 4 + 0.01, 0.08 + leafH / 2 + 0.01, facingSign * 0.012);
-            // Tirador circular embutido oscuro (cubeta)
-            const pullRight = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.032, 16), doorFrameMat);
-            pullRight.rotation.x = Math.PI / 2;
-            pullRight.position.set(w / 4 + 0.01 + leafW * 0.36, 0.08 + 1.00, facingSign * 0.012);
-            holder.add(rightLeaf, pullRight);
+            // 1. Hoja izquierda (interior, corre por riel posterior)
+            const leftLeafGroup = new THREE.Group();
+            const leftClosedX = -w / 4;
+            const leftOpenX = w / 4 - 0.02; // Se corre detrás de la hoja derecha para abrir el sector izquierdo
+            leftLeafGroup.position.set(leftOpenX, 0, 0); // Inicialmente abierta como en fotos
 
-            // 2. Hoja izquierda (interior, entreabierta hacia el centro permitiendo ver la cajonera y estantes como en fotos)
             const leftLeaf = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
             leftLeaf.scale.set(leafW, leafH, leafT);
-            leftLeaf.position.set(0.04, 0.08 + leafH / 2 + 0.01, -facingSign * 0.014);
+            leftLeaf.position.set(0, 0.08 + leafH / 2 + 0.01, -facingSign * 0.014);
+            leftLeaf.castShadow = true;
+
             const pullLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.032, 16), doorFrameMat);
             pullLeft.rotation.x = Math.PI / 2;
-            pullLeft.position.set(0.04 - leafW * 0.36, 0.08 + 1.00, -facingSign * 0.014);
-            holder.add(leftLeaf, pullLeft);
+            pullLeft.position.set(-leafW * 0.36, 0.08 + 1.00, -facingSign * 0.014);
+
+            leftLeafGroup.add(leftLeaf, pullLeft);
+            holder.add(leftLeafGroup);
+
+            const leftAnim = {
+                name: `${placardName} (Hoja Izq)`,
+                type: 'slide',
+                group: leftLeafGroup,
+                currentVal: leftOpenX,
+                targetVal: leftOpenX,
+                openVal: leftOpenX,
+                closedVal: leftClosedX,
+                isOpen: true,
+                interactiveMeshes: [leftLeaf, pullLeft],
+                toggle: function() {
+                    this.isOpen = !this.isOpen;
+                    this.targetVal = this.isOpen ? this.openVal : this.closedVal;
+                    wakeRenderer();
+                    return this.isOpen;
+                }
+            };
+            leftLeaf.userData.animDoor = leftAnim;
+            pullLeft.userData.animDoor = leftAnim;
+            doorClickCandidates.push(leftLeaf, pullLeft);
+            animDoors.push(leftAnim);
+
+            // 2. Hoja derecha (exterior, corre por riel anterior)
+            const rightLeafGroup = new THREE.Group();
+            const rightClosedX = w / 4;
+            const rightOpenX = -w / 4 + 0.02; // Se corre delante de la hoja izquierda para abrir el sector derecho
+            rightLeafGroup.position.set(rightClosedX, 0, 0); // Inicialmente cerrada como en fotos
+
+            const rightLeaf = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
+            rightLeaf.scale.set(leafW, leafH, leafT);
+            rightLeaf.position.set(0, 0.08 + leafH / 2 + 0.01, facingSign * 0.012);
+            rightLeaf.castShadow = true;
+
+            const pullRight = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.032, 16), doorFrameMat);
+            pullRight.rotation.x = Math.PI / 2;
+            pullRight.position.set(leafW * 0.36, 0.08 + 1.00, facingSign * 0.012);
+
+            rightLeafGroup.add(rightLeaf, pullRight);
+            holder.add(rightLeafGroup);
+
+            const rightAnim = {
+                name: `${placardName} (Hoja Der)`,
+                type: 'slide',
+                group: rightLeafGroup,
+                currentVal: rightClosedX,
+                targetVal: rightClosedX,
+                openVal: rightOpenX,
+                closedVal: rightClosedX,
+                isOpen: false,
+                interactiveMeshes: [rightLeaf, pullRight],
+                toggle: function() {
+                    this.isOpen = !this.isOpen;
+                    this.targetVal = this.isOpen ? this.openVal : this.closedVal;
+                    wakeRenderer();
+                    return this.isOpen;
+                }
+            };
+            rightLeaf.userData.animDoor = rightAnim;
+            pullRight.userData.animDoor = rightAnim;
+            doorClickCandidates.push(rightLeaf, pullRight);
+            animDoors.push(rightAnim);
 
             doors3DGroup.add(holder);
             attachWallMount(holder, 0.11, zWall, true);
@@ -1728,16 +1895,13 @@
             cocinaLintel.position.set(3.725, DOOR_H + lintelH / 2, 4.50);
             doors3DGroup.add(cocinaLintel);
             attachWallMount(cocinaLintel, 4.60, 4.50, true);
-            // Instanciar puertas 3D relevadas de las fotos (#17, #23, #39, #40):
-            // - Puerta Estudio: bisagra en X=3.00 (hingeAtStart=false), abre hacia adentro sobre muro Este (swingSign=-1)
-            // - Puerta Baño: bisagra en Z=3.65 (hingeAtStart=false), abre hacia adentro al Sur (swingSign=1)
-            // - Puerta Cuarto: bisagra en X=3.00 (hingeAtStart=false), abre hacia adentro sobre muro Este (swingSign=1)
+            // Instanciar puertas 3D interactivas relevadas de las fotos (#17, #23, #39, #40, link1 y link2):
             addMainEntranceDoor3D(5.38, 5.70, 6.12, 5.70);
-            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 55);
-            addInteriorWoodDoor3D(2.30, 3.02, 2.30, 3.65, false, 1, 55);
-            addInteriorWoodDoor3D(2.30, 4.50, 3.00, 4.50, false, 1, 55);
-            addSlidingPlacardFront3D(0.22, 2.12, 2.30, -1);
-            addSlidingPlacardFront3D(0.22, 2.12, 4.50, 1);
+            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 75, "Puerta Estudio");
+            addInteriorWoodDoor3D(2.30, 3.02, 2.30, 3.65, false, 1, 75, "Puerta Baño");
+            addInteriorWoodDoor3D(2.30, 4.50, 3.00, 4.50, false, 1, 75, "Puerta Cuarto");
+            addSlidingPlacardFront3D(0.22, 2.12, 2.30, -1, "Placard Estudio");
+            addSlidingPlacardFront3D(0.22, 2.12, 4.50, 1, "Placard Cuarto");
             resolveWallMounts();
         }
         setTimeout(ensure3DExtrasBuilt, 60);
@@ -2530,6 +2694,21 @@
             pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(pointer, activeCamera);
 
+            // 0. Raycast sobre puertas y hojas de placard animadas (click para abrir/cerrar)
+            if (activeCamera === perspCam) {
+                const doorHits = raycaster.intersectObjects(doorClickCandidates, false);
+                if (doorHits.length > 0) {
+                    const hitDoor = doorHits[0].object.userData.animDoor;
+                    if (hitDoor) {
+                        const nextState = hitDoor.toggle();
+                        showSelectionBar(`${hitDoor.name}: ${nextState ? 'Abierta' : 'Cerrada'}`);
+                        clearSelection();
+                        wakeRenderer();
+                        return;
+                    }
+                }
+            }
+
             // 1. Raycast sobre muebles interactivos
             const hits = raycaster.intersectObjects(furnitureMeshes, false);
             if (hits.length > 0) {
@@ -2854,6 +3033,18 @@
             }
             wakeRenderer();
         });
+
+        document.getElementById('btn-toggle-doors').addEventListener('click', () => {
+            const anyClosed = animDoors.some(d => !d.isOpen);
+            const nextState = anyClosed; // Si alguna está cerrada, abre todas; si todas están abiertas, las cierra
+            animDoors.forEach(d => {
+                d.isOpen = nextState;
+                d.targetVal = d.isOpen ? d.openVal : d.closedVal;
+            });
+            document.getElementById('btn-toggle-doors').classList.toggle('active', nextState);
+            showSelectionBar(nextState ? 'Todas las puertas y placards abiertos' : 'Todas las puertas y placards cerrados');
+            wakeRenderer();
+        });
         document.getElementById('chk-furniture').addEventListener('change', (e) => {
             furnitureGroup.visible = e.target.checked;
             updateSelectionVisual();
@@ -2871,7 +3062,7 @@
         });
 
         function setActiveTopBtn(id) {
-            document.querySelectorAll('.mode-btn:not(#btn-toggle-roof):not(#btn-toggle-video-decor):not(#btn-toggle-labels)').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.mode-btn:not(#btn-toggle-roof):not(#btn-toggle-video-decor):not(#btn-toggle-labels):not(#btn-toggle-doors)').forEach(b => b.classList.remove('active'));
             const el = document.getElementById(id);
             if (el) el.classList.add('active');
         }
@@ -3020,6 +3211,40 @@
             window.addEventListener(ev, wakeRenderer, { passive: true });
         });
 
+        // Cambiar cursor a pointer al pasar sobre puertas animadas
+        window.addEventListener('pointermove', (e) => {
+            if (activeCamera !== perspCam || isDraggingFurniture || isRotatingFurniture) return;
+            const rect = renderer.domElement.getBoundingClientRect();
+            const px = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            const py = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            const ray = new THREE.Raycaster();
+            ray.setFromCamera(new THREE.Vector2(px, py), activeCamera);
+            const dHits = ray.intersectObjects(doorClickCandidates, false);
+            renderer.domElement.style.cursor = dHits.length > 0 ? 'pointer' : '';
+        }, { passive: true });
+
+        // Actualizador de interpolación suave de puertas y placards
+        function updateAnimDoors() {
+            let moving = false;
+            for (let i = 0; i < animDoors.length; i++) {
+                const d = animDoors[i];
+                if (Math.abs(d.currentVal - d.targetVal) > 0.002) {
+                    d.currentVal += (d.targetVal - d.currentVal) * 0.16;
+                    moving = true;
+                    if (d.type === 'swing') {
+                        d.pivot.rotation.y = d.currentVal;
+                    } else if (d.type === 'slide') {
+                        d.group.position.x = d.currentVal;
+                    }
+                } else if (d.currentVal !== d.targetVal) {
+                    d.currentVal = d.targetVal;
+                    if (d.type === 'swing') d.pivot.rotation.y = d.currentVal;
+                    else if (d.type === 'slide') d.group.position.x = d.currentVal;
+                }
+            }
+            return moving;
+        }
+
         function animate() {
             requestAnimationFrame(animate);
             const movedPersp = controlsPersp.enabled && controlsPersp.update();
@@ -3027,7 +3252,8 @@
             if (movedPersp || movedOrtho) dirtyFrames = Math.max(dirtyFrames, 5);
             if (dirtyFrames > 0) {
                 const wallsMoving = updateSimsWalls(false);
-                if (wallsMoving) dirtyFrames = Math.max(dirtyFrames, 3);
+                const doorsMoving = updateAnimDoors();
+                if (wallsMoving || doorsMoving) dirtyFrames = Math.max(dirtyFrames, 3);
                 dirtyFrames--;
                 updateLabels();
                 if (selectionBox) selectionBox.update();
