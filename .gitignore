@@ -11,6 +11,7 @@ video_frames/
 walkthrough/
 sample_frames/
 fotos_nuevas/
+fotos_techos/
 extract_frames.py
 extract_walkthrough.py
 download_videos.py
