@@ -634,11 +634,15 @@
             <button class="mode-btn" id="btn-mode-sims" title="Paredes estilo Los Sims (Corte Dinámico que baja las paredes al rotar)"><span>🏡</span> Sims</button>
             <button class="mode-btn" id="btn-mode-cut" title="Paredes Bajas a media altura"><span>✂️</span> Bajas</button>
             <button class="mode-btn" id="btn-mode-nowalls" title="Ocultar todas las paredes"><span>🚫</span> Sin Muros</button>
+            <button class="mode-btn" id="btn-toggle-zoning" style="background:rgba(20,184,166,0.22); border:1px solid #14b8a6; color:#2dd4bf; font-weight:700;" title="Ver análisis axonométrico de zonificación funcional por colores (como en la infografía)">
+                <span>📊</span> Zonificación
+            </button>
             <button class="mode-btn" id="btn-toggle-styles" style="background:rgba(56,189,248,0.2); border:1px solid #38bdf8; color:#f8fafc; font-weight:700;" title="Abrir selector visual con todos los estilos gráficos">
                 <span id="btn-styles-icon">🎨</span> <span id="btn-styles-text">Estilos</span>
             </button>
             <select id="select-quick-style" class="mode-btn" style="background:#0f172a; border:1px solid #38bdf8; color:#38bdf8; padding:5px 8px; border-radius:8px; font-weight:700; cursor:pointer;" title="Cambiar estilo gráfico al instante">
-                <option value="archviz" selected>🏠 ArchViz Diorama (Foto Referencia)</option>
+                <option value="archviz" selected>🏢 Axonométrico Estudio (Foto Referencia)</option>
+                <option value="zoning">📊 Zonificación Funcional (Análisis)</option>
                 <option value="sims">🎨 Sims (Color Real)</option>
                 <option value="realist">✨ Realista Cálido</option>
                 <option value="clay">🏛️ Maqueta Blanca</option>
@@ -3069,6 +3073,68 @@
                 }
             });
 
+            // 7. Plantas Arquitectónicas de Interior en Macetas Cilíndricas Blancas (Estilo Revista / Foto Referencia)
+            const indoorPlantsGroup = new THREE.Group();
+            indoorPlantsGroup.name = 'indoorPlants';
+            const potGeo = new THREE.CylinderGeometry(0.16, 0.13, 0.38, 20);
+            const potMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25, metalness: 0.05 }); // Maceta blanca satinada
+            const soilGeo = new THREE.CylinderGeometry(0.155, 0.155, 0.04, 16);
+            const soilMat = new THREE.MeshStandardMaterial({ color: 0x3e2723, roughness: 0.95 }); // Tierra fértil oscura
+            const leafGeo = new THREE.DodecahedronGeometry(0.12, 1);
+            const leafColors = [0x15803d, 0x166534, 0x14532d, 0x22c55e];
+
+            function addIndoorPlant(px, pz) {
+                const pGroup = new THREE.Group();
+                pGroup.position.set(px, 0.19, pz);
+
+                const pot = new THREE.Mesh(potGeo, potMat);
+                pot.castShadow = true;
+                pot.receiveShadow = true;
+                pGroup.add(pot);
+
+                const soil = new THREE.Mesh(soilGeo, soilMat);
+                soil.position.y = 0.17;
+                pGroup.add(soil);
+
+                // Ramas y hojas estilizadas (Monstera / Ficus)
+                for (let l = 0; l < 9; l++) {
+                    const lMat = new THREE.MeshStandardMaterial({
+                        color: leafColors[l % leafColors.length],
+                        roughness: 0.65,
+                        flatShading: true
+                    });
+                    const leaf = new THREE.Mesh(leafGeo, lMat);
+                    const ang = (l / 9) * Math.PI * 2;
+                    const r = 0.14 + (l % 3) * 0.06;
+                    const h = 0.26 + (l * 0.04);
+                    leaf.scale.set(0.85, 1.4, 0.35);
+                    leaf.position.set(Math.cos(ang) * r, h, Math.sin(ang) * r);
+                    leaf.rotation.set(0.4 * Math.sin(ang), ang, -0.4 * Math.cos(ang));
+                    leaf.castShadow = true;
+                    pGroup.add(leaf);
+                }
+
+                indoorPlantsGroup.add(pGroup);
+            }
+
+            // Ubicación en esquinas estratégicas de las habitaciones (como en la foto de referencia):
+            addIndoorPlant(3.25, 0.35); // Living: Esquina Norte junto al sillón
+            addIndoorPlant(6.05, 0.35); // Living: Esquina Noreste junto al ventanal
+            addIndoorPlant(3.25, 4.45); // Living: Esquina divisoria con pasillo
+            addIndoorPlant(0.35, 0.35); // Estudio: Esquina Noroeste
+            addIndoorPlant(0.35, 7.65); // Dormitorio: Esquina Suroeste
+            addIndoorPlant(5.95, 6.05); // Entrada: Hall de acceso
+            decorVideoGroup.add(indoorPlantsGroup);
+
+            // 8. Alfombra felpudo exterior en la puerta de entrada (como en la foto de referencia)
+            const entranceMatGeo = new THREE.BoxGeometry(0.95, 0.012, 0.55);
+            const entranceMatMaterial = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.95 });
+            const entranceMat = new THREE.Mesh(entranceMatGeo, entranceMatMaterial);
+            entranceMat.position.set(5.76, 0.006, 6.62);
+            entranceMat.receiveShadow = true;
+            entranceMat.name = 'entranceMat';
+            decorVideoGroup.add(entranceMat);
+
             buildWoodenRoof();
             // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 3.85, ancho 0.85 m)
             // Remata a 3.30 m bajo las vigas de madera para evitar perforaciones en la cubierta
@@ -3091,6 +3157,132 @@
             updateRoofCapsVisibility();
         }
         setTimeout(ensure3DExtrasBuilt, 60);
+        // ============================================================================
+        // SISTEMA DE ANÁLISIS DE ZONIFICACIÓN FUNCIONAL AXONOMÉTRICA (FOTO REFERENCIA INFERIOR)
+        // ============================================================================
+        const zoningGroup = new THREE.Group();
+        zoningGroup.name = 'zoningGroup';
+        zoningGroup.visible = false;
+        apartmentGroup.add(zoningGroup);
+
+        const ZONING_AREAS = [
+            {
+                id: 'living',
+                name: 'LOUNGE / LIVING-COMEDOR',
+                subtitle: 'Área de estar, reuniones, TV y relax',
+                area: '22,4 m²',
+                color: 0x14b8a6, // Pastel Teal / Turquesa
+                x: 4.65, z: 2.40, w: 3.30, d: 4.80,
+                calloutX: 7.20, calloutZ: 2.00, calloutY: 2.20
+            },
+            {
+                id: 'cocina',
+                name: 'PANTRY / COCINA INTEGRADA',
+                subtitle: 'Preparación, cocción, heladera y lavado',
+                area: '8,4 m²',
+                color: 0xf43f5e, // Pastel Coral / Rosa
+                x: 3.925, z: 6.40, w: 1.85, d: 3.20,
+                calloutX: 6.20, calloutZ: 8.40, calloutY: 2.10
+            },
+            {
+                id: 'dormitorio',
+                name: 'PRIVATE BEDROOM / CUARTO',
+                subtitle: 'Descanso principal, cama doble y placard',
+                area: '9,9 m²',
+                color: 0x6366f1, // Pastel Indigo / Violeta
+                x: 1.50, z: 6.35, w: 3.00, d: 3.30,
+                calloutX: -1.20, calloutZ: 7.20, calloutY: 2.20
+            },
+            {
+                id: 'bano',
+                name: 'RESTROOM / BAÑO COMPLETO',
+                subtitle: 'Núcleo sanitario privado con ducha e inodoro',
+                area: '3,2 m²',
+                color: 0x06b6d4, // Pastel Aqua / Celeste
+                x: 1.15, z: 3.50, w: 2.30, d: 2.40,
+                calloutX: -1.20, calloutZ: 3.50, calloutY: 2.00
+            },
+            {
+                id: 'estudio',
+                name: 'OPEN COWORK / ESTUDIO',
+                subtitle: 'Puesto de trabajo, PC gamer y concentración',
+                area: '6,9 m²',
+                color: 0x22c55e, // Pastel Mint / Verde
+                x: 1.50, z: 1.15, w: 3.00, d: 2.30,
+                calloutX: -1.20, calloutZ: 1.00, calloutY: 2.10
+            },
+            {
+                id: 'entrada',
+                name: 'RECEPTION / ACCESO',
+                subtitle: 'Hall de entrada, calzado y despojo',
+                area: '3,4 m²',
+                color: 0xf97316, // Pastel Amber / Naranja
+                x: 5.575, z: 5.55, w: 1.45, d: 1.50,
+                calloutX: 7.20, calloutZ: 5.80, calloutY: 2.00
+            }
+        ];
+
+        function buildZoningAnalysisLayers() {
+            ZONING_AREAS.forEach(zone => {
+                // 1. Placa de color pastel traslúcida sobre el piso
+                const planeGeo = new THREE.PlaneGeometry(zone.w - 0.06, zone.d - 0.06);
+                const planeMat = new THREE.MeshBasicMaterial({
+                    color: zone.color,
+                    transparent: true,
+                    opacity: 0.32,
+                    depthWrite: false
+                });
+                const mesh = new THREE.Mesh(planeGeo, planeMat);
+                mesh.rotation.x = -Math.PI / 2;
+                mesh.position.set(zone.x, 0.008, zone.z);
+                zoningGroup.add(mesh);
+
+                // Borde perimetral coloreado
+                const edgesGeo = new THREE.EdgesGeometry(planeGeo);
+                const lineMat = new THREE.LineBasicMaterial({ color: zone.color, linewidth: 2, transparent: true, opacity: 0.85 });
+                const line = new THREE.LineSegments(edgesGeo, lineMat);
+                line.rotation.x = -Math.PI / 2;
+                line.position.set(zone.x, 0.009, zone.z);
+                zoningGroup.add(line);
+
+                // 2. Línea directriz arquitectónica (Leader Line) con punto de origen
+                const dotGeo = new THREE.SphereGeometry(0.04, 12, 12);
+                const dotMat = new THREE.MeshBasicMaterial({ color: 0x0f172a });
+                const dot = new THREE.Mesh(dotGeo, dotMat);
+                dot.position.set(zone.x, 0.015, zone.z);
+                zoningGroup.add(dot);
+
+                const linePts = [
+                    new THREE.Vector3(zone.x, 0.015, zone.z),
+                    new THREE.Vector3(zone.x, zone.calloutY, zone.z),
+                    new THREE.Vector3(zone.calloutX, zone.calloutY, zone.calloutZ)
+                ];
+                const leaderGeo = new THREE.BufferGeometry().setFromPoints(linePts);
+                const leaderMat = new THREE.LineBasicMaterial({ color: 0x334155, linewidth: 1.5 });
+                const leaderLine = new THREE.Line(leaderGeo, leaderMat);
+                zoningGroup.add(leaderLine);
+
+                // Punto final de anclaje
+                const endDot = new THREE.Mesh(dotGeo, dotMat);
+                endDot.position.copy(linePts[2]);
+                zoningGroup.add(endDot);
+            });
+        }
+        buildZoningAnalysisLayers();
+
+        // Control del botón de Zonificación
+        let isZoningActive = false;
+        function toggleZoningAnalysis(forceState = null) {
+            isZoningActive = (forceState !== null) ? forceState : !isZoningActive;
+            zoningGroup.visible = isZoningActive;
+            const btn = document.getElementById('btn-toggle-zoning');
+            if (btn) btn.classList.toggle('active', isZoningActive);
+            const overlayContainer = document.getElementById('zoning-overlay-cards');
+            if (overlayContainer) overlayContainer.style.display = isZoningActive ? 'block' : 'none';
+            showToast(`📊 Zonificación Funcional: ${isZoningActive ? 'Activada' : 'Desactivada'}`);
+            wakeRenderer();
+        }
+
 
         // ============================================================================
         // 4C. MUEBLES, ELECTRODOMÉSTICOS, CORTINAS Y DECORACIÓN EXTRAÍDOS DEL 2° VIDEO
@@ -4957,8 +5149,8 @@
         // 12. MOTOR DE ESTILOS GRÁFICOS INTERACTIVOS (SIMS, REALISTA, CLAY, BLUEPRINT, BOCETO, NOCHE)
         // ============================================================================
         let currentGraphicStyle = 'archviz'; // Por defecto ArchViz Diorama (idéntico a la foto de referencia)
-        if (localStorage.getItem('dep_graphic_style_v5')) {
-            currentGraphicStyle = localStorage.getItem('dep_graphic_style_v5');
+        if (localStorage.getItem('dep_graphic_style_v6')) {
+            currentGraphicStyle = localStorage.getItem('dep_graphic_style_v6');
         }
 
         const nightLightsGroup = new THREE.Group();
@@ -5012,6 +5204,18 @@
             map: proceduralBrickTex,
             roughness: 0.78,
             metalness: 0.02
+        });
+        const archvizWhiteWallMat = new THREE.MeshStandardMaterial({
+            color: 0xffffff, // Muros blancos puros (Foto Referencia)
+            bumpMap: proceduralPlasterBumpTex,
+            bumpScale: 0.0010,
+            roughness: 0.88,
+            metalness: 0.01
+        });
+        const archvizCleanCapMat = new THREE.MeshStandardMaterial({
+            color: 0xf8fafc, // Albardilla superior blanca integrada
+            roughness: 0.85,
+            metalness: 0.01
         });
         const archvizIntWallMat = new THREE.MeshStandardMaterial({
             color: 0xf4efe6, // Yeso blanco cálido mate
@@ -5092,7 +5296,8 @@
         const sketchFloorMat = new THREE.MeshStandardMaterial({ color: 0xf1ebe1, roughness: 0.95 });
 
         const STYLE_METADATA = {
-            archviz: { icon: '🏠', name: 'ArchViz' },
+            archviz: { icon: '🏢', name: 'Axonométrico' },
+            zoning: { icon: '📊', name: 'Zonificación' },
             sims: { icon: '🎨', name: 'Sims' },
             realist: { icon: '✨', name: 'Realista' },
             clay: { icon: '🏛️', name: 'Maqueta' },
@@ -5112,33 +5317,38 @@
         function applyGraphicStyle(style) {
             ensureOriginalMaterialsCached();
             currentGraphicStyle = style;
-            localStorage.setItem('dep_graphic_style_v5', style);
+            localStorage.setItem('dep_graphic_style_v6', style);
 
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
             
             // 1. Configuración de Iluminación y Cielo según Estilo
-            if (style === 'archviz') {
-                scene.background = new THREE.Color(0xd7bf9e); // Color cálido diorama de la foto de referencia
-                hemiLight.color.setHex(0xdbeafe);
-                hemiLight.groundColor.setHex(0xc49a6c);
-                hemiLight.intensity = 0.62;
-                ambLight.color.setHex(0xe0e7ff);
-                ambLight.intensity = 0.42;
-                dirLight.color.setHex(0xfff6ea);
-                dirLight.intensity = 1.15;
-                dirLight.position.set(-6.8, 17.5, -4.8);
-                fillLight.color.setHex(0xffeedd);
-                fillLight.intensity = 0.28;
-                cyanLedStudy.intensity = 2.4;
-                cyanLedLiving.intensity = 2.0;
-                bedsideLampLeft.intensity = 1.6;
-                bedsideLampRight.intensity = 1.6;
-                kitchenLed.intensity = 1.4;
+            if (style === 'archviz' || style === 'zoning') {
+                scene.background = new THREE.Color(0xffffff); // Fondo de estudio blanco puro (Foto Referencia)
+                hemiLight.color.setHex(0xf8fafc);
+                hemiLight.groundColor.setHex(0xe2e8f0);
+                hemiLight.intensity = 0.70;
+                ambLight.color.setHex(0xffffff);
+                ambLight.intensity = 0.50;
+                dirLight.color.setHex(0xffffff);
+                dirLight.intensity = 1.10;
+                dirLight.position.set(-6.5, 17.0, -4.5);
+                fillLight.color.setHex(0xf1f5f9);
+                fillLight.intensity = 0.32;
+                cyanLedStudy.intensity = 1.2;
+                cyanLedLiving.intensity = 1.0;
+                bedsideLampLeft.intensity = 1.2;
+                bedsideLampRight.intensity = 1.2;
+                kitchenLed.intensity = 1.2;
                 nightLightsGroup.visible = false;
-                if (dioramaGround) dioramaGround.visible = true;
-                if (dioramaFlora) dioramaFlora.visible = true;
-                
+                if (dioramaGround) dioramaGround.visible = false;
+                if (dioramaFlora) dioramaFlora.visible = false;
+                zoningGroup.visible = (style === 'zoning');
+                isZoningActive = (style === 'zoning');
+                const btnZ = document.getElementById('btn-toggle-zoning');
+                if (btnZ) btnZ.classList.toggle('active', isZoningActive);
+                const ovCards = document.getElementById('zoning-overlay-cards');
+                if (ovCards) ovCards.style.display = isZoningActive ? 'block' : 'none';
             } else if (style === 'sims') {
                 scene.background = new THREE.Color(0xffffff);
                 hemiLight.intensity = 0.35;
@@ -5276,13 +5486,11 @@
                 const isGlassItem = nameLower.includes('vidrio') || nameLower.includes('ventana') || nameLower.includes('mampara') || nameLower.includes('espejo');
                 const isScreenDisplay = nameLower.includes('pantalla') || nameLower.includes('monitor') || nameLower.includes('tv') || nameLower.includes('televisor');
 
-                if (style === 'archviz') {
+                if (style === 'archviz' || style === 'zoning') {
                     if (isCap) {
-                        child.material = topCapMat;
-                    } else if (isExtWall) {
-                        child.material = archvizBrickWallMat;
-                    } else if (isIntWall) {
-                        child.material = archvizIntWallMat;
+                        child.material = archvizCleanCapMat;
+                    } else if (isExtWall || isIntWall) {
+                        child.material = archvizWhiteWallMat;
                     } else if (isFloor) {
                         if (child.name === 'bathFloorMesh' || isBathFloor) {
                             child.material = archvizBathTileFloorMat;
@@ -5359,6 +5567,12 @@
             wakeRenderer();
         }// Control del Modal de Estilos
         const stylesModal = document.getElementById('styles-modal');
+        const btnToggleZoning = document.getElementById('btn-toggle-zoning');
+        if (btnToggleZoning) {
+            btnToggleZoning.addEventListener('click', () => {
+                toggleZoningAnalysis();
+            });
+        }
         const btnToggleStyles = document.getElementById('btn-toggle-styles');
         const btnCloseStyles = document.getElementById('btn-close-styles');
         const selectQuickStyle = document.getElementById('select-quick-style');
@@ -5529,5 +5743,35 @@
         </div>
     </div>
 
+
+    <!-- Carteles de Análisis de Zonificación Funcional (como en la infografía inferior) -->
+    <div id="zoning-overlay-cards" style="display:none; position:absolute; bottom:65px; left:16px; right:16px; pointer-events:none; z-index:30;">
+        <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:960px; margin:0 auto;">
+            <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border-left:4px solid #14b8a6; padding:6px 12px; border-radius:8px; color:#fff; font-size:11px; max-width:180px;">
+                <div style="font-weight:700; color:#2dd4bf;">LOUNGE / LIVING</div>
+                <div style="color:#94a3b8; font-size:10px;">Estar, TV y descanso (22,4 m²)</div>
+            </div>
+            <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border-left:4px solid #f43f5e; padding:6px 12px; border-radius:8px; color:#fff; font-size:11px; max-width:180px;">
+                <div style="font-weight:700; color:#fb7185;">PANTRY / COCINA</div>
+                <div style="color:#94a3b8; font-size:10px;">Cocción y lavado (8,4 m²)</div>
+            </div>
+            <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border-left:4px solid #6366f1; padding:6px 12px; border-radius:8px; color:#fff; font-size:11px; max-width:180px;">
+                <div style="font-weight:700; color:#818cf8;">BEDROOM / CUARTO</div>
+                <div style="color:#94a3b8; font-size:10px;">Descanso principal (9,9 m²)</div>
+            </div>
+            <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border-left:4px solid #06b6d4; padding:6px 12px; border-radius:8px; color:#fff; font-size:11px; max-width:180px;">
+                <div style="font-weight:700; color:#38bdf8;">RESTROOM / BAÑO</div>
+                <div style="color:#94a3b8; font-size:10px;">Sanitario y ducha (3,2 m²)</div>
+            </div>
+            <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border-left:4px solid #22c55e; padding:6px 12px; border-radius:8px; color:#fff; font-size:11px; max-width:180px;">
+                <div style="font-weight:700; color:#4ade80;">COWORK / ESTUDIO</div>
+                <div style="color:#94a3b8; font-size:10px;">Puesto gamer y PC (6,9 m²)</div>
+            </div>
+            <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border-left:4px solid #f97316; padding:6px 12px; border-radius:8px; color:#fff; font-size:11px; max-width:180px;">
+                <div style="font-weight:700; color:#fb923c;">RECEPTION / ACCESO</div>
+                <div style="color:#94a3b8; font-size:10px;">Hall y calzado (3,4 m²)</div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
