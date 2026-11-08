@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { exec } = require('child_process');
 
 let PORT = parseInt(process.env.PORT || '8101', 10);
@@ -108,19 +109,34 @@ const server = http.createServer((req, res) => {
     }
 });
 
+function getLanIp() {
+    const ifaces = os.networkInterfaces();
+    for (const name of Object.keys(ifaces)) {
+        for (const net of ifaces[name]) {
+            if (net.family === 'IPv4' && !net.internal) {
+                return net.address;
+            }
+        }
+    }
+    return '127.0.0.1';
+}
+
 function startServer(portToTry) {
-    server.listen(portToTry, () => {
-        const url = `http://localhost:${portToTry}`;
+    server.listen(portToTry, '0.0.0.0', () => {
+        const localUrl = `http://localhost:${portToTry}`;
+        const lanIp = getLanIp();
+        const lanUrl = `http://${lanIp}:${portToTry}`;
         console.log(`\n======================================================`);
         console.log(`  🚀 SERVIDOR DE DESARROLLO LOCAL OFFLINE ACTIVO`);
         console.log(`  🏢 Proyecto: Departamento 01-01`);
-        console.log(`  🔗 URL: ${url}`);
+        console.log(`  💻 Local (PC):          ${localUrl}`);
+        console.log(`  📱 Celular / Red Local: ${lanUrl}`);
         console.log(`  ⚡ Hot-Reload: Activado (recarga automática al guardar)`);
         console.log(`  📦 Modo: 100% Offline (Three.js y controles en libs/)`);
         console.log(`======================================================\n`);
         
         if (!process.argv.includes('--no-open')) {
-            try { exec(`start ${url}`); } catch (e) {}
+            try { exec(`start ${localUrl}`); } catch (e) {}
         }
     });
 
