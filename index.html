@@ -3943,40 +3943,37 @@
             addDecorBox(6.20, 1.05, 6.05, 0.014, 0.12, 0.08, 0xf1f5f9, 0.4);
             setMountWall(null);
 
-            // - Bolsos / mochila sobre el piso cerca de la puerta (fotos #1 y #3)
-            addDecorBox(6.10, 0.14, 5.85, 0.28, 0.28, 0.36, 0x0f766e, 0.85, 0.12, 'Bolso Estampado Entrada'); // Bolso teal/estampado
-            addDecorBox(6.08, 0.18, 5.72, 0.24, 0.32, 0.22, 0x1e293b, 0.9, -0.15, 'Mochila Negra Entrada'); // Mochila
+            // - Bolsos / mochila sobre el piso cerca de la puerta (fotos #1 y #3): conjunto unificado seleccionable
+            createCompoundAssembly('Mochila y Bolso Entrada', () => {
+                addDecorBox(6.10, 0.14, 5.85, 0.28, 0.28, 0.36, 0x0f766e, 0.85, 0.12, 'Bolso Estampado Entrada');
+                addDecorBox(6.08, 0.18, 5.72, 0.24, 0.32, 0.22, 0x1e293b, 0.9, -0.15, 'Mochila Negra Entrada');
+            });
 
             // - Perchero industrial de hierro negro + zapatero de 3 niveles + estante superior (fotos #0, #1, #3):
             createCompoundAssembly('Perchero y Zapatero Entrada', () => {
-                // Zapatero 3 niveles abajo con calzado (Z = 5.20 a 5.56, X = 6.10):
-                addDecorBox(6.10, 0.03, 5.38, 0.28, 0.02, 0.65, 0x0f172a); // Estante inferior metal
-                addDecorBox(6.10, 0.19, 5.38, 0.28, 0.02, 0.65, 0x0f172a); // Estante medio metal
-                addDecorBox(6.10, 0.35, 5.38, 0.28, 0.02, 0.65, 0x0f172a); // Estante superior metal
+                // Zapatero 3 niveles abajo con calzado (Z = 5.06 a 5.70, X = 6.10):
+                addDecorBox(6.10, 0.03, 5.38, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Inferior Zapatero');
+                addDecorBox(6.10, 0.19, 5.38, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Medio Zapatero');
+                addDecorBox(6.10, 0.35, 5.38, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Superior Zapatero');
                 // Patas y estructura lateral de hierro negro:
-                addDecorBox(6.10, 0.90, 5.06, 0.025, 1.80, 0.025, 0x0f172a); // Columna Norte
-                addDecorBox(6.10, 0.90, 5.70, 0.025, 1.80, 0.025, 0x0f172a); // Columna Sur
-                // Calzados en el zapatero:
-                addDecorBox(6.08, 0.09, 5.22, 0.22, 0.09, 0.26, 0x1e293b, 0.8); // Zapatillas negras
-                addDecorBox(6.08, 0.09, 5.52, 0.22, 0.09, 0.24, 0x94a3b8, 0.8); // Zapatillas grises
-                addDecorBox(6.08, 0.25, 5.30, 0.22, 0.09, 0.24, 0x475569, 0.8); // Calzado estante 2
-                // Zapatillas sobre el piso frente al zapatero (fotos #0 y #3):
-                addDecorBox(5.72, 0.05, 5.14, 0.18, 0.08, 0.26, 0x1e293b, 0.85, 0.25, 'Zapatillas Piso Entrada');
-                addDecorBox(5.72, 0.05, 4.96, 0.18, 0.08, 0.26, 0xf1f5f9, 0.85, -0.20);
+                addDecorBox(6.10, 0.90, 5.06, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Norte Perchero');
+                addDecorBox(6.10, 0.90, 5.70, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Sur Perchero');
+                // Calzados ordenados dentro de los estantes del mueble zapatero:
+                addDecorBox(6.08, 0.09, 5.22, 0.22, 0.09, 0.24, 0x1e293b, 0.8, 0, 'Zapatillas Negras Estante 1');
+                addDecorBox(6.08, 0.09, 5.52, 0.22, 0.09, 0.24, 0x94a3b8, 0.8, 0, 'Zapatillas Grises Estante 1');
+                addDecorBox(6.08, 0.25, 5.22, 0.22, 0.09, 0.24, 0x475569, 0.8, 0, 'Zapatillas Cuero Estante 2');
+                addDecorBox(6.08, 0.25, 5.52, 0.22, 0.09, 0.24, 0xf1f5f9, 0.8, 0, 'Zapatillas Blancas Estante 2');
 
-                // Camperas colgadas del perchero (fotos #0, #1, #3):
-                setMountWall(6.30, 5.38, false);
-                // Campera inflable negra/azul oscuro:
+                // Camperas colgadas del perchero (sin setMountWall que altere alturas):
                 addDecorBox(6.10, 1.25, 5.25, 0.24, 0.82, 0.38, 0x1e293b, 0.85, 0, 'Campera Abrigada');
                 // Bolsa de tela con manija ("Ochenta y Cinco Accesorios", foto #1):
                 addDecorBox(6.11, 1.35, 5.46, 0.16, 0.32, 0.26, 0xfef08a, 0.9, 0.05, 'Bolsa Tela Accesorios');
                 // Estante superior de madera natural (pino/paraíso):
                 addDecorBox(6.10, 1.78, 5.38, 0.26, 0.03, 0.68, 0x9a5b32, 0.6, 0, 'Estante Madera Perchero');
                 // Adornos sobre el estante superior (fotos #0, #1, #3):
-                addDecorCyl(6.10, 1.88, 5.20, 0.035, 0.025, 0.16, 0xf1f5f9, 0.4); // Florero cerámico claro
-                addDecorCyl(6.10, 1.88, 5.34, 0.025, 0.025, 0.15, 0x1c1917, 0.2); // Botella de vidrio oscuro
-                addDecorBox(6.10, 1.88, 5.48, 0.045, 0.16, 0.045, 0x78350f, 0.6); // Escultura / caja de madera
-                setMountWall(null);
+                addDecorCyl(6.10, 1.88, 5.20, 0.035, 0.025, 0.16, 0xf1f5f9, 0.4, 'Florero Cerámico Perchero');
+                addDecorCyl(6.10, 1.88, 5.34, 0.025, 0.025, 0.15, 0x1c1917, 0.2, 'Botella Vidrio Perchero');
+                addDecorBox(6.10, 1.88, 5.48, 0.045, 0.16, 0.045, 0x78350f, 0.6, 0, 'Escultura Madera Perchero');
             });
 
             // - Maceta redonda blanca sobre pie nórdico de madera con Sansevieria (Lengua de suegra, fotos #0 y #3):
@@ -4482,10 +4479,16 @@
                 (currentAssemblyGroup || decorVideoGroup).add(g);
                 setMountWall(null);
             });
-            // - 2 Cuchas / colchonetas grises para los perros bajo las ventanas Norte + bebedero celeste (fotos #4, #5 y #7)
-            addDecorBox(5.55, 0.05, 0.36, 0.85, 0.10, 0.54, 0x94a3b8, 0.85); // Cucha gris esquina NE
-            addDecorBox(3.52, 0.05, 0.36, 0.80, 0.10, 0.52, 0x94a3b8, 0.85); // Cucha gris esquina NO
-            addDecorCyl(5.96, 0.08, 0.78, 0.13, 0.15, 0.14, 0x38bdf8, 0.4);  // Bebedero celeste con dispensador
+            // - 2 Cuchas / colchonetas grises para los perros bajo las ventanas Norte + bebedero celeste (fotos #4, #5 y #7): unidades gestionables
+            createCompoundAssembly('Cucha de Mascota Esquina NE', () => {
+                addDecorBox(5.55, 0.05, 0.36, 0.85, 0.10, 0.54, 0x94a3b8, 0.85, 0, 'Cucha Mascota Esquina NE');
+            });
+            createCompoundAssembly('Cucha de Mascota Esquina NO', () => {
+                addDecorBox(3.52, 0.05, 0.36, 0.80, 0.10, 0.52, 0x94a3b8, 0.85, 0, 'Cucha Mascota Esquina NO');
+            });
+            createCompoundAssembly('Bebedero de Mascota con Dispenser', () => {
+                addDecorCyl(5.96, 0.08, 0.78, 0.13, 0.15, 0.14, 0x38bdf8, 0.4, 'Bebedero Celeste con Dispenser');
+            });
             // - Cortinas beige con barral de madera en las 3 ventanas del Living (V1, V2 y V3)
             addCurtainAssembly(3.25, 0.00, 4.35, 0.00, 0, 0.12, 0xd6ccc2);
             addCurtainAssembly(4.95, 0.00, 6.05, 0.00, 0, 0.12, 0xd6ccc2);
@@ -4668,30 +4671,32 @@
             createCompoundAssembly('Mesa de Luz Sur', () => {
                 addDecorBox(0.28, 0.31, 7.25, 0.42, 0.62, 0.42, 0x4a3222, 0.5);
             });
-            // 4. Panel calefactor eléctrico negro en muro Sur (X=2.48, Z=7.88) + Cesto de ropa sucia gris en muro Este (X=2.72, Z=6.80, foto #17)
-            addDecorBox(2.48, 0.48, 7.88, 0.50, 0.50, 0.05, 0x0f172a, 0.2);  // Panel calefactor vidrio negro
-            addDecorBox(2.72, 0.35, 6.80, 0.38, 0.70, 0.44, 0x475569, 0.8);  // Cesto ropa sucia gris con ropa arriba
+            // 4. Panel calefactor eléctrico negro en muro Sur (X=2.48, Z=7.88) + Cesto de ropa sucia gris en muro Este
+            createCompoundAssembly('Panel Calefactor Cuarto', () => {
+                addDecorBox(2.48, 0.48, 7.88, 0.50, 0.50, 0.05, 0x0f172a, 0.2, 0, 'Panel Calefactor Vidrio Negro');
+            });
+            createCompoundAssembly('Cesto Ropa Sucia Cuarto', () => {
+                addDecorBox(2.72, 0.35, 6.80, 0.38, 0.70, 0.44, 0x475569, 0.8, 0, 'Cesto Ropa Sucia Gris');
+            });
 
-            // Equipaje, organizador y cajas guardados sobre la LOSA PLANA a Y = 2.20 m en la baulera abierta del cuarto:
-            // - Sector Izquierdo:
-            addDecorBox(0.40, 2.20 + 0.12, 4.46, 0.26, 0.24, 0.28, 0x18181b, 0.6);   // Caja negra encintada a la izquierda
-            addDecorBox(0.60, 2.20 + 0.14, 4.50, 0.24, 0.28, 0.24, 0xe2e8f0, 0.5);   // Caja electrodoméstico Oster blanca
-            addDecorBox(0.60, 2.20 + 0.28 + 0.045, 4.48, 0.20, 0.09, 0.20, 0x556b2f, 0.8);   // Bolso verde oliva arriba
-            addDecorBox(0.62, 2.20 + 0.13, 4.30, 0.20, 0.26, 0.16, 0x1d4ed8, 0.5);   // Caja azul al fondo
-            // - Sector Central:
-            // Mueble organizador gris de 2 puertas con tiradores negros
-            const cabW = 0.48, cabH = 0.52, cabD = 0.36;
-            addDecorBox(1.05, 2.20 + cabH / 2, 4.45, cabW, cabH, cabD, 0x64748b, 0.4);
-            addDecorBox(0.99, 2.20 + cabH / 2, 4.64, 0.07, 0.016, 0.02, 0x0f172a, 0.3); // Tirador negro izquierdo
-            addDecorBox(1.11, 2.20 + cabH / 2, 4.64, 0.07, 0.016, 0.02, 0x0f172a, 0.3); // Tirador negro derecho
-            // Caja del Monitor Samsung Essential Curved 27" arriba del mueble organizador (rematando bajo el faldón de madera)
-            addDecorBox(1.05, 2.20 + cabH + 0.09, 4.45, 0.56, 0.18, 0.36, 0xd4a373, 0.6);
-            // - Sector Derecho:
-            // Valija rígida grafito oscuro acostada en primer plano con candado TSA
-            addDecorBox(1.68, 2.20 + 0.14, 4.52, 0.58, 0.28, 0.26, 0x334155, 0.35);
-            addDecorBox(1.66, 2.20 + 0.285, 4.52, 0.12, 0.015, 0.04, 0x0f172a, 0.2); // Candado TSA y manija superior
-            // Valija / bolso negro de tela vertical contra el fondo
-            addDecorBox(1.68, 2.20 + 0.28, 4.32, 0.46, 0.56, 0.20, 0x18181b, 0.8);
+            // Equipaje, organizador y cajas guardados sobre la losa a Y = 2.20 m en la baulera abierta del cuarto:
+            createCompoundAssembly('Baulera Cuarto (Cajas y Valijas)', () => {
+                // - Sector Izquierdo:
+                addDecorBox(0.40, 2.20 + 0.12, 4.46, 0.26, 0.24, 0.28, 0x18181b, 0.6, 0, 'Caja Negra Encintada');
+                addDecorBox(0.60, 2.20 + 0.14, 4.50, 0.24, 0.28, 0.24, 0xe2e8f0, 0.5, 0, 'Caja Electrodoméstico Blanca');
+                addDecorBox(0.60, 2.20 + 0.28 + 0.045, 4.48, 0.20, 0.09, 0.20, 0x556b2f, 0.8, 0, 'Bolso Verde Baulera');
+                addDecorBox(0.62, 2.20 + 0.13, 4.30, 0.20, 0.26, 0.16, 0x1d4ed8, 0.5, 0, 'Caja Azul Fondo');
+                // - Sector Central:
+                const cabW = 0.48, cabH = 0.52, cabD = 0.36;
+                addDecorBox(1.05, 2.20 + cabH / 2, 4.45, cabW, cabH, cabD, 0x64748b, 0.4, 0, 'Mueble Organizador Baulera');
+                addDecorBox(0.99, 2.20 + cabH / 2, 4.64, 0.07, 0.016, 0.02, 0x0f172a, 0.3, 0, 'Tirador Izquierdo Baulera');
+                addDecorBox(1.11, 2.20 + cabH / 2, 4.64, 0.07, 0.016, 0.02, 0x0f172a, 0.3, 0, 'Tirador Derecho Baulera');
+                addDecorBox(1.05, 2.20 + cabH + 0.09, 4.45, 0.56, 0.18, 0.36, 0xd4a373, 0.6, 0, 'Caja Monitor Samsung Curved');
+                // - Sector Derecho:
+                addDecorBox(1.68, 2.20 + 0.14, 4.52, 0.58, 0.28, 0.26, 0x334155, 0.35, 0, 'Valija Rígida Grafito');
+                addDecorBox(1.66, 2.20 + 0.285, 4.52, 0.12, 0.015, 0.04, 0x0f172a, 0.2, 0, 'Candado TSA Valija');
+                addDecorBox(1.68, 2.20 + 0.28, 4.32, 0.46, 0.56, 0.20, 0x18181b, 0.8, 0, 'Valija Tela Negra');
+            });
             // 5. Cortina gris topo con barral de madera en la ventana Sur del Cuarto (V5: X=0.90..2.10, Z=8.00)
             addCurtainAssembly(0.90, 8.00, 2.10, 8.00, 0, -0.12, 0x78716c);
 
@@ -4726,8 +4731,10 @@
 
             // 1. MURO NORTE (Y = 0.00 m):
             // - Panel Calefactor Negro (X = 0.95 a 1.55 m, ancho 0.60 m) inmediatamente a la izquierda de la ventana:
-            addDecorBox(1.25, 0.48, 0.04, 0.60, 0.50, 0.03, 0x0f172a, 0.15); // Vidrio negro templado
-            addDecorBox(1.50, 0.68, 0.056, 0.04, 0.02, 0.01, 0x38bdf8);      // Display LED digital azul
+            createCompoundAssembly('Panel Calefactor Estudio', () => {
+                addDecorBox(1.25, 0.48, 0.04, 0.60, 0.50, 0.03, 0x0f172a, 0.15, 0, 'Vidrio Templado Calefactor Estudio');
+                addDecorBox(1.50, 0.68, 0.056, 0.04, 0.02, 0.01, 0x38bdf8, 0.2, 0, 'Display Digital Calefactor Estudio');
+            });
             // - Cortina de ventana Norte (V4: X = 1.65 a 2.95 m, barral a Z = 2.15 m):
             addCurtainAssembly(1.65, 0.00, 2.95, 0.00, 0, 0.12, 0x57534e);
 
@@ -4949,25 +4956,23 @@
                 setMountWall(null);
             });
 
-            // 3. 3 ESTANTES FLOTANTES (Muro Este X = 3.00 m):
-            // Corren por encima del escritorio principal, de Y = 0.10 m a 1.55 m (profundidad 0.25 m):
-            // a alturas Z = 1.35 m, Z = 1.70 m y Z = 2.05 m:
-            setMountWall(3.00, 0.85, false);
-            // 1° Estante (Z = 1.35 m): consolas portátiles y estuches
-            addDecorBox(2.875, 1.35, 0.85, 0.25, 0.03, 1.40, 0x9a441e, 0.45);
-            addDecorBox(2.86, 1.42, 0.45, 0.16, 0.10, 0.18, 0xfacc15, 0.3); // Game Boy / Switch Pikachu
-            addDecorBox(2.86, 1.42, 0.75, 0.16, 0.10, 0.24, 0x38bdf8, 0.4); // Consola azul
-            addDecorBox(2.86, 1.44, 1.20, 0.18, 0.14, 0.30, 0x334155, 0.5); // Estuches negros
-            // 2° Estante (Z = 1.70 m): colección libros Tolkien y bolso cámara
-            addDecorBox(2.875, 1.70, 0.85, 0.25, 0.03, 1.40, 0x9a441e, 0.45);
-            addDecorBox(2.86, 1.83, 0.95, 0.18, 0.22, 0.75, 0x7f1d1d, 0.6); // Libros Tolkien bordó
-            addDecorBox(2.86, 1.80, 0.45, 0.18, 0.16, 0.26, 0x18181b, 0.7); // Bolso cámara
-            // 3° Estante (Z = 2.05 m): planta Potus colgante y figura Goku
-            addDecorBox(2.875, 2.05, 0.85, 0.25, 0.03, 1.40, 0x9a441e, 0.45);
-            addDecorCyl(2.86, 2.14, 0.35, 0.08, 0.06, 0.14, 0xf8fafc, 0.3); // Maceta Potus
-            addDecorBox(2.86, 1.95, 0.35, 0.12, 0.30, 0.18, 0x16a34a, 0.6);  // Ramas colgantes
-            addDecorBox(2.86, 2.16, 1.15, 0.10, 0.18, 0.12, 0xf97316, 0.4); // Figura Goku naranja
-            setMountWall(null);
+            // 3. 3 ESTANTES FLOTANTES (Muro Este X = 3.00 m sobre escritorio): conjunto unificado gestionable
+            createCompoundAssembly('Estantes Flotantes Estudio (Libros y Figuras)', () => {
+                // 1° Estante (Z = 1.35 m): consolas portátiles y estuches
+                addDecorBox(2.875, 1.35, 0.85, 0.25, 0.03, 1.40, 0x9a441e, 0.45, 0, 'Estante Flotante Inferior');
+                addDecorBox(2.86, 1.42, 0.45, 0.16, 0.10, 0.18, 0xfacc15, 0.3, 0, 'Game Boy / Switch Pikachu');
+                addDecorBox(2.86, 1.42, 0.75, 0.16, 0.10, 0.24, 0x38bdf8, 0.4, 0, 'Consola Azul');
+                addDecorBox(2.86, 1.44, 1.20, 0.18, 0.14, 0.30, 0x334155, 0.5, 0, 'Estuches Periféricos');
+                // 2° Estante (Z = 1.70 m): colección libros Tolkien y bolso cámara
+                addDecorBox(2.875, 1.70, 0.85, 0.25, 0.03, 1.40, 0x9a441e, 0.45, 0, 'Estante Flotante Medio');
+                addDecorBox(2.86, 1.83, 0.95, 0.18, 0.22, 0.75, 0x7f1d1d, 0.6, 0, 'Libros Colección Tolkien');
+                addDecorBox(2.86, 1.80, 0.45, 0.18, 0.16, 0.26, 0x18181b, 0.7, 0, 'Bolso Cámara Fotográfica');
+                // 3° Estante (Z = 2.05 m): planta Potus colgante y figura Goku
+                addDecorBox(2.875, 2.05, 0.85, 0.25, 0.03, 1.40, 0x9a441e, 0.45, 0, 'Estante Flotante Superior');
+                addDecorCyl(2.86, 2.14, 0.35, 0.08, 0.06, 0.14, 0xf8fafc, 0.3, 'Maceta Cerámica Potus');
+                addDecorBox(2.86, 1.95, 0.35, 0.12, 0.30, 0.18, 0x16a34a, 0.6, 0, 'Ramas Colgantes Potus');
+                addDecorBox(2.86, 2.16, 1.15, 0.10, 0.18, 0.12, 0xf97316, 0.4, 0, 'Figura Coleccionable Goku');
+            });
 
             // 4. BIBLIOTECA ALTA (Muro Oeste X = 0.00 m):
             createCompoundAssembly('Biblioteca Alta con Libros', () => {
@@ -5159,28 +5164,30 @@
                 (currentAssemblyGroup || decorVideoGroup).add(cg);
             });
 
-            // 7. OBJETOS EN BAULERA ABIERTA DEL ESTUDIO (sobre losa plana en Z = 2.20 m):
-            // - Sector Izquierdo (X=0.25..0.75):
-            addDecorBox(0.44, 2.20 + 0.08, 2.62, 0.34, 0.16, 0.26, 0x1e3a8a, 0.4); // Caja Sony azul
-            addDecorBox(0.44, 2.20 + 0.25, 2.62, 0.26, 0.18, 0.22, 0xf8fafc, 0.3); // Caja Mirage L120 blanca
-            addDecorBox(0.38, 2.20 + 0.10, 2.42, 0.28, 0.20, 0.18, 0x18181b, 0.7); // Morral negro
-            addDecorBox(0.38, 2.20 + 0.05, 2.32, 0.14, 0.10, 0.03, 0xf1f5f9, 0.3); // Libreta
-            addDecorBox(0.41, 2.20 - 0.06, 2.29, 0.035, 0.18, 0.015, 0x18181b, 0.8);// Correa colgante
+            // 7. OBJETOS EN BAULERA ABIERTA DEL ESTUDIO (sobre losa plana en Z = 2.20 m): conjunto unificado
+            createCompoundAssembly('Baulera Estudio (Cajas y Valijas)', () => {
+                // - Sector Izquierdo (X=0.25..0.75):
+                addDecorBox(0.44, 2.20 + 0.08, 2.62, 0.34, 0.16, 0.26, 0x1e3a8a, 0.4, 0, 'Caja Sony Azul Baulera');
+                addDecorBox(0.44, 2.20 + 0.25, 2.62, 0.26, 0.18, 0.22, 0xf8fafc, 0.3, 0, 'Caja Mirage L120 Baulera');
+                addDecorBox(0.38, 2.20 + 0.10, 2.42, 0.28, 0.20, 0.18, 0x18181b, 0.7, 0, 'Morral Negro Baulera');
+                addDecorBox(0.38, 2.20 + 0.05, 2.32, 0.14, 0.10, 0.03, 0xf1f5f9, 0.3, 0, 'Libreta Baulera');
+                addDecorBox(0.41, 2.20 - 0.06, 2.29, 0.035, 0.18, 0.015, 0x18181b, 0.8, 0, 'Correa Colgante Baulera');
 
-            // - Sector Central-Izquierdo (X=0.75..1.30):
-            addDecorBox(0.92, 2.20 + 0.12, 2.64, 0.42, 0.24, 0.22, 0x1e293b, 0.7); // Bolso deportivo azul
-            addDecorBox(0.94, 2.20 + 0.13, 2.48, 0.46, 0.13, 0.13, 0xd9779f, 0.6); // Mat yoga lila
-            addDecorBox(0.94, 2.20 + 0.05, 2.38, 0.52, 0.10, 0.12, 0x111827, 0.8); // Funda tubular negra
+                // - Sector Central-Izquierdo (X=0.75..1.30):
+                addDecorBox(0.92, 2.20 + 0.12, 2.64, 0.42, 0.24, 0.22, 0x1e293b, 0.7, 0, 'Bolso Deportivo Azul Baulera');
+                addDecorBox(0.94, 2.20 + 0.13, 2.48, 0.46, 0.13, 0.13, 0xd9779f, 0.6, 0, 'Mat Yoga Lila Baulera');
+                addDecorBox(0.94, 2.20 + 0.05, 2.38, 0.52, 0.10, 0.12, 0x111827, 0.8, 0, 'Funda Tubular Negra Baulera');
 
-            // - Sector Central-Derecho (X=1.30..1.65):
-            addDecorBox(1.44, 2.20 + 0.07, 2.52, 0.34, 0.14, 0.28, 0x27272a, 0.5); // Caja zapatos CAT
-            addDecorBox(1.58, 2.20 + 0.07, 2.37, 0.05, 0.045, 0.01, 0xfacc15, 0.2);// Logo amarillo CAT
-            addDecorBox(1.42, 2.20 + 0.20, 2.52, 0.32, 0.13, 0.26, 0xb48a64, 0.6); // Caja zapatos Lippi
+                // - Sector Central-Derecho (X=1.30..1.65):
+                addDecorBox(1.44, 2.20 + 0.07, 2.52, 0.34, 0.14, 0.28, 0x27272a, 0.5, 0, 'Caja Zapatos CAT Baulera');
+                addDecorBox(1.58, 2.20 + 0.07, 2.37, 0.05, 0.045, 0.01, 0xfacc15, 0.2, 0, 'Logo Amarillo CAT Baulera');
+                addDecorBox(1.42, 2.20 + 0.20, 2.52, 0.32, 0.13, 0.26, 0xb48a64, 0.6, 0, 'Caja Zapatos Lippi Baulera');
 
-            // - Sector Derecho (X=1.65..2.10):
-            addDecorCyl(1.84, 2.20 + 0.09, 2.56, 0.26, 0.26, 0.18, 0x27272a, 0.9); // Neumático auxilio
-            addDecorBox(1.80, 2.20 + 0.24, 2.54, 0.20, 0.12, 0.24, 0x1e293b, 0.3); // Casco ciclismo
-            addDecorBox(1.98, 2.20 + 0.09, 2.44, 0.26, 0.18, 0.26, 0xb5bda0, 0.7); // Manta verde salvia
+                // - Sector Derecho (X=1.65..2.10):
+                addDecorCyl(1.84, 2.20 + 0.09, 2.56, 0.26, 0.26, 0.18, 0x27272a, 0.9, 'Neumático Auxilio Baulera');
+                addDecorBox(1.80, 2.20 + 0.24, 2.54, 0.20, 0.12, 0.24, 0x1e293b, 0.3, 0, 'Casco Ciclismo Baulera');
+                addDecorBox(1.98, 2.20 + 0.09, 2.44, 0.26, 0.18, 0.26, 0xb5bda0, 0.7, 0, 'Manta Verde Salvia Baulera');
+            });
         }
         // ============================================================================
         // SISTEMA DE PERSISTENCIA DE MODIFICACIONES (MUEBLES MOVIDOS Y ELIMINADOS)
@@ -6114,24 +6121,45 @@
             // Si el modo edición NO está activo, nunca permitir arrastre accidental de muebles
             if (!isFurnitureEditMode) return;
 
-            // Si hay un objeto seleccionado, comprobar si el cursor está sobre él para arrastrarlo
-            const curObj = getSelectedObject();
-            if (curObj) {
-                const rect = renderer.domElement.getBoundingClientRect();
-                pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-                pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-                raycaster.setFromCamera(pointer, activeCamera);
+            const rect = renderer.domElement.getBoundingClientRect();
+            pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(pointer, activeCamera);
 
-                const hits = raycaster.intersectObject(curObj, true);
-                if (hits.length > 0) {
-                    isDraggingSelected = true;
-                    dragPlane.setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 1, 0), curObj.position);
-                    if (raycaster.ray.intersectPlane(dragPlane, dragIntersection)) {
-                        dragOffset.copy(dragIntersection).sub(curObj.position);
-                    }
-                    controlsPersp.enabled = false;
-                    controlsOrtho.enabled = false;
+            // Comprobar primero sobre el objeto ya seleccionado (si existe)
+            let curObj = getSelectedObject();
+            let hits = curObj ? raycaster.intersectObject(curObj, true) : [];
+
+            // Si no golpeó el seleccionado o no había ninguno, raycast sobre todos los candidatos
+            if (hits.length === 0) {
+                const candidates = [];
+                decorVideoGroup.traverse(child => {
+                    if (child.isMesh && child.name !== 'contactShadow') candidates.push(child);
+                });
+                fixturesGroup.traverse(child => {
+                    if (child.isMesh && child.name !== 'contactShadow') candidates.push(child);
+                });
+                furnitureMeshes.forEach(fm => {
+                    fm.traverse(child => {
+                        if (child.isMesh && child.name !== 'contactShadow') candidates.push(child);
+                    });
+                });
+                const testHits = raycaster.intersectObjects(candidates, false);
+                if (testHits.length > 0) {
+                    selectDecorObject(testHits[0].object);
+                    curObj = getSelectedObject();
+                    if (curObj) hits = raycaster.intersectObject(curObj, true);
                 }
+            }
+
+            if (curObj && hits.length > 0) {
+                isDraggingSelected = true;
+                dragPlane.setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 1, 0), curObj.position);
+                if (raycaster.ray.intersectPlane(dragPlane, dragIntersection)) {
+                    dragOffset.copy(dragIntersection).sub(curObj.position);
+                }
+                controlsPersp.enabled = false;
+                controlsOrtho.enabled = false;
             }
         });
 
