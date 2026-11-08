@@ -98,13 +98,17 @@ const server = http.createServer((req, res) => {
         }
         res.writeHead(200, {
             'Content-Type': mime,
-            'Cache-Control': 'no-cache, no-store, must-revalidate'
+            'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+            'Pragma': 'no-cache',
+            'Expires': '0'
         });
         res.end(content);
     } else {
         res.writeHead(200, {
             'Content-Type': mime,
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+            'Pragma': 'no-cache',
+            'Expires': '0'
         });
         fs.createReadStream(filePath).pipe(res);
     }

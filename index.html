@@ -996,6 +996,7 @@
         let activeCamera = perspCam;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', alpha: false });
+        renderer.setClearColor(0xf8fafc, 1.0); // Prevenir pantalla negra en WebGL bajo cualquier circunstancia
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0));
         renderer.shadowMap.enabled = true;
@@ -1715,10 +1716,14 @@
             return tex;
         }
 
-        const pmremGen = new THREE.PMREMGenerator(renderer);
-        pmremGen.compileEquirectangularShader();
-        const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
-        scene.environment = studioEnvTarget.texture;
+        try {
+            const pmremGen = new THREE.PMREMGenerator(renderer);
+            pmremGen.compileEquirectangularShader();
+            const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
+            scene.environment = studioEnvTarget.texture;
+        } catch (errPmrem) {
+            console.warn("PMREM environment generation skipped (using physical lights fallback):", errPmrem);
+        }
 
         // 1. Rebote natural cielo-suelo (HemisphereLight suave)
         const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0xb88850, 0.58);
@@ -6779,13 +6784,30 @@
         }
 
         // ============================================================================
-        // MOTOR DE POST-PROCESAMIENTO SSAO (Screen Space Ambient Occlusion)
+        // MOTOR DE POST-PROCESAMIENTO SEGURO (Screen Space Ambient Occlusion / Nativo)
         // ============================================================================
         let composer = null;
         let ssaoPass = null;
         let fxaaPass = null;
+        const isMobileOrLowEnd = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 800);
+
         function initPostProcessing() {
             try {
+                // En dispositivos móviles, SSAOPass causa pantalla negra por limitaciones de precisión de profundidad en WebGL móvil.
+                // El renderizador nativo WebGL ya incluye antialiasing por hardware (MSAA), sombras suaves PCF y contacto AO integrado.
+                if (isMobileOrLowEnd) {
+                    console.log("Modo móvil detectado: usando renderizador nativo WebGL PBR con antialiasing nativo y sombras PCF (previene pantalla negra).");
+                    composer = null;
+                    return;
+                }
+
+                const hasDepth = renderer.capabilities.isWebGL2 || !!renderer.extensions.get('WEBGL_depth_texture');
+                if (!hasDepth) {
+                    console.warn("WEBGL_depth_texture no disponible: usando renderizador nativo PBR.");
+                    composer = null;
+                    return;
+                }
+
                 if (typeof THREE.EffectComposer !== 'undefined' && typeof THREE.SSAOPass !== 'undefined') {
                     const width = window.innerWidth;
                     const height = window.innerHeight;
@@ -6795,7 +6817,7 @@
                     composer.addPass(renderPass);
 
                     ssaoPass = new THREE.SSAOPass(scene, activeCamera, width, height);
-                    ssaoPass.kernelRadius = 0.40; // Radio suave y orgánico para oclusión sin ruido
+                    ssaoPass.kernelRadius = 0.35;
                     ssaoPass.minDistance = 0.001;
                     ssaoPass.maxDistance = 0.15;
                     ssaoPass.output = THREE.SSAOPass.OUTPUT.Default;
@@ -6811,7 +6833,7 @@
                     console.log("SSAO & FXAA Post-processing initialized successfully!");
                 }
             } catch (err) {
-                console.warn("Post-processing initialization warning (fallback to native WebGL renderer):", err);
+                console.warn("Post-processing fallback to native WebGL renderer:", err);
                 composer = null;
                 ssaoPass = null;
                 fxaaPass = null;
@@ -6832,10 +6854,12 @@
                 updateLabels();
                 if (selectionBox) selectionBox.update();
                 
-                if (composer && activeCamera === perspCam) {
+                if (composer && activeCamera === perspCam && !isMobileOrLowEnd) {
                     try {
                         composer.render();
                     } catch (e) {
+                        console.warn("Error en composer.render(), cayendo permanentemente a renderizador nativo:", e);
+                        composer = null;
                         renderer.render(scene, activeCamera);
                     }
                 } else {
@@ -6875,9 +6899,18 @@
         // ============================================================================
         // 12. MOTOR DE ESTILOS GRÁFICOS INTERACTIVOS (SIMS, REALISTA, CLAY, BLUEPRINT, BOCETO, NOCHE)
         // ============================================================================
+        const VALID_STYLES = ['archviz', 'sims', 'realist', 'night'];
         let currentGraphicStyle = 'archviz'; // Por defecto ArchViz Diorama (idéntico a la foto de referencia)
-        if (localStorage.getItem('dep_graphic_style_v8')) {
-            currentGraphicStyle = localStorage.getItem('dep_graphic_style_v8');
+        try {
+            const savedStyle = localStorage.getItem('dep_graphic_style_v8');
+            if (savedStyle && VALID_STYLES.includes(savedStyle)) {
+                currentGraphicStyle = savedStyle;
+            } else {
+                localStorage.setItem('dep_graphic_style_v8', 'archviz');
+                currentGraphicStyle = 'archviz';
+            }
+        } catch (e) {
+            currentGraphicStyle = 'archviz';
         }
 
         const nightLightsGroup = new THREE.Group();
@@ -6996,8 +7029,14 @@
 
         function applyGraphicStyle(style) {
             ensureOriginalMaterialsCached();
+            if (!VALID_STYLES.includes(style)) {
+                console.warn(`Estilo no reconocido '${style}', restableciendo a 'archviz'`);
+                style = 'archviz';
+            }
             currentGraphicStyle = style;
-            localStorage.setItem('dep_graphic_style_v8', style);
+            try {
+                localStorage.setItem('dep_graphic_style_v8', style);
+            } catch (e) {}
 
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
