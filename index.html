@@ -671,7 +671,6 @@
             <button class="mode-btn" id="btn-mode-2d" title="Plano 2D Técnico Ortogonal"><span>📐</span> 2D</button>
             <button class="mode-btn" id="btn-mode-3d" title="3D Normal con muros completos"><span>🏢</span> 3D Muros</button>
             <button class="mode-btn active" id="btn-mode-sims" title="3D Maqueta con corte dinámico estilo Los Sims"><span>✂️</span> 3D Sims</button>
-            <button class="mode-btn" id="btn-mode-render4k" style="background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fef08a;" title="Activar Gestión en Calidad 4K Ultra-HD en el 3D"><span>✨</span> Calidad 4K</button>
 
             <button class="mode-btn" id="btn-global-undo" style="display:none; background:rgba(239,68,68,0.22); border:1px solid #ef4444; color:#fca5a5;" title="Deshacer último cambio (Ctrl+Z)">
                 <span>↩️</span> <span id="btn-undo-text">Deshacer</span>
@@ -695,19 +694,6 @@
                 <button class="icon-btn" id="btn-zoom-reset" title="Restablecer vista" style="padding:4px 6px; font-size:12px;">🎯</button>
             </div>
         </div>
-    </div>
-
-    <!-- Badge Flotante de Gestión en Calidad 4K Ultra-HD -->
-    <div id="badge-4k-quality" style="display:none; position:fixed; top:74px; right:16px; z-index:25; background:rgba(15,23,42,0.94); border:1.5px solid #f59e0b; padding:6px 14px; border-radius:30px; align-items:center; gap:10px; backdrop-filter:blur(10px); box-shadow:0 10px 28px rgba(0,0,0,0.65);">
-        <span style="font-size:12px; color:#fef08a; font-weight:800; display:flex; align-items:center; gap:6px;">
-            <span>✨</span> 3D Calidad 4K (Plano Exacto)
-        </span>
-        <button id="btn-capture-4k-snapshot" class="mode-btn" style="background:#f59e0b; color:#0f172a; font-size:11px; font-weight:800; padding:4px 12px; border-radius:14px; border:none; cursor:pointer; box-shadow:0 2px 8px rgba(245,158,11,0.4);" title="Descargar foto 4K UHD (3840×2160) de la vista 3D actual de tu departamento">
-            📸 Descargar Foto 4K UHD
-        </button>
-        <button id="btn-exit-4k-mode" class="mode-btn" style="background:rgba(255,255,255,0.12); color:#f8fafc; font-size:11px; font-weight:700; padding:4px 10px; border-radius:14px; border:1px solid rgba(255,255,255,0.25); cursor:pointer;" title="Volver a calidad estándar">
-            ✕ Salir de 4K
-        </button>
     </div>
 
     <!-- Right Sidebar (Visibility & Layers) -->
@@ -944,7 +930,6 @@
     <div id="bottom-bar" class="glass-panel">
         <div class="view-chip" data-view="top2d">📐 Plano 2D Exacto</div>
         <div class="view-chip active" data-view="isom">🏢 Maqueta 3D General</div>
-        <div class="view-chip" data-view="render4k" id="chip-render4k" style="color:#fef08a; border-color:rgba(245,158,11,0.5);">🖼️ Render 4K Cutaway</div>
         <div class="view-chip" data-view="living">🛋️ Living y Entrada</div>
         <div class="view-chip" data-view="cocina">🍳 Cocina</div>
         <div class="view-chip" data-view="cuarto">🛏️ Cuarto</div>
@@ -6768,13 +6753,10 @@
             switchTo3D(current3DPreset, 'up', true);
         });
         document.getElementById('btn-mode-sims').addEventListener('click', () => {
-            exit4KMode();
             applyWallsVisibility(true, true);
             switchTo3D(current3DPreset, 'sims', true);
         });
-        document.getElementById('btn-mode-render4k').addEventListener('click', () => {
-            switchTo4KMode();
-        });
+        
         if (document.getElementById('btn-mode-cut')) document.getElementById('btn-mode-cut').addEventListener('click', () => {
             applyWallsVisibility(true, true);
             switchTo3D(current3DPreset, 'down', true);
@@ -6832,9 +6814,7 @@
                 const v = chip.dataset.view;
                 if (v === 'top2d') {
                     switchTo2D();
-                } else if (v === 'render4k') {
-                    toggle4KUltraMode(true);
-                    switchTo3D('isom', 'sims', true);
+                
                 } else {
                     switchTo3D(v, wallMode, true);
                 }
@@ -7024,141 +7004,7 @@
 
 
         // ============================================================================
-        // ============================================================================
-        // MOTOR DE GESTIÓN Y RENDERIZADO 3D EN CALIDAD 4K ULTRA-HD (FIEL AL MODELO 3D)
-        // ============================================================================
-        let is4KModeActive = false;
-
-        function applyMaxAnisotropy(root = scene) {
-            try {
-                const maxAniso = renderer.capabilities.getMaxAnisotropy();
-                root.traverse((child) => {
-                    if (child.isMesh && child.material) {
-                        const mats = Array.isArray(child.material) ? child.material : [child.material];
-                        mats.forEach(m => {
-                            ['map', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap'].forEach(k => {
-                                if (m[k] && m[k].isTexture) {
-                                    m[k].anisotropy = maxAniso;
-                                    m[k].needsUpdate = true;
-                                }
-                            });
-                        });
-                    }
-                });
-            } catch (e) {}
-        }
-
-        function switchTo4KMode() {
-            // 1. Activar 3D Maqueta Realista en ángulo isométrico canónico
-            applyWallsVisibility(true, true);
-            switchTo3D('isom', 'sims', true);
-            setActiveTopBtn('btn-mode-render4k');
-
-            is4KModeActive = true;
-            // Calibrar pixelRatio para máxima definición y nitidez visual sin crash de GPU
-            const highPR = isMobileOrLowEnd ? Math.max(window.devicePixelRatio, 2.0) : Math.max(window.devicePixelRatio, 2.25);
-            renderer.setPixelRatio(highPR);
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            if (composer) composer.setSize(window.innerWidth, window.innerHeight);
-
-            applyMaxAnisotropy(scene);
-            applyShadowsRecursively(scene);
-
-            const badge4K = document.getElementById('badge-4k-quality');
-            if (badge4K) badge4K.style.display = 'flex';
-
-            const btn4K = document.getElementById('btn-mode-render4k');
-            if (btn4K) {
-                btn4K.classList.add('active');
-                btn4K.style.background = 'linear-gradient(135deg, #d97706, #b45309)';
-                btn4K.style.borderColor = '#fbbf24';
-                btn4K.style.color = '#fff';
-                btn4K.style.boxShadow = '0 0 16px rgba(245,158,11,0.5)';
-            }
-
-            // Modo edición siempre habilitado para gestión interactiva completa en 4K
-            setFurnitureEditMode(true);
-            showToast('✨ Calidad 4K Activa: Render 3D fotorrealista fiel a tu plano exacto');
-            wakeRenderer();
-        }
-        window.switchTo4KMode = switchTo4KMode;
-
-        function exit4KMode() {
-            if (!is4KModeActive) return;
-            is4KModeActive = false;
-            const normalPR = Math.min(window.devicePixelRatio, 2.0);
-            renderer.setPixelRatio(normalPR);
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            if (composer) composer.setSize(window.innerWidth, window.innerHeight);
-
-            const badge4K = document.getElementById('badge-4k-quality');
-            if (badge4K) badge4K.style.display = 'none';
-
-            const btn4K = document.getElementById('btn-mode-render4k');
-            if (btn4K) {
-                btn4K.classList.remove('active');
-                btn4K.style.background = 'rgba(245,158,11,0.22)';
-                btn4K.style.borderColor = '#f59e0b';
-                btn4K.style.color = '#fef08a';
-                btn4K.style.boxShadow = 'none';
-            }
-        }
-        window.exit4KMode = exit4KMode;
-
-        function capture4KSnapshot() {
-            try {
-                showToast('📸 Generando Render 4K UHD (3840×2160)...');
-                const origW = window.innerWidth;
-                const origH = window.innerHeight;
-                const origPR = renderer.getPixelRatio();
-
-                const targetW = 3840;
-                const targetH = 2160;
-
-                renderer.setPixelRatio(1.0);
-                renderer.setSize(targetW, targetH, false);
-                activeCamera.aspect = targetW / targetH;
-                activeCamera.updateProjectionMatrix();
-
-                renderer.render(scene, activeCamera);
-
-                const dataURL = renderer.domElement.toDataURL('image/png', 1.0);
-
-                renderer.setPixelRatio(origPR);
-                renderer.setSize(origW, origH, true);
-                activeCamera.aspect = origW / origH;
-                activeCamera.updateProjectionMatrix();
-                if (composer) composer.setSize(origW, origH);
-                wakeRenderer();
-
-                if (!dataURL || dataURL.length < 1000) {
-                    throw new Error('DataURL generado vacío');
-                }
-
-                const link = document.createElement('a');
-                link.download = 'Render_3D_4K_Depto_01-01_' + Date.now() + '.png';
-                link.href = dataURL;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showToast('✅ Foto 4K Ultra-HD descargada con éxito!');
-            } catch (err) {
-                console.error('Error al capturar 4K:', err);
-                showToast('⚠️ Error al generar 4K: ' + err.message);
-            }
-        }
-        window.capture4KSnapshot = capture4KSnapshot;
-
-        // Salir de modo 4K desde el badge
-        document.getElementById('btn-exit-4k-mode')?.addEventListener('click', () => {
-            exit4KMode();
-            switchTo3D('isom', 'sims', true);
-        });
-
-        document.getElementById('btn-capture-4k-snapshot')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            capture4KSnapshot();
-        });
+        
         </script>
 
 
