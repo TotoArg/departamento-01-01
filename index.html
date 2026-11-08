@@ -1511,12 +1511,7 @@
         // Calefactor Living (Muro Este X=6.30, Z=1.85, entre Ventana Este V3 y Rack TV)
         addBoxFixture(6.14, 0.32, 1.85, 0.18, 0.58, 0.44, 0x9ca3af);
         addBoxFixture(6.14, 0.62, 1.85, 0.19, 0.04, 0.46, 0xf97316); // Tapa/indicador térmico
-        // Conducto vertical galvanizado que sube desde el calefactor hasta el techo de madera
-        const pipeMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.65, roughness: 0.3 });
-        const pipeVert = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 2.45, 16), pipeMat);
-        pipeVert.position.set(6.15, 1.82, 1.85);
-        fixturesGroup.add(pipeVert);
-        attachWallMount(pipeVert, 6.30, 1.90, false);
+        // (El conducto vertical galvanizado bajo la pendiente del techo se modela con altura exacta en decorVideoGroup)
 
         // Calefactor Cuarto Ampliado (Muro Sur Y=8.00, X=2.48, a la derecha de la ventana)
         addBoxFixture(2.48, 0.34, 7.86, 0.46, 0.62, 0.14, 0x9ca3af);
@@ -1572,132 +1567,166 @@
         //    Techo de madera con limahoya / quiebre en X = 2.30 m
         function buildWoodenRoof() {
             // =========================================================================
-            // 1) BLOQUE IZQUIERDO UNIFICADO (ESTUDIO, BAÑO Y CUARTO: X = 0.00 a 3.00 m, Z = 0.00 a 8.00 m)
-            //    - Sector A (Faldón inclinado): sube de X = 0.00 m (Z = 2.50 m) a X = 2.30 m (Z = 3.60 m)
+            // 1) BLOQUE IZQUIERDO UNIFICADO (ESTUDIO, BAÑO Y CUARTO: X = -0.15 a 3.00 m, Z = -0.15 a 8.15 m)
+            //    - Sector A (Faldón inclinado): alero perimetral en X = -0.15 m (Z = 2.43 m) hasta cumbrera X = 2.30 m (Z = 3.60 m)
             //    - Sector B (Plano horizontal superior): de X = 2.30 m a X = 3.00 m a cota constante Z = 3.60 m
+            //    - Aleros de 15 cm cubren completamente el espesor exterior de los muros Oeste (X=0.00), Norte (Z=0.00) y Sur (Z=8.00)
             // =========================================================================
-            const dxA = 2.30;
-            const dyA = 3.60 - 2.50; // 1.10 m
-            const lenSlopeA = Math.hypot(dxA, dyA); // ~2.5495 m
-            const angSlopeA = Math.atan2(dyA, dxA); // ~25.56°
-            const totalDepth = 8.00; // De Z = 0.00 m a Z = 8.00 m
+            const eave = 0.15;
+            const zStart = -eave;
+            const zEnd = 8.00 + eave;
+            const totalDepth = zEnd - zStart; // 8.30 m
+            const zCenter = (zStart + zEnd) / 2; // 4.00 m
 
-            // Cubierta machimbrada Sector A (X = 0.00 a 2.30 m)
+            // Sector A: Faldón inclinado izquierdo
+            const xA1 = -eave; // -0.15 m
+            const xA2 = 2.30;
+            const dxA = xA2 - xA1; // 2.45 m
+            const slopeA = (3.60 - 2.50) / 2.30; // 0.47826 (pendiente original continua)
+            const yA1 = 3.60 - dxA * slopeA; // ~2.428 m en el borde del alero exterior
+            const yA2 = 3.60;
+            const dyA = yA2 - yA1; // ~1.172 m
+            const lenSlopeA = Math.hypot(dxA, dyA); // ~2.716 m
+            const angSlopeA = Math.atan2(dyA, dxA); // ~25.56°
+
+            // Cubierta machimbrada Sector A
             const roofLeftA = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
             roofLeftA.scale.set(lenSlopeA, 0.04, totalDepth);
-            roofLeftA.position.set(dxA / 2, 2.50 + dyA / 2, totalDepth / 2);
+            roofLeftA.position.set((xA1 + xA2) / 2, (yA1 + yA2) / 2, zCenter);
             roofLeftA.rotation.z = angSlopeA;
             roofGroup.add(roofLeftA);
 
-            // Tirantes de madera bajo Sector A (corren paralelos a X de 0.00 a 2.30 m)
+            // Tirantes de madera vistos bajo Sector A (en el interior de las habitaciones, bajo el entablonado)
+            // Desplazamiento normal exacto bajo el entablonado: -(0.04 + 0.11)/2 = -0.075 m
+            const beamOffsetA_X = 0.075 * Math.sin(angSlopeA);
+            const beamOffsetA_Y = -0.075 * Math.cos(angSlopeA);
             for (let zBeam = 0.35; zBeam <= 7.75; zBeam += 0.55) {
                 const beamA = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
                 beamA.scale.set(lenSlopeA, 0.11, 0.07);
-                beamA.position.set(dxA / 2, 2.50 + dyA / 2 - 0.055, zBeam);
+                beamA.position.set((xA1 + xA2) / 2 + beamOffsetA_X, (yA1 + yA2) / 2 + beamOffsetA_Y, zBeam);
                 beamA.rotation.z = angSlopeA;
                 roofGroup.add(beamA);
             }
 
-            // Cubierta machimbrada Sector B (Plano superior horizontal sobre puertas y pasillo, X = 2.30 a 3.00 m)
+            // Cubierta machimbrada Sector B (Plano superior horizontal sobre pasillo, X = 2.30 a 3.00 m)
             const widthB = 0.70;
             const roofLeftB = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
             roofLeftB.scale.set(widthB, 0.04, totalDepth);
-            roofLeftB.position.set(2.30 + widthB / 2, 3.60, totalDepth / 2);
+            roofLeftB.position.set(2.30 + widthB / 2, 3.60, zCenter);
             roofGroup.add(roofLeftB);
 
             // Tirantes horizontales bajo Sector B
             for (let zBeam = 0.35; zBeam <= 7.75; zBeam += 0.55) {
                 const beamB = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
                 beamB.scale.set(widthB, 0.08, 0.07);
-                beamB.position.set(2.30 + widthB / 2, 3.60 - 0.04, zBeam);
+                beamB.position.set(2.30 + widthB / 2, 3.54, zBeam);
                 roofGroup.add(beamB);
             }
 
-            // Viga cumbrera/quiebre longitudinal en X = 2.30 m (a lo largo de todo el pasillo y habitaciones)
+            // Viga cumbrera/quiebre longitudinal en X = 2.30 m
             const ridgeLeft = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
             ridgeLeft.scale.set(0.12, 0.16, totalDepth);
-            ridgeLeft.position.set(2.30, 3.52, totalDepth / 2);
+            ridgeLeft.position.set(2.30, 3.50, zCenter);
             roofGroup.add(ridgeLeft);
 
-            // Viga longitudinal central en X = 3.00 m
+            // Viga cumbrera central en X = 3.00 m
             const ridgeSpine = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
             ridgeSpine.scale.set(0.12, 0.16, totalDepth);
-            ridgeSpine.position.set(3.00, 3.52, totalDepth / 2);
+            ridgeSpine.position.set(3.00, 3.50, zCenter);
             roofGroup.add(ridgeSpine);
 
             // =========================================================================
-            // 2) BLOQUE DERECHO ELEVADO (LIVING, ENTRADA Y COCINA: X = 3.00 a 6.30 m)
-            //    - Techo continuo sin fisuras desde la cumbrera central X = 3.00 m (Z = 3.60 m)
-            //      hasta el muro Este X = 6.30 m (Z = 3.00 m), cubriendo la totalidad de Z = 0.00 a 8.00 m
+            // 2) BLOQUE DERECHO ELEVADO (LIVING, ENTRADA Y COCINA: X = 3.00 a 6.45 m)
+            //    - Techo continuo desde la cumbrera central X = 3.00 m (Z = 3.60 m)
+            //      hasta el alero Este X = 6.45 m (Z = 2.973 m)
+            //    - Alero cubre el muro Este y fachadas Norte/Sur
             // =========================================================================
-            const dxRight = 3.30;
-            const dyRight = 3.60 - 3.00; // 0.60 m
-            const lenSlopeRight = Math.hypot(dxRight, dyRight); // ~3.354 m
+            const xR1 = 3.00;
+            const xR2 = 6.30 + eave; // 6.45 m
+            const dxRight = xR2 - xR1; // 3.45 m
+            const slopeRight = (3.60 - 3.00) / 3.30; // 0.181818
+            const yR1 = 3.60;
+            const yR2 = 3.60 - dxRight * slopeRight; // ~2.973 m
+            const dyRight = yR1 - yR2; // ~0.627 m
+            const lenSlopeRight = Math.hypot(dxRight, dyRight); // ~3.506 m
             const angSlopeRight = -Math.atan2(dyRight, dxRight); // ~ -10.30°
 
-            // 1. Cubierta machimbrada Living + Entrada (de Z = 0.00 a 6.30 m, X = 3.00 a 6.30 m)
-            const depthLivingEnt = 6.30;
+            // Desplazamiento normal exacto bajo el entablonado derecho: -(0.04 + 0.11)/2 = -0.075 m
+            const beamOffsetR_X = -0.075 * Math.sin(angSlopeRight);
+            const beamOffsetR_Y = -0.075 * Math.cos(angSlopeRight);
+
+            // 1. Cubierta machimbrada Living + Entrada (de Z = -0.15 a 6.35 m, X = 3.00 a 6.45 m)
+            const zLivStart = -eave; // -0.15 m
+            const zLivEnd = 6.35; // Cubre puerta de entrada y muro divisorio con palier
+            const depthLivingEnt = zLivEnd - zLivStart; // 6.50 m
+            const zLivCenter = (zLivStart + zLivEnd) / 2; // 3.10 m
+
             const roofLivingEnt = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
             roofLivingEnt.scale.set(lenSlopeRight, 0.04, depthLivingEnt);
-            roofLivingEnt.position.set(3.00 + dxRight / 2, 3.60 - dyRight / 2, depthLivingEnt / 2);
+            roofLivingEnt.position.set((xR1 + xR2) / 2, (yR1 + yR2) / 2, zLivCenter);
             roofLivingEnt.rotation.z = angSlopeRight;
             roofGroup.add(roofLivingEnt);
 
-            // 2. Cubierta machimbrada Cocina (de Z = 6.30 a 8.00 m, X = 3.00 a 4.85 m)
-            //    Termina exactamente en el muro divisorio Este X = 4.85 m sin invadir el Palier
-            const dxCocina = 1.85;
-            const dyCocina = (dxCocina / dxRight) * dyRight; // 0.336 m
-            const lenSlopeCocina = Math.hypot(dxCocina, dyCocina);
-            const depthCocinaSouth = 8.00 - 6.30; // 1.70 m
+            // 2. Cubierta machimbrada Cocina (de Z = 6.30 a 8.15 m, X = 3.00 a 4.95 m)
+            //    Encuentro continuo a 6.30 m sin quiebres, cubriendo muro divisorio Este X = 4.85 m con 10 cm de alero
+            const xCocinaEnd = 4.85 + 0.10; // 4.95 m
+            const dxCocina = xCocinaEnd - xR1; // 1.95 m
+            const dyCocina = dxCocina * slopeRight; // ~0.355 m
+            const lenSlopeCocina = Math.hypot(dxCocina, dyCocina); // ~1.982 m
+            const zCocinaStart = 6.30;
+            const zCocinaEnd = 8.00 + eave; // 8.15 m
+            const depthCocinaSouth = zCocinaEnd - zCocinaStart; // 1.85 m
+            const zCocinaCenter = (zCocinaStart + zCocinaEnd) / 2; // 7.225 m
+
             const roofCocinaSouth = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
             roofCocinaSouth.scale.set(lenSlopeCocina, 0.04, depthCocinaSouth);
-            roofCocinaSouth.position.set(3.00 + dxCocina / 2, 3.60 - dyCocina / 2, 6.30 + depthCocinaSouth / 2);
+            roofCocinaSouth.position.set(xR1 + dxCocina / 2, yR1 - dyCocina / 2, zCocinaCenter);
             roofCocinaSouth.rotation.z = angSlopeRight;
             roofGroup.add(roofCocinaSouth);
 
-            // Tirantes de madera vistos en Living (Z = 0.00 a 4.80 m, corren de X = 3.00 a 6.30 m)
+            // Tirantes de madera vistos en Living (Z = 0.35 a 4.65 m)
             for (let zBeam = 0.35; zBeam <= 4.65; zBeam += 0.55) {
                 const beamL = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-                beamL.scale.set(lenSlopeRight, 0.11, 0.07);
-                beamL.position.set(3.00 + dxRight / 2, 3.60 - dyRight / 2 - 0.055, zBeam);
+                beamL.scale.set(lenSlopeRight - 0.15, 0.11, 0.07);
+                beamL.position.set((xR1 + xR2) / 2 + beamOffsetR_X, (yR1 + yR2) / 2 + beamOffsetR_Y, zBeam);
                 beamL.rotation.z = angSlopeRight;
                 roofGroup.add(beamL);
             }
 
-            // Tirantes de madera en Entrada (Z = 4.80 a 6.30 m, X = 4.85 a 6.30 m)
+            // Tirantes de madera en Entrada (Z = 4.95 a 6.20 m, X = 4.85 a 6.30 m)
             const dxEnt = 1.45;
-            const dyEnt = (dxEnt / dxRight) * dyRight; // 0.264 m
+            const dyEnt = dxEnt * slopeRight;
             const lenSlopeEnt = Math.hypot(dxEnt, dyEnt);
             for (let zBeam = 4.95; zBeam <= 6.20; zBeam += 0.55) {
                 const beamE = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
                 beamE.scale.set(lenSlopeEnt, 0.11, 0.07);
-                beamE.position.set(4.85 + dxEnt / 2, 3.264 - dyEnt / 2 - 0.055, zBeam);
+                beamE.position.set(4.85 + dxEnt / 2 + beamOffsetR_X, 3.264 - dyEnt / 2 + beamOffsetR_Y, zBeam);
                 beamE.rotation.z = angSlopeRight;
                 roofGroup.add(beamE);
             }
 
-            // Tirantes de madera en Cocina (Z = 4.80 a 8.00 m, X = 3.00 a 4.85 m)
+            // Tirantes de madera en Cocina (Z = 4.95 a 7.75 m, X = 3.00 a 4.85 m)
             for (let zBeam = 4.95; zBeam <= 7.75; zBeam += 0.55) {
                 const beamC = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-                beamC.scale.set(lenSlopeCocina, 0.11, 0.07);
-                beamC.position.set(3.00 + dxCocina / 2, 3.60 - dyCocina / 2 - 0.055, zBeam);
+                beamC.scale.set(lenSlopeCocina - 0.10, 0.11, 0.07);
+                beamC.position.set(xR1 + dxCocina / 2 + beamOffsetR_X, yR1 - dyCocina / 2 + beamOffsetR_Y, zBeam);
                 beamC.rotation.z = angSlopeRight;
                 roofGroup.add(beamC);
             }
 
-            // Viga solera de remate sobre muro Este (X = 6.30 m, de Z = 0.00 a 6.30 m sobre la fachada)
+            // Viga solera de remate sobre muro Este (X = 6.30 m)
             const eaveBeamEast = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-            eaveBeamEast.scale.set(0.10, 0.14, depthLivingEnt);
-            eaveBeamEast.position.set(6.25, 2.93, depthLivingEnt / 2);
+            eaveBeamEast.scale.set(0.12, 0.14, depthLivingEnt);
+            eaveBeamEast.position.set(6.30, 2.91, zLivCenter);
             roofGroup.add(eaveBeamEast);
 
             // Viga solera de remate sobre muro Oeste (X = 0.00 m)
             const eaveBeamWest = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-            eaveBeamWest.scale.set(0.10, 0.14, totalDepth);
-            eaveBeamWest.position.set(0.05, 2.43, totalDepth / 2);
+            eaveBeamWest.scale.set(0.12, 0.14, totalDepth);
+            eaveBeamWest.position.set(0.00, 2.40, zCenter);
             roofGroup.add(eaveBeamWest);
         }
-
+        
         // ============================================================================
         // 4. MUROS INTERNOS, PUERTAS (HACIA ADENTRO DE BAÑO Y HABITACIONES) Y VANOS ABIERTOS
         // ============================================================================
@@ -1743,7 +1772,7 @@
         // - VANO ABIERTO COCINA (Corregido a ancho reglamentario de 0.85 m; mocheta de 1.00 m cubre la heladera):
         //   Paso libre de X = 3.00 a X = 3.85; mocheta de X = 3.85 a X = 4.85 (3.44 m a 3.26 m)
         addDashedLine(3.00, 4.80, 3.85, 4.80);
-        addSlopedWallSegment(3.85, 4.80, 4.85, 4.80, 3.44, 3.26, INT_T, interiorWallsGroup);
+        addSlopedWallSegment(3.85, 4.80, 4.85, 4.80, 3.38, 3.20, INT_T, interiorWallsGroup);
 
         // ============================================================================
         // 4B. PUERTAS 3D REALES EXTRAÍDAS DEL VIDEO (MARCOS DE CHAPA, HOJAS MADERA,
@@ -1780,6 +1809,7 @@
             const capMesh = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
             capMesh.scale.set(w + 0.01, 0.02, INT_T + 0.01);
             capMesh.position.set(0, wallTopH + 0.01, 0);
+            capMesh.userData.isCap = true;
             holder.add(capMesh);
 
             // Marco de chapa doblada color gris grafito oscuro (#2b3036) en jambas y dintel
@@ -1882,6 +1912,7 @@
             const capMesh = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
             capMesh.scale.set(w + 0.01, 0.02, EXT_T + 0.01);
             capMesh.position.set(0, wallHAtEntrance + 0.01, 0);
+            capMesh.userData.isCap = true;
             holder.add(capMesh);
 
             // Marco pesado de chapa gris grafito oscuro
@@ -2003,6 +2034,7 @@
             const capLosa = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
             capLosa.scale.set(w + 0.01, 0.016, 0.05);
             capLosa.position.set(0, 2.20 + 0.008, 0);
+            capLosa.userData.isCap = true;
             holder.add(capLosa);
 
             // --- INTERIOR VISIBLE DEL PLACARD ---
@@ -2200,8 +2232,10 @@
             extras3DBuilt = true;
             buildWoodenRoof();
             // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 3.85, ancho 0.85 m)
+            // Remata a 3.30 m bajo las vigas de madera para evitar perforaciones en la cubierta
             const wCocinaVano = 0.85;
-            const lintelH = 3.52 - DOOR_H;
+            const lintelTopH = 3.30;
+            const lintelH = lintelTopH - DOOR_H;
             const cocinaLintel = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
             cocinaLintel.scale.set(wCocinaVano, lintelH, INT_T);
             cocinaLintel.position.set(3.00 + wCocinaVano / 2, DOOR_H + lintelH / 2, 4.80);
@@ -2215,6 +2249,7 @@
             addSlidingPlacardFront3D(0.00, 2.30, 2.30, -1, "Placard Estudio");
             addSlidingPlacardFront3D(0.00, 2.30, 4.70, 1, "Placard Cuarto");
             resolveWallMounts();
+            updateRoofCapsVisibility();
         }
         setTimeout(ensure3DExtrasBuilt, 60);
 
@@ -2877,6 +2912,22 @@
         addPlanLabel(-0.32, 4.00, "8.00 m", "arch-label dim-v");
 
         const _projVec = new THREE.Vector3();
+        function updateRoofCapsVisibility() {
+            const hideCaps = !!(roofGroup && roofGroup.visible);
+            for (let i = 0; i < simsWalls.length; i++) {
+                const w = simsWalls[i];
+                if (w.capMesh) w.capMesh.visible = !hideCaps;
+                if (w.capGroup) w.capGroup.visible = !hideCaps;
+            }
+            if (doors3DGroup) {
+                doors3DGroup.traverse(child => {
+                    if (child.userData && child.userData.isCap) {
+                        child.visible = !hideCaps;
+                    }
+                });
+            }
+        }
+
         const labelsContainerEl = document.getElementById('labels-container');
         const chkLabelsEl = document.getElementById('chk-labels');
         let lastLabelStateKey = '';
@@ -2890,7 +2941,8 @@
             if (labelsContainerEl.style.display !== 'block') labelsContainerEl.style.display = 'block';
 
             const camPos = activeCamera.position;
-            const stateKey = `${activeCamera.uuid}_${camPos.x.toFixed(3)}_${camPos.y.toFixed(3)}_${camPos.z.toFixed(3)}_${activeCamera.zoom.toFixed(3)}_${decorVideoGroup.visible}_${window.innerWidth}_${window.innerHeight}`;
+            const showRoof = !!(roofGroup && roofGroup.visible);
+            const stateKey = `${activeCamera.uuid}_${camPos.x.toFixed(3)}_${camPos.y.toFixed(3)}_${camPos.z.toFixed(3)}_${activeCamera.zoom.toFixed(3)}_${decorVideoGroup.visible}_${showRoof}_${window.innerWidth}_${window.innerHeight}`;
             if (!force && stateKey === lastLabelStateKey) return;
             lastLabelStateKey = stateKey;
 
@@ -2901,6 +2953,12 @@
             for (let i = 0; i < labelElements.length; i++) {
                 const item = labelElements[i];
                 if (item.isDecor && !showDecor) {
+                    if (item.el.style.display !== 'none') item.el.style.display = 'none';
+                    continue;
+                }
+                // Si la cubierta de techo está activa, ocultar los nombres de ambientes interiores
+                // pero conservar las cotas perimetrales exteriores ('dim' y 'dim-v')
+                if (showRoof && !item.el.classList.contains('dim') && !item.el.classList.contains('dim-v')) {
                     if (item.el.style.display !== 'none') item.el.style.display = 'none';
                     continue;
                 }
@@ -3506,6 +3564,8 @@
         document.getElementById('chk-roof').addEventListener('change', (e) => {
             roofGroup.visible = e.target.checked;
             document.getElementById('btn-toggle-roof').classList.toggle('active', e.target.checked);
+            updateRoofCapsVisibility();
+            updateLabels(true);
             wakeRenderer();
         });
         document.getElementById('btn-toggle-roof').addEventListener('click', () => {
@@ -3516,6 +3576,8 @@
             if (nextState && activeCamera === orthoCam) {
                 switchTo3D(current3DPreset, wallMode);
             }
+            updateRoofCapsVisibility();
+            updateLabels(true);
             wakeRenderer();
         });
 
@@ -3576,6 +3638,8 @@
             roofGroup.visible = false;
             document.getElementById('chk-roof').checked = false;
             document.getElementById('btn-toggle-roof').classList.remove('active');
+            updateRoofCapsVisibility();
+            updateLabels(true);
             updateSimsWalls(true);
             setActiveTopBtn('btn-mode-2d');
             document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === 'top2d'));
