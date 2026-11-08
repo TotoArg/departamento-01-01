@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 
-const PORT = process.env.PORT || 3000;
+let PORT = parseInt(process.env.PORT || '8101', 10);
 const clients = [];
 
 // Watch directory for hot live-reload
@@ -108,17 +108,30 @@ const server = http.createServer((req, res) => {
     }
 });
 
-server.listen(PORT, () => {
-    const url = `http://localhost:${PORT}`;
-    console.log(`\n======================================================`);
-    console.log(`  🚀 SERVIDOR DE DESARROLLO LOCAL OFFLINE ACTIVO`);
-    console.log(`  🔗 URL: ${url}`);
-    console.log(`  ⚡ Hot-Reload: Activado (recarga automática al guardar)`);
-    console.log(`  📦 Modo: 100% Offline (Three.js y controles en libs/)`);
-    console.log(`======================================================\n`);
-    
-    // Auto abrir en Windows si no se pasa --no-open
-    if (!process.argv.includes('--no-open')) {
-        try { exec(`start ${url}`); } catch (e) {}
-    }
-});
+function startServer(portToTry) {
+    server.listen(portToTry, () => {
+        const url = `http://localhost:${portToTry}`;
+        console.log(`\n======================================================`);
+        console.log(`  🚀 SERVIDOR DE DESARROLLO LOCAL OFFLINE ACTIVO`);
+        console.log(`  🏢 Proyecto: Departamento 01-01`);
+        console.log(`  🔗 URL: ${url}`);
+        console.log(`  ⚡ Hot-Reload: Activado (recarga automática al guardar)`);
+        console.log(`  📦 Modo: 100% Offline (Three.js y controles en libs/)`);
+        console.log(`======================================================\n`);
+        
+        if (!process.argv.includes('--no-open')) {
+            try { exec(`start ${url}`); } catch (e) {}
+        }
+    });
+
+    server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.warn(`Puerto ${portToTry} ocupado, intentando con ${portToTry + 1}...`);
+            startServer(portToTry + 1);
+        } else {
+            console.error('Error al iniciar el servidor:', err);
+        }
+    });
+}
+
+startServer(PORT);
