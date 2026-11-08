@@ -629,7 +629,7 @@
 
         <!-- Top Mode Switcher -->
         <div id="top-toolbar" class="glass-panel">
-            <button class="mode-btn active" id="btn-mode-2d" title="Plano 2D Técnico Ortogonal"><span>📐</span> 2D</button>
+            <button class="mode-btn" id="btn-mode-2d" title="Plano 2D Técnico Ortogonal"><span>📐</span> 2D</button>
             <button class="mode-btn" id="btn-mode-3d" title="3D Normal con muros completos como antes"><span>🧊</span> 3D</button>
             <button class="mode-btn" id="btn-mode-sims" title="Paredes estilo Los Sims (Corte Dinámico que baja las paredes al rotar)"><span>🏡</span> Sims</button>
             <button class="mode-btn" id="btn-mode-cut" title="Paredes Bajas a media altura"><span>✂️</span> Bajas</button>
@@ -878,8 +878,8 @@
 
     <!-- Bottom Quick Camera Views -->
     <div id="bottom-bar" class="glass-panel">
-        <div class="view-chip active" data-view="top2d">📐 Plano 2D Exacto (Ortogonal)</div>
-        <div class="view-chip" data-view="isom">🧊 Maqueta 3D General</div>
+        <div class="view-chip" data-view="top2d">📐 Plano 2D Exacto (Ortogonal)</div>
+        <div class="view-chip active" data-view="isom">🧊 Maqueta 3D General</div>
         <div class="view-chip" data-view="living">🛋️ Living y Entrada</div>
         <div class="view-chip" data-view="cocina">🍳 Cocina</div>
         <div class="view-chip" data-view="cuarto">🛏️ Cuarto</div>
@@ -960,8 +960,8 @@
         }
         const orthoCam = createOrthoCam();
 
-        // Arranca en modo Plano 2D Ortográfico Exacto para que coincida 1:1 con el plano 2D
-        let activeCamera = orthoCam;
+        // Arranca directamente en 3D Maqueta Realista (Axonométrica con sombras)
+        let activeCamera = perspCam;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', alpha: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -4938,7 +4938,8 @@
         }
 
         const viewPresets = {
-            isom:   { pos: [3.15, 14.5, 13.80], target: [3.15, 0.40, 4.00] },
+            // Ángulo diagonal axonométrico natural (Foto Referencia: 25° de sesgo para ver profundidad 3D real de muros y ambientes)
+            isom:   { pos: [-1.80, 11.80, 12.20], target: [3.15, 0.40, 4.00] },
             living: { pos: [4.90, 3.4, 5.50], target: [4.65, 0.6, 2.00] },
             cocina: { pos: [4.10, 3.4, 4.10], target: [4.10, 0.6, 5.80] },
             cuarto: { pos: [2.40, 3.4, 4.60], target: [1.35, 0.5, 5.80] },
@@ -4979,19 +4980,33 @@
             if (dioramaGround) dioramaGround.visible = isDioramaStyle;
             if (dioramaFlora) dioramaFlora.visible = isDioramaStyle;
             if (studioGround) studioGround.visible = (currentGraphicStyle === 'archviz' || currentGraphicStyle === 'zoning');
+            
             current3DPreset = presetName;
             activeCamera = perspCam;
             controlsOrtho.enabled = false;
             controlsPersp.enabled = true;
-            ambLight.intensity = 0.85;
+            
+            // ACTIVAR SOMBRAS FOTORREALISTAS OBLIGATORIAMENTE EN 3D
+            dirLight.castShadow = true;
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.needsUpdate = true;
+            
+            // Re-aplicar estilo gráfico para asegurar materiales PBR activos
+            if (currentGraphicStyle) {
+                applyGraphicStyle(currentGraphicStyle);
+            }
+            
             applyWallsVisibility(true, true);
             setWallMode(mode || 'sims');
+            
             if (moveCam) {
                 const v = get3DPreset(presetName);
                 perspCam.position.set(v.pos[0], v.pos[1], v.pos[2]);
                 controlsPersp.target.set(v.target[0], v.target[1], v.target[2]);
                 controlsPersp.update();
             }
+            
+            setActiveTopBtn(mode === 'sims' ? 'btn-mode-sims' : (mode === 'down' ? 'btn-mode-cut' : 'btn-mode-3d'));
             document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === presetName));
             wakeRenderer();
         }
@@ -5002,15 +5017,15 @@
         });
         document.getElementById('btn-mode-3d').addEventListener('click', () => {
             applyWallsVisibility(true, true);
-            switchTo3D(current3DPreset, 'up', activeCamera === orthoCam);
+            switchTo3D(current3DPreset, 'up', true);
         });
         document.getElementById('btn-mode-sims').addEventListener('click', () => {
             applyWallsVisibility(true, true);
-            switchTo3D(current3DPreset, 'sims', activeCamera === orthoCam);
+            switchTo3D(current3DPreset, 'sims', true);
         });
         document.getElementById('btn-mode-cut').addEventListener('click', () => {
             applyWallsVisibility(true, true);
-            switchTo3D(current3DPreset, 'down', activeCamera === orthoCam);
+            switchTo3D(current3DPreset, 'down', true);
         });
         document.getElementById('btn-mode-nowalls').addEventListener('click', () => {
             if (activeCamera === orthoCam) {
@@ -5154,8 +5169,8 @@
         // 12. MOTOR DE ESTILOS GRÁFICOS INTERACTIVOS (SIMS, REALISTA, CLAY, BLUEPRINT, BOCETO, NOCHE)
         // ============================================================================
         let currentGraphicStyle = 'archviz'; // Por defecto ArchViz Diorama (idéntico a la foto de referencia)
-        if (localStorage.getItem('dep_graphic_style_v7')) {
-            currentGraphicStyle = localStorage.getItem('dep_graphic_style_v7');
+        if (localStorage.getItem('dep_graphic_style_v8')) {
+            currentGraphicStyle = localStorage.getItem('dep_graphic_style_v8');
         }
 
         const nightLightsGroup = new THREE.Group();
@@ -5322,7 +5337,7 @@
         function applyGraphicStyle(style) {
             ensureOriginalMaterialsCached();
             currentGraphicStyle = style;
-            localStorage.setItem('dep_graphic_style_v7', style);
+            localStorage.setItem('dep_graphic_style_v8', style);
 
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
@@ -5651,8 +5666,9 @@
             });
         });
 
-        // Inicializar estilo guardado tras el render inicial
+        // Inicializar en 3D Maqueta Realista al cargar
         setTimeout(() => {
+            switchTo3D('isom', 'sims', true);
             if (currentGraphicStyle) {
                 applyGraphicStyle(currentGraphicStyle);
             }
