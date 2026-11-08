@@ -58,6 +58,7 @@ const liveReloadScript = `
 `;
 
 const server = http.createServer((req, res) => {
+    console.log(`[REQ] ${req.method} ${req.url} de ${req.socket.remoteAddress}`);
     if (req.url === '/__livereload') {
         res.writeHead(200, {
             'Content-Type': 'text/event-stream',
