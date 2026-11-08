@@ -1298,11 +1298,11 @@
         addWindowSegment(3.25, 7.00, 4.55, 7.00, 1.05, 0.95);
         addWallSegment(4.55, 7.00, 5.20, 7.00, EXT_T, exteriorWallsGroup, true);
 
-        // Muro Izquierdo (Oeste, X = 0.00): sube de [0.00, 0.00] a [0.00, 7.00]
+        // Muro Izquierdo (Oeste, X = 0.00): sube de [0.00, 0.00] a [0.00, 7.00] - Altura exterior Z = 2.35 m según especificación:
         // - Ventiluz Baño V7 sobre bañera (Y = 3.05 a 3.75)
-        addWallSegment(0.00, 0.00, 0.00, 3.05, EXT_T, exteriorWallsGroup, true);
-        addWindowSegment(0.00, 3.05, 0.00, 3.75, 1.35, 0.65);
-        addWallSegment(0.00, 3.75, 0.00, 7.00, EXT_T, exteriorWallsGroup, true);
+        addWallSegment(0.00, 0.00, 0.00, 3.05, EXT_T, exteriorWallsGroup, true, 2.35);
+        addWindowSegment(0.00, 3.05, 0.00, 3.75, 1.35, 0.65, 2.35);
+        addWallSegment(0.00, 3.75, 0.00, 7.00, EXT_T, exteriorWallsGroup, true, 2.35);
 
         // ============================================================================
         // 3B. EQUIPAMIENTO FIJO, CALEFACTORES Y TECHO DE MADERA EXTRAÍDOS DEL VIDEO
@@ -1379,55 +1379,100 @@
         // 4) TECHO DE MADERA MACHIMBRADA EN PENDIENTE CON VIGAS VISTAS DE NORTE A SUR (Extraído de las fotos y videos)
         // Dos faldones que suben hacia la cumbrera central Este-Oeste (Z = 3.50, de 2.62m en frentes Norte/Sur a 3.30m en la cumbrera)
         // con cabios/vigas vistas corriendo de Norte a Sur hacia las ventanas (tal como se ve en las fotos de la cocina y living)
+        // 4) CUBIERTA QUEBRADA EN DOS PLANOS (Item 1 de la especificación):
+        //    Techo de madera con limahoya / quiebre en X = 2.30 m
         function buildWoodenRoof() {
-            const dzSlope = 3.50, dySlope = 0.68;
-            const lenSlope = Math.hypot(dzSlope, dySlope);
-            const angSlope = Math.atan2(dySlope, dzSlope);
+            // =========================================================================
+            // A) BLOQUE IZQUIERDO: SECTOR A (Faldón inclinado de X = 0.00 a X = 2.30 m)
+            //    Nace en muro exterior izquierdo (X = 0.00, Y = 2.35 m) y sube hasta Z = 3.40 m en X = 2.30 m.
+            //    Tirantes de madera paralelos al eje X.
+            // =========================================================================
+            const dxA = 2.30, dyA = 3.40 - 2.35; // 1.05 m
+            const lenSlopeA = Math.hypot(dxA, dyA); // 2.5283 m
+            const angSlopeA = Math.atan2(dyA, dxA); // ~24.56°
+            const roofDeckZ = 7.00; // Todo el bloque de Norte a Sur (Z = 0.00 a 7.00)
 
-            // Faldón Norte completo (Estudio + Living Norte: X = 0.00 a 6.30, Z = 0.00 a 3.50)
-            const roofNorth = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
-            roofNorth.scale.set(6.30, 0.05, lenSlope);
-            roofNorth.position.set(3.15, 2.62 + dySlope / 2, 1.75);
-            roofNorth.rotation.x = -angSlope;
-            roofGroup.add(roofNorth);
+            const roofSectorA = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofSectorA.scale.set(lenSlopeA, 0.04, roofDeckZ);
+            roofSectorA.position.set(1.15, 2.35 + dyA / 2, 3.50);
+            roofSectorA.rotation.z = angSlopeA;
+            roofGroup.add(roofSectorA);
 
-            // Faldón Sur principal (Baño + Cuarto + Cocina: X = 0.00 a 5.20, Z = 3.50 a 7.00, baja hacia la ventana Sur Z = 7.00)
-            const roofSouthMain = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
-            roofSouthMain.scale.set(5.20, 0.05, lenSlope);
-            roofSouthMain.position.set(2.60, 2.62 + dySlope / 2, 5.25);
-            roofSouthMain.rotation.x = angSlope;
-            roofGroup.add(roofSouthMain);
+            // Tirantes de madera paralelos al eje X corriendo a lo largo de la pendiente (de X = 0 a X = 2.30):
+            for (let zBeam = 0.35; zBeam <= 6.70; zBeam += 0.55) {
+                const beamA = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
+                beamA.scale.set(lenSlopeA, 0.11, 0.07);
+                beamA.position.set(1.15, 2.35 + dyA / 2 - 0.055, zBeam);
+                beamA.rotation.z = angSlopeA;
+                roofGroup.add(beamA);
+            }
 
-            // Faldón Sur sobre Entrada (X = 5.20 a 6.30, Z = 3.50 a 5.70)
-            const dzEnt = 2.20, dyEnt = (2.20 / 3.50) * dySlope;
+            // =========================================================================
+            // B) BLOQUE IZQUIERDO: SECTOR B (Plano superior horizontal sobre Pasillo y Puertas, X = 2.30 a 3.00 m)
+            //    Mantiene Z = 3.40 m en el borde superior del muro sobre las puertas.
+            // =========================================================================
+            const widthB = 0.70; // 3.00 - 2.30
+            const roofSectorB = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofSectorB.scale.set(widthB, 0.04, roofDeckZ);
+            roofSectorB.position.set(2.30 + widthB / 2, 3.40, 3.50);
+            roofGroup.add(roofSectorB);
+
+            // Viga cumbrera / limahoya estructural de encuentro en X = 2.30 m a cota Y = 3.40 m:
+            const ridgeBeam = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
+            ridgeBeam.scale.set(0.12, 0.16, roofDeckZ);
+            ridgeBeam.position.set(2.30, 3.32, 3.50);
+            roofGroup.add(ridgeBeam);
+
+            // =========================================================================
+            // C) BLOQUE DERECHO: LIVING, COCINA Y ENTRADA (X = 3.00 a 6.30 m)
+            //    Encuentro a cota Y = 3.40 m en muro divisorio central X = 3.00 m
+            // =========================================================================
+            const dzLiving = 3.50, dyLiving = 0.76;
+            const lenSlopeLiving = Math.hypot(dzLiving, dyLiving);
+            const angSlopeLiving = Math.atan2(dyLiving, dzLiving);
+
+            // Faldón Norte Living (X = 3.00 a 6.30, Z = 0.00 a 3.50)
+            const roofLivingN = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofLivingN.scale.set(3.30, 0.05, lenSlopeLiving);
+            roofLivingN.position.set(4.65, 3.40 - dyLiving / 2, 1.75);
+            roofLivingN.rotation.x = -angSlopeLiving;
+            roofGroup.add(roofLivingN);
+
+            // Faldón Sur Cocina (X = 3.00 a 5.20, Z = 3.50 a 7.00)
+            const roofCocinaS = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofCocinaS.scale.set(2.20, 0.05, lenSlopeLiving);
+            roofCocinaS.position.set(4.10, 3.40 - dyLiving / 2, 5.25);
+            roofCocinaS.rotation.x = angSlopeLiving;
+            roofGroup.add(roofCocinaS);
+
+            // Faldón Sur Entrada (X = 5.20 a 6.30, Z = 3.50 a 5.70)
+            const dzEnt = 2.20, dyEnt = (2.20 / 3.50) * dyLiving;
             const lenEnt = Math.hypot(dzEnt, dyEnt);
-            const roofSouthEnt = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
-            roofSouthEnt.scale.set(1.10, 0.05, lenEnt);
-            roofSouthEnt.position.set(5.75, 3.30 - dyEnt / 2, 4.60);
-            roofSouthEnt.rotation.x = angSlope;
-            roofGroup.add(roofSouthEnt);
+            const roofEntS = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofEntS.scale.set(1.10, 0.05, lenEnt);
+            roofEntS.position.set(5.75, 3.40 - dyEnt / 2, 4.60);
+            roofEntS.rotation.x = angSlopeLiving;
+            roofGroup.add(roofEntS);
 
-            // Vigas/cabios vistos de madera corriendo de Norte a Sur (4 cabios en el ancho de la cocina, cada ~0.55 m)
-            for (let xBeam = 0.45; xBeam <= 6.00; xBeam += 0.55) {
-                // Cabio Norte (Z = 0.00 a 3.50)
+            // Cabios de madera sobre Living y Cocina
+            for (let xBeam = 3.45; xBeam <= 6.05; xBeam += 0.55) {
                 const bN = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-                bN.scale.set(0.07, 0.11, lenSlope);
-                bN.position.set(xBeam, 2.56 + dySlope / 2, 1.75);
-                bN.rotation.x = -angSlope;
+                bN.scale.set(0.07, 0.11, lenSlopeLiving);
+                bN.position.set(xBeam, 3.34 - dyLiving / 2, 1.75);
+                bN.rotation.x = -angSlopeLiving;
                 roofGroup.add(bN);
 
-                // Cabio Sur (Z = 3.50 a 7.00 en sector depto, o Z = 3.50 a 5.70 en Entrada)
                 if (xBeam <= 5.15) {
                     const bS = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-                    bS.scale.set(0.07, 0.11, lenSlope);
-                    bS.position.set(xBeam, 2.56 + dySlope / 2, 5.25);
-                    bS.rotation.x = angSlope;
+                    bS.scale.set(0.07, 0.11, lenSlopeLiving);
+                    bS.position.set(xBeam, 3.34 - dyLiving / 2, 5.25);
+                    bS.rotation.x = angSlopeLiving;
                     roofGroup.add(bS);
                 } else {
                     const bSE = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
                     bSE.scale.set(0.07, 0.11, lenEnt);
-                    bSE.position.set(xBeam, 3.24 - dyEnt / 2, 4.60);
-                    bSE.rotation.x = angSlope;
+                    bSE.position.set(xBeam, 3.34 - dyEnt / 2, 4.60);
+                    bSE.rotation.x = angSlopeLiving;
                     roofGroup.add(bSE);
                 }
             }
@@ -1436,46 +1481,45 @@
         // ============================================================================
         // 4. MUROS INTERNOS, PUERTAS (HACIA ADENTRO DE BAÑO Y HABITACIONES) Y VANOS ABIERTOS
         // ============================================================================
-        // Eje Vertical X = 2.30 (Cierre de Placards y Baño):
-        // - Muro sólido más largo arriba: de Y = 2.30 a Y = 3.02 (cubre Placard Sup. 2.30..2.80 + mocheta superior del Baño 2.80..3.02)
-        addWallSegment(2.30, 2.30, 2.30, 3.02, INT_T, interiorWallsGroup, false);
+        // Eje Vertical X = 2.30 (Cierre lateral de Bauleras y Baño - Item 2.3):
+        // En X = 2.30 m, el tabique vertical sube desde el piso hasta tocar el quiebre del techo (Z = 3.40 m),
+        // separando el hueco de la baulera del sector de la puerta de entrada.
+        addWallSegment(2.30, 2.30, 2.30, 3.02, INT_T, interiorWallsGroup, false, 3.40);
         // - PUERTA BAÑO: Entre Y = 3.02 e Y = 3.65 (bisagra al Sur en Y=3.65, abre HACIA ADENTRO del Baño hacia la izquierda X < 2.30, foto #23)
         addDashedLine(2.30, 3.02, 2.30, 3.65);
         addDoorSymbol2D(2.30, 3.62, 2.08, 3.42, 2.04, 3.20, 2.30, 3.05);
-        // - Muro sólido abajo: de Y = 3.65 a Y = 4.50 (mocheta inferior del Baño 3.65..4.00 + Placard Inf. 4.00..4.50)
-        addWallSegment(2.30, 3.65, 2.30, 4.50, INT_T, interiorWallsGroup, false);
+        // - Muro sólido abajo: de Y = 3.65 a Y = 4.50 (mocheta inferior del Baño 3.65..4.00 + lateral Placard/Baulera Cuarto 4.00..4.50)
+        addWallSegment(2.30, 3.65, 2.30, 4.50, INT_T, interiorWallsGroup, false, 3.40);
 
         // Eje Vertical Central X = 3.00:
-        // - Muro sólido de Y = 0.00 a Y = 3.70 (separa Estudio y parte del Pasillo del Living)
-        addWallSegment(3.00, 0.00, 3.00, 3.70, INT_T, interiorWallsGroup, false);
+        // - Muro sólido de Y = 0.00 a Y = 3.70 (separa Estudio y Pasillo del Living, remata en techo a Z = 3.40 m)
+        addWallSegment(3.00, 0.00, 3.00, 3.70, INT_T, interiorWallsGroup, false, 3.40);
         // - VANO ABIERTO (Paso Living-Pasillo): Sin muro entre Y = 3.70 e Y = 4.50
         addDashedLine(3.00, 3.70, 3.00, 4.50);
         // - Muro sólido de Y = 4.50 a Y = 7.00 (separa Cuarto de Cocina)
-        addWallSegment(3.00, 4.50, 3.00, 7.00, INT_T, interiorWallsGroup, false);
+        addWallSegment(3.00, 4.50, 3.00, 7.00, INT_T, interiorWallsGroup, false, 3.40);
 
         // Eje Vertical X = 5.20 (separa Cocina de Entrada): de Y = 4.50 a Y = 5.70
         addWallSegment(5.20, 4.50, 5.20, 5.70, INT_T, interiorWallsGroup, false);
 
-        // Eje Horizontal Y = 2.30 (Frente Placard y Puerta Estudio):
-        // - Mochetas laterales del placard (0.00..0.22 y 2.12..2.30; entre 0.22 y 2.12 van las hojas corredizas y baulera abierta arriba hacia adentro)
-        addWallSegment(0.00, 2.30, 0.22, 2.30, INT_T, interiorWallsGroup, false);
-        addWallSegment(2.12, 2.30, 2.30, 2.30, INT_T, interiorWallsGroup, false);
-        addDashedLine(0.22, 2.30, 2.12, 2.30);
+        // Eje Horizontal Y = 2.30 (Frente Placard Estudio y Puerta Estudio - Items 2.5 y 3):
+        // - Línea de frente en 2D:
+        addDashedLine(0.00, 2.30, 2.30, 2.30);
         // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Estudio sobre muro Este, fotos #39 y #40)
         addDashedLine(2.30, 2.30, 3.00, 2.30);
         addDoorSymbol2D(2.95, 2.30, 2.75, 2.08, 2.55, 2.08, 2.42, 2.30);
 
-        // Eje Horizontal Y = 2.80 (Divide Placard Superior y Baño): de X = 0.00 a X = 2.30
-        addWallSegment(0.00, 2.80, 2.30, 2.80, INT_T, interiorWallsGroup, false);
+        // Eje Horizontal Y = 2.80 (Cierre de fondo de Baulera Estudio / Divide con Baño - Item 2.4):
+        // Sube de X = 0.00 (Y = 2.35 m) a X = 2.30 (Y = 3.40 m) tocando el faldón inclinado del techo.
+        addSlopedWallSegment(0.00, 2.80, 2.30, 2.35, 3.40, INT_T, interiorWallsGroup);
 
-        // Eje Horizontal Y = 4.00 (Divide Baño y Placard Inferior): de X = 0.00 a X = 2.30
-        addWallSegment(0.00, 4.00, 2.30, 4.00, INT_T, interiorWallsGroup, false);
+        // Eje Horizontal Y = 4.00 (Cierre de fondo de Baulera Cuarto / Divide con Baño - Item 2.4):
+        // Sube de X = 0.00 (Y = 2.35 m) a X = 2.30 (Y = 3.40 m) tocando el faldón inclinado del techo.
+        addSlopedWallSegment(0.00, 4.00, 2.30, 2.35, 3.40, INT_T, interiorWallsGroup);
 
-        // Eje Horizontal Y = 4.50 (Frente Placard, Puerta Cuarto y Vano Cocina):
-        // - Mochetas laterales del placard (0.00..0.22 y 2.12..2.30; entre 0.22 y 2.12 van las hojas corredizas y baulera abierta arriba hacia adentro)
-        addWallSegment(0.00, 4.50, 0.22, 4.50, INT_T, interiorWallsGroup, false);
-        addWallSegment(2.12, 4.50, 2.30, 4.50, INT_T, interiorWallsGroup, false);
-        addDashedLine(0.22, 4.50, 2.12, 4.50);
+        // Eje Horizontal Y = 4.50 (Frente Placard Cuarto, Puerta Cuarto y Vano Cocina - Items 2.5 y 3):
+        // - Línea de frente en 2D:
+        addDashedLine(0.00, 4.50, 2.30, 4.50);
         // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Cuarto sobre muro Este, fotos #17 y #22)
         addDashedLine(2.30, 4.50, 3.00, 4.50);
         addDoorSymbol2D(2.95, 4.50, 2.75, 4.72, 2.55, 4.72, 2.42, 4.50);
@@ -1496,7 +1540,7 @@
         // 1) Constructor de Puerta Placa Interior de Madera (Estudio, Baño y Cuarto)
         //    Extraído de sec_066, sec_068, sec_084, sec_092 y video_06_s10:
         //    Hoja placa enchapada en madera cedro/haya + marco de chapa gris oscuro + picaporte cromado + dintel superior
-        function addInteriorWoodDoor3D(x1, z1, x2, z2, hingeAtStart = true, swingSign = 1, openAngleDeg = 75, doorName = "Puerta") {
+        function addInteriorWoodDoor3D(x1, z1, x2, z2, hingeAtStart = true, swingSign = 1, openAngleDeg = 75, doorName = "Puerta", wallTopH = 2.60) {
             const dx = x2 - x1;
             const dz = z2 - z1;
             const w = Math.hypot(dx, dz);
@@ -1506,13 +1550,19 @@
             holder.position.set((x1 + x2) / 2, 0, (z1 + z2) / 2);
             holder.rotation.y = -angle;
 
-            // Dintel superior de mampostería (de 2.05m a 2.60m)
-            const lintelH = WALL_H - DOOR_H;
+            // Dintel superior de mampostería (sube de 2.05m hasta rematar en borde superior horizontal en wallTopH = 3.40m, Item 3)
+            const lintelH = Math.max(0.02, wallTopH - DOOR_H);
             const lintelMesh = new THREE.Mesh(new THREE.BoxGeometry(w, lintelH, INT_T), intWallMat);
             lintelMesh.position.set(0, DOOR_H + lintelH / 2, 0);
             lintelMesh.castShadow = true;
             lintelMesh.receiveShadow = true;
             holder.add(lintelMesh);
+
+            // Borde superior horizontal cap
+            const capMesh = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            capMesh.scale.set(w + 0.01, 0.02, INT_T + 0.01);
+            capMesh.position.set(0, wallTopH + 0.01, 0);
+            holder.add(capMesh);
 
             // Marco de chapa doblada color gris grafito oscuro (#2b3036) en jambas y dintel
             const frameDepth = INT_T + 0.026;
@@ -1687,13 +1737,17 @@
         //    Placard embutido de 2 hojas corredizas de madera barnizada con tiradores circulares oscuros
         //    + INTERIOR COMPLETO AMBAS ALAS (módulo cajonera blanca + estantes izq; barrales dobles de colgar ropa y perchas der)
         //    + BAULERA ABIERTA SUPERIOR HACIA ADENTRO (sin puertas ni techo arriba, abierta directamente al techo en pendiente)
+        // 3) CAJÓN DE BAULERA Y FRENTE DE PLACARD (Item 2 de la especificación):
+        //    Caja cerrada de mampostería que llega solo hasta Z = 2.20 m.
+        //    Piso de baulera: losa horizontal plana en Z = 2.20 m (de X = 0.00 a X = 2.30 m).
+        //    Frente abierto: por encima de Z = 2.20 m queda TOTALMENTE ABIERTO dejando una abertura trapezoidal.
         function addSlidingPlacardFront3D(x1, x2, zWall, facingSign = -1, placardName = "Placard") {
-            const w = x2 - x1;
+            const w = x2 - x1; // 2.30 m
             const holder = new THREE.Group();
             holder.position.set((x1 + x2) / 2, 0, zWall);
 
-            // Marco metálico perimetral oscuro de chapa doblada (va desde piso Y=0.08 hasta dintel Y=2.08)
-            const PLACARD_H = 2.00;
+            // Volumen inferior del placard hasta Z = 2.20 m:
+            const PLACARD_H = 2.12;
             const frameT = 0.035;
             const topTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.04, frameT), doorFrameMat);
             topTrack.position.set(0, 0.08 + PLACARD_H - 0.02, 0);
@@ -1705,24 +1759,26 @@
             rightBorder.position.set(w / 2 - 0.02, 0.08 + PLACARD_H / 2, 0);
             holder.add(topTrack, botTrack, leftBorder, rightBorder);
 
-            // Zócalo inferior blanco de obra (levanta el placard 8 cm del suelo, fotos #20 y #38)
+            // Zócalo inferior blanco de obra
             const plinth = new THREE.Mesh(new THREE.BoxGeometry(w, 0.08, INT_T), intWallMat);
             plinth.position.set(0, 0.04, 0);
             holder.add(plinth);
 
-            // Estante superior divisorio interior del placard (a nivel de dintel 2.08m, piso de la baulera abierta)
-            const interiorDepth = 0.44;
+            // PISO DE BAULERA (Item 2.2): Losa horizontal plana en Z = 2.20 m (de X = 0.00 a X = 2.30 m, profundidad 0.50 m)
+            const interiorDepth = 0.50;
             const interiorZ = -facingSign * (interiorDepth / 2);
-            const topShelf = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xf1f5f9, 0.5));
-            topShelf.scale.set(w - 0.02, 0.02, interiorDepth);
-            topShelf.position.set(0, 0.08 + PLACARD_H - 0.01, interiorZ);
-            holder.add(topShelf);
+            const slabMesh = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
+            slabMesh.scale.set(w, 0.04, interiorDepth);
+            slabMesh.position.set(0, 2.20 - 0.02, interiorZ);
+            slabMesh.castShadow = true;
+            slabMesh.receiveShadow = true;
+            holder.add(slabMesh);
 
-            // Dintel / antepecho frontal blanco sobre riel superior (borde de mampostería de la baulera abierta, fotos link1 y link2)
-            const frontLintel = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
-            frontLintel.scale.set(w, 0.08, INT_T);
-            frontLintel.position.set(0, 0.08 + PLACARD_H + 0.04, 0);
-            holder.add(frontLintel);
+            // Remate horizontal sobre el frente de la losa a Z = 2.20 m (POR ENCIMA QUEDA 100% ABIERTO, Item 2.5)
+            const capLosa = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            capLosa.scale.set(w + 0.01, 0.016, 0.04);
+            capLosa.position.set(0, 2.20 + 0.008, 0);
+            holder.add(capLosa);
 
             // --- INTERIOR VISIBLE DEL PLACARD (visto en fotos link1 y link2) ---
             // Divisor central vertical blanco
@@ -1901,13 +1957,13 @@
             cocinaLintel.position.set(3.725, DOOR_H + lintelH / 2, 4.50);
             doors3DGroup.add(cocinaLintel);
             attachWallMount(cocinaLintel, 4.60, 4.50, true);
-            // Instanciar puertas 3D interactivas relevadas de las fotos (#17, #23, #39, #40, link1 y link2):
+            // Instanciar puertas 3D interactivas con dintel a Z = 3.40 m (Item 3) y Placards de X = 0.00 a 2.30 m (Item 2):
             addMainEntranceDoor3D(5.38, 5.70, 6.12, 5.70);
-            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 75, "Puerta Estudio");
-            addInteriorWoodDoor3D(2.30, 3.02, 2.30, 3.65, false, 1, 75, "Puerta Baño");
-            addInteriorWoodDoor3D(2.30, 4.50, 3.00, 4.50, false, 1, 75, "Puerta Cuarto");
-            addSlidingPlacardFront3D(0.22, 2.12, 2.30, -1, "Placard Estudio");
-            addSlidingPlacardFront3D(0.22, 2.12, 4.50, 1, "Placard Cuarto");
+            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 75, "Puerta Estudio", 3.40);
+            addInteriorWoodDoor3D(2.30, 3.02, 2.30, 3.65, false, 1, 75, "Puerta Baño", 3.40);
+            addInteriorWoodDoor3D(2.30, 4.50, 3.00, 4.50, false, 1, 75, "Puerta Cuarto", 3.40);
+            addSlidingPlacardFront3D(0.00, 2.30, 2.30, -1, "Placard Estudio");
+            addSlidingPlacardFront3D(0.00, 2.30, 4.50, 1, "Placard Cuarto");
             resolveWallMounts();
         }
         setTimeout(ensure3DExtrasBuilt, 60);
@@ -2325,27 +2381,26 @@
             addDecorBox(2.48, 0.48, 6.88, 0.50, 0.50, 0.05, 0x0f172a, 0.2);  // Panel calefactor vidrio negro
             addDecorBox(2.72, 0.35, 6.20, 0.38, 0.70, 0.44, 0x475569, 0.8);  // Cesto ropa sucia gris con ropa arriba
 
-            // Equipaje, organizador y cajas guardados HACIA ADENTRO en la baulera abierta del cuarto (relevado fielmente de la foto):
-            // La baulera está a Y=2.17m y se adentra entre Z=4.02 y Z=4.48 (profundidad ~0.46m hacia el muro del baño Z=4.00)
+            // Equipaje, organizador y cajas guardados sobre la LOSA PLANA a Y = 2.20 m en la baulera abierta del cuarto:
             // - Sector Izquierdo:
-            addDecorBox(0.40, 2.29, 4.26, 0.26, 0.24, 0.28, 0x18181b, 0.6);   // Caja negra encintada a la izquierda
-            addDecorBox(0.60, 2.31, 4.30, 0.24, 0.28, 0.24, 0xe2e8f0, 0.5);   // Caja electrodoméstico Oster blanca
-            addDecorBox(0.60, 2.49, 4.28, 0.20, 0.09, 0.20, 0x556b2f, 0.8);   // Bolso de lona verde oliva con correas
-            addDecorBox(0.62, 2.30, 4.10, 0.20, 0.26, 0.16, 0x1d4ed8, 0.5);   // Caja azul al fondo
+            addDecorBox(0.40, 2.20 + 0.12, 4.26, 0.26, 0.24, 0.28, 0x18181b, 0.6);   // Caja negra encintada a la izquierda
+            addDecorBox(0.60, 2.20 + 0.14, 4.30, 0.24, 0.28, 0.24, 0xe2e8f0, 0.5);   // Caja electrodoméstico Oster blanca
+            addDecorBox(0.60, 2.20 + 0.28 + 0.045, 4.28, 0.20, 0.09, 0.20, 0x556b2f, 0.8);   // Bolso verde oliva arriba
+            addDecorBox(0.62, 2.20 + 0.13, 4.10, 0.20, 0.26, 0.16, 0x1d4ed8, 0.5);   // Caja azul al fondo
             // - Sector Central:
             // Mueble organizador gris de 2 puertas con tiradores negros
             const cabW = 0.48, cabH = 0.52, cabD = 0.36;
-            addDecorBox(1.05, 2.17 + cabH / 2, 4.25, cabW, cabH, cabD, 0x64748b, 0.4);
-            addDecorBox(0.99, 2.24, 4.44, 0.07, 0.016, 0.02, 0x0f172a, 0.3); // Tirador negro izquierdo
-            addDecorBox(1.11, 2.24, 4.44, 0.07, 0.016, 0.02, 0x0f172a, 0.3); // Tirador negro derecho
-            // Caja del Monitor Samsung Essential Curved 27" arriba del mueble organizador
-            addDecorBox(1.05, 2.17 + cabH + 0.09, 4.25, 0.56, 0.18, 0.36, 0xd4a373, 0.6);
+            addDecorBox(1.05, 2.20 + cabH / 2, 4.25, cabW, cabH, cabD, 0x64748b, 0.4);
+            addDecorBox(0.99, 2.20 + cabH / 2, 4.44, 0.07, 0.016, 0.02, 0x0f172a, 0.3); // Tirador negro izquierdo
+            addDecorBox(1.11, 2.20 + cabH / 2, 4.44, 0.07, 0.016, 0.02, 0x0f172a, 0.3); // Tirador negro derecho
+            // Caja del Monitor Samsung Essential Curved 27" arriba del mueble organizador (rematando bajo el faldón de madera)
+            addDecorBox(1.05, 2.20 + cabH + 0.09, 4.25, 0.56, 0.18, 0.36, 0xd4a373, 0.6);
             // - Sector Derecho:
-            // Valija / bolso negro de tela vertical contra el fondo
-            addDecorBox(1.68, 2.45, 4.12, 0.46, 0.56, 0.20, 0x18181b, 0.8);
             // Valija rígida grafito oscuro acostada en primer plano con candado TSA
-            addDecorBox(1.68, 2.31, 4.32, 0.58, 0.28, 0.26, 0x334155, 0.35);
-            addDecorBox(1.66, 2.455, 4.32, 0.12, 0.015, 0.04, 0x0f172a, 0.2); // Candado TSA y manija superior
+            addDecorBox(1.68, 2.20 + 0.14, 4.32, 0.58, 0.28, 0.26, 0x334155, 0.35);
+            addDecorBox(1.66, 2.20 + 0.285, 4.32, 0.12, 0.015, 0.04, 0x0f172a, 0.2); // Candado TSA y manija superior
+            // Valija / bolso negro de tela vertical contra el fondo
+            addDecorBox(1.68, 2.20 + 0.28, 4.12, 0.46, 0.56, 0.20, 0x18181b, 0.8);
             // 5. Cortina gris topo con barral de madera en la ventana Sur del Cuarto (V5: X=0.90..2.10, Z=7.00)
             addCurtainAssembly(0.90, 7.00, 2.10, 7.00, 0, -0.12, 0x78716c);
 
