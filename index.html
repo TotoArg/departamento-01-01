@@ -1741,6 +1741,11 @@
         //    Caja cerrada de mampostería que llega solo hasta Z = 2.20 m.
         //    Piso de baulera: losa horizontal plana en Z = 2.20 m (de X = 0.00 a X = 2.30 m).
         //    Frente abierto: por encima de Z = 2.20 m queda TOTALMENTE ABIERTO dejando una abertura trapezoidal.
+        // 3) CAJÓN DE BAULERA Y FRENTE DE PLACARD (Item 2 de la especificación):
+        //    Caja cerrada de mampostería que llega solo hasta Z = 2.20 m.
+        //    Piso de baulera: losa horizontal plana en Z = 2.20 m (de X = 0.00 a X = 2.30 m).
+        //    Frente abierto: por encima de Z = 2.20 m queda TOTALMENTE ABIERTO dejando una abertura trapezoidal.
+        //    Hojas corredizas simétricas, idénticas, con tiradores enfrentados hacia la habitación y animación fluida.
         function addSlidingPlacardFront3D(x1, x2, zWall, facingSign = -1, placardName = "Placard") {
             const w = x2 - x1; // 2.30 m
             const holder = new THREE.Group();
@@ -1748,7 +1753,7 @@
 
             // Volumen inferior del placard hasta Z = 2.20 m:
             const PLACARD_H = 2.12;
-            const frameT = 0.035;
+            const frameT = 0.06;
             const topTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.04, frameT), doorFrameMat);
             topTrack.position.set(0, 0.08 + PLACARD_H - 0.02, 0);
             const botTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.04, frameT), doorFrameMat);
@@ -1776,11 +1781,11 @@
 
             // Remate horizontal sobre el frente de la losa a Z = 2.20 m (POR ENCIMA QUEDA 100% ABIERTO, Item 2.5)
             const capLosa = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
-            capLosa.scale.set(w + 0.01, 0.016, 0.04);
+            capLosa.scale.set(w + 0.01, 0.016, 0.05);
             capLosa.position.set(0, 2.20 + 0.008, 0);
             holder.add(capLosa);
 
-            // --- INTERIOR VISIBLE DEL PLACARD (visto en fotos link1 y link2) ---
+            // --- INTERIOR VISIBLE DEL PLACARD (Idéntico y ordenado para ambos placards) ---
             // Divisor central vertical blanco
             const chestW = (w - 0.10) / 2;
             const centerDivider = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xffffff, 0.4));
@@ -1788,7 +1793,7 @@
             centerDivider.position.set(0, 0.08 + (PLACARD_H - 0.06) / 2, interiorZ);
             holder.add(centerDivider);
 
-            // SECTOR IZQUIERDO: Cajonera de 4 cajones + estantes con cajas / juegos
+            // SECTOR IZQUIERDO: Cajonera de 4 cajones + estantes con cajas / organizadores
             const chestH = 0.88;
             const chestMesh = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xf8fafc, 0.3));
             chestMesh.scale.set(chestW, chestH, interiorDepth);
@@ -1814,7 +1819,7 @@
             bin2.position.set(-w / 4 + chestW * 0.24, 0.08 + chestH + 0.28 + 0.11, interiorZ);
             holder.add(bin1, bin2);
 
-            // SECTOR DERECHO: Barrales y ropa colgada (fotos link1_img2 y link2_img1)
+            // SECTOR DERECHO: Barrales y ropa colgada
             const barUpper = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, chestW, 16), chromeMat);
             barUpper.rotation.z = Math.PI / 2;
             barUpper.position.set(w / 4, 1.95, interiorZ);
@@ -1827,95 +1832,133 @@
                 holder.add(coat);
             }
 
-            if (facingSign === 1) { // Cuarto: barral inferior con camisas
-                const barLower = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, chestW, 16), chromeMat);
-                barLower.rotation.z = Math.PI / 2;
-                barLower.position.set(w / 4, 1.10, interiorZ);
-                holder.add(barLower);
+            const barLower = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, chestW, 16), chromeMat);
+            barLower.rotation.z = Math.PI / 2;
+            barLower.position.set(w / 4, 1.10, interiorZ);
+            holder.add(barLower);
 
-                for (let h = -chestW * 0.38; h <= chestW * 0.38; h += 0.09) {
-                    const shirt = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x64748b));
-                    shirt.scale.set(0.04, 0.52, 0.28);
-                    shirt.position.set(w / 4 + h, 0.80, interiorZ);
-                    holder.add(shirt);
-                }
-            } else { // Estudio: estante medio con caja de herramientas negra y amarilla (foto link2_img1)
-                const midShelf = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xffffff, 0.4));
-                midShelf.scale.set(chestW, 0.02, interiorDepth);
-                midShelf.position.set(w / 4, 0.08 + 0.88, interiorZ);
-                holder.add(midShelf);
-
-                const toolBox = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0x18181b, 0.5));
-                toolBox.scale.set(0.42, 0.26, 0.26);
-                toolBox.position.set(w / 4 - 0.04, 0.08 + 0.14, interiorZ);
-                const toolAccent = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0xfacc15));
-                toolAccent.scale.set(0.43, 0.04, 0.08);
-                toolAccent.position.set(w / 4 - 0.04, 0.08 + 0.18, interiorZ + facingSign * 0.13);
-                holder.add(toolBox, toolAccent);
+            for (let h = -chestW * 0.38; h <= chestW * 0.38; h += 0.09) {
+                const shirt = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x64748b));
+                shirt.scale.set(0.04, 0.52, 0.28);
+                shirt.position.set(w / 4 + h, 0.80, interiorZ);
+                holder.add(shirt);
             }
 
-            // --- 2 HOJAS CORREDIZAS DE MADERA NATURAL / CEDRO ANIMADAS ---
-            const leafW = (w - 0.04) / 2 + 0.035;
-            const leafH = PLACARD_H - 0.05;
-            const leafT = 0.026;
+            // --- 2 HOJAS CORREDIZAS DE MADERA NATURAL / CEDRO IDÉNTICAS Y SIMÉTRICAS ---
+            const leafW = (w - 0.04) / 2 + 0.025; // 1.155 m cada una, solape de 3 cm en el centro
+            const leafH = PLACARD_H - 0.05;       // 2.07 m
+            const leafT = 0.022;                  // 2.2 cm
 
-            // 1. Hoja izquierda (interior, corre por riel posterior)
-            const leftLeafGroup = new THREE.Group();
+            // Posiciones cerradas y abiertas:
+            // Ambas hojas parten CERRADAS (isOpen = false)
             const leftClosedX = -w / 4;
-            const leftOpenX = w / 4 - 0.02; // Se corre detrás de la hoja derecha para abrir el sector izquierdo
-            leftLeafGroup.position.set(leftOpenX, 0, 0); // Inicialmente abierta como en fotos
+            const leftOpenX = w / 4 - 0.025; // Se corre hacia la derecha detrás de la hoja derecha para abrir el sector izquierdo
 
-            const leftLeaf = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
-            leftLeaf.scale.set(leafW, leafH, leafT);
-            leftLeaf.position.set(0, 0.08 + leafH / 2 + 0.01, -facingSign * 0.014);
-            leftLeaf.castShadow = true;
+            const rightClosedX = w / 4;
+            const rightOpenX = -w / 4 + 0.025; // Se corre hacia la izquierda delante de la hoja izquierda para abrir el sector derecho
 
-            const pullLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.032, 16), doorFrameMat);
+            // Desplazamiento hacia la habitación según facingSign (para tiradores y cara frontal):
+            // Estudio: facingSign = -1 -> habitación en -Z
+            // Cuarto: facingSign = 1   -> habitación en +Z
+            const frontFaceOffset = facingSign * (leafT / 2 + 0.003);
+
+            // =========================================================================
+            // 1. HOJA IZQUIERDA (Corre por riel interior a -facingSign * 0.016 m)
+            // =========================================================================
+            const leftLeafGroup = new THREE.Group();
+            leftLeafGroup.position.set(leftClosedX, 0, 0); // Cerrada inicialmente
+
+            const leftLeafMesh = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
+            leftLeafMesh.scale.set(leafW, leafH, leafT);
+            leftLeafMesh.position.set(0, 0.08 + leafH / 2 + 0.01, -facingSign * 0.016);
+            leftLeafMesh.castShadow = true;
+            leftLeafMesh.receiveShadow = true;
+            leftLeafGroup.add(leftLeafMesh);
+
+            // Perfilería perimetral de aluminio grafito para la hoja izquierda
+            const leftTrimL = new THREE.Mesh(UNIT_BOX_GEO, doorFrameMat);
+            leftTrimL.scale.set(0.018, leafH, leafT + 0.004);
+            leftTrimL.position.set(-leafW / 2 + 0.009, 0.08 + leafH / 2 + 0.01, -facingSign * 0.016);
+            const leftTrimR = new THREE.Mesh(UNIT_BOX_GEO, doorFrameMat);
+            leftTrimR.scale.set(0.018, leafH, leafT + 0.004);
+            leftTrimR.position.set(leafW / 2 - 0.009, 0.08 + leafH / 2 + 0.01, -facingSign * 0.016);
+            leftLeafGroup.add(leftTrimL, leftTrimR);
+
+            // Tirador / Cubeta embutida en la hoja izquierda (sobre la cara frontal hacia la habitación):
+            const pullLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.012, 16), doorFrameMat);
             pullLeft.rotation.x = Math.PI / 2;
-            pullLeft.position.set(-leafW * 0.36, 0.08 + 1.00, -facingSign * 0.014);
+            pullLeft.position.set(-leafW / 2 + 0.08, 0.08 + 1.05, -facingSign * 0.016 + frontFaceOffset);
+            leftLeafGroup.add(pullLeft);
 
-            leftLeafGroup.add(leftLeaf, pullLeft);
             holder.add(leftLeafGroup);
 
+            // =========================================================================
+            // 2. HOJA DERECHA (Corre por riel exterior a +facingSign * 0.016 m) - IDÉNTICA
+            // =========================================================================
+            const rightLeafGroup = new THREE.Group();
+            rightLeafGroup.position.set(rightClosedX, 0, 0); // Cerrada inicialmente
+
+            const rightLeafMesh = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
+            rightLeafMesh.scale.set(leafW, leafH, leafT);
+            rightLeafMesh.position.set(0, 0.08 + leafH / 2 + 0.01, facingSign * 0.016);
+            rightLeafMesh.castShadow = true;
+            rightLeafMesh.receiveShadow = true;
+            rightLeafGroup.add(rightLeafMesh);
+
+            // Perfilería perimetral de aluminio grafito para la hoja derecha
+            const rightTrimL = new THREE.Mesh(UNIT_BOX_GEO, doorFrameMat);
+            rightTrimL.scale.set(0.018, leafH, leafT + 0.004);
+            rightTrimL.position.set(-leafW / 2 + 0.009, 0.08 + leafH / 2 + 0.01, facingSign * 0.016);
+            const rightTrimR = new THREE.Mesh(UNIT_BOX_GEO, doorFrameMat);
+            rightTrimR.scale.set(0.018, leafH, leafT + 0.004);
+            rightTrimR.position.set(leafW / 2 - 0.009, 0.08 + leafH / 2 + 0.01, facingSign * 0.016);
+            rightLeafGroup.add(rightTrimL, rightTrimR);
+
+            // Tirador / Cubeta embutida en la hoja derecha (idéntica, simétrica, sobre la cara frontal hacia la habitación):
+            const pullRight = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.012, 16), doorFrameMat);
+            pullRight.rotation.x = Math.PI / 2;
+            pullRight.position.set(leafW / 2 - 0.08, 0.08 + 1.05, facingSign * 0.016 + frontFaceOffset);
+            rightLeafGroup.add(pullRight);
+
+            holder.add(rightLeafGroup);
+
+            // =========================================================================
+            // 3. PLANOS DE CLICK TRANSPARENTES PARA INTERACCIÓN NATURAL EN APERTURAS
+            // =========================================================================
+            const transparentMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
+            const leftVanoClick = new THREE.Mesh(new THREE.PlaneGeometry(leafW, leafH), transparentMat);
+            leftVanoClick.position.set(leftClosedX, 0.08 + leafH / 2 + 0.01, facingSign * 0.025);
+            holder.add(leftVanoClick);
+
+            const rightVanoClick = new THREE.Mesh(new THREE.PlaneGeometry(leafW, leafH), transparentMat);
+            rightVanoClick.position.set(rightClosedX, 0.08 + leafH / 2 + 0.01, facingSign * 0.025);
+            holder.add(rightVanoClick);
+
+            // =========================================================================
+            // 4. ANIMADORES INDEPENDIENTES CON EXCLUSIÓN MUTUA
+            // =========================================================================
             const leftAnim = {
                 name: `${placardName} (Hoja Izq)`,
                 type: 'slide',
                 group: leftLeafGroup,
-                currentVal: leftOpenX,
-                targetVal: leftOpenX,
+                currentVal: leftClosedX,
+                targetVal: leftClosedX,
                 openVal: leftOpenX,
                 closedVal: leftClosedX,
-                isOpen: true,
-                interactiveMeshes: [leftLeaf, pullLeft],
+                isOpen: false,
+                isPlacardSecondary: false,
                 toggle: function() {
+                    // Si la otra hoja estaba abierta, la cerramos para no colisionar
+                    if (rightAnim.isOpen) {
+                        rightAnim.isOpen = false;
+                        rightAnim.targetVal = rightAnim.closedVal;
+                    }
                     this.isOpen = !this.isOpen;
                     this.targetVal = this.isOpen ? this.openVal : this.closedVal;
                     wakeRenderer();
                     return this.isOpen;
                 }
             };
-            leftLeaf.userData.animDoor = leftAnim;
-            pullLeft.userData.animDoor = leftAnim;
-            doorClickCandidates.push(leftLeaf, pullLeft);
-            animDoors.push(leftAnim);
-
-            // 2. Hoja derecha (exterior, corre por riel anterior)
-            const rightLeafGroup = new THREE.Group();
-            const rightClosedX = w / 4;
-            const rightOpenX = -w / 4 + 0.02; // Se corre delante de la hoja izquierda para abrir el sector derecho
-            rightLeafGroup.position.set(rightClosedX, 0, 0); // Inicialmente cerrada como en fotos
-
-            const rightLeaf = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
-            rightLeaf.scale.set(leafW, leafH, leafT);
-            rightLeaf.position.set(0, 0.08 + leafH / 2 + 0.01, facingSign * 0.012);
-            rightLeaf.castShadow = true;
-
-            const pullRight = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.032, 16), doorFrameMat);
-            pullRight.rotation.x = Math.PI / 2;
-            pullRight.position.set(leafW * 0.36, 0.08 + 1.00, facingSign * 0.012);
-
-            rightLeafGroup.add(rightLeaf, pullRight);
-            holder.add(rightLeafGroup);
 
             const rightAnim = {
                 name: `${placardName} (Hoja Der)`,
@@ -1926,18 +1969,35 @@
                 openVal: rightOpenX,
                 closedVal: rightClosedX,
                 isOpen: false,
-                interactiveMeshes: [rightLeaf, pullRight],
+                isPlacardSecondary: true, // Se mantiene cerrada en "Abrir todas las puertas" para que el placard quede abierto mostrando el interior
                 toggle: function() {
+                    // Si la otra hoja estaba abierta, la cerramos para no colisionar
+                    if (leftAnim.isOpen) {
+                        leftAnim.isOpen = false;
+                        leftAnim.targetVal = leftAnim.closedVal;
+                    }
                     this.isOpen = !this.isOpen;
                     this.targetVal = this.isOpen ? this.openVal : this.closedVal;
                     wakeRenderer();
                     return this.isOpen;
                 }
             };
-            rightLeaf.userData.animDoor = rightAnim;
+
+            leftLeafMesh.userData.animDoor = leftAnim;
+            pullLeft.userData.animDoor = leftAnim;
+            leftTrimL.userData.animDoor = leftAnim;
+            leftTrimR.userData.animDoor = leftAnim;
+            leftVanoClick.userData.animDoor = leftAnim;
+
+            rightLeafMesh.userData.animDoor = rightAnim;
             pullRight.userData.animDoor = rightAnim;
-            doorClickCandidates.push(rightLeaf, pullRight);
-            animDoors.push(rightAnim);
+            rightTrimL.userData.animDoor = rightAnim;
+            rightTrimR.userData.animDoor = rightAnim;
+            rightVanoClick.userData.animDoor = rightAnim;
+
+            doorClickCandidates.push(leftLeafMesh, pullLeft, leftTrimL, leftTrimR, leftVanoClick);
+            doorClickCandidates.push(rightLeafMesh, pullRight, rightTrimL, rightTrimR, rightVanoClick);
+            animDoors.push(leftAnim, rightAnim);
 
             doors3DGroup.add(holder);
             attachWallMount(holder, 0.11, zWall, true);
@@ -3161,11 +3221,16 @@
         });
 
         document.getElementById('btn-toggle-doors').addEventListener('click', () => {
-            const anyClosed = animDoors.some(d => !d.isOpen);
-            const nextState = anyClosed; // Si alguna está cerrada, abre todas; si todas están abiertas, las cierra
+            const anyClosed = animDoors.some(d => !d.isOpen && !d.isPlacardSecondary);
+            const nextState = anyClosed; // Si alguna puerta principal o placard está cerrado, abre todo
             animDoors.forEach(d => {
-                d.isOpen = nextState;
-                d.targetVal = d.isOpen ? d.openVal : d.closedVal;
+                if (d.isPlacardSecondary) {
+                    d.isOpen = false;
+                    d.targetVal = d.closedVal;
+                } else {
+                    d.isOpen = nextState;
+                    d.targetVal = d.isOpen ? d.openVal : d.closedVal;
+                }
             });
             document.getElementById('btn-toggle-doors').classList.toggle('active', nextState);
             showSelectionBar(nextState ? 'Todas las puertas y placards abiertos' : 'Todas las puertas y placards cerrados');
