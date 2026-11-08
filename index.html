@@ -640,6 +640,9 @@
             <button class="mode-btn" id="btn-toggle-styles" style="background:rgba(56,189,248,0.2); border:1px solid #38bdf8; color:#f8fafc; font-weight:700;" title="Abrir selector visual con todos los estilos gráficos">
                 <span id="btn-styles-icon">🎨</span> <span id="btn-styles-text">Estilos</span>
             </button>
+            <button class="mode-btn" id="btn-global-undo" style="display:none; background:rgba(239,68,68,0.22); border:1px solid #f87171; color:#fca5a5; font-weight:700;" title="Deshacer última eliminación (Ctrl+Z)">
+                <span>↩️</span> <span id="btn-undo-text">Deshacer</span>
+            </button>
             <select id="select-quick-style" class="mode-btn" style="background:#0f172a; border:1px solid #38bdf8; color:#38bdf8; padding:5px 8px; border-radius:8px; font-weight:700; cursor:pointer;" title="Cambiar estilo gráfico al instante">
                 <option value="archviz" selected>🏢 Axonométrico Estudio (Foto Referencia)</option>
                 <option value="zoning">📊 Zonificación Funcional (Análisis)</option>
@@ -821,6 +824,7 @@
 
                 <div class="editor-actions">
                     <button class="action-btn btn-delete" id="btn-del-furniture">🗑️ Eliminar</button>
+                    <button class="action-btn" id="btn-editor-undo" style="display:none; background:rgba(56,189,248,0.22); border:1px solid #38bdf8; color:#38bdf8; font-weight:700;">↩️ Deshacer</button>
                     <button class="action-btn btn-export" id="btn-copy-json">📋 Copiar Medidas</button>
                 </div>
             </div>
@@ -849,6 +853,10 @@
         <!-- Botón Eliminar -->
         <button id="btn-quick-del" class="action-btn btn-delete" style="padding:6px 12px; font-size:11.5px; margin:0; border-radius:14px; font-weight:600;" title="Eliminar objeto (o tecla Supr / Backspace)">
             🗑️ Eliminar
+        </button>
+        <!-- Botón Deshacer rápido -->
+        <button id="btn-quick-undo" class="action-btn" style="display:none; background:rgba(56,189,248,0.22); border:1px solid #38bdf8; color:#38bdf8; padding:6px 12px; font-size:11.5px; border-radius:14px; font-weight:700; cursor:pointer;" title="Deshacer última eliminación (Ctrl+Z)">
+            ↩️ Deshacer
         </button>
         
         <!-- Botón Deseleccionar grande y accesible para móviles -->
@@ -4320,15 +4328,43 @@
         // ============================================================================
         let selectedDecorMesh = null;
 
-        function showToast(msg) {
+        let activeToast = null;
+        let activeToastTimer = null;
+
+        function showToast(msg, withUndo = false) {
+            if (activeToast) {
+                clearTimeout(activeToastTimer);
+                activeToast.remove();
+                activeToast = null;
+            }
             const toast = document.createElement('div');
-            toast.innerText = msg;
-            toast.style.cssText = 'position:fixed; top:68px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.95); border:1px solid #38bdf8; color:#38bdf8; padding:8px 18px; border-radius:20px; font-size:12px; font-weight:600; z-index:9999; box-shadow:0 10px 25px rgba(0,0,0,0.5); pointer-events:none; transition:opacity 0.35s;';
+            toast.style.cssText = 'position:fixed; top:68px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.96); border:1.5px solid #38bdf8; color:#f8fafc; padding:8px 16px; border-radius:24px; font-size:12px; font-weight:600; z-index:9999; box-shadow:0 10px 30px rgba(0,0,0,0.65); display:flex; align-items:center; gap:10px; transition:opacity 0.3s; pointer-events:auto;';
+
+            const msgSpan = document.createElement('span');
+            msgSpan.innerText = msg;
+            toast.appendChild(msgSpan);
+
+            if (withUndo && undoHistoryStack.length > 0) {
+                const undoBtn = document.createElement('button');
+                undoBtn.innerText = '↩ Deshacer';
+                undoBtn.style.cssText = 'background:#38bdf8; color:#0f172a; border:none; padding:4px 12px; border-radius:14px; font-size:11px; font-weight:800; cursor:pointer; box-shadow:0 2px 8px rgba(56,189,248,0.4);';
+                undoBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    toast.remove();
+                    undoLastAction();
+                };
+                toast.appendChild(undoBtn);
+            }
+
             document.body.appendChild(toast);
-            setTimeout(() => {
+            activeToast = toast;
+            activeToastTimer = setTimeout(() => {
                 toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 350);
-            }, 1800);
+                setTimeout(() => {
+                    if (toast.parentNode) toast.remove();
+                    if (activeToast === toast) activeToast = null;
+                }, 350);
+            }, withUndo ? 4500 : 2000);
         }
 
         function getSelectedObject() {
@@ -4437,25 +4473,87 @@
             wakeRenderer();
         }
 
+        const undoHistoryStack = [];
+
+        function updateUndoButtonUI() {
+            const count = undoHistoryStack.length;
+            const btnGlobal = document.getElementById('btn-global-undo');
+            const textGlobal = document.getElementById('btn-undo-text');
+            if (btnGlobal) {
+                btnGlobal.style.display = count > 0 ? 'inline-flex' : 'none';
+                if (textGlobal) textGlobal.innerText = count > 1 ? `Deshacer (${count})` : 'Deshacer';
+            }
+            const btnQuick = document.getElementById('btn-quick-undo');
+            if (btnQuick) {
+                btnQuick.style.display = count > 0 ? 'inline-flex' : 'none';
+            }
+            const btnEditor = document.getElementById('btn-editor-undo');
+            if (btnEditor) {
+                btnEditor.style.display = count > 0 ? 'inline-flex' : 'none';
+            }
+        }
+
         function deleteCurrentSelected() {
             if (selectedId) {
                 const item = furnitureList.find(f => f.id === selectedId);
                 const name = item ? item.name : 'Mueble';
+                const index = furnitureList.indexOf(item);
+                undoHistoryStack.push({
+                    type: 'furniture',
+                    name: name,
+                    item: JSON.parse(JSON.stringify(item)),
+                    index: index
+                });
                 furnitureList = furnitureList.filter(f => f.id !== selectedId);
                 selectedId = null;
                 renderFurniture3D();
                 clearSelection();
-                showToast(`🗑️ "${name}" eliminado`);
+                updateUndoButtonUI();
+                showToast(`🗑️ "${name}" eliminado`, true);
             } else if (selectedDecorMesh) {
-                const name = selectedDecorMesh.userData.name || 'Objeto';
-                if (selectedDecorMesh.parent) {
-                    selectedDecorMesh.parent.remove(selectedDecorMesh);
-                }
-                selectedDecorMesh.traverse(child => {
-                    if (child.geometry) child.geometry.dispose();
+                const obj = selectedDecorMesh;
+                const parent = obj.parent || decorVideoGroup;
+                const name = obj.userData.name || 'Objeto';
+                parent.remove(obj);
+                undoHistoryStack.push({
+                    type: 'decor',
+                    name: name,
+                    obj: obj,
+                    parent: parent
                 });
                 clearSelection();
-                showToast(`🗑️ "${name}" eliminado`);
+                updateUndoButtonUI();
+                showToast(`🗑️ "${name}" eliminado`, true);
+                wakeRenderer();
+            }
+        }
+
+        function undoLastAction() {
+            if (undoHistoryStack.length === 0) {
+                showToast('ℹ️ Nada que deshacer');
+                return;
+            }
+            const action = undoHistoryStack.pop();
+            updateUndoButtonUI();
+
+            if (action.type === 'furniture') {
+                const insertIdx = (action.index !== undefined && action.index >= 0) ? action.index : furnitureList.length;
+                furnitureList.splice(insertIdx, 0, action.item);
+                renderFurniture3D();
+                selectedId = action.item.id;
+                renderFurniture3D();
+                showToast(`↩️ "${action.name}" restaurado`);
+                wakeRenderer();
+            } else if (action.type === 'decor') {
+                action.parent.add(action.obj);
+                selectDecorObject(action.obj);
+                showToast(`↩️ "${action.name}" restaurado`);
+                wakeRenderer();
+            } else if (action.type === 'furniture_bulk') {
+                furnitureList = action.items;
+                renderFurniture3D();
+                showToast('↩️ Muebles restaurados');
+                wakeRenderer();
             }
         }
 
@@ -4463,6 +4561,13 @@
         document.getElementById('btn-del-furniture').addEventListener('click', deleteCurrentSelected);
         document.getElementById('btn-quick-del').addEventListener('click', deleteCurrentSelected);
         document.getElementById('btn-quick-close').addEventListener('click', clearSelection);
+
+        const btnGlobalUndo = document.getElementById('btn-global-undo');
+        if (btnGlobalUndo) btnGlobalUndo.addEventListener('click', undoLastAction);
+        const btnQuickUndo = document.getElementById('btn-quick-undo');
+        if (btnQuickUndo) btnQuickUndo.addEventListener('click', undoLastAction);
+        const btnEditorUndo = document.getElementById('btn-editor-undo');
+        if (btnEditorUndo) btnEditorUndo.addEventListener('click', undoLastAction);
 
         const btnToggleMovePad = document.getElementById('btn-toggle-move-pad');
         const moveDpadPanel = document.getElementById('move-dpad-panel');
@@ -4496,10 +4601,17 @@
             });
         });
 
-        // Atajos de teclado: Escape para deseleccionar, Flechas para mover, R para girar, Supr para borrar
+        // Atajos de teclado: Ctrl+Z / Cmd+Z para Deshacer, Escape para deseleccionar, Flechas para mover, R para girar, Supr para borrar
         window.addEventListener('keydown', (e) => {
             const tag = document.activeElement ? document.activeElement.tagName : '';
             if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
+
+            // Ctrl+Z o Cmd+Z para Deshacer en cualquier momento
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                undoLastAction();
+                return;
+            }
 
             if (e.key === 'Escape') {
                 if (selectedId || selectedDecorMesh) {
@@ -4765,10 +4877,19 @@
         });
         document.getElementById('btn-clear-all').addEventListener('click', () => {
             if (confirm("¿Vaciar todos los muebles agregados?")) {
+                if (furnitureList.length > 0) {
+                    undoHistoryStack.push({
+                        type: 'furniture_bulk',
+                        name: 'Todos los muebles',
+                        items: JSON.parse(JSON.stringify(furnitureList))
+                    });
+                    updateUndoButtonUI();
+                }
                 furnitureList = [];
                 selectedId = null;
                 renderFurniture3D();
                 jsonModal.style.display = 'none';
+                showToast('🗑️ Muebles vaciados', true);
             }
         });
 
