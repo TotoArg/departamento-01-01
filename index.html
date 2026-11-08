@@ -671,7 +671,7 @@
             <button class="mode-btn" id="btn-mode-2d" title="Plano 2D Técnico Ortogonal"><span>📐</span> 2D</button>
             <button class="mode-btn" id="btn-mode-3d" title="3D Normal con muros completos"><span>🏢</span> 3D Muros</button>
             <button class="mode-btn active" id="btn-mode-sims" title="3D Maqueta con corte dinámico estilo Los Sims"><span>✂️</span> 3D Sims</button>
-            <button class="mode-btn" id="btn-mode-render4k" style="background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fef08a;" title="Ver Render Isométrico Arquitectónico 4K (Cutaway)"><span>🖼️</span> Render 4K</button>
+            <button class="mode-btn" id="btn-mode-render4k" style="background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fef08a;" title="Activar Gestión en Calidad 4K Ultra-HD en el 3D"><span>✨</span> Calidad 4K</button>
 
             <button class="mode-btn" id="btn-global-undo" style="display:none; background:rgba(239,68,68,0.22); border:1px solid #ef4444; color:#fca5a5;" title="Deshacer último cambio (Ctrl+Z)">
                 <span>↩️</span> <span id="btn-undo-text">Deshacer</span>
@@ -695,6 +695,16 @@
                 <button class="icon-btn" id="btn-zoom-reset" title="Restablecer vista" style="padding:4px 6px; font-size:12px;">🎯</button>
             </div>
         </div>
+    </div>
+
+    <!-- Badge Flotante de Gestión en Calidad 4K Ultra-HD -->
+    <div id="badge-4k-quality" style="display:none; position:fixed; top:74px; right:16px; z-index:25; background:rgba(15,23,42,0.92); border:1px solid #f59e0b; padding:6px 14px; border-radius:30px; align-items:center; gap:10px; backdrop-filter:blur(8px); box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+        <span style="font-size:11.5px; color:#fef08a; font-weight:700; display:flex; align-items:center; gap:5px;">
+            <span>✨</span> 3D en Calidad 4K Ultra-HD
+        </span>
+        <button id="btn-capture-4k-snapshot" class="mode-btn" style="background:#f59e0b; color:#0f172a; font-size:11px; font-weight:700; padding:3px 10px; border-radius:14px; border:none; cursor:pointer;" title="Exportar foto 4K UHD (3840×2160) de la vista actual del 3D">
+            📸 Foto 4K
+        </button>
     </div>
 
     <!-- Right Sidebar (Visibility & Layers) -->
@@ -6784,7 +6794,8 @@
                 if (v === 'top2d') {
                     switchTo2D();
                 } else if (v === 'render4k') {
-                    switchToRender4K();
+                    toggle4KUltraMode(true);
+                    switchTo3D('isom', 'sims', true);
                 } else {
                     switchTo3D(v, wallMode, true);
                 }
@@ -6994,66 +7005,136 @@
 
 
         // ============================================================================
-        // VISTA CANÓNICA DIRECTA: RENDER 4K ISOMÉTRICO ARQUITECTÓNICO
         // ============================================================================
-        let isRender4KZoomed = false;
+        // MOTOR DE GESTIÓN Y RENDERIZADO 3D EN CALIDAD 4K ULTRA-HD
+        // ============================================================================
+        let is4KModeActive = false;
 
-        function switchToRender4K() {
-            const el = document.getElementById('view-render4k-container');
-            if (el) el.style.display = 'flex';
-            setActiveTopBtn('btn-mode-render4k');
-            document.querySelectorAll('.view-chip').forEach(c => c.classList.toggle('active', c.dataset.view === 'render4k'));
+        function applyMaxAnisotropy(root = scene) {
+            try {
+                const maxAniso = renderer.capabilities.getMaxAnisotropy();
+                root.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        const mats = Array.isArray(child.material) ? child.material : [child.material];
+                        mats.forEach(m => {
+                            ['map', 'bumpMap', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap'].forEach(k => {
+                                if (m[k] && m[k].isTexture) {
+                                    m[k].anisotropy = maxAniso;
+                                    m[k].needsUpdate = true;
+                                }
+                            });
+                        });
+                    }
+                });
+            } catch (e) {}
         }
-        window.switchToRender4K = switchToRender4K;
 
-        function hideRender4K() {
-            const el = document.getElementById('view-render4k-container');
-            if (el) el.style.display = 'none';
-            const img = document.getElementById('img-render4k-view');
-            if (img) {
-                img.style.transform = 'scale(1.0)';
-                img.style.cursor = 'zoom-in';
-                isRender4KZoomed = false;
+        function toggle4KUltraMode(forceState = null) {
+            is4KModeActive = (forceState !== null) ? forceState : !is4KModeActive;
+            const btn4K = document.getElementById('btn-mode-render4k');
+            const badge4K = document.getElementById('badge-4k-quality');
+
+            if (is4KModeActive) {
+                // Impulsa el motor a resolución 4K supersampleada con sombras 4096
+                const highPR = isMobileOrLowEnd ? Math.max(window.devicePixelRatio, 2.0) : Math.max(window.devicePixelRatio, 2.5);
+                renderer.setPixelRatio(highPR);
+                renderer.setSize(window.innerWidth, window.innerHeight);
+
+                dirLight.shadow.mapSize.set(4096, 4096);
+                dirLight.shadow.radius = 4.2;
+                renderer.shadowMap.needsUpdate = true;
+                applyMaxAnisotropy(scene);
+
+                if (btn4K) {
+                    btn4K.classList.add('active');
+                    btn4K.style.background = 'linear-gradient(135deg, #d97706, #b45309)';
+                    btn4K.style.borderColor = '#fbbf24';
+                    btn4K.style.color = '#fff';
+                    btn4K.style.boxShadow = '0 0 16px rgba(245,158,11,0.5)';
+                }
+                if (badge4K) badge4K.style.display = 'flex';
+                showToast('✨ Calidad 4K Ultra-HD Activa: 3D interactivo con sombras 4K y texturas 16x');
+            } else {
+                const normalPR = isMobileOrLowEnd ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2.0);
+                renderer.setPixelRatio(normalPR);
+                renderer.setSize(window.innerWidth, window.innerHeight);
+
+                dirLight.shadow.mapSize.set(2048, 2048);
+                dirLight.shadow.radius = 3.5;
+                renderer.shadowMap.needsUpdate = true;
+
+                if (btn4K) {
+                    btn4K.classList.remove('active');
+                    btn4K.style.background = 'rgba(245,158,11,0.22)';
+                    btn4K.style.borderColor = '#f59e0b';
+                    btn4K.style.color = '#fef08a';
+                    btn4K.style.boxShadow = 'none';
+                }
+                if (badge4K) badge4K.style.display = 'none';
+                showToast('Modo estándar restablecido');
+            }
+            wakeRenderer();
+        }
+        window.toggle4KUltraMode = toggle4KUltraMode;
+
+        function capture4KSnapshot() {
+            try {
+                showToast('📸 Generando Render 4K UHD (3840×2160)...');
+                const origW = window.innerWidth;
+                const origH = window.innerHeight;
+                const origPR = renderer.getPixelRatio();
+
+                const targetW = 3840;
+                const targetH = 2160;
+
+                renderer.setPixelRatio(1.0);
+                renderer.setSize(targetW, targetH, false);
+                activeCamera.aspect = targetW / targetH;
+                activeCamera.updateProjectionMatrix();
+
+                dirLight.shadow.mapSize.set(4096, 4096);
+                renderer.shadowMap.needsUpdate = true;
+                renderer.render(scene, activeCamera);
+
+                const dataURL = renderer.domElement.toDataURL('image/png', 1.0);
+
+                renderer.setPixelRatio(origPR);
+                renderer.setSize(origW, origH, true);
+                activeCamera.aspect = origW / origH;
+                activeCamera.updateProjectionMatrix();
+                wakeRenderer();
+
+                const link = document.createElement('a');
+                link.download = `Render_3D_4K_Depto_01-01_${Date.now()}.png`;
+                link.href = dataURL;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('✅ Foto 4K Ultra-HD descargada con éxito!');
+            } catch (err) {
+                console.error('Error al capturar 4K:', err);
+                showToast('⚠️ No se pudo exportar imagen 4K');
             }
         }
-        window.hideRender4K = hideRender4K;
+        window.capture4KSnapshot = capture4KSnapshot;
 
         document.addEventListener('click', (e) => {
             if (e.target && (e.target.id === 'btn-mode-render4k' || e.target.closest('#btn-mode-render4k'))) {
                 e.preventDefault();
-                switchToRender4K();
+                toggle4KUltraMode();
             }
-            if (e.target && (e.target.id === 'btn-close-render4k-view' || e.target.closest('#btn-close-render4k-view'))) {
+            if (e.target && (e.target.id === 'btn-capture-4k-snapshot' || e.target.closest('#btn-capture-4k-snapshot'))) {
                 e.preventDefault();
-                switchTo3D(current3DPreset || 'isom', 'sims', true);
-            }
-            if (e.target && e.target.id === 'img-render4k-view') {
-                isRender4KZoomed = !isRender4KZoomed;
-                e.target.style.transform = isRender4KZoomed ? 'scale(1.55)' : 'scale(1.0)';
-                e.target.style.cursor = isRender4KZoomed ? 'zoom-out' : 'zoom-in';
+                capture4KSnapshot();
             }
         });
-</script>
+        </script>
 
 
 
 
     
 
-    <!-- Vista Canónica Directa: Render 4K Isométrico Arquitectónico -->
-    <div id="view-render4k-container" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:15; background:#0b1120; overflow:hidden; justify-content:center; align-items:center;">
-        <div style="position:absolute; top:72px; left:50%; transform:translateX(-50%); z-index:25; background:rgba(15,23,42,0.92); border:1px solid rgba(245,158,11,0.45); padding:6px 18px; border-radius:30px; display:flex; align-items:center; gap:12px; backdrop-filter:blur(10px); box-shadow:0 12px 30px rgba(0,0,0,0.6);">
-            <span style="font-size:12px; color:#fef08a; font-weight:700; display:flex; align-items:center; gap:6px;">
-                <span>🖼️</span> Render Isométrico Arquitectónico 4K (Cutaway Octane / UE5)
-            </span>
-            <a href="images/render_isom_cutaway.jpg" download="Render_Arquitectonico_Cutaway_Depto_01-01.jpg" style="background:#f59e0b; color:#0f172a; font-size:11px; font-weight:700; text-decoration:none; padding:4px 12px; border-radius:14px; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(245,158,11,0.4);">
-                <span>⬇️</span> Descargar 4K
-            </a>
-            <button id="btn-close-render4k-view" class="icon-btn" style="padding:3px 10px; font-size:12px; cursor:pointer;" title="Volver a Maqueta 3D">✕ Volver a 3D</button>
-        </div>
-        <div id="render4k-img-wrapper" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; padding:80px 12px 85px 12px; box-sizing:border-box;">
-            <img id="img-render4k-view" src="images/render_isom_cutaway.jpg" alt="Render Isométrico Cutaway 4K" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:10px; box-shadow:0 20px 50px rgba(0,0,0,0.8); cursor:zoom-in; transition:transform 0.25s ease;">
-        </div>
-    </div>
+    
 </body>
 </html>
