@@ -645,6 +645,7 @@
             <button class="mode-btn" id="btn-mode-zocalo" title="Paredes a nivel zócalo bajo (0.25m) - Vista limpia de planta 3D"><span>📏</span> Zócalo</button>
             <button class="mode-btn" id="btn-mode-nowalls" title="Ocultar todas las paredes"><span>🚫</span> Sin Muros</button>
 
+            <button class="mode-btn" id="btn-view-render4k" style="background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fef08a;" title="Ver Render Isométrico Arquitectónico 4K"><span>🖼️</span> Render 4K</button>
             <button class="mode-btn" id="btn-toggle-styles" style="background:rgba(56,189,248,0.2); border:1px solid #38bdf8; color:#f8fafc; font-weight:700;" title="Abrir selector visual con todos los estilos gráficos">
                 <span id="btn-styles-icon">🎨</span> <span id="btn-styles-text">Estilos</span>
             </button>
@@ -1733,23 +1734,25 @@
         const ambLight = new THREE.AmbientLight(0xdbeafe, 0.16);
         scene.add(ambLight);
 
-        // 3. Sol Fotorrealista Potente en Ángulo Diagonal [35, 70, 35] con Sombras Suaves de 2048x2048
-        const dirLight = new THREE.DirectionalLight(0xfff8ee, 1.42);
-        dirLight.position.set(35.0, 70.0, 35.0);
-        dirLight.target.position.set(3.15, 0.80, 4.00);
+        // 3. Sol Fotorrealista Atardecer Cálido en Ángulo Rasante con Sombras Suaves 4K (PCFSoftShadowMap)
+        const dirLight = new THREE.DirectionalLight(0xffecd2, 1.55);
+        dirLight.position.set(28.0, 38.0, 26.0); // Ángulo diagonal rasante para proyectar sombras largas arquitectónicas
+        dirLight.target.position.set(3.15, 0.70, 3.80);
         scene.add(dirLight.target);
         dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.height = 2048;
-        dirLight.shadow.camera.near = 15.0;
-        dirLight.shadow.camera.far = 140.0;
-        dirLight.shadow.camera.left = -9.5;
-        dirLight.shadow.camera.right = 9.5;
-        dirLight.shadow.camera.top = 9.5;
-        dirLight.shadow.camera.bottom = -9.5;
-        dirLight.shadow.bias = -0.0002;
-        dirLight.shadow.normalBias = 0.035;
-        dirLight.shadow.radius = 3.5; // Sombras arquitectónicas suaves difusas
+        // Resolución 4K en desktop y 2K en móvil para máxima fidelidad y rendimiento
+        const shadowRes = isMobileOrLowEnd ? 2048 : 4096;
+        dirLight.shadow.mapSize.width = shadowRes;
+        dirLight.shadow.mapSize.height = shadowRes;
+        dirLight.shadow.camera.near = 10.0;
+        dirLight.shadow.camera.far = 120.0;
+        dirLight.shadow.camera.left = -10.0;
+        dirLight.shadow.camera.right = 10.0;
+        dirLight.shadow.camera.top = 10.0;
+        dirLight.shadow.camera.bottom = -10.0;
+        dirLight.shadow.bias = -0.00018;
+        dirLight.shadow.normalBias = 0.032;
+        dirLight.shadow.radius = 4.0; // Sombras arquitectónicas suaves de penumbra difusa
         scene.add(dirLight);
 
         // 4. Luz de Relleno Suave Posterior
@@ -1975,32 +1978,34 @@
 
         // Material PBR Paredes de Yeso Mate (blanco crema suave, roughness: 0.92)
         const wallPlasterMat = new THREE.MeshStandardMaterial({
-            color: 0xf6f3ed, // Blanco crema yeso suave
+            color: 0xf8f9fa, // Blanco mate yeso puro arquitectónico
             bumpMap: proceduralPlasterBumpTex,
             bumpScale: 0.0008,
-            roughness: 0.92, // Mate yeso aterciopelado
+            roughness: 0.95, // Mate yeso aterciopelado sin reflejos
             metalness: 0.0
         });
 
-        // Material PBR Albardillas de Corte Superior de Muros (Gris oscuro grafito para contraste de maqueta)
+        // Material PBR Albardillas de Corte Superior de Muros (Gris oscuro grafito #1e242b para contraste de maqueta cutaway)
         const wallCapCutMat = new THREE.MeshStandardMaterial({
-            color: 0x22262d,
-            roughness: 0.55,
-            metalness: 0.12
+            color: 0x1e242b,
+            roughness: 0.50,
+            metalness: 0.15
         });
 
         // Piso Cerámico Esmaltado 33×33 cm real (fotos/foto_01.jpg, foto_04.jpg y corridor_floor.jpg)
         const ceramicTile33MainTex = createRealisticCeramic33Texture(6.30, 6.30);
         const ceramicTile33SouthTex = createRealisticCeramic33Texture(4.85, 1.70);
         const pbrCeramicFloorMat = new THREE.MeshStandardMaterial({
+            color: 0xe2dcd3, // Baldosas cerámicas beige cálidas
             map: ceramicTile33MainTex,
-            roughness: 0.36,
-            metalness: 0.08
+            roughness: 0.55,
+            metalness: 0.05
         });
         const pbrCeramicSouthFloorMat = new THREE.MeshStandardMaterial({
+            color: 0xe2dcd3,
             map: ceramicTile33SouthTex,
-            roughness: 0.36,
-            metalness: 0.08
+            roughness: 0.55,
+            metalness: 0.05
         });
         const floorMatMain = pbrCeramicFloorMat;
         const floorMatSouth = pbrCeramicSouthFloorMat;
@@ -2017,8 +2022,9 @@
         const winGlassMat = new THREE.MeshPhysicalMaterial({ color: 0xcfe2ff, transparent: true, opacity: 0.35, roughness: 0.08, metalness: 0.15, transmission: 0.85, ior: 1.5 });
         // Machimbre PBR del techo inclinado (Digital Twin exacto con ranuras en V y veta de pino)
         const woodRoofMat = new THREE.MeshStandardMaterial({
+            color: 0x8d5524, // Pino barnizado cálido
             map: machimbreRoofTex,
-            roughness: 0.50,
+            roughness: 0.60,
             metalness: 0.02,
             side: THREE.DoubleSide
         });
@@ -4689,8 +4695,8 @@
 
             // 2. ESCRITORIO GAMER EN "L" (Setup Detallado con FFVII Rebirth, Rebote LED, Mate y Termo)
             createCompoundAssembly('Escritorio Gamer en "L" con Setup', () => {
-                const deskWoodMat = new THREE.MeshStandardMaterial({ color: 0x8f3818, roughness: 0.70, metalness: 0.05 });
-                const legWoodMat = new THREE.MeshStandardMaterial({ color: 0x6b2810, roughness: 0.72, metalness: 0.05 });
+                const deskWoodMat = new THREE.MeshStandardMaterial({ color: 0xa65e18, roughness: 0.68, metalness: 0.04 }); // Madera rojiza calibrada
+                const legWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c3a0e, roughness: 0.72, metalness: 0.04 });
                 const monitorBezelMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.10, metalness: 0.75 });
                 const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.30, metalness: 0.60 });
                 const silverMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.15, metalness: 0.95 }); // Virola de mate y bombilla
@@ -4761,10 +4767,43 @@
                 monGroup.add(monBezel, monDisplay, monStand, monArm);
 
                 // Luz LED trasera cyan/azul de baja intensidad para rebote LED en la pared este
-                const monBackLed = new THREE.PointLight(0x00e5ff, 0.9, 2.6, 1.6);
+                const monBackLed = new THREE.PointLight(0x00e5ff, 0.95, 2.6, 1.6);
                 monBackLed.position.set(0.06, 0, 0);
                 monGroup.add(monBackLed);
                 (currentAssemblyGroup || decorVideoGroup).add(monGroup);
+
+                // --- SEGUNDO MONITOR GAMER SLIM (SETUP DUAL CON REBOTE LED ROJO/CIAN) ---
+                const monGroup2 = new THREE.Group();
+                monGroup2.position.set(2.78, 1.05, 1.25);
+                monGroup2.rotation.y = -0.22; // Inclinado ergonómicamente hacia el usuario
+                const monBezel2 = new THREE.Mesh(UNIT_BOX_GEO, monitorBezelMat);
+                monBezel2.scale.set(0.03, 0.38, 0.58);
+                monBezel2.castShadow = true;
+                const monDisplayMat2 = new THREE.MeshStandardMaterial({
+                    map: proceduralScreenTex,
+                    emissive: 0x00d8f6,
+                    emissiveMap: proceduralScreenTex,
+                    emissiveIntensity: 0.55,
+                    roughness: 0.12,
+                    metalness: 0.10
+                });
+                const monDisplay2 = new THREE.Mesh(UNIT_BOX_GEO, monDisplayMat2);
+                monDisplay2.scale.set(0.005, 0.36, 0.56);
+                monDisplay2.position.set(-0.015, 0, 0);
+                const monStand2 = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
+                monStand2.scale.set(0.15, 0.012, 0.22);
+                monStand2.position.set(-0.05, -0.28, 0);
+                monStand2.castShadow = true;
+                const monArm2 = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
+                monArm2.scale.set(0.04, 0.28, 0.05);
+                monArm2.position.set(-0.02, -0.15, 0);
+                monArm2.castShadow = true;
+                monGroup2.add(monBezel2, monDisplay2, monStand2, monArm2);
+                // Rebote LED rojo complementario en la pared este
+                const monBackLedRed = new THREE.PointLight(0xff1744, 0.75, 2.2, 1.5);
+                monBackLedRed.position.set(0.06, 0, 0);
+                monGroup2.add(monBackLedRed);
+                (currentAssemblyGroup || decorVideoGroup).add(monGroup2);
 
                 // Barra de luz LED superior (Lightbar) y webcam
                 const lightBar = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
@@ -7290,6 +7329,29 @@
             }
         }, 120);
 
+
+        // Control del Modal de Render 4K Cutaway
+        const btnViewRender4K = document.getElementById('btn-view-render4k');
+        const modalRender4K = document.getElementById('render4k-modal');
+        const btnCloseRender4K = document.getElementById('btn-close-render4k');
+
+        if (btnViewRender4K && modalRender4K) {
+            btnViewRender4K.addEventListener('click', (e) => {
+                e.preventDefault();
+                modalRender4K.style.display = 'flex';
+            });
+        }
+        if (btnCloseRender4K && modalRender4K) {
+            btnCloseRender4K.addEventListener('click', (e) => {
+                e.preventDefault();
+                modalRender4K.style.display = 'none';
+            });
+        }
+        if (modalRender4K) {
+            modalRender4K.addEventListener('click', (e) => {
+                if (e.target === modalRender4K) modalRender4K.style.display = 'none';
+            });
+        }
 </script>
 
     <!-- Modal Selector de Estilos Gráficos -->
@@ -7362,5 +7424,33 @@
 
 
 
+
+    <!-- Modal Render 4K Cutaway Arquitectónico -->
+    <div class="modal-overlay" id="render4k-modal" style="display:none; align-items:center; justify-content:center; z-index:99999; background:rgba(10,15,28,0.88); backdrop-filter:blur(8px);">
+        <div class="modal-box glass-panel" style="max-width:920px; width:92%; max-height:90vh; overflow-y:auto; padding:18px; border-radius:12px; border:1px solid rgba(245,158,11,0.4); box-shadow:0 20px 40px rgba(0,0,0,0.6);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">
+                <div>
+                    <h3 style="font-size:16px; font-weight:700; color:#fbbf24; margin:0; display:flex; align-items:center; gap:8px;">
+                        <span>🖼️</span> Render Isométrico Arquitectónico Cutaway (Octane / UE5)
+                    </h3>
+                    <p style="font-size:12px; color:#94a3b8; margin:3px 0 0 0;">
+                        Visualización fotorrealista con muros cortados a 1.30m, sol rasante de atardecer, sombras 4K y Digital Twin completo.
+                    </p>
+                </div>
+                <button class="icon-btn" id="btn-close-render4k" style="font-size:18px; padding:4px 10px; cursor:pointer;">✕</button>
+            </div>
+            <div style="text-align:center; background:#020617; border-radius:8px; padding:6px; border:1px solid rgba(255,255,255,0.06);">
+                <img src="images/render_isom_cutaway.jpg" alt="Render 3D Isométrico Cutaway" style="max-width:100%; height:auto; border-radius:6px; display:block; margin:0 auto; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; gap:10px;">
+                <span style="font-size:11.5px; color:#94a3b8;">
+                    Resolución Ultra-HD • Estilo Unreal Engine 5 / Octane Render
+                </span>
+                <a href="images/render_isom_cutaway.jpg" download="Render_Arquitectonico_Cutaway_Depto_01-01.jpg" class="mode-btn" style="background:#f59e0b; color:#0f172a; font-weight:700; text-decoration:none; padding:8px 16px; border-radius:6px; display:inline-flex; align-items:center; gap:6px;">
+                    <span>⬇️</span> Descargar Render 4K
+                </a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
