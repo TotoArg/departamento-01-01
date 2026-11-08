@@ -635,9 +635,7 @@
             <button class="mode-btn" id="btn-mode-cut" title="Paredes Medias cortadas a 1.10m (Maqueta arquitectónica)"><span>✂️</span> Medias</button>
             <button class="mode-btn" id="btn-mode-zocalo" title="Paredes a nivel zócalo bajo (0.25m) - Vista limpia de planta 3D"><span>📏</span> Zócalo</button>
             <button class="mode-btn" id="btn-mode-nowalls" title="Ocultar todas las paredes"><span>🚫</span> Sin Muros</button>
-            <button class="mode-btn" id="btn-toggle-zoning" style="background:rgba(20,184,166,0.22); border:1px solid #14b8a6; color:#2dd4bf; font-weight:700;" title="Ver análisis axonométrico de zonificación funcional por colores (como en la infografía)">
-                <span>📊</span> Zonificación
-            </button>
+
             <button class="mode-btn" id="btn-toggle-styles" style="background:rgba(56,189,248,0.2); border:1px solid #38bdf8; color:#f8fafc; font-weight:700;" title="Abrir selector visual con todos los estilos gráficos">
                 <span id="btn-styles-icon">🎨</span> <span id="btn-styles-text">Estilos</span>
             </button>
@@ -645,13 +643,9 @@
                 <span>↩️</span> <span id="btn-undo-text">Deshacer</span>
             </button>
             <select id="select-quick-style" class="mode-btn" style="background:#0f172a; border:1px solid #38bdf8; color:#38bdf8; padding:5px 8px; border-radius:8px; font-weight:700; cursor:pointer;" title="Cambiar estilo gráfico al instante">
-                <option value="archviz" selected>🏢 Axonométrico Estudio (Foto Referencia)</option>
-                <option value="zoning">📊 Zonificación Funcional (Análisis)</option>
+                <option value="archviz" selected>🏢 Axonométrico Estudio</option>
                 <option value="sims">🎨 Sims (Color Real)</option>
                 <option value="realist">✨ Realista Cálido</option>
-                <option value="clay">🏛️ Maqueta Blanca</option>
-                <option value="blueprint">📐 Blueprint Técnico</option>
-                <option value="sketch">✒️ Boceto / Tinta</option>
                 <option value="night">🌙 Noche Acogedora</option>
             </select>
             <button class="mode-btn active" id="btn-toggle-labels" title="Mostrar/Ocultar Nombres de los Ambientes"><span>🏷️</span> Nombres</button>
@@ -3137,129 +3131,7 @@
         setTimeout(ensure3DExtrasBuilt, 60);
         // ============================================================================
         // SISTEMA DE ANÁLISIS DE ZONIFICACIÓN FUNCIONAL AXONOMÉTRICA (FOTO REFERENCIA INFERIOR)
-        // ============================================================================
-        const zoningGroup = new THREE.Group();
-        zoningGroup.name = 'zoningGroup';
-        zoningGroup.visible = false;
-        apartmentGroup.add(zoningGroup);
-
-        const ZONING_AREAS = [
-            {
-                id: 'living',
-                name: 'LOUNGE / LIVING-COMEDOR',
-                subtitle: 'Área de estar, reuniones, TV y relax',
-                area: '22,4 m²',
-                color: 0x14b8a6, // Pastel Teal / Turquesa
-                x: 4.65, z: 2.40, w: 3.30, d: 4.80,
-                calloutX: 7.20, calloutZ: 2.00, calloutY: 2.20
-            },
-            {
-                id: 'cocina',
-                name: 'PANTRY / COCINA INTEGRADA',
-                subtitle: 'Preparación, cocción, heladera y lavado',
-                area: '8,4 m²',
-                color: 0xf43f5e, // Pastel Coral / Rosa
-                x: 3.925, z: 6.40, w: 1.85, d: 3.20,
-                calloutX: 6.20, calloutZ: 8.40, calloutY: 2.10
-            },
-            {
-                id: 'dormitorio',
-                name: 'PRIVATE BEDROOM / CUARTO',
-                subtitle: 'Descanso principal, cama doble y placard',
-                area: '9,9 m²',
-                color: 0x6366f1, // Pastel Indigo / Violeta
-                x: 1.50, z: 6.35, w: 3.00, d: 3.30,
-                calloutX: -1.20, calloutZ: 7.20, calloutY: 2.20
-            },
-            {
-                id: 'bano',
-                name: 'RESTROOM / BAÑO COMPLETO',
-                subtitle: 'Núcleo sanitario privado con ducha e inodoro',
-                area: '3,2 m²',
-                color: 0x06b6d4, // Pastel Aqua / Celeste
-                x: 1.15, z: 3.50, w: 2.30, d: 2.40,
-                calloutX: -1.20, calloutZ: 3.50, calloutY: 2.00
-            },
-            {
-                id: 'estudio',
-                name: 'OPEN COWORK / ESTUDIO',
-                subtitle: 'Puesto de trabajo, PC gamer y concentración',
-                area: '6,9 m²',
-                color: 0x22c55e, // Pastel Mint / Verde
-                x: 1.50, z: 1.15, w: 3.00, d: 2.30,
-                calloutX: -1.20, calloutZ: 1.00, calloutY: 2.10
-            },
-            {
-                id: 'entrada',
-                name: 'RECEPTION / ACCESO',
-                subtitle: 'Hall de entrada, calzado y despojo',
-                area: '3,4 m²',
-                color: 0xf97316, // Pastel Amber / Naranja
-                x: 5.575, z: 5.55, w: 1.45, d: 1.50,
-                calloutX: 7.20, calloutZ: 5.80, calloutY: 2.00
-            }
-        ];
-
-        function buildZoningAnalysisLayers() {
-            ZONING_AREAS.forEach(zone => {
-                // 1. Placa de color pastel traslúcida sobre el piso
-                const planeGeo = new THREE.PlaneGeometry(zone.w - 0.06, zone.d - 0.06);
-                const planeMat = new THREE.MeshBasicMaterial({
-                    color: zone.color,
-                    transparent: true,
-                    opacity: 0.32,
-                    depthWrite: false
-                });
-                const mesh = new THREE.Mesh(planeGeo, planeMat);
-                mesh.rotation.x = -Math.PI / 2;
-                mesh.position.set(zone.x, 0.008, zone.z);
-                zoningGroup.add(mesh);
-
-                // Borde perimetral coloreado
-                const edgesGeo = new THREE.EdgesGeometry(planeGeo);
-                const lineMat = new THREE.LineBasicMaterial({ color: zone.color, linewidth: 2, transparent: true, opacity: 0.85 });
-                const line = new THREE.LineSegments(edgesGeo, lineMat);
-                line.rotation.x = -Math.PI / 2;
-                line.position.set(zone.x, 0.009, zone.z);
-                zoningGroup.add(line);
-
-                // 2. Línea directriz arquitectónica (Leader Line) con punto de origen
-                const dotGeo = new THREE.SphereGeometry(0.04, 12, 12);
-                const dotMat = new THREE.MeshBasicMaterial({ color: 0x0f172a });
-                const dot = new THREE.Mesh(dotGeo, dotMat);
-                dot.position.set(zone.x, 0.015, zone.z);
-                zoningGroup.add(dot);
-
-                const linePts = [
-                    new THREE.Vector3(zone.x, 0.015, zone.z),
-                    new THREE.Vector3(zone.x, zone.calloutY, zone.z),
-                    new THREE.Vector3(zone.calloutX, zone.calloutY, zone.calloutZ)
-                ];
-                const leaderGeo = new THREE.BufferGeometry().setFromPoints(linePts);
-                const leaderMat = new THREE.LineBasicMaterial({ color: 0x334155, linewidth: 1.5 });
-                const leaderLine = new THREE.Line(leaderGeo, leaderMat);
-                zoningGroup.add(leaderLine);
-
-                // Punto final de anclaje
-                const endDot = new THREE.Mesh(dotGeo, dotMat);
-                endDot.position.copy(linePts[2]);
-                zoningGroup.add(endDot);
-            });
-        }
-        buildZoningAnalysisLayers();
-
-        // Control del botón de Zonificación
-        let isZoningActive = false;
-        function toggleZoningAnalysis(forceState = null) {
-            isZoningActive = (forceState !== null) ? forceState : !isZoningActive;
-            zoningGroup.visible = isZoningActive;
-            const btn = document.getElementById('btn-toggle-zoning');
-            if (btn) btn.classList.toggle('active', isZoningActive);
-            const overlayContainer = document.getElementById('zoning-overlay-cards');
-            if (overlayContainer) overlayContainer.style.display = isZoningActive ? 'block' : 'none';
-            showToast(`📊 Zonificación Funcional: ${isZoningActive ? 'Activada' : 'Desactivada'}`);
-            wakeRenderer();
-        }
+// ============================================================================
 
 
         // ============================================================================
@@ -5148,7 +5020,7 @@
             const isDioramaStyle = (currentGraphicStyle === 'realist' || currentGraphicStyle === 'night');
             if (dioramaGround) dioramaGround.visible = isDioramaStyle;
             if (dioramaFlora) dioramaFlora.visible = isDioramaStyle;
-            if (studioGround) studioGround.visible = (currentGraphicStyle === 'archviz' || currentGraphicStyle === 'zoning');
+            if (studioGround) studioGround.visible = (currentGraphicStyle === 'archviz');
             
             current3DPreset = presetName;
             activeCamera = perspCam;
@@ -5479,26 +5351,10 @@
             roughness: 0.20
         });
 
-        // Materiales para estilos alternativos (Clay, Blueprint, Sketch)
-        const clayWallMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.88, metalness: 0.05 });
-        const clayFloorMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.85, metalness: 0.05 });
-        const clayFurnMat = new THREE.MeshStandardMaterial({ color: 0xedebe8, roughness: 0.72, metalness: 0.08 });
-
-        const bpWallMat = new THREE.MeshStandardMaterial({ color: 0x0f2a4a, roughness: 0.45, transparent: true, opacity: 0.88 });
-        const bpFloorMat = new THREE.MeshStandardMaterial({ color: 0x071526, roughness: 0.65 });
-        const bpFurnMat = new THREE.MeshStandardMaterial({ color: 0x133863, roughness: 0.50 });
-
-        const sketchWallMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95 });
-        const sketchFloorMat = new THREE.MeshStandardMaterial({ color: 0xf1ebe1, roughness: 0.95 });
-
         const STYLE_METADATA = {
             archviz: { icon: '🏢', name: 'Axonométrico' },
-            zoning: { icon: '📊', name: 'Zonificación' },
             sims: { icon: '🎨', name: 'Sims' },
             realist: { icon: '✨', name: 'Realista' },
-            clay: { icon: '🏛️', name: 'Maqueta' },
-            blueprint: { icon: '📐', name: 'Blueprint' },
-            sketch: { icon: '✒️', name: 'Boceto' },
             night: { icon: '🌙', name: 'Noche' }
         };
 
@@ -5520,8 +5376,8 @@
             const studioGround = floorGroup.getObjectByName('studioGround');
             
             // 1. Configuración de Iluminación y Cielo según Estilo
-            if (style === 'archviz' || style === 'zoning') {
-                scene.background = new THREE.Color(0xffffff); // Fondo de estudio blanco puro (Foto Referencia)
+            if (style === 'archviz') {
+                scene.background = new THREE.Color(0xffffff); // Fondo de estudio blanco puro
                 hemiLight.color.setHex(0xf8fafc);
                 hemiLight.groundColor.setHex(0xe2e8f0);
                 hemiLight.intensity = 0.70;
@@ -5540,14 +5396,7 @@
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = false;
                 if (dioramaFlora) dioramaFlora.visible = false;
-            
-            if (studioGround) studioGround.visible = false;
-                zoningGroup.visible = (style === 'zoning');
-                isZoningActive = (style === 'zoning');
-                const btnZ = document.getElementById('btn-toggle-zoning');
-                if (btnZ) btnZ.classList.toggle('active', isZoningActive);
-                const ovCards = document.getElementById('zoning-overlay-cards');
-                if (ovCards) ovCards.style.display = isZoningActive ? 'block' : 'none';
+                if (studioGround) studioGround.visible = false;
             } else if (style === 'sims') {
                 scene.background = new THREE.Color(0xffffff);
                 hemiLight.intensity = 0.35;
@@ -5565,9 +5414,7 @@
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = false;
                 if (dioramaFlora) dioramaFlora.visible = false;
-            
-            if (studioGround) studioGround.visible = false;
-                
+                if (studioGround) studioGround.visible = false;
             } else if (style === 'realist') {
                 scene.background = new THREE.Color(0xf1f5f9);
                 hemiLight.intensity = 0.55;
@@ -5587,65 +5434,6 @@
                 if (studioGround) studioGround.visible = false;
                 if (dioramaGround) dioramaGround.visible = true;
                 if (dioramaFlora) dioramaFlora.visible = true;
-                
-            } else if (style === 'clay') {
-                scene.background = new THREE.Color(0xdbe4ee);
-                hemiLight.intensity = 0.40;
-                ambLight.color.setHex(0xffffff);
-                ambLight.intensity = 0.46;
-                dirLight.color.setHex(0xffffff);
-                dirLight.intensity = 0.90;
-                fillLight.intensity = 0.15;
-                cyanLedStudy.intensity = 0;
-                cyanLedLiving.intensity = 0;
-                bedsideLampLeft.intensity = 0;
-                bedsideLampRight.intensity = 0;
-                kitchenLed.intensity = 0;
-                nightLightsGroup.visible = false;
-                if (studioGround) studioGround.visible = false;
-                if (dioramaGround) dioramaGround.visible = true;
-                if (dioramaFlora) dioramaFlora.visible = false;
-            
-            if (studioGround) studioGround.visible = false;
-                
-            } else if (style === 'blueprint') {
-                scene.background = new THREE.Color(0x061122);
-                hemiLight.intensity = 0.20;
-                ambLight.color.setHex(0x1e3a5f);
-                ambLight.intensity = 0.80;
-                dirLight.color.setHex(0x38bdf8);
-                dirLight.intensity = 0.65;
-                fillLight.intensity = 0.25;
-                cyanLedStudy.intensity = 2.4;
-                cyanLedLiving.intensity = 2.0;
-                bedsideLampLeft.intensity = 0;
-                bedsideLampRight.intensity = 0;
-                kitchenLed.intensity = 0;
-                nightLightsGroup.visible = false;
-                if (dioramaGround) dioramaGround.visible = false;
-                if (dioramaFlora) dioramaFlora.visible = false;
-            
-            if (studioGround) studioGround.visible = false;
-                
-            } else if (style === 'sketch') {
-                scene.background = new THREE.Color(0xfbf8f1);
-                hemiLight.intensity = 0.30;
-                ambLight.color.setHex(0xffffff);
-                ambLight.intensity = 1.15;
-                dirLight.color.setHex(0x475569);
-                dirLight.intensity = 0.30;
-                fillLight.intensity = 0.15;
-                cyanLedStudy.intensity = 0;
-                cyanLedLiving.intensity = 0;
-                bedsideLampLeft.intensity = 0;
-                bedsideLampRight.intensity = 0;
-                kitchenLed.intensity = 0;
-                nightLightsGroup.visible = false;
-                if (dioramaGround) dioramaGround.visible = false;
-                if (dioramaFlora) dioramaFlora.visible = false;
-            
-            if (studioGround) studioGround.visible = false;
-                
             } else if (style === 'night') {
                 scene.background = new THREE.Color(0x050814);
                 hemiLight.intensity = 0.15;
@@ -5696,7 +5484,7 @@
                 const isGlassItem = nameLower.includes('vidrio') || nameLower.includes('ventana') || nameLower.includes('mampara') || nameLower.includes('espejo');
                 const isScreenDisplay = nameLower.includes('pantalla') || nameLower.includes('monitor') || nameLower.includes('tv') || nameLower.includes('televisor');
 
-                if (style === 'archviz' || style === 'zoning') {
+                if (style === 'archviz') {
                     if (isCap) {
                         child.material = archvizCleanCapMat;
                     } else if (isExtWall || isIntWall) {
@@ -5736,18 +5524,6 @@
                     }
                 } else if (style === 'sims') {
                     child.material = child.userData.origMat;
-                } else if (style === 'clay') {
-                    if ((isExtWall || isIntWall || isRoof) && !child.userData.isCap) child.material = clayWallMat;
-                    else if (isFloor) child.material = clayFloorMat;
-                    else child.material = clayFurnMat;
-                } else if (style === 'blueprint') {
-                    if ((isExtWall || isIntWall || isRoof) && !child.userData.isCap) child.material = bpWallMat;
-                    else if (isFloor) child.material = bpFloorMat;
-                    else child.material = bpFurnMat;
-                } else if (style === 'sketch') {
-                    if ((isExtWall || isIntWall || isRoof) && !child.userData.isCap) child.material = sketchWallMat;
-                    else if (isFloor) child.material = sketchFloorMat;
-                    else child.material = child.userData.origMat;
                 } else if (style === 'realist') {
                     child.material = child.userData.origMat;
                     if (child.material.roughness !== undefined && isFloor) {
@@ -5777,12 +5553,7 @@
             wakeRenderer();
         }// Control del Modal de Estilos
         const stylesModal = document.getElementById('styles-modal');
-        const btnToggleZoning = document.getElementById('btn-toggle-zoning');
-        if (btnToggleZoning) {
-            btnToggleZoning.addEventListener('click', () => {
-                toggleZoningAnalysis();
-            });
-        }
+
         const btnToggleStyles = document.getElementById('btn-toggle-styles');
         const btnCloseStyles = document.getElementById('btn-close-styles');
         const selectQuickStyle = document.getElementById('select-quick-style');
@@ -5903,41 +5674,7 @@
                     </div>
                 </div>
 
-                <!-- 3. Maqueta Blanca Clay -->
-                <div class="style-card" data-style="clay">
-                    <div class="style-card-header">
-                        <span class="style-icon">🏛️</span>
-                        <span class="style-title">Maqueta Clay Blanca</span>
-                        <span class="style-badge badge-arch">Estudio Arq.</span>
-                    </div>
-                    <div class="style-desc">
-                        Monocromático en yeso y alabastro blanco. Resalta las proporciones y la espacialidad pura.
-                    </div>
-                </div>
 
-                <!-- 4. Blueprint Técnico -->
-                <div class="style-card" data-style="blueprint">
-                    <div class="style-card-header">
-                        <span class="style-icon">📐</span>
-                        <span class="style-title">Blueprint Técnico</span>
-                        <span class="style-badge badge-eng">Ingeniería</span>
-                    </div>
-                    <div class="style-desc">
-                        Cianotipia azul marino profundo (#071326) con líneas cian fluorescentes y muros translúcidos.
-                    </div>
-                </div>
-
-                <!-- 5. Boceto a Mano / Tinta -->
-                <div class="style-card" data-style="sketch">
-                    <div class="style-card-header">
-                        <span class="style-icon">✒️</span>
-                        <span class="style-title">Boceto / Tinta</span>
-                        <span class="style-badge badge-art">Ilustración</span>
-                    </div>
-                    <div class="style-desc">
-                        Papel pergamino cálido (#faf7f2) con líneas de tinta negra en bordes y estética cómic / acuarela.
-                    </div>
-                </div>
 
                 <!-- 6. Noche Cálida -->
                 <div class="style-card" data-style="night">
@@ -5955,34 +5692,6 @@
     </div>
 
 
-    <!-- Carteles de Análisis de Zonificación Funcional (como en la infografía inferior) -->
-    <div id="zoning-overlay-cards" style="display:none; position:absolute; bottom:65px; left:16px; right:16px; pointer-events:none; z-index:30;">
-        <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:960px; margin:0 auto;">
-            <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border-left:4px solid #14b8a6; padding:6px 12px; border-radius:8px; color:#fff; font-size:11px; max-width:180px;">
-                <div style="font-weight:700; color:#2dd4bf;">LOUNGE / LIVING</div>
-                <div style="color:#94a3b8; font-size:10px;">Estar, TV y descanso (22,4 m²)</div>
-            </div>
-            <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border-left:4px solid #f43f5e; padding:6px 12px; border-radius:8px; color:#fff; font-size:11px; max-width:180px;">
-                <div style="font-weight:700; color:#fb7185;">PANTRY / COCINA</div>
-                <div style="color:#94a3b8; font-size:10px;">Cocción y lavado (8,4 m²)</div>
-            </div>
-            <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border-left:4px solid #6366f1; padding:6px 12px; border-radius:8px; color:#fff; font-size:11px; max-width:180px;">
-                <div style="font-weight:700; color:#818cf8;">BEDROOM / CUARTO</div>
-                <div style="color:#94a3b8; font-size:10px;">Descanso principal (9,9 m²)</div>
-            </div>
-            <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border-left:4px solid #06b6d4; padding:6px 12px; border-radius:8px; color:#fff; font-size:11px; max-width:180px;">
-                <div style="font-weight:700; color:#38bdf8;">RESTROOM / BAÑO</div>
-                <div style="color:#94a3b8; font-size:10px;">Sanitario y ducha (3,2 m²)</div>
-            </div>
-            <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border-left:4px solid #22c55e; padding:6px 12px; border-radius:8px; color:#fff; font-size:11px; max-width:180px;">
-                <div style="font-weight:700; color:#4ade80;">COWORK / ESTUDIO</div>
-                <div style="color:#94a3b8; font-size:10px;">Puesto gamer y PC (6,9 m²)</div>
-            </div>
-            <div style="background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); border-left:4px solid #f97316; padding:6px 12px; border-radius:8px; color:#fff; font-size:11px; max-width:180px;">
-                <div style="font-weight:700; color:#fb923c;">RECEPTION / ACCESO</div>
-                <div style="color:#94a3b8; font-size:10px;">Hall y calzado (3,4 m²)</div>
-            </div>
-        </div>
-    </div>
+
 </body>
 </html>
