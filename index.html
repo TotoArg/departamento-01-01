@@ -4091,7 +4091,11 @@
         }
 
         function updateSelectionVisual() {
-            if (selectionBox) scene.remove(selectionBox);
+            if (selectionBox) {
+                scene.remove(selectionBox);
+                if (selectionBox.geometry) selectionBox.geometry.dispose();
+                selectionBox = null;
+            }
             const selMesh = furnitureMeshes.find(m => m.userData.id === selectedId);
             if (selMesh && document.getElementById('chk-furniture').checked) {
                 selectionBox = new THREE.BoxHelper(selMesh, 0x0284c7);
@@ -4269,7 +4273,7 @@
             selectedDecorMesh = null;
             if (selectionBox) {
                 scene.remove(selectionBox);
-                selectionBox.dispose();
+                if (selectionBox.geometry) selectionBox.geometry.dispose();
                 selectionBox = null;
             }
             hideSelectionBar();
@@ -4287,7 +4291,7 @@
             selectedDecorMesh = mesh;
             if (selectionBox) {
                 scene.remove(selectionBox);
-                selectionBox.dispose();
+                if (selectionBox.geometry) selectionBox.geometry.dispose();
                 selectionBox = null;
             }
             selectionBox = new THREE.BoxHelper(mesh, 0x38bdf8);
@@ -4402,13 +4406,14 @@
             if (action.type === 'furniture') {
                 const insertIdx = (action.index !== undefined && action.index >= 0) ? action.index : furnitureList.length;
                 furnitureList.splice(insertIdx, 0, action.item);
-                renderFurniture3D();
                 selectedId = action.item.id;
                 renderFurniture3D();
+                showSelectionBar(action.name || 'Mueble');
                 showToast(`↩️ "${action.name}" restaurado`);
                 wakeRenderer();
             } else if (action.type === 'decor') {
                 action.parent.add(action.obj);
+                applyShadowsRecursively(action.obj);
                 selectDecorObject(action.obj);
                 showToast(`↩️ "${action.name}" restaurado`);
                 wakeRenderer();
@@ -4639,10 +4644,10 @@
                 return;
             }
 
-            // 2. Raycast sobre objetos decorativos y electrodomésticos
+            // 2. Raycast sobre objetos decorativos y electrodomésticos (excluyendo sombras de piso)
             const decorCandidates = [];
             decorVideoGroup.traverse(child => {
-                if (child.isMesh) decorCandidates.push(child);
+                if (child.isMesh && child.name !== 'contactShadow') decorCandidates.push(child);
             });
             const decorHits = raycaster.intersectObjects(decorCandidates, false);
             if (decorHits.length > 0) {
@@ -4653,7 +4658,7 @@
             // 3. Raycast sobre equipamiento fijo (cocina, calefactor, sanitarios)
             const fixtureCandidates = [];
             fixturesGroup.traverse(child => {
-                if (child.isMesh) fixtureCandidates.push(child);
+                if (child.isMesh && child.name !== 'contactShadow') fixtureCandidates.push(child);
             });
             const fixtureHits = raycaster.intersectObjects(fixtureCandidates, false);
             if (fixtureHits.length > 0) {
