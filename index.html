@@ -1181,17 +1181,21 @@
             });
         }
 
-        // Ventana real calada en muro exterior (con antepecho, dintel, marco aluminio negro y símbolo 2D)
-        function addWindowSegment(x1, z1, x2, z2, sillH = 0.95, winH = 1.10, customH) {
+        // Ventana real calada en muro exterior (con antepecho, dintel recto o en pendiente, marco aluminio negro y símbolo 2D)
+        function addWindowSegment(x1, z1, x2, z2, sillH = 0.95, winH = 1.10, customH1, customH2) {
             const dx = x2 - x1;
             const dz = z2 - z1;
             const len = Math.hypot(dx, dz);
+            if (len < 0.005) return;
             const angle = Math.atan2(dz, dx);
             const holder = new THREE.Group();
             holder.position.set((x1 + x2) / 2, 0, (z1 + z2) / 2);
             holder.rotation.y = -angle;
 
-            const wallH = (typeof customH === 'number') ? customH : WALL_H;
+            const h1 = (typeof customH1 === 'number') ? customH1 : WALL_H;
+            const h2 = (typeof customH2 === 'number') ? customH2 : h1;
+            const maxH = Math.max(h1, h2);
+            const avgH = (h1 + h2) / 2;
 
             // Antepecho inferior
             const sillMesh = new THREE.Mesh(UNIT_BOX_GEO, extWallMat);
@@ -1201,13 +1205,33 @@
 
             const upperWinGroup = new THREE.Group();
 
-            // Dintel superior adaptado a la altura del muro
-            const lintelH = wallH - (sillH + winH);
-            if (lintelH > 0.02) {
-                const lintelMesh = new THREE.Mesh(UNIT_BOX_GEO, extWallMat);
-                lintelMesh.scale.set(len, lintelH, EXT_T);
-                lintelMesh.position.set(0, sillH + winH + lintelH / 2, 0);
-                upperWinGroup.add(lintelMesh);
+            // Dintel superior adaptado exactamente a la cota o pendiente del techo
+            const yWinTop = sillH + winH;
+            const dh1 = Math.max(0, h1 - yWinTop);
+            const dh2 = Math.max(0, h2 - yWinTop);
+
+            if (dh1 > 0.01 || dh2 > 0.01) {
+                if (Math.abs(h1 - h2) < 0.01) {
+                    const lintelH = (dh1 + dh2) / 2;
+                    const lintelMesh = new THREE.Mesh(UNIT_BOX_GEO, extWallMat);
+                    lintelMesh.scale.set(len, lintelH, EXT_T);
+                    lintelMesh.position.set(0, yWinTop + lintelH / 2, 0);
+                    upperWinGroup.add(lintelMesh);
+                } else {
+                    const shape = new THREE.Shape();
+                    shape.moveTo(-len / 2, yWinTop);
+                    shape.lineTo(len / 2, yWinTop);
+                    shape.lineTo(len / 2, h2);
+                    shape.lineTo(-len / 2, h1);
+                    shape.closePath();
+
+                    const lintelGeo = new THREE.ExtrudeGeometry(shape, { steps: 1, depth: EXT_T, bevelEnabled: false });
+                    lintelGeo.translate(0, 0, -EXT_T / 2);
+                    const lintelMesh = new THREE.Mesh(lintelGeo, extWallMat);
+                    lintelMesh.castShadow = true;
+                    lintelMesh.receiveShadow = true;
+                    upperWinGroup.add(lintelMesh);
+                }
             }
 
             // Vidrio interior
@@ -1236,21 +1260,26 @@
             upperWinGroup.add(topBar, botBar, leftBar, rightBar);
             holder.add(upperWinGroup);
 
-            // Símbolo 2D en la tapa superior (para que en vista 2D y en corte Sims se vea igual al plano técnico)
+            // Símbolo 2D en la tapa superior adaptado a la pendiente
             const capGroup = new THREE.Group();
-            capGroup.position.set(0, wallH + 0.012, 0);
+            capGroup.position.set(0, avgH + 0.012, 0);
+            const capAngle = Math.atan2(h2 - h1, len);
+            if (Math.abs(capAngle) > 0.005) {
+                capGroup.rotation.z = capAngle;
+            }
 
+            const capLen = Math.hypot(len, h2 - h1);
             const capBg = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0xdbeafe));
-            capBg.scale.set(len, 0.025, EXT_T + 0.01);
+            capBg.scale.set(capLen, 0.025, EXT_T + 0.01);
             capBg.position.set(0, 0, 0);
             capGroup.add(capBg);
 
             const lineMat = getBasicMat(0x0284c7);
             const l1 = new THREE.Mesh(UNIT_BOX_GEO, lineMat);
-            l1.scale.set(len, 0.028, 0.018);
+            l1.scale.set(capLen, 0.028, 0.018);
             l1.position.set(0, 0.003, -0.022);
             const l2 = new THREE.Mesh(UNIT_BOX_GEO, lineMat);
-            l2.scale.set(len, 0.028, 0.018);
+            l2.scale.set(capLen, 0.028, 0.018);
             l2.position.set(0, 0.003, 0.022);
             const midCap = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
             midCap.scale.set(0.025, 0.03, EXT_T + 0.015);
@@ -1268,9 +1297,12 @@
                 upperWinGroup,
                 capGroup,
                 isExterior: true,
-                maxH: wallH,
-                currentH: wallH,
-                targetH: wallH,
+                h1,
+                h2,
+                avgH,
+                maxH,
+                currentH: maxH,
+                targetH: maxH,
                 linkedObjs: [],
                 ...getWallNormals(x1, z1, x2, z2, true)
             });
@@ -1332,38 +1364,42 @@
         // ============================================================================
         // 3. PERÍMETRO EXTERIOR CON LAS 7 VENTANAS REALES DEL VIDEO
         // ============================================================================
-        // Muro Superior (Norte, Y = 0.00):
+        // Muro Superior (Norte, Z = 0.00):
         // 1) SECTOR ESTUDIO (X = 0.00 a 3.00 m):
-        //    - Faldón inclinado que sube de X = 0.00 m (Z = 2.50 m) a X = 2.30 m (Z = 3.60 m),
-        //      y continúa horizontal a Z = 3.60 m de X = 2.30 a 3.00 m
-        addSlopedWallSegment(0.00, 0.00, 1.65, 0.00, 2.50, 3.29, EXT_T, exteriorWallsGroup, true);
-        addWindowSegment(1.65, 0.00, 2.95, 0.00, 0.95, 1.10, 3.60);
-        addSlopedWallSegment(1.65, 0.00, 2.30, 0.00, 3.29, 3.60, EXT_T, exteriorWallsGroup, true);
-        addWallSegment(2.30, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 3.60);
+        //    - Tramo izquierdo ciego: de X = 0.00 a 1.65 m (sube de 2.48 m a 3.27 m bajo el faldón)
+        addSlopedWallSegment(0.00, 0.00, 1.65, 0.00, 2.48, 3.27, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Estudio: de X = 1.65 a 2.95 m (ancho 1.30 m)
+        //      Tramo izquierdo bajo pendiente (X = 1.65 a 2.30 m, sube de 3.27 m a 3.58 m)
+        addWindowSegment(1.65, 0.00, 2.30, 0.00, 0.95, 1.10, 3.27, 3.58);
+        //      Tramo derecho bajo cota plana (X = 2.30 a 2.95 m, cota 3.58 m)
+        addWindowSegment(2.30, 0.00, 2.95, 0.00, 0.95, 1.10, 3.58, 3.58);
+        //    - Mocheta derecha de cierre (X = 2.95 a 3.00 m, cota 3.58 m)
+        addWallSegment(2.95, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 3.58);
 
         // 2) SECTOR LIVING (X = 3.00 a 6.30 m):
-        //    - Techo catedral alto que desciende suavemente desde la cumbrera central en X = 3.00 m (Z = 3.60 m)
-        //      hasta el muro Este en X = 6.30 m (Z = 3.00 m)
-        addSlopedWallSegment(3.00, 0.00, 3.35, 0.00, 3.60, 3.54, EXT_T, exteriorWallsGroup, true);
-        addWindowSegment(3.35, 0.00, 4.55, 0.00, 0.95, 1.10, 3.40);
-        addSlopedWallSegment(3.35, 0.00, 4.55, 0.00, 3.54, 3.32, EXT_T, exteriorWallsGroup, true);
-        addSlopedWallSegment(4.55, 0.00, 4.90, 0.00, 3.32, 3.25, EXT_T, exteriorWallsGroup, true);
-        addWindowSegment(4.90, 0.00, 6.00, 0.00, 0.95, 1.10, 3.15);
-        addSlopedWallSegment(4.90, 0.00, 6.00, 0.00, 3.25, 3.05, EXT_T, exteriorWallsGroup, true);
-        addSlopedWallSegment(6.00, 0.00, 6.30, 0.00, 3.05, 3.00, EXT_T, exteriorWallsGroup, true);
+        //    - Muro inicial junto al eje central (X = 3.00 a 3.35 m, baja de 3.58 m a 3.51 m)
+        addSlopedWallSegment(3.00, 0.00, 3.35, 0.00, 3.58, 3.51, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Living V1 (X = 3.35 a 4.55 m, baja de 3.51 m a 3.30 m)
+        addWindowSegment(3.35, 0.00, 4.55, 0.00, 0.95, 1.10, 3.51, 3.30);
+        //    - Muro intermedio entre ventanales (X = 4.55 a 4.90 m, baja de 3.30 m a 3.23 m)
+        addSlopedWallSegment(4.55, 0.00, 4.90, 0.00, 3.30, 3.23, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Living V2 (X = 4.90 a 6.00 m, baja de 3.23 m a 3.03 m)
+        addWindowSegment(4.90, 0.00, 6.00, 0.00, 0.95, 1.10, 3.23, 3.03);
+        //    - Muro esquinero Este (X = 6.00 a 6.30 m, baja de 3.03 m a 2.98 m)
+        addSlopedWallSegment(6.00, 0.00, 6.30, 0.00, 3.03, 2.98, EXT_T, exteriorWallsGroup, true);
 
-        // Muro Derecho (Este, X = 6.30): remata en Z = 3.00 m bajo el alero
-        // - Ventana lateral Living V3 (Y = 0.55 a 1.55)
-        addWallSegment(6.30, 0.00, 6.30, 0.55, EXT_T, exteriorWallsGroup, true, 3.00);
-        addWindowSegment(6.30, 0.55, 6.30, 1.55, 0.95, 1.10, 3.00);
-        addWallSegment(6.30, 1.55, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 3.00);
+        // Muro Derecho (Este, X = 6.30): remata en 2.98 m bajo la solera del techo
+        // - Ventana lateral Living V3 (Z = 0.55 a 1.55)
+        addWallSegment(6.30, 0.00, 6.30, 0.55, EXT_T, exteriorWallsGroup, true, 2.98);
+        addWindowSegment(6.30, 0.55, 6.30, 1.55, 0.95, 1.10, 2.98);
+        addWallSegment(6.30, 1.55, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
 
-        // Retranqueo Palier (Puerta Principal en Y = 6.30): de [5.20, 6.30] a [6.30, 6.30] a Z = 3.00 m
-        addWallSegment(5.20, 6.30, 5.38, 6.30, EXT_T, exteriorWallsGroup, true, 3.00);
-        addWallSegment(6.12, 6.30, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 3.00);
-        // Jambas de Puerta Principal en X = 5.38 y X = 6.12 sobre Y = 6.30
-        addWallSegment(5.38, 6.18, 5.38, 6.42, 0.04, exteriorWallsGroup, true, 3.00);
-        addWallSegment(6.12, 6.18, 6.12, 6.42, 0.04, exteriorWallsGroup, true, 3.00);
+        // Retranqueo Palier (Puerta Principal en Z = 6.30): de [5.20, 6.30] a [6.30, 6.30] a 2.98 m
+        addWallSegment(5.20, 6.30, 5.38, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
+        addWallSegment(6.12, 6.30, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
+        // Jambas de Puerta Principal en X = 5.38 y X = 6.12 sobre Z = 6.30
+        addWallSegment(5.38, 6.18, 5.38, 6.42, 0.04, exteriorWallsGroup, true, 2.98);
+        addWallSegment(6.12, 6.18, 6.12, 6.42, 0.04, exteriorWallsGroup, true, 2.98);
         const entranceThreshold = new THREE.Mesh(
             new THREE.BoxGeometry(0.74, 0.01, 0.06),
             new THREE.MeshBasicMaterial({ color: 0xcbd5e1 })
@@ -1371,27 +1407,26 @@
         entranceThreshold.position.set(5.75, 0.01, 6.30);
         lines2DGroup.add(entranceThreshold);
 
-        // Muro Derecho Cocina (Límite con Palier): baja de [5.20, 6.30] a [5.20, 8.00] a Z = 3.20 m
-        addWallSegment(5.20, 6.30, 5.20, 8.00, EXT_T, exteriorWallsGroup, true, 3.20);
+        // Muro Derecho Cocina (Límite con Palier): baja de [5.20, 6.30] a [5.20, 8.00] a 3.18 m
+        addWallSegment(5.20, 6.30, 5.20, 8.00, EXT_T, exteriorWallsGroup, true, 3.18);
 
-        // Muro Inferior (Sur, Y = 8.00): cierra de [0.00, 8.00] a [5.20, 8.00]
-        // - Sector Cuarto (X = 0.00 a 3.00 m): sube de 2.50 m en X = 0.00 a 3.60 m en X = 2.30 m
-        addSlopedWallSegment(0.00, 8.00, 0.90, 8.00, 2.50, 2.93, EXT_T, exteriorWallsGroup, true);
-        addWindowSegment(0.90, 8.00, 2.10, 8.00, 0.95, 1.10, 3.30);
-        addSlopedWallSegment(0.90, 8.00, 2.10, 8.00, 2.93, 3.50, EXT_T, exteriorWallsGroup, true);
-        addSlopedWallSegment(2.10, 8.00, 2.30, 8.00, 3.50, 3.60, EXT_T, exteriorWallsGroup, true);
-        addWallSegment(2.30, 8.00, 3.00, 8.00, EXT_T, exteriorWallsGroup, true, 3.60);
-        // - Sector Cocina (X = 3.00 a 5.20 m): baja de 3.60 m en X = 3.00 a 3.20 m en X = 5.20 m
-        addSlopedWallSegment(3.00, 8.00, 3.25, 8.00, 3.60, 3.55, EXT_T, exteriorWallsGroup, true);
-        addWindowSegment(3.25, 8.00, 4.55, 8.00, 1.05, 0.95, 3.40);
-        addSlopedWallSegment(3.25, 8.00, 4.55, 8.00, 3.55, 3.32, EXT_T, exteriorWallsGroup, true);
-        addSlopedWallSegment(4.55, 8.00, 5.20, 8.00, 3.32, 3.20, EXT_T, exteriorWallsGroup, true);
+        // Muro Inferior (Sur, Z = 8.00): cierra de [0.00, 8.00] a [5.20, 8.00]
+        // - Sector Cuarto (X = 0.00 a 3.00 m):
+        addSlopedWallSegment(0.00, 8.00, 0.90, 8.00, 2.48, 2.91, EXT_T, exteriorWallsGroup, true);
+        addWindowSegment(0.90, 8.00, 2.10, 8.00, 0.95, 1.10, 2.91, 3.48);
+        addSlopedWallSegment(2.10, 8.00, 2.30, 8.00, 3.48, 3.58, EXT_T, exteriorWallsGroup, true);
+        addWallSegment(2.30, 8.00, 3.00, 8.00, EXT_T, exteriorWallsGroup, true, 3.58);
 
-        // Muro Izquierdo (Oeste, X = 0.00): sube de [0.00, 0.00] a [0.00, 8.00] a cota exterior Z = 2.50 m
-        // - Ventiluz Baño V7 sobre bañera (Y = 3.15 a 3.85)
-        addWallSegment(0.00, 0.00, 0.00, 3.15, EXT_T, exteriorWallsGroup, true, 2.50);
-        addWindowSegment(0.00, 3.15, 0.00, 3.85, 1.35, 0.65, 2.50);
-        addWallSegment(0.00, 3.85, 0.00, 8.00, EXT_T, exteriorWallsGroup, true, 2.50);
+        // - Sector Cocina (X = 3.00 a 5.20 m):
+        addSlopedWallSegment(3.00, 8.00, 3.25, 8.00, 3.58, 3.53, EXT_T, exteriorWallsGroup, true);
+        addWindowSegment(3.25, 8.00, 4.55, 8.00, 1.05, 0.95, 3.53, 3.30);
+        addSlopedWallSegment(4.55, 8.00, 5.20, 8.00, 3.30, 3.18, EXT_T, exteriorWallsGroup, true);
+
+        // Muro Izquierdo (Oeste, X = 0.00): sube de [0.00, 0.00] a [0.00, 8.00] a cota exterior 2.48 m
+        // - Ventiluz Baño V7 sobre bañera (Z = 3.15 a 3.85)
+        addWallSegment(0.00, 0.00, 0.00, 3.15, EXT_T, exteriorWallsGroup, true, 2.48);
+        addWindowSegment(0.00, 3.15, 0.00, 3.85, 1.35, 0.65, 2.48);
+        addWallSegment(0.00, 3.85, 0.00, 8.00, EXT_T, exteriorWallsGroup, true, 2.48);
 
         // ============================================================================
         // 3B. EQUIPAMIENTO FIJO, CALEFACTORES Y TECHO DE MADERA EXTRAÍDOS DEL VIDEO
@@ -1472,7 +1507,7 @@
         //    Techo de madera con limahoya / quiebre en X = 2.30 m
         function buildWoodenRoof() {
             // =========================================================================
-            // 1) BLOQUE IZQUIERDO UNIFICADO (ESTUDIO, BAÑO Y CUARTO: X = 0.00 a 3.00 m, Y = 0.00 a 8.00 m)
+            // 1) BLOQUE IZQUIERDO UNIFICADO (ESTUDIO, BAÑO Y CUARTO: X = 0.00 a 3.00 m, Z = 0.00 a 8.00 m)
             //    - Sector A (Faldón inclinado): sube de X = 0.00 m (Z = 2.50 m) a X = 2.30 m (Z = 3.60 m)
             //    - Sector B (Plano horizontal superior): de X = 2.30 m a X = 3.00 m a cota constante Z = 3.60 m
             // =========================================================================
@@ -1480,7 +1515,7 @@
             const dyA = 3.60 - 2.50; // 1.10 m
             const lenSlopeA = Math.hypot(dxA, dyA); // ~2.5495 m
             const angSlopeA = Math.atan2(dyA, dxA); // ~25.56°
-            const totalDepth = 8.00; // De Y = 0.00 m a Y = 8.00 m
+            const totalDepth = 8.00; // De Z = 0.00 m a Z = 8.00 m
 
             // Cubierta machimbrada Sector A (X = 0.00 a 2.30 m)
             const roofLeftA = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
@@ -1490,10 +1525,10 @@
             roofGroup.add(roofLeftA);
 
             // Tirantes de madera bajo Sector A (corren paralelos a X de 0.00 a 2.30 m)
-            for (let yBeam = 0.35; yBeam <= 7.75; yBeam += 0.55) {
+            for (let zBeam = 0.35; zBeam <= 7.75; zBeam += 0.55) {
                 const beamA = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
                 beamA.scale.set(lenSlopeA, 0.11, 0.07);
-                beamA.position.set(dxA / 2, 2.50 + dyA / 2 - 0.055, yBeam);
+                beamA.position.set(dxA / 2, 2.50 + dyA / 2 - 0.055, zBeam);
                 beamA.rotation.z = angSlopeA;
                 roofGroup.add(beamA);
             }
@@ -1506,10 +1541,10 @@
             roofGroup.add(roofLeftB);
 
             // Tirantes horizontales bajo Sector B
-            for (let yBeam = 0.35; yBeam <= 7.75; yBeam += 0.55) {
+            for (let zBeam = 0.35; zBeam <= 7.75; zBeam += 0.55) {
                 const beamB = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
                 beamB.scale.set(widthB, 0.08, 0.07);
-                beamB.position.set(2.30 + widthB / 2, 3.60 - 0.04, yBeam);
+                beamB.position.set(2.30 + widthB / 2, 3.60 - 0.04, zBeam);
                 roofGroup.add(beamB);
             }
 
@@ -1526,81 +1561,65 @@
             roofGroup.add(ridgeSpine);
 
             // =========================================================================
-            // 2) BLOQUE DERECHO ELEVADO (LIVING, COCINA Y ENTRADA: X = 3.00 a 6.30 m)
-            //    - Techo catedral alto que nace en el muro divisorio central X = 3.00 m (Z = 3.60 m)
-            //      y desciende suavemente hacia el muro Este X = 6.30 m (Z = 3.00 m)
+            // 2) BLOQUE DERECHO ELEVADO (LIVING, ENTRADA Y COCINA: X = 3.00 a 6.30 m)
+            //    - Techo continuo sin fisuras desde la cumbrera central X = 3.00 m (Z = 3.60 m)
+            //      hasta el muro Este X = 6.30 m (Z = 3.00 m), cubriendo la totalidad de Z = 0.00 a 8.00 m
             // =========================================================================
-            const dxLiving = 3.30;
-            const dyLiving = 3.60 - 3.00; // 0.60 m
-            const lenSlopeLiving = Math.hypot(dxLiving, dyLiving); // ~3.354 m
-            const angSlopeLiving = -Math.atan2(dyLiving, dxLiving); // ~ -10.30°
+            const dxRight = 3.30;
+            const dyRight = 3.60 - 3.00; // 0.60 m
+            const lenSlopeRight = Math.hypot(dxRight, dyRight); // ~3.354 m
+            const angSlopeRight = -Math.atan2(dyRight, dxRight); // ~ -10.30°
 
-            // Faldón Living (Y = 0.00 a 4.80 m, X = 3.00 a 6.30 m)
-            const depthLiving = 4.80;
-            const roofLiving = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
-            roofLiving.scale.set(lenSlopeLiving, 0.04, depthLiving);
-            roofLiving.position.set(3.00 + dxLiving / 2, 3.60 - dyLiving / 2, depthLiving / 2);
-            roofLiving.rotation.z = angSlopeLiving;
-            roofGroup.add(roofLiving);
+            // Cubierta machimbrada unificada para todo el bloque derecho (elimina huecos y desniveles)
+            const roofRight = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofRight.scale.set(lenSlopeRight, 0.04, totalDepth);
+            roofRight.position.set(3.00 + dxRight / 2, 3.60 - dyRight / 2, totalDepth / 2);
+            roofRight.rotation.z = angSlopeRight;
+            roofGroup.add(roofRight);
 
-            // Tirantes de madera en Living (corren de X = 3.00 m a X = 6.30 m a lo largo de la pendiente)
-            for (let yBeam = 0.35; yBeam <= 4.65; yBeam += 0.55) {
+            // Tirantes de madera vistos en Living (Z = 0.00 a 4.80 m, corren de X = 3.00 a 6.30 m)
+            for (let zBeam = 0.35; zBeam <= 4.65; zBeam += 0.55) {
                 const beamL = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-                beamL.scale.set(lenSlopeLiving, 0.11, 0.07);
-                beamL.position.set(3.00 + dxLiving / 2, 3.60 - dyLiving / 2 - 0.055, yBeam);
-                beamL.rotation.z = angSlopeLiving;
+                beamL.scale.set(lenSlopeRight, 0.11, 0.07);
+                beamL.position.set(3.00 + dxRight / 2, 3.60 - dyRight / 2 - 0.055, zBeam);
+                beamL.rotation.z = angSlopeRight;
                 roofGroup.add(beamL);
             }
 
-            // Faldón Cocina (Y = 4.80 a 8.00 m, X = 3.00 a 5.20 m)
-            const dxCocina = 2.20;
-            const dyCocina = (dxCocina / dxLiving) * dyLiving; // 0.40 m -> baja de 3.60 m a 3.20 m
-            const lenSlopeCocina = Math.hypot(dxCocina, dyCocina);
-            const depthCocina = 3.20; // 8.00 - 4.80
-            const roofCocina = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
-            roofCocina.scale.set(lenSlopeCocina, 0.04, depthCocina);
-            roofCocina.position.set(3.00 + dxCocina / 2, 3.60 - dyCocina / 2, 4.80 + depthCocina / 2);
-            roofCocina.rotation.z = angSlopeLiving;
-            roofGroup.add(roofCocina);
-
-            // Tirantes en Cocina
-            for (let yBeam = 5.05; yBeam <= 7.75; yBeam += 0.55) {
-                const beamC = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-                beamC.scale.set(lenSlopeCocina, 0.11, 0.07);
-                beamC.position.set(3.00 + dxCocina / 2, 3.60 - dyCocina / 2 - 0.055, yBeam);
-                beamC.rotation.z = angSlopeLiving;
-                roofGroup.add(beamC);
-            }
-
-            // Faldón Entrada (Y = 6.30 a 8.00 m, X = 5.20 a 6.30 m)
+            // Tirantes de madera en Entrada / Pasillo Este (Z = 4.80 a 6.30 m, X = 5.20 a 6.30 m)
             const dxEnt = 1.10;
-            const dyEnt = (dxEnt / dxLiving) * dyLiving; // 0.20 m -> baja de 3.20 m a 3.00 m
+            const dyEnt = (dxEnt / dxRight) * dyRight; // 0.20 m
             const lenSlopeEnt = Math.hypot(dxEnt, dyEnt);
-            const depthEnt = 1.70; // 8.00 - 6.30
-            const roofEnt = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
-            roofEnt.scale.set(lenSlopeEnt, 0.04, depthEnt);
-            roofEnt.position.set(5.20 + dxEnt / 2, 3.20 - dyEnt / 2, 6.30 + depthEnt / 2);
-            roofEnt.rotation.z = angSlopeLiving;
-            roofGroup.add(roofEnt);
-
-            for (let yBeam = 6.45; yBeam <= 7.80; yBeam += 0.50) {
+            for (let zBeam = 4.95; zBeam <= 6.20; zBeam += 0.55) {
                 const beamE = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
                 beamE.scale.set(lenSlopeEnt, 0.11, 0.07);
-                beamE.position.set(5.20 + dxEnt / 2, 3.20 - dyEnt / 2 - 0.055, yBeam);
-                beamE.rotation.z = angSlopeLiving;
+                beamE.position.set(5.20 + dxEnt / 2, 3.20 - dyEnt / 2 - 0.055, zBeam);
+                beamE.rotation.z = angSlopeRight;
                 roofGroup.add(beamE);
+            }
+
+            // Tirantes de madera en Cocina (Z = 4.80 a 8.00 m, X = 3.00 a 5.20 m)
+            const dxCocina = 2.20;
+            const dyCocina = (dxCocina / dxRight) * dyRight; // 0.40 m
+            const lenSlopeCocina = Math.hypot(dxCocina, dyCocina);
+            for (let zBeam = 4.95; zBeam <= 7.75; zBeam += 0.55) {
+                const beamC = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
+                beamC.scale.set(lenSlopeCocina, 0.11, 0.07);
+                beamC.position.set(3.00 + dxCocina / 2, 3.60 - dyCocina / 2 - 0.055, zBeam);
+                beamC.rotation.z = angSlopeRight;
+                roofGroup.add(beamC);
             }
 
             // Viga solera de remate sobre muro Este (X = 6.30 m)
             const eaveBeamEast = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-            eaveBeamEast.scale.set(0.10, 0.14, 6.30);
-            eaveBeamEast.position.set(6.25, 2.93, 3.15);
+            eaveBeamEast.scale.set(0.10, 0.14, totalDepth);
+            eaveBeamEast.position.set(6.25, 2.93, totalDepth / 2);
             roofGroup.add(eaveBeamEast);
 
             // Viga solera de remate sobre muro Oeste (X = 0.00 m)
             const eaveBeamWest = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-            eaveBeamWest.scale.set(0.10, 0.14, 8.00);
-            eaveBeamWest.position.set(0.05, 2.43, 4.00);
+            eaveBeamWest.scale.set(0.10, 0.14, totalDepth);
+            eaveBeamWest.position.set(0.05, 2.43, totalDepth / 2);
             roofGroup.add(eaveBeamWest);
         }
 
@@ -1608,50 +1627,47 @@
         // 4. MUROS INTERNOS, PUERTAS (HACIA ADENTRO DE BAÑO Y HABITACIONES) Y VANOS ABIERTOS
         // ============================================================================
         // Eje Vertical X = 2.30 (Cierre lateral de Bauleras y Baño):
-        // En X = 2.30 m, el tabique vertical sube desde el piso hasta tocar el quiebre del techo (Z = 3.60 m),
-        // separando el hueco de la baulera del sector de la puerta de entrada.
-        addWallSegment(2.30, 2.30, 2.30, 3.15, INT_T, interiorWallsGroup, false, 3.60);
-        // - PUERTA BAÑO: Entre Y = 3.15 e Y = 3.85 (abre HACIA ADENTRO del Baño hacia la izquierda X < 2.30)
+        // En X = 2.30 m, el tabique vertical remata a 3.56 m bajo la cubierta machimbrada
+        addWallSegment(2.30, 2.30, 2.30, 3.15, INT_T, interiorWallsGroup, false, 3.56);
+        // - PUERTA BAÑO: Entre Z = 3.15 y Z = 3.85 (abre HACIA ADENTRO del Baño hacia la izquierda X < 2.30)
         addDashedLine(2.30, 3.15, 2.30, 3.85);
         addDoorSymbol2D(2.30, 3.82, 2.08, 3.62, 2.04, 3.40, 2.30, 3.18);
-        // - Muro sólido abajo: de Y = 3.85 a Y = 4.70 (mocheta inferior del Baño 3.85..4.20 + lateral Placard/Baulera Cuarto 4.20..4.70)
-        addWallSegment(2.30, 3.85, 2.30, 4.70, INT_T, interiorWallsGroup, false, 3.60);
+        // - Muro sólido abajo: de Z = 3.85 a Z = 4.70
+        addWallSegment(2.30, 3.85, 2.30, 4.70, INT_T, interiorWallsGroup, false, 3.56);
 
         // Eje Vertical Central X = 3.00:
-        // - Muro sólido de Y = 0.00 a Y = 4.05 (separa Estudio y Pasillo del Living, da soporte completo al respaldo del sillón)
-        addWallSegment(3.00, 0.00, 3.00, 4.05, INT_T, interiorWallsGroup, false, 3.60);
-        // - VANO ABIERTO (Paso Living-Pasillo): Sin muro entre Y = 4.05 e Y = 4.80 (0.75 m de paso libre al pasillo)
+        // - Muro sólido de Z = 0.00 a Z = 4.05 (remata a 3.56 m bajo la viga cumbrera)
+        addWallSegment(3.00, 0.00, 3.00, 4.05, INT_T, interiorWallsGroup, false, 3.56);
+        // - VANO ABIERTO (Paso Living-Pasillo): Sin muro entre Z = 4.05 y Z = 4.80 (0.75 m de paso libre al pasillo)
         addDashedLine(3.00, 4.05, 3.00, 4.80);
-        // - Muro sólido de Y = 4.80 a Y = 8.00 (separa Cuarto de Cocina, remata en techo a Z = 3.60 m)
-        addWallSegment(3.00, 4.80, 3.00, 8.00, INT_T, interiorWallsGroup, false, 3.60);
+        // - Muro sólido de Z = 4.80 a Z = 8.00 (separa Cuarto de Cocina, remata a 3.56 m bajo el techo)
+        addWallSegment(3.00, 4.80, 3.00, 8.00, INT_T, interiorWallsGroup, false, 3.56);
 
-        // Eje Vertical X = 5.20 (separa Cocina de Entrada): de Y = 4.80 a Y = 6.30 a Z = 3.20 m
-        addWallSegment(5.20, 4.80, 5.20, 6.30, INT_T, interiorWallsGroup, false, 3.20);
+        // Eje Vertical X = 5.20 (separa Cocina de Entrada): de Z = 4.80 a Z = 6.30 a cota 3.18 m
+        addWallSegment(5.20, 4.80, 5.20, 6.30, INT_T, interiorWallsGroup, false, 3.18);
 
-        // Eje Horizontal Y = 2.30 (Frente Placard Estudio y Puerta Estudio):
-        // - Línea de frente en 2D:
+        // Eje Horizontal Z = 2.30 (Frente Placard Estudio y Puerta Estudio):
         addDashedLine(0.00, 2.30, 2.30, 2.30);
         // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (bisagra a la derecha en [3.00, 2.30], abre 90° hacia el Norte)
         addDashedLine(2.30, 2.30, 3.00, 2.30);
         addDoorSymbol2D(2.95, 2.30, 2.95, 1.62, 2.32, 1.62, 2.32, 2.30);
 
-        // Eje Horizontal Y = 2.80 (Cierre de fondo de Baulera Estudio / Divide con Baño):
-        // Sube de X = 0.00 (Z = 2.50 m) a X = 2.30 (Z = 3.60 m) tocando el faldón inclinado del techo.
-        addSlopedWallSegment(0.00, 2.80, 2.30, 2.50, 3.60, INT_T, interiorWallsGroup);
+        // Eje Horizontal Z = 2.80 (Cierre de fondo de Baulera Estudio / Divide con Baño):
+        // Sube de X = 0.00 (2.48 m) a X = 2.30 (3.56 m) tocando la cara inferior del faldón.
+        addSlopedWallSegment(0.00, 2.80, 2.30, 2.48, 3.56, INT_T, interiorWallsGroup);
 
-        // Eje Horizontal Y = 4.20 (Cierre de fondo de Baulera Cuarto / Divide con Baño):
-        // Sube de X = 0.00 (Z = 2.50 m) a X = 2.30 (Z = 3.60 m) tocando el faldón inclinado del techo.
-        addSlopedWallSegment(0.00, 4.20, 2.30, 2.50, 3.60, INT_T, interiorWallsGroup);
+        // Eje Horizontal Z = 4.20 (Cierre de fondo de Baulera Cuarto / Divide con Baño):
+        // Sube de X = 0.00 (2.48 m) a X = 2.30 (3.56 m) tocando la cara inferior del faldón.
+        addSlopedWallSegment(0.00, 4.20, 2.30, 2.48, 3.56, INT_T, interiorWallsGroup);
 
-        // Eje Horizontal Y = 4.70 (Frente Placard Cuarto, Puerta Cuarto y Vano Cocina):
-        // - Línea de frente en 2D:
+        // Eje Horizontal Z = 4.70 (Frente Placard Cuarto, Puerta Cuarto y Vano Cocina):
         addDashedLine(0.00, 4.70, 2.30, 4.70);
         // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Cuarto)
         addDashedLine(2.30, 4.70, 3.00, 4.70);
         addDoorSymbol2D(2.95, 4.70, 2.75, 4.92, 2.55, 4.92, 2.42, 4.70);
-        // - VANO ABIERTO COCINA (SIN PUERTA): Paso libre de X = 3.00 a X = 4.45 alineado con el pasillo de la cocina; mocheta de X = 4.45 a X = 5.20 delante del lateral de la heladera
+        // - VANO ABIERTO COCINA: Paso libre de X = 3.00 a X = 4.45; mocheta de X = 4.45 a X = 5.20 (3.30 m a 3.16 m)
         addDashedLine(3.00, 4.80, 4.45, 4.80);
-        addSlopedWallSegment(4.45, 4.80, 5.20, 4.80, 3.34, 3.20, INT_T, interiorWallsGroup);
+        addSlopedWallSegment(4.45, 4.80, 5.20, 4.80, 3.30, 3.16, INT_T, interiorWallsGroup);
 
         // ============================================================================
         // 4B. PUERTAS 3D REALES EXTRAÍDAS DEL VIDEO (MARCOS DE CHAPA, HOJAS MADERA,
@@ -2137,17 +2153,17 @@
             buildWoodenRoof();
             // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 4.45)
             const wCocinaVano = 1.45;
-            const lintelH = 3.47 - DOOR_H;
+            const lintelH = 3.45 - DOOR_H;
             const cocinaLintel = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
             cocinaLintel.scale.set(wCocinaVano, lintelH, INT_T);
             cocinaLintel.position.set(3.725, DOOR_H + lintelH / 2, 4.80);
             doors3DGroup.add(cocinaLintel);
             attachWallMount(cocinaLintel, 4.60, 4.80, true);
-            // Instanciar puertas 3D interactivas con dintel a Z = 3.40 m (Item 3) y Placards de X = 0.00 a 2.30 m (Item 2):
+            // Instanciar puertas 3D interactivas con dintel a 3.56 m bajo la viga cumbrera:
             addMainEntranceDoor3D(5.38, 6.30, 6.12, 6.30);
-            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 90, "Puerta Estudio", 3.60);
-            addInteriorWoodDoor3D(2.30, 3.15, 2.30, 3.85, false, 1, 75, "Puerta Baño", 3.60);
-            addInteriorWoodDoor3D(2.30, 4.70, 3.00, 4.70, false, 1, 75, "Puerta Cuarto", 3.60);
+            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 90, "Puerta Estudio", 3.56);
+            addInteriorWoodDoor3D(2.30, 3.15, 2.30, 3.85, false, 1, 75, "Puerta Baño", 3.56);
+            addInteriorWoodDoor3D(2.30, 4.70, 3.00, 4.70, false, 1, 75, "Puerta Cuarto", 3.56);
             addSlidingPlacardFront3D(0.00, 2.30, 2.30, -1, "Placard Estudio");
             addSlidingPlacardFront3D(0.00, 2.30, 4.70, 1, "Placard Cuarto");
             resolveWallMounts();
@@ -3273,7 +3289,9 @@
                     w.upperWinGroup.scale.y = t;
                     w.upperWinGroup.position.y = w.sillH * (1 - t);
                 }
-                w.capGroup.position.y = h + 0.012;
+                const fullH = w.maxH || WALL_H;
+                const ratio = Math.max(0.01, h / fullH);
+                w.capGroup.position.y = (w.avgH || fullH) * ratio + 0.012;
             }
             const showLinked = (h > 1.35);
             for (let j = 0; j < w.linkedObjs.length; j++) {
