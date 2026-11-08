@@ -3099,6 +3099,10 @@
 
             function addIndoorPlant(px, pz) {
                 const pGroup = new THREE.Group();
+                pGroup.name = 'Planta de Interior en Maceta';
+                pGroup.userData.name = 'Planta de Interior en Maceta';
+                pGroup.userData.isAssembly = true;
+                pGroup.userData.isDecor = true;
                 pGroup.position.set(px, 0.19, pz);
 
                 const pot = new THREE.Mesh(potGeo, potMat);
@@ -3302,6 +3306,58 @@
         // 4C. MUEBLES, ELECTRODOMÉSTICOS, CORTINAS Y DECORACIÓN EXTRAÍDOS DEL 2° VIDEO
         //     (https://photos.app.goo.gl/8k4MQeY4BcyoqhDK8 - video_34)
         // ============================================================================
+        let currentAssemblyGroup = null;
+
+        function createCompoundAssembly(name, buildFn) {
+            const parentGroup = currentAssemblyGroup || decorVideoGroup;
+            const tempGroup = new THREE.Group();
+            const prevGroup = currentAssemblyGroup;
+            currentAssemblyGroup = tempGroup;
+            try {
+                buildFn();
+            } finally {
+                currentAssemblyGroup = prevGroup;
+            }
+
+            if (tempGroup.children.length === 0) return null;
+
+            // Calcular bounding box para centrar el origen del grupo en el centro geométrico
+            const box = new THREE.Box3().setFromObject(tempGroup);
+            const center = new THREE.Vector3();
+            box.getCenter(center);
+
+            // Crear el grupo definitivo ubicado en `center`
+            const assemblyGroup = new THREE.Group();
+            assemblyGroup.name = name;
+            assemblyGroup.userData.name = name;
+            assemblyGroup.userData.isAssembly = true;
+            assemblyGroup.userData.isDecor = true;
+            assemblyGroup.position.copy(center);
+
+            // Reparentar hijos con offset relativo al centro
+            while (tempGroup.children.length > 0) {
+                const child = tempGroup.children[0];
+                child.position.sub(center);
+                assemblyGroup.add(child);
+            }
+
+            parentGroup.add(assemblyGroup);
+            return assemblyGroup;
+        }
+
+        function getSelectionRoot(obj) {
+            if (!obj) return obj;
+            let curr = obj;
+            let assemblyRoot = null;
+            while (curr && curr !== decorVideoGroup && curr !== fixturesGroup && curr !== apartmentGroup && curr !== scene) {
+                if (curr.userData && curr.userData.isAssembly) {
+                    assemblyRoot = curr;
+                }
+                curr = curr.parent;
+            }
+            return assemblyRoot || obj;
+        }
+
         function addDecorBox(x, y, z, w, h, d, color, rough = 0.45, rotY = 0, name = '') {
             const m = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(color, rough));
             m.scale.set(w, h, d);
@@ -3309,7 +3365,7 @@
             if (rotY) m.rotation.y = rotY;
             m.userData.name = name || 'Elemento / Mueble';
             m.userData.isDecor = true;
-            decorVideoGroup.add(m);
+            (currentAssemblyGroup || decorVideoGroup).add(m);
             if (currentMountWallSpec) {
                 attachWallMount(m, currentMountWallSpec.x, currentMountWallSpec.z, currentMountWallSpec.isHoriz);
             }
@@ -3325,7 +3381,7 @@
             m.position.set(x, y, z);
             m.userData.name = name || 'Elemento / Mueble';
             m.userData.isDecor = true;
-            decorVideoGroup.add(m);
+            (currentAssemblyGroup || decorVideoGroup).add(m);
             if (currentMountWallSpec) {
                 attachWallMount(m, currentMountWallSpec.x, currentMountWallSpec.z, currentMountWallSpec.isHoriz);
             }
@@ -3387,7 +3443,10 @@
             topCap.rotation.z = -0.12; // Inclinación aerodinámica hacia atrás
             tg.add(topCap);
 
-            decorVideoGroup.add(tg);
+            tg.userData.isAssembly = true;
+            tg.userData.name = 'Torre de Sonido LG';
+            tg.userData.isDecor = true;
+            (currentAssemblyGroup || decorVideoGroup).add(tg);
             return tg;
         }
 
@@ -3474,141 +3533,149 @@
             addDecorBox(6.08, 0.18, 5.72, 0.24, 0.32, 0.22, 0x1e293b, 0.9, -0.15, 'Mochila Negra Entrada'); // Mochila
 
             // - Perchero industrial de hierro negro + zapatero de 3 niveles + estante superior (fotos #0, #1, #3):
-            //   Zapatero 3 niveles abajo con calzado (Z = 5.20 a 5.56, X = 6.10):
-            addDecorBox(6.10, 0.03, 5.38, 0.28, 0.02, 0.65, 0x0f172a); // Estante inferior metal
-            addDecorBox(6.10, 0.19, 5.38, 0.28, 0.02, 0.65, 0x0f172a); // Estante medio metal
-            addDecorBox(6.10, 0.35, 5.38, 0.28, 0.02, 0.65, 0x0f172a); // Estante superior metal
-            // Patas y estructura lateral de hierro negro:
-            addDecorBox(6.10, 0.90, 5.06, 0.025, 1.80, 0.025, 0x0f172a); // Columna Norte
-            addDecorBox(6.10, 0.90, 5.70, 0.025, 1.80, 0.025, 0x0f172a); // Columna Sur
-            // Calzados en el zapatero:
-            addDecorBox(6.08, 0.09, 5.22, 0.22, 0.09, 0.26, 0x1e293b, 0.8); // Zapatillas negras
-            addDecorBox(6.08, 0.09, 5.52, 0.22, 0.09, 0.24, 0x94a3b8, 0.8); // Zapatillas grises
-            addDecorBox(6.08, 0.25, 5.30, 0.22, 0.09, 0.24, 0x475569, 0.8); // Calzado estante 2
-            // Zapatillas sobre el piso frente al zapatero (fotos #0 y #3):
-            addDecorBox(5.72, 0.05, 5.14, 0.18, 0.08, 0.26, 0x1e293b, 0.85, 0.25, 'Zapatillas Piso Entrada');
-            addDecorBox(5.72, 0.05, 4.96, 0.18, 0.08, 0.26, 0xf1f5f9, 0.85, -0.20);
+            createCompoundAssembly('Perchero y Zapatero Entrada', () => {
+                // Zapatero 3 niveles abajo con calzado (Z = 5.20 a 5.56, X = 6.10):
+                addDecorBox(6.10, 0.03, 5.38, 0.28, 0.02, 0.65, 0x0f172a); // Estante inferior metal
+                addDecorBox(6.10, 0.19, 5.38, 0.28, 0.02, 0.65, 0x0f172a); // Estante medio metal
+                addDecorBox(6.10, 0.35, 5.38, 0.28, 0.02, 0.65, 0x0f172a); // Estante superior metal
+                // Patas y estructura lateral de hierro negro:
+                addDecorBox(6.10, 0.90, 5.06, 0.025, 1.80, 0.025, 0x0f172a); // Columna Norte
+                addDecorBox(6.10, 0.90, 5.70, 0.025, 1.80, 0.025, 0x0f172a); // Columna Sur
+                // Calzados en el zapatero:
+                addDecorBox(6.08, 0.09, 5.22, 0.22, 0.09, 0.26, 0x1e293b, 0.8); // Zapatillas negras
+                addDecorBox(6.08, 0.09, 5.52, 0.22, 0.09, 0.24, 0x94a3b8, 0.8); // Zapatillas grises
+                addDecorBox(6.08, 0.25, 5.30, 0.22, 0.09, 0.24, 0x475569, 0.8); // Calzado estante 2
+                // Zapatillas sobre el piso frente al zapatero (fotos #0 y #3):
+                addDecorBox(5.72, 0.05, 5.14, 0.18, 0.08, 0.26, 0x1e293b, 0.85, 0.25, 'Zapatillas Piso Entrada');
+                addDecorBox(5.72, 0.05, 4.96, 0.18, 0.08, 0.26, 0xf1f5f9, 0.85, -0.20);
 
-            // Camperas colgadas del perchero (fotos #0, #1, #3):
-            setMountWall(6.30, 5.38, false);
-            // Campera inflable negra/azul oscuro:
-            addDecorBox(6.10, 1.25, 5.25, 0.24, 0.82, 0.38, 0x1e293b, 0.85, 0, 'Campera Abrigada');
-            // Bolsa de tela con manija ("Ochenta y Cinco Accesorios", foto #1):
-            addDecorBox(6.11, 1.35, 5.46, 0.16, 0.32, 0.26, 0xfef08a, 0.9, 0.05, 'Bolsa Tela Accesorios');
-            // Estante superior de madera natural (pino/paraíso):
-            addDecorBox(6.10, 1.78, 5.38, 0.26, 0.03, 0.68, 0x9a5b32, 0.6, 0, 'Estante Madera Perchero');
-            // Adornos sobre el estante superior (fotos #0, #1, #3):
-            addDecorCyl(6.10, 1.88, 5.20, 0.035, 0.025, 0.16, 0xf1f5f9, 0.4); // Florero cerámico claro
-            addDecorCyl(6.10, 1.88, 5.34, 0.025, 0.025, 0.15, 0x1c1917, 0.2); // Botella de vidrio oscuro
-            addDecorBox(6.10, 1.88, 5.48, 0.045, 0.16, 0.045, 0x78350f, 0.6); // Escultura / caja de madera
-            setMountWall(null);
+                // Camperas colgadas del perchero (fotos #0, #1, #3):
+                setMountWall(6.30, 5.38, false);
+                // Campera inflable negra/azul oscuro:
+                addDecorBox(6.10, 1.25, 5.25, 0.24, 0.82, 0.38, 0x1e293b, 0.85, 0, 'Campera Abrigada');
+                // Bolsa de tela con manija ("Ochenta y Cinco Accesorios", foto #1):
+                addDecorBox(6.11, 1.35, 5.46, 0.16, 0.32, 0.26, 0xfef08a, 0.9, 0.05, 'Bolsa Tela Accesorios');
+                // Estante superior de madera natural (pino/paraíso):
+                addDecorBox(6.10, 1.78, 5.38, 0.26, 0.03, 0.68, 0x9a5b32, 0.6, 0, 'Estante Madera Perchero');
+                // Adornos sobre el estante superior (fotos #0, #1, #3):
+                addDecorCyl(6.10, 1.88, 5.20, 0.035, 0.025, 0.16, 0xf1f5f9, 0.4); // Florero cerámico claro
+                addDecorCyl(6.10, 1.88, 5.34, 0.025, 0.025, 0.15, 0x1c1917, 0.2); // Botella de vidrio oscuro
+                addDecorBox(6.10, 1.88, 5.48, 0.045, 0.16, 0.045, 0x78350f, 0.6); // Escultura / caja de madera
+                setMountWall(null);
+            });
 
             // - Maceta redonda blanca sobre pie nórdico de madera con Sansevieria (Lengua de suegra, fotos #0 y #3):
-            //   Ubicada en X = 6.05, Z = 4.45 (entre el Perchero y el Rack de TV):
-            addDecorBox(6.05, 0.14, 4.45, 0.24, 0.28, 0.24, 0xc2844f, 0.6, 0, 'Pie Nórdico Maceta'); // Patas madera
-            addDecorCyl(6.05, 0.28, 4.45, 0.13, 0.11, 0.24, 0xf8fafc, 0.3, 0, 'Maceta Cerámica Sansevieria'); // Maceta cilíndrica blanca
-            addDecorCyl(6.05, 0.62, 4.45, 0.04, 0.10, 0.52, 0x3f6212, 0.7); // Follaje Sansevieria hojas verdes
-            addDecorBox(6.05, 0.62, 4.45, 0.03, 0.50, 0.16, 0xca8a04, 0.7); // Franja amarilla variegada
+            createCompoundAssembly('Sansevieria en Pie Nórdico', () => {
+                addDecorBox(6.05, 0.14, 4.45, 0.24, 0.28, 0.24, 0xc2844f, 0.6, 0, 'Pie Nórdico Maceta'); // Patas madera
+                addDecorCyl(6.05, 0.28, 4.45, 0.13, 0.11, 0.24, 0xf8fafc, 0.3, 0, 'Maceta Cerámica Sansevieria'); // Maceta cilíndrica blanca
+                addDecorCyl(6.05, 0.62, 4.45, 0.04, 0.10, 0.52, 0x3f6212, 0.7); // Follaje Sansevieria hojas verdes
+                addDecorBox(6.05, 0.62, 4.45, 0.03, 0.50, 0.16, 0xca8a04, 0.7); // Franja amarilla variegada
+            });
 
             // 3. Comederos / bebederos del perro junto al zócalo de la pared de cocina (fotos #0, #3 y #4):
-            //    Ubicados en el zócalo Oeste de Entrada justo al doblar hacia el paso de la cocina:
-            addDecorCyl(4.94, 0.04, 4.80, 0.10, 0.08, 0.08, 0x22c55e, 0.4, 0, 'Comedero Verde Mascota'); // Plato verde
-            addDecorCyl(4.94, 0.04, 4.52, 0.10, 0.08, 0.08, 0xef4444, 0.4, 0, 'Bebedero Rojo Mascota'); // Plato rojo
+            createCompoundAssembly('Comederos de Mascota', () => {
+                addDecorCyl(4.94, 0.04, 4.80, 0.10, 0.08, 0.08, 0x22c55e, 0.4, 0, 'Comedero Verde Mascota'); // Plato verde
+                addDecorCyl(4.94, 0.04, 4.52, 0.10, 0.08, 0.08, 0xef4444, 0.4, 0, 'Bebedero Rojo Mascota'); // Plato rojo
+            });
 
             // 2. Sector Rack TV, Torres de Sonido LG y Decoración (Muro Este X=6.30, centrado en Z=3.10 ALINEADO CON EL SILLÓN Y MESA RATONA, fotos #0 a #7 del álbum):
-            // - Rack de TV rústico de madera cálida (cedro/pino rústico con vetas oscuras, de Z=2.30 a Z=3.90, centro Z=3.10)
-            const rackW = 1.60, rackD = 0.44, rackH = 0.76;
-            const rackZ = 3.10;
-            // Cuerpo principal del rack
-            addDecorBox(6.02, rackH / 2, rackZ, rackD, rackH, rackW, 0x78350f, 0.55);
-            // Tapa superior de madera maciza con vuelo
-            addDecorBox(6.01, rackH + 0.015, rackZ, rackD + 0.03, 0.03, rackW + 0.04, 0x602808, 0.45);
-            // Puerta izquierda con tirador negro vertical
-            addDecorBox(5.79, rackH / 2, rackZ - 0.54, 0.02, rackH - 0.08, 0.42, 0x854d0e, 0.5);
-            addDecorBox(5.77, rackH / 2, rackZ - 0.38, 0.02, 0.16, 0.02, 0x111827, 0.3); // Tirador vertical negro
-            // Puerta derecha con tirador negro vertical
-            addDecorBox(5.79, rackH / 2, rackZ + 0.54, 0.02, 0.42, 0.42, 0x854d0e, 0.5);
-            addDecorBox(5.77, rackH / 2, rackZ + 0.38, 0.02, 0.16, 0.02, 0x111827, 0.3); // Tirador vertical negro
-            // Nicho central superior abierto con PlayStation 5 horizontal + DualSense + PS VR2
-            addDecorBox(5.90, 0.58, rackZ, 0.36, 0.015, 0.66, 0x451a03); // Estante divisorio medio
-            addDecorBox(5.88, 0.63, rackZ - 0.16, 0.24, 0.07, 0.36, 0xf8fafc, 0.2); // PS5 blanca horizontal
-            addDecorBox(5.88, 0.63, rackZ - 0.16, 0.22, 0.05, 0.10, 0x0f172a, 0.3); // Centro negro PS5
-            addDecorBox(5.80, 0.62, rackZ - 0.08, 0.08, 0.05, 0.12, 0xf8fafc, 0.3); // Joystick DualSense blanco
-            addDecorBox(5.86, 0.65, rackZ + 0.14, 0.18, 0.10, 0.18, 0x111827, 0.4); // Casco PS VR2 negro/blanco
-            // Nicho central inferior:
-            // - Sintoamplificador / subwoofer negro Home Theater con visor digital y puerto circular (izq)
-            addDecorBox(5.88, 0.32, rackZ - 0.16, 0.32, 0.34, 0.32, 0x0f172a, 0.3);
-            addDecorCyl(5.72, 0.26, rackZ - 0.24, 0.05, 0.05, 0.02, 0x111827); // Puerto bass reflex circular
-            // - Puerta de madera inferior derecha con tirador horizontal negro
-            addDecorBox(5.79, 0.32, rackZ + 0.14, 0.02, 0.34, 0.30, 0x854d0e, 0.5);
-            addDecorBox(5.77, 0.42, rackZ + 0.14, 0.02, 0.02, 0.12, 0x111827, 0.3); // Tirador horizontal negro
+            createCompoundAssembly('Rack TV y Centro Audiovisual', () => {
+                const rackW = 1.60, rackD = 0.44, rackH = 0.76;
+                const rackZ = 3.10;
+                // Cuerpo principal del rack
+                addDecorBox(6.02, rackH / 2, rackZ, rackD, rackH, rackW, 0x78350f, 0.55);
+                // Tapa superior de madera maciza con vuelo
+                addDecorBox(6.01, rackH + 0.015, rackZ, rackD + 0.03, 0.03, rackW + 0.04, 0x602808, 0.45);
+                // Puerta izquierda con tirador negro vertical
+                addDecorBox(5.79, rackH / 2, rackZ - 0.54, 0.02, rackH - 0.08, 0.42, 0x854d0e, 0.5);
+                addDecorBox(5.77, rackH / 2, rackZ - 0.38, 0.02, 0.16, 0.02, 0x111827, 0.3); // Tirador vertical negro
+                // Puerta derecha con tirador negro vertical
+                addDecorBox(5.79, rackH / 2, rackZ + 0.54, 0.02, 0.42, 0.42, 0x854d0e, 0.5);
+                addDecorBox(5.77, rackH / 2, rackZ + 0.38, 0.02, 0.16, 0.02, 0x111827, 0.3); // Tirador vertical negro
+                // Nicho central superior abierto con PlayStation 5 horizontal + DualSense + PS VR2
+                addDecorBox(5.90, 0.58, rackZ, 0.36, 0.015, 0.66, 0x451a03); // Estante divisorio medio
+                addDecorBox(5.88, 0.63, rackZ - 0.16, 0.24, 0.07, 0.36, 0xf8fafc, 0.2); // PS5 blanca horizontal
+                addDecorBox(5.88, 0.63, rackZ - 0.16, 0.22, 0.05, 0.10, 0x0f172a, 0.3); // Centro negro PS5
+                addDecorBox(5.80, 0.62, rackZ - 0.08, 0.08, 0.05, 0.12, 0xf8fafc, 0.3); // Joystick DualSense blanco
+                addDecorBox(5.86, 0.65, rackZ + 0.14, 0.18, 0.10, 0.18, 0x111827, 0.4); // Casco PS VR2 negro/blanco
+                // Nicho central inferior:
+                // - Sintoamplificador / subwoofer negro Home Theater con visor digital y puerto circular (izq)
+                addDecorBox(5.88, 0.32, rackZ - 0.16, 0.32, 0.34, 0.32, 0x0f172a, 0.3);
+                addDecorCyl(5.72, 0.26, rackZ - 0.24, 0.05, 0.05, 0.02, 0x111827); // Puerto bass reflex circular
+                // - Puerta de madera inferior derecha con tirador horizontal negro
+                addDecorBox(5.79, 0.32, rackZ + 0.14, 0.02, 0.34, 0.30, 0x854d0e, 0.5);
+                addDecorBox(5.77, 0.42, rackZ + 0.14, 0.02, 0.02, 0.12, 0x111827, 0.3); // Tirador horizontal negro
 
-            // - Smart TV 55" pantalla plana centrada sobre el rack
-            setMountWall(6.30, rackZ, false);
-            const tvMesh = addDecorBox(6.16, 1.38, rackZ, 0.04, 0.72, 1.24, 0x0a0a0a, 0.1);
-            tvMesh.rotation.z = 0.04;
-            setMountWall(null);
+                // - Smart TV 55" pantalla plana centrada sobre el rack
+                setMountWall(6.30, rackZ, false);
+                const tvMesh = addDecorBox(6.16, 1.38, rackZ, 0.04, 0.72, 1.24, 0x0a0a0a, 0.1);
+                tvMesh.rotation.z = 0.04;
+                setMountWall(null);
 
-            // - 2 Torres de sonido delanteras LG Home Theater sobre el mueble:
-            addLGSoundTower(5.98, rackH + 0.03, rackZ - 0.66, 0); // Delantera izquierda (Norte)
-            addLGSoundTower(5.98, rackH + 0.03, rackZ + 0.66, 0); // Delantera derecha (Sur)
+                // - 2 Torres de sonido delanteras LG Home Theater sobre el mueble:
+                addLGSoundTower(5.98, rackH + 0.03, rackZ - 0.66, 0); // Delantera izquierda (Norte)
+                addLGSoundTower(5.98, rackH + 0.03, rackZ + 0.66, 0); // Delantera derecha (Sur)
 
-            // - Camino de tela rústica sobre el rack + cuarzos/plato decorativo + velas (foto #1)
-            addDecorBox(5.92, rackH + 0.035, rackZ, 0.24, 0.005, 0.76, 0xc2410c);
-            addDecorBox(5.88, rackH + 0.045, rackZ, 0.14, 0.015, 0.22, 0xf1f5f9); // Plato blanco piedras
-            addDecorCyl(5.88, rackH + 0.07, rackZ - 0.14, 0.035, 0.035, 0.06, 0x0f766e);  // Vela teal
+                // - Camino de tela rústica sobre el rack + cuarzos/plato decorativo + velas (foto #1)
+                addDecorBox(5.92, rackH + 0.035, rackZ, 0.24, 0.005, 0.76, 0xc2410c);
+                addDecorBox(5.88, rackH + 0.045, rackZ, 0.14, 0.015, 0.22, 0xf1f5f9); // Plato blanco piedras
+                addDecorCyl(5.88, rackH + 0.07, rackZ - 0.14, 0.035, 0.035, 0.06, 0x0f766e);  // Vela teal
 
-            // - Aplique de pared cúbico blanco cálido encendido a la derecha del TV (foto #1)
-            setMountWall(6.30, rackZ + 0.62, false);
-            addDecorBox(6.25, 1.88, rackZ + 0.62, 0.08, 0.12, 0.12, 0xffedd5, 0.2);
-            setMountWall(null);
+                // - Aplique de pared cúbico blanco cálido encendido a la derecha del TV (foto #1)
+                setMountWall(6.30, rackZ + 0.62, false);
+                addDecorBox(6.25, 1.88, rackZ + 0.62, 0.08, 0.12, 0.12, 0xffedd5, 0.2);
+                setMountWall(null);
+            });
 
             // - Calefactor a gas metálico gris a la izquierda del rack con caño vertical de escape (en Z=1.85, fotos #1 y #7)
-            addDecorBox(6.05, 0.36, 1.85, 0.28, 0.68, 0.40, 0x475569, 0.35); // Calefactor
-            addDecorCyl(6.12, 1.65, 1.85, 0.045, 0.045, 1.90, 0x94a3b8, 0.3); // Caño de ventilación al techo
+            createCompoundAssembly('Calefactor a Gas con Conducto', () => {
+                addDecorBox(6.05, 0.36, 1.85, 0.28, 0.68, 0.40, 0x475569, 0.35); // Calefactor
+                addDecorCyl(6.12, 1.65, 1.85, 0.045, 0.045, 1.90, 0x94a3b8, 0.3); // Caño de ventilación al techo
+            });
 
             // 3. Sector Sillón Futón 3 Cuerpos, Torres Traseras, Lámpara de Pie y Mesa Ratona (Muro Oeste X=3.00, centrado en Z=3.10 ALINEADO CON LA TV, fotos #0 a #7):
-            // - Sillón futón con estructura de pino macizo y apoyabrazos con celosía diagonal en "X" (fotos #0, #1 y #7):
-            const futonW = 2.00, futonD = 0.88, futonH = 0.82;
-            const futonZ = 3.10;
-            // Base y travesaños inferiores de pino
-            addDecorBox(3.44, 0.12, futonZ, futonD - 0.10, 0.20, futonW - 0.10, 0xd4a373, 0.6);
-            // 4 Patas robustas de madera de pino
-            addDecorBox(3.12, 0.18, futonZ - futonW / 2 + 0.05, 0.08, 0.36, 0.08, 0xd4a373, 0.6);
-            addDecorBox(3.76, 0.18, futonZ - futonW / 2 + 0.05, 0.08, 0.36, 0.08, 0xd4a373, 0.6);
-            addDecorBox(3.12, 0.18, futonZ + futonW / 2 - 0.05, 0.08, 0.36, 0.08, 0xd4a373, 0.6);
-            addDecorBox(3.76, 0.18, futonZ + futonW / 2 - 0.05, 0.08, 0.36, 0.08, 0xd4a373, 0.6);
-            // Apoyabrazos de pino con celosía en X en ambos laterales:
-            // - Lateral Norte (Z = futonZ - futonW/2):
-            addDecorBox(3.44, 0.52, futonZ - futonW / 2, futonD, 0.05, 0.10, 0xd4a373, 0.55); // Tapa apoyabrazos
-            addDecorBox(3.44, 0.34, futonZ - futonW / 2, 0.04, 0.32, 0.04, 0xd4a373, 0.6);  // Celosía central
-            // - Lateral Sur (Z = futonZ + futonW/2):
-            addDecorBox(3.44, 0.52, futonZ + futonW / 2, futonD, 0.05, 0.10, 0xd4a373, 0.55); // Tapa apoyabrazos
-            addDecorBox(3.44, 0.34, futonZ + futonW / 2, 0.04, 0.32, 0.04, 0xd4a373, 0.6);
+            createCompoundAssembly('Sillón Futón 3 Cuerpos', () => {
+                const futonW = 2.00, futonD = 0.88, futonH = 0.82;
+                const futonZ = 3.10;
+                // Base y travesaños inferiores de pino
+                addDecorBox(3.44, 0.12, futonZ, futonD - 0.10, 0.20, futonW - 0.10, 0xd4a373, 0.6);
+                // 4 Patas robustas de madera de pino
+                addDecorBox(3.12, 0.18, futonZ - futonW / 2 + 0.05, 0.08, 0.36, 0.08, 0xd4a373, 0.6);
+                addDecorBox(3.76, 0.18, futonZ - futonW / 2 + 0.05, 0.08, 0.36, 0.08, 0xd4a373, 0.6);
+                addDecorBox(3.12, 0.18, futonZ + futonW / 2 - 0.05, 0.08, 0.36, 0.08, 0xd4a373, 0.6);
+                addDecorBox(3.76, 0.18, futonZ + futonW / 2 - 0.05, 0.08, 0.36, 0.08, 0xd4a373, 0.6);
+                // Apoyabrazos de pino con celosía en X en ambos laterales:
+                // - Lateral Norte (Z = futonZ - futonW/2):
+                addDecorBox(3.44, 0.52, futonZ - futonW / 2, futonD, 0.05, 0.10, 0xd4a373, 0.55); // Tapa apoyabrazos
+                addDecorBox(3.44, 0.34, futonZ - futonW / 2, 0.04, 0.32, 0.04, 0xd4a373, 0.6);  // Celosía central
+                // - Lateral Sur (Z = futonZ + futonW/2):
+                addDecorBox(3.44, 0.52, futonZ + futonW / 2, futonD, 0.05, 0.10, 0xd4a373, 0.55); // Tapa apoyabrazos
+                addDecorBox(3.44, 0.34, futonZ + futonW / 2, 0.04, 0.32, 0.04, 0xd4a373, 0.6);
 
-            // - Colchón tapizado azul denim / jeans oscuro (#224c78)
-            addDecorBox(3.46, 0.36, futonZ, 0.74, 0.18, futonW - 0.18, 0x224c78, 0.8); // Asiento
-            addDecorBox(3.14, 0.64, futonZ, 0.18, 0.52, futonW - 0.18, 0x224c78, 0.8); // Respaldo inclinado
+                // - Colchón tapizado azul denim / jeans oscuro (#224c78)
+                addDecorBox(3.46, 0.36, futonZ, 0.74, 0.18, futonW - 0.18, 0x224c78, 0.8); // Asiento
+                addDecorBox(3.14, 0.64, futonZ, 0.18, 0.52, futonW - 0.18, 0x224c78, 0.8); // Respaldo inclinado
 
-            // - 2 Almohadones cilíndricos (bolsters) de tela azul denim apoyados en los apoyabrazos
-            const bol1 = addDecorCyl(3.46, 0.49, futonZ - futonW / 2 + 0.12, 0.085, 0.085, 0.65, 0x25527e, 0.8);
-            bol1.rotation.z = Math.PI / 2;
-            const bol2 = addDecorCyl(3.46, 0.49, futonZ + futonW / 2 - 0.12, 0.085, 0.085, 0.65, 0x25527e, 0.8);
-            bol2.rotation.z = Math.PI / 2;
+                // - 2 Almohadones cilíndricos (bolsters) de tela azul denim apoyados en los apoyabrazos
+                const bol1 = addDecorCyl(3.46, 0.49, futonZ - futonW / 2 + 0.12, 0.085, 0.085, 0.65, 0x25527e, 0.8);
+                bol1.rotation.z = Math.PI / 2;
+                const bol2 = addDecorCyl(3.46, 0.49, futonZ + futonW / 2 - 0.12, 0.085, 0.085, 0.65, 0x25527e, 0.8);
+                bol2.rotation.z = Math.PI / 2;
 
-            // - Almohadones decorativos sobre el futón (fotos #0 y #7):
-            addDecorBox(3.32, 0.56, futonZ - 0.60, 0.16, 0.28, 0.32, 0xf5f5dc, 0.8); // Almohadón crema
-            addDecorBox(3.34, 0.55, futonZ - 0.32, 0.16, 0.26, 0.28, 0x1e3a8a, 0.7); // Almohadón búho azul
-            addDecorCyl(3.38, 0.54, futonZ, 0.14, 0.14, 0.16, 0x9ca3af, 0.9);        // Almohadón redondo gris medio
-            addDecorBox(3.32, 0.56, futonZ + 0.30, 0.16, 0.28, 0.32, 0xe5e7eb, 0.8); // Almohadón dibujo arquitectura
-            addDecorBox(3.34, 0.55, futonZ + 0.62, 0.16, 0.26, 0.28, 0xfef08a, 0.8); // Almohadón hojas otoño
+                // - Almohadones decorativos sobre el futón (fotos #0 y #7):
+                addDecorBox(3.32, 0.56, futonZ - 0.60, 0.16, 0.28, 0.32, 0xf5f5dc, 0.8); // Almohadón crema
+                addDecorBox(3.34, 0.55, futonZ - 0.32, 0.16, 0.26, 0.28, 0x1e3a8a, 0.7); // Almohadón búho azul
+                addDecorCyl(3.38, 0.54, futonZ, 0.14, 0.14, 0.16, 0x9ca3af, 0.9);        // Almohadón redondo gris medio
+                addDecorBox(3.32, 0.56, futonZ + 0.30, 0.16, 0.28, 0.32, 0xe5e7eb, 0.8); // Almohadón dibujo arquitectura
+                addDecorBox(3.34, 0.55, futonZ + 0.62, 0.16, 0.26, 0.28, 0xfef08a, 0.8); // Almohadón hojas otoño
 
-            // - Mantas dobladas en el respaldo (fotos #0 y #7):
-            // Manta tejida a cuadros de colores (amarillo, verde, lila, gris) al Norte
-            addDecorBox(3.16, 0.88, futonZ - 0.40, 0.22, 0.06, 0.52, 0xeab308, 0.8);
-            addDecorBox(3.16, 0.88, futonZ - 0.58, 0.22, 0.06, 0.26, 0xa855f7, 0.8);
-            // Manta roja estampada doblada al Sur
-            addDecorBox(3.16, 0.88, futonZ + 0.55, 0.22, 0.06, 0.58, 0xd9381e, 0.8);
+                // - Mantas dobladas en el respaldo (fotos #0 y #7):
+                // Manta tejida a cuadros de colores (amarillo, verde, lila, gris) al Norte
+                addDecorBox(3.16, 0.88, futonZ - 0.40, 0.22, 0.06, 0.52, 0xeab308, 0.8);
+                addDecorBox(3.16, 0.88, futonZ - 0.58, 0.22, 0.06, 0.26, 0xa855f7, 0.8);
+                // Manta roja estampada doblada al Sur
+                addDecorBox(3.16, 0.88, futonZ + 0.55, 0.22, 0.06, 0.58, 0xd9381e, 0.8);
+            });
 
             // - 2 Torres de sonido traseras LG apoyadas DIRECTAMENTE EN EL PISO (fotos #0, #1 y #2):
             // Torre trasera sur (apoyada en el piso junto al apoyabrazos sur del futón, en el vano hacia el pasillo):
@@ -3617,82 +3684,88 @@
             addLGSoundTower(3.28, 0.00, futonZ - futonW / 2 - 0.06, Math.PI + 0.22);
 
             // - Lámpara de pie de arco con base cromada en el piso y pantalla cónica cálida (fotos #1, #2 y #7):
-            addDecorCyl(3.28, 0.015, 1.84, 0.16, 0.16, 0.03, 0xd1d5db, 0.2); // Base circular cromada
-            addDecorCyl(3.28, 0.82, 1.84, 0.014, 0.014, 1.60, 0xd1d5db, 0.2); // Caño metálico vertical
-            addDecorCyl(3.38, 1.65, 1.90, 0.012, 0.012, 0.45, 0xd1d5db, 0.2); // Brazo curvado/inclinado
-            // Pantalla cónica blanca translúcida encendida
-            addDecorCyl(3.46, 1.58, 1.94, 0.08, 0.18, 0.22, 0xffffff, 0.3);
+            createCompoundAssembly('Lámpara de Pie de Arco', () => {
+                addDecorCyl(3.28, 0.015, 1.84, 0.16, 0.16, 0.03, 0xd1d5db, 0.2); // Base circular cromada
+                addDecorCyl(3.28, 0.82, 1.84, 0.014, 0.014, 1.60, 0xd1d5db, 0.2); // Caño metálico vertical
+                addDecorCyl(3.38, 1.65, 1.90, 0.012, 0.012, 0.45, 0xd1d5db, 0.2); // Brazo curvado/inclinado
+                // Pantalla cónica blanca translúcida encendida
+                addDecorCyl(3.46, 1.58, 1.94, 0.08, 0.18, 0.22, 0xffffff, 0.3);
+            });
 
             // - Planta de interior en maceta de piso (Calathea/Maranta con hojas púrpura/verde, fotos #2 y #7):
-            addDecorCyl(3.25, 0.16, 1.66, 0.10, 0.08, 0.22, 0xb45309); // Maceta terracota
-            addDecorCyl(3.25, 0.36, 1.66, 0.18, 0.08, 0.24, 0x4c0519); // Hojas púrpura/verde
+            createCompoundAssembly('Planta Calathea en Maceta', () => {
+                addDecorCyl(3.25, 0.16, 1.66, 0.10, 0.08, 0.22, 0xb45309); // Maceta terracota
+                addDecorCyl(3.25, 0.36, 1.66, 0.18, 0.08, 0.24, 0x4c0519); // Hojas púrpura/verde
+            });
 
             // - Mesa ratona (fotos #0, #1, #2 y #7):
-            // Ubicada ergonómicamente a 31 cm del sillón y dejando 1.23 m de pasillo libre frente al Rack TV:
-            const tableX = 4.38, tableZ = futonZ, tableW = 0.50, tableL = 1.05, tableH = 0.42;
-            const legW = 0.045, legH = 0.39;
-            const legMatColor = 0xf8fafc;
-            // 4 Patas blancas cuadradas
-            addDecorBox(tableX - tableW / 2 + legW / 2, legH / 2, tableZ - tableL / 2 + legW / 2, legW, legH, legW, legMatColor, 0.35); // Noroeste
-            addDecorBox(tableX + tableW / 2 - legW / 2, legH / 2, tableZ - tableL / 2 + legW / 2, legW, legH, legW, legMatColor, 0.35); // Noreste
-            addDecorBox(tableX - tableW / 2 + legW / 2, legH / 2, tableZ + tableL / 2 - legW / 2, legW, legH, legW, legMatColor, 0.35); // Suroeste
-            addDecorBox(tableX + tableW / 2 - legW / 2, legH / 2, tableZ + tableL / 2 - legW / 2, legW, legH, legW, legMatColor, 0.35); // Sureste
-            // Estante bajo revistero abierto de madera nogal cálido (elevado 12cm del piso)
-            addDecorBox(tableX, 0.12, tableZ, tableW - 0.07, 0.018, tableL - 0.07, 0x5c3a21, 0.45);
-            // Almohadón / cesto circular color vino tinto / magenta en el revistero inferior (foto #1)
-            addDecorCyl(tableX, 0.16, tableZ - 0.18, 0.11, 0.11, 0.06, 0x831843, 0.7);
-            // Tapa superior de madera maciza nogal oscuro con cantos biselados (foto #2)
-            addDecorBox(tableX, tableH - 0.015, tableZ, tableW, 0.03, tableL, 0x4a2c18, 0.4);
+            createCompoundAssembly('Mesa Ratona de Living', () => {
+                const tableX = 4.38, tableZ = 3.10, tableW = 0.50, tableL = 1.05, tableH = 0.42;
+                const legW = 0.045, legH = 0.39;
+                const legMatColor = 0xf8fafc;
+                // 4 Patas blancas cuadradas
+                addDecorBox(tableX - tableW / 2 + legW / 2, legH / 2, tableZ - tableL / 2 + legW / 2, legW, legH, legW, legMatColor, 0.35); // Noroeste
+                addDecorBox(tableX + tableW / 2 - legW / 2, legH / 2, tableZ - tableL / 2 + legW / 2, legW, legH, legW, legMatColor, 0.35); // Noreste
+                addDecorBox(tableX - tableW / 2 + legW / 2, legH / 2, tableZ + tableL / 2 - legW / 2, legW, legH, legW, legMatColor, 0.35); // Suroeste
+                addDecorBox(tableX + tableW / 2 - legW / 2, legH / 2, tableZ + tableL / 2 - legW / 2, legW, legH, legW, legMatColor, 0.35); // Sureste
+                // Estante bajo revistero abierto de madera nogal cálido (elevado 12cm del piso)
+                addDecorBox(tableX, 0.12, tableZ, tableW - 0.07, 0.018, tableL - 0.07, 0x5c3a21, 0.45);
+                // Almohadón / cesto circular color vino tinto / magenta en el revistero inferior (foto #1)
+                addDecorCyl(tableX, 0.16, tableZ - 0.18, 0.11, 0.11, 0.06, 0x831843, 0.7);
+                // Tapa superior de madera maciza nogal oscuro con cantos biselados (foto #2)
+                addDecorBox(tableX, tableH - 0.015, tableZ, tableW, 0.03, tableL, 0x4a2c18, 0.4);
 
-            // Objetos sobre la mesa ratona relevados al milímetro de las fotos #1 y #2:
-            // 1. Vaso térmico negro mate tipo Stanley (foto #2):
-            addDecorCyl(tableX - 0.06, tableH + 0.09, tableZ - 0.28, 0.042, 0.036, 0.18, 0x18181b, 0.4);
-            addDecorCyl(tableX - 0.06, tableH + 0.182, tableZ - 0.28, 0.038, 0.038, 0.012, 0xd1d5db, 0.2); // Anillo plateado de tapa
-            // 2. Tableta gráfica / digitalizadora negra con lápiz óptico blanco (foto #2):
-            addDecorBox(tableX, tableH + 0.006, tableZ - 0.02, 0.22, 0.010, 0.30, 0x111827, 0.5);
-            addDecorBox(tableX - 0.02, tableH + 0.015, tableZ, 0.010, 0.008, 0.14, 0xf8fafc, 0.3); // Stylus blanco
-            // 3. Dos controles remotos negros alineados (TV y audio LG):
-            addDecorBox(tableX + 0.09, tableH + 0.008, tableZ + 0.22, 0.048, 0.014, 0.18, 0x0f172a, 0.3);
-            addDecorBox(tableX + 0.09, tableH + 0.008, tableZ + 0.38, 0.044, 0.014, 0.15, 0x1e293b, 0.3);
-            // 4. Cinta métrica amarilla Stanley con gancho metálico (foto #2):
-            addDecorBox(tableX - 0.09, tableH + 0.016, tableZ + 0.26, 0.055, 0.030, 0.055, 0xeab308, 0.35);
-            addDecorBox(tableX - 0.12, tableH + 0.016, tableZ + 0.26, 0.010, 0.015, 0.020, 0xd1d5db, 0.2); // Gancho metálico
-            // 5. Billetera / llaves en el extremo sur:
-            addDecorBox(tableX - 0.08, tableH + 0.008, tableZ + 0.42, 0.08, 0.012, 0.10, 0x334155, 0.6); // Billetera
+                // Objetos sobre la mesa ratona relevados al milímetro de las fotos #1 y #2:
+                // 1. Vaso térmico negro mate tipo Stanley (foto #2):
+                addDecorCyl(tableX - 0.06, tableH + 0.09, tableZ - 0.28, 0.042, 0.036, 0.18, 0x18181b, 0.4);
+                addDecorCyl(tableX - 0.06, tableH + 0.182, tableZ - 0.28, 0.038, 0.038, 0.012, 0xd1d5db, 0.2); // Anillo plateado de tapa
+                // 2. Tableta gráfica / digitalizadora negra con lápiz óptico blanco (foto #2):
+                addDecorBox(tableX, tableH + 0.006, tableZ - 0.02, 0.22, 0.010, 0.30, 0x111827, 0.5);
+                addDecorBox(tableX - 0.02, tableH + 0.015, tableZ, 0.010, 0.008, 0.14, 0xf8fafc, 0.3); // Stylus blanco
+                // 3. Dos controles remotos negros alineados (TV y audio LG):
+                addDecorBox(tableX + 0.09, tableH + 0.008, tableZ + 0.22, 0.048, 0.014, 0.18, 0x0f172a, 0.3);
+                addDecorBox(tableX + 0.09, tableH + 0.008, tableZ + 0.38, 0.044, 0.014, 0.15, 0x1e293b, 0.3);
+                // 4. Cinta métrica amarilla Stanley con gancho metálico (foto #2):
+                addDecorBox(tableX - 0.09, tableH + 0.016, tableZ + 0.26, 0.055, 0.030, 0.055, 0xeab308, 0.35);
+                addDecorBox(tableX - 0.12, tableH + 0.016, tableZ + 0.26, 0.010, 0.015, 0.020, 0xd1d5db, 0.2); // Gancho metálico
+                // 5. Billetera / llaves en el extremo sur:
+                addDecorBox(tableX - 0.08, tableH + 0.008, tableZ + 0.42, 0.08, 0.012, 0.10, 0x334155, 0.6); // Billetera
+            });
 
             // 4. Sector Comedor: Mesa Redonda de Madera Caoba + 4 Sillas con Almohadones Verde Lima + Plantas + Cuchas Perros (Z=0.35..1.60, fotos #3, #4, #5, #6 y #7):
-            // - Mesa redonda de madera rojiza lustrada (X=4.55, Z=0.95, Ø 1.00m)
-            const tableDiningZ = 0.95;
-            addDecorCyl(4.55, 0.37, tableDiningZ, 0.22, 0.26, 0.72, 0x7c2d12, 0.4);  // Pedestal central madera
-            addDecorCyl(4.55, 0.75, tableDiningZ, 0.50, 0.50, 0.04, 0x882915, 0.32); // Tapa redonda lustrada
-            // - Centro de mesa: camino rojo + macetas con plantas (anturio verde y trébol morado Oxalis)
-            addDecorBox(4.55, 0.775, tableDiningZ, 0.80, 0.01, 0.22, 0xb91c1c);
-            addDecorCyl(4.55, 0.86, tableDiningZ, 0.11, 0.08, 0.16, 0x7c2d12);
-            addDecorCyl(4.55, 1.04, tableDiningZ, 0.22, 0.11, 0.28, 0x15803d);       // Follaje plantas centro de mesa
-            // - 4 Sillas de madera natural con almohadón verde lima (#84cc16)
-            const chairCoords = [
-                { x: 4.55, z: tableDiningZ + 0.52, rot: 0 },             // Silla Sur (hacia el living)
-                { x: 4.55, z: tableDiningZ - 0.50, rot: Math.PI },        // Silla Norte (bajo ventana)
-                { x: 4.55 - 0.52, z: tableDiningZ, rot: -Math.PI / 2 },   // Silla Oeste
-                { x: 4.55 + 0.52, z: tableDiningZ, rot: Math.PI / 2 }     // Silla Este
-            ];
-            const chairWoodMat = getStdMat(0xc28a52, 0.55);
-            const chairCushionMat = getStdMat(0x84cc16, 0.7);
-            chairCoords.forEach(c => {
-                const cg = new THREE.Group();
-                cg.position.set(c.x, 0, c.z);
-                cg.rotation.y = c.rot;
-                const seat = new THREE.Mesh(UNIT_BOX_GEO, chairWoodMat);
-                seat.scale.set(0.42, 0.42, 0.42);
-                seat.position.set(0, 0.21, 0);
-                const cushion = new THREE.Mesh(UNIT_BOX_GEO, chairCushionMat);
-                cushion.scale.set(0.40, 0.06, 0.40);
-                cushion.position.set(0, 0.45, 0);
-                const back = new THREE.Mesh(UNIT_BOX_GEO, chairWoodMat);
-                back.scale.set(0.42, 0.46, 0.05);
-                back.position.set(0, 0.68, 0.18);
-                cg.add(seat, cushion, back);
-                decorVideoGroup.add(cg);
+            createCompoundAssembly('Juego de Comedor (Mesa + Sillas)', () => {
+                const tableDiningZ = 0.95;
+                addDecorCyl(4.55, 0.37, tableDiningZ, 0.22, 0.26, 0.72, 0x7c2d12, 0.4);  // Pedestal central madera
+                addDecorCyl(4.55, 0.75, tableDiningZ, 0.50, 0.50, 0.04, 0x882915, 0.32); // Tapa redonda lustrada
+                // - Centro de mesa: camino rojo + macetas con plantas (anturio verde y trébol morado Oxalis)
+                addDecorBox(4.55, 0.775, tableDiningZ, 0.80, 0.01, 0.22, 0xb91c1c);
+                addDecorCyl(4.55, 0.86, tableDiningZ, 0.11, 0.08, 0.16, 0x7c2d12);
+                addDecorCyl(4.55, 1.04, tableDiningZ, 0.22, 0.11, 0.28, 0x15803d);       // Follaje plantas centro de mesa
+                // - 4 Sillas de madera natural con almohadón verde lima (#84cc16)
+                const chairCoords = [
+                    { x: 4.55, z: tableDiningZ + 0.52, rot: 0 },             // Silla Sur (hacia el living)
+                    { x: 4.55, z: tableDiningZ - 0.50, rot: Math.PI },        // Silla Norte (bajo ventana)
+                    { x: 4.55 - 0.52, z: tableDiningZ, rot: -Math.PI / 2 },   // Silla Oeste
+                    { x: 4.55 + 0.52, z: tableDiningZ, rot: Math.PI / 2 }     // Silla Este
+                ];
+                const chairWoodMat = getStdMat(0xc28a52, 0.55);
+                const chairCushionMat = getStdMat(0x84cc16, 0.7);
+                chairCoords.forEach(c => {
+                    const cg = new THREE.Group();
+                    cg.position.set(c.x, 0, c.z);
+                    cg.rotation.y = c.rot;
+                    const seat = new THREE.Mesh(UNIT_BOX_GEO, chairWoodMat);
+                    seat.scale.set(0.42, 0.42, 0.42);
+                    seat.position.set(0, 0.21, 0);
+                    const cushion = new THREE.Mesh(UNIT_BOX_GEO, chairCushionMat);
+                    cushion.scale.set(0.40, 0.06, 0.40);
+                    cushion.position.set(0, 0.45, 0);
+                    const back = new THREE.Mesh(UNIT_BOX_GEO, chairWoodMat);
+                    back.scale.set(0.42, 0.46, 0.05);
+                    back.position.set(0, 0.68, 0.18);
+                    cg.add(seat, cushion, back);
+                    (currentAssemblyGroup || decorVideoGroup).add(cg);
+                });
             });
             // - 2 Cuchas / colchonetas grises para los perros bajo las ventanas Norte + bebedero celeste (fotos #4, #5 y #7)
             addDecorBox(5.55, 0.05, 0.36, 0.85, 0.10, 0.54, 0x94a3b8, 0.85); // Cucha gris esquina NE
@@ -3707,12 +3780,15 @@
             // B) COCINA ([3.00, 4.80] a [5.20, 8.00]) - Relevamiento exacto de las fotos reales
             // ------------------------------------------------------------------------
             // 1. Mueble envolvente de heladera en esquina Noreste (X=4.50, Z=5.11, protegido tras la mocheta de acceso):
-            // - Heladera blanca con freezer superior mirando al Oeste + imanes en la puerta
-            addDecorBox(4.50, 0.84, 5.11, 0.60, 1.68, 0.62, 0xf8fafc, 0.25, 0, 'Heladera con Freezer');
-            // - Bodega portabotellas de 8 nichos (4x2) + Alacena superior de 2 puertas en melamina roble claro hasta arriba
-            setMountWall(4.85, 5.11, false);
-            addDecorBox(4.50, 1.78, 5.11, 0.60, 0.16, 0.62, 0xd6ccc2, 0.5, 0, 'Bodega Portabotellas');  // Bodega portabotellas
-            addDecorBox(4.50, 2.12, 5.11, 0.60, 0.52, 0.62, 0xd6ccc2, 0.45, 0, 'Alacena sobre Heladera'); // Alacena alta sobre heladera
+            createCompoundAssembly('Heladera con Bodega y Alacena', () => {
+                // - Heladera blanca con freezer superior mirando al Oeste + imanes en la puerta
+                addDecorBox(4.50, 0.84, 5.11, 0.60, 1.68, 0.62, 0xf8fafc, 0.25, 0, 'Heladera con Freezer');
+                // - Bodega portabotellas de 8 nichos (4x2) + Alacena superior de 2 puertas en melamina roble claro hasta arriba
+                setMountWall(4.85, 5.11, false);
+                addDecorBox(4.50, 1.78, 5.11, 0.60, 0.16, 0.62, 0xd6ccc2, 0.5, 0, 'Bodega Portabotellas');  // Bodega portabotellas
+                addDecorBox(4.50, 2.12, 5.11, 0.60, 0.52, 0.62, 0xd6ccc2, 0.45, 0, 'Alacena sobre Heladera'); // Alacena alta sobre heladera
+                setMountWall(null);
+            });
             // 2. Alacenas superiores sobre Muro Este (X=4.85):
             // - Alacena sobre el calefón Orbis/Bosch (Z=5.72) + caño corrugado de aluminio arriba + plumero extensible violeta en el hueco
             addDecorBox(4.61, 1.98, 5.72, 0.34, 0.48, 0.40, 0xd6ccc2, 0.45, 0, 'Alacena sobre Calefón');
@@ -3764,20 +3840,26 @@
             // ------------------------------------------------------------------------
             // C) CUARTO AMPLIADO ([0.00, 4.70] a [3.00, 8.00]) - CAMA Y MESAS DE LUZ SOBRE MURO OESTE (X=0.00, fotos #17 a #22)
             // ------------------------------------------------------------------------
-            // 1. Amplio respaldo horizontal de madera oscura nogal/wengué en Muro Oeste X=0.00 (Z=5.00..7.40)
-            addDecorBox(0.08, 0.68, 6.20, 0.06, 1.15, 2.40, 0x4a3222, 0.5);
-            // 2. Cama de 2 plazas (1.45m ancho × 1.90m largo) con cabecera en X=0.10 extendiéndose hacia el Este hasta X=2.00, centrada en Z=6.20 + 2 valijas abiertas encima (fotos #18-#21)
-            addDecorBox(1.05, 0.24, 6.20, 1.90, 0.46, 1.45, 0x475569, 0.7);  // Colchón + acolchado a rayas gris topo
-            addDecorBox(1.05, 0.48, 6.20, 1.86, 0.03, 1.40, 0x64748b, 0.75); // Franjas claras del acolchado
-            addDecorBox(0.32, 0.53, 5.88, 0.34, 0.10, 0.52, 0xe2e8f0, 0.8);  // Almohada norte (lado Oeste)
-            addDecorBox(0.32, 0.53, 6.52, 0.34, 0.10, 0.52, 0xe2e8f0, 0.8);  // Almohada sur (lado Oeste)
-            addDecorBox(1.48, 0.58, 5.96, 0.58, 0.16, 0.42, 0x1e293b, 0.4);  // Valija negra sobre la cama
+            // 1. Cama de 2 plazas con respaldo (X=0.00..2.00, Z=5.00..7.40)
+            createCompoundAssembly('Cama Matrimonial 2 Plazas', () => {
+                addDecorBox(0.08, 0.68, 6.20, 0.06, 1.15, 2.40, 0x4a3222, 0.5);
+                addDecorBox(1.05, 0.24, 6.20, 1.90, 0.46, 1.45, 0x475569, 0.7);  // Colchón + acolchado a rayas gris topo
+                addDecorBox(1.05, 0.48, 6.20, 1.86, 0.03, 1.40, 0x64748b, 0.75); // Franjas claras del acolchado
+                addDecorBox(0.32, 0.53, 5.88, 0.34, 0.10, 0.52, 0xe2e8f0, 0.8);  // Almohada norte (lado Oeste)
+                addDecorBox(0.32, 0.53, 6.52, 0.34, 0.10, 0.52, 0xe2e8f0, 0.8);  // Almohada sur (lado Oeste)
+                addDecorBox(1.48, 0.58, 5.96, 0.58, 0.16, 0.42, 0x1e293b, 0.4);  // Valija negra sobre la cama
+            });
+
             // 3. 2 Mesas de luz de madera nogal oscuro a ambos lados de la cama (sobre Muro Oeste X=0.00):
             // - Mesa de luz Norte (X=0.28, Z=5.15, pegada al Placard Inferior) con humidificador blanco y parlante inteligente
-            addDecorBox(0.28, 0.31, 5.15, 0.42, 0.62, 0.44, 0x4a3222, 0.5);
-            addDecorCyl(0.28, 0.72, 5.20, 0.07, 0.07, 0.18, 0xffffff, 0.2);  // Humidificador blanco
+            createCompoundAssembly('Mesa de Luz Norte', () => {
+                addDecorBox(0.28, 0.31, 5.15, 0.42, 0.62, 0.44, 0x4a3222, 0.5);
+                addDecorCyl(0.28, 0.72, 5.20, 0.07, 0.07, 0.18, 0xffffff, 0.2);  // Humidificador blanco
+            });
             // - Mesa de luz Sur (X=0.28, Z=7.25, en esquina Suroeste) con reloj digital blanco y peluches
-            addDecorBox(0.28, 0.31, 7.25, 0.42, 0.62, 0.42, 0x4a3222, 0.5);
+            createCompoundAssembly('Mesa de Luz Sur', () => {
+                addDecorBox(0.28, 0.31, 7.25, 0.42, 0.62, 0.42, 0x4a3222, 0.5);
+            });
             // 4. Panel calefactor eléctrico negro en muro Sur (X=2.48, Z=7.88) + Cesto de ropa sucia gris en muro Este (X=2.72, Z=6.80, foto #17)
             addDecorBox(2.48, 0.48, 7.88, 0.50, 0.50, 0.05, 0x0f172a, 0.2);  // Panel calefactor vidrio negro
             addDecorBox(2.72, 0.35, 6.80, 0.38, 0.70, 0.44, 0x475569, 0.8);  // Cesto ropa sucia gris con ropa arriba
@@ -3817,7 +3899,7 @@
                 topMesh.rotation.y = Math.PI / 8; // Orientado a ejes ortogonales
                 topMesh.castShadow = true;
                 topMesh.receiveShadow = true;
-                decorVideoGroup.add(topMesh);
+                (currentAssemblyGroup || decorVideoGroup).add(topMesh);
 
                 // 4 patas inclinadas de madera
                 const legH = tableH - 0.03;
@@ -3829,7 +3911,7 @@
                     const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.018, legH, 12), getStdMat(colorLegs, 0.4));
                     leg.position.set(lx, legH / 2, lz);
                     leg.castShadow = true;
-                    decorVideoGroup.add(leg);
+                    (currentAssemblyGroup || decorVideoGroup).add(leg);
                 }
                 return topMesh;
             }
@@ -3842,40 +3924,38 @@
             addCurtainAssembly(1.65, 0.00, 2.95, 0.00, 0, 0.12, 0x57534e);
 
             // 2. ESCRITORIO EN "L" (Madera lustrada cedro/caoba rojizo #8f3818):
-            // - Tramo Largo Principal (contra pared Este X = 3.00 m, lado de la puerta):
-            //   Mide 1.60 m de largo (de Y = 0.00 a 1.60 m, llegando justo al borde de la puerta abierta)
-            //   por 0.65 m de profundidad (de X = 2.35 a 3.00 m).
-            addDecorBox(2.675, 0.745, 0.80, 0.65, 0.035, 1.60, 0x8f3818, 0.38); // Tapa principal
-            addDecorBox(2.675, 0.36, 1.58, 0.63, 0.72, 0.035, 0x6b2810, 0.4);   // Pata lateral Sur (límite puerta)
+            createCompoundAssembly('Escritorio Gamer en "L" con Setup', () => {
+                // - Tramo Largo Principal (contra pared Este X = 3.00 m, lado de la puerta):
+                addDecorBox(2.675, 0.745, 0.80, 0.65, 0.035, 1.60, 0x8f3818, 0.38); // Tapa principal
+                addDecorBox(2.675, 0.36, 1.58, 0.63, 0.72, 0.035, 0x6b2810, 0.4);   // Pata lateral Sur (límite puerta)
 
-            // - Ala Corta (contra pared Norte Y = 0.00 m, bajo la ventana):
-            //   Sale hacia la izquierda desde X = 2.35 m hasta X = 1.75 m (0.60 m de extensión libre)
-            //   por 0.45 m de profundidad (de Y = 0.00 a 0.45 m).
-            addDecorBox(2.05, 0.745, 0.225, 0.60, 0.035, 0.45, 0x8f3818, 0.38); // Tapa ala corta en L
-            addDecorBox(1.77, 0.36, 0.225, 0.035, 0.72, 0.43, 0x6b2810, 0.4);   // Pata lateral izquierda
+                // - Ala Corta (contra pared Norte Y = 0.00 m, bajo la ventana):
+                addDecorBox(2.05, 0.745, 0.225, 0.60, 0.035, 0.45, 0x8f3818, 0.38); // Tapa ala corta en L
+                addDecorBox(1.77, 0.36, 0.225, 0.035, 0.72, 0.43, 0x6b2810, 0.4);   // Pata lateral izquierda
 
-            // - Gabinete PC Gamer abajo a la derecha (en Y = 1.45 m, ocupando X = 2.65..2.95, Y = 1.30..1.58):
-            addDecorBox(2.80, 0.24, 1.45, 0.24, 0.46, 0.42, 0x0f172a, 0.25); // Chasis Thermaltake negro
-            addDecorBox(2.675, 0.24, 1.45, 0.01, 0.42, 0.38, 0x38bdf8, 0.2); // Ventana vidrio con iluminación RGB
+                // - Gabinete PC Gamer abajo a la derecha (en Y = 1.45 m, ocupando X = 2.65..2.95, Y = 1.30..1.58):
+                addDecorBox(2.80, 0.24, 1.45, 0.24, 0.46, 0.42, 0x0f172a, 0.25); // Chasis Thermaltake negro
+                addDecorBox(2.675, 0.24, 1.45, 0.01, 0.42, 0.38, 0x38bdf8, 0.2); // Ventana vidrio con iluminación RGB
 
-            // - Equipamiento sobre escritorio:
-            // Monitor 27" centrado en Y = 0.80 m
-            addDecorBox(2.82, 1.05, 0.80, 0.05, 0.38, 0.62, 0x0f172a, 0.2);
-            addDecorBox(2.82, 1.25, 0.80, 0.04, 0.02, 0.45, 0x334155);       // Barra de luz LED superior
-            addDecorBox(2.80, 1.25, 0.80, 0.04, 0.03, 0.06, 0x111827);       // Webcam HD
-            // Deskmat negro, teclado y mouse
-            addDecorBox(2.62, 0.765, 0.80, 0.44, 0.008, 0.84, 0x111827, 0.7);
-            addDecorBox(2.62, 0.775, 0.76, 0.16, 0.018, 0.38, 0x1e293b, 0.3);
-            addDecorBox(2.62, 0.775, 0.98, 0.10, 0.025, 0.06, 0x0f172a, 0.3);
-            // Soporte notebook aluminio en Y = 0.35 m
-            addDecorBox(2.62, 0.88, 0.35, 0.26, 0.20, 0.32, 0x94a3b8, 0.3);
-            // Parlantes 2.1 y brazo articulado con micrófono
-            addDecorBox(2.80, 0.88, 0.44, 0.12, 0.20, 0.12, 0x111827, 0.3);
-            addDecorBox(2.80, 0.88, 1.16, 0.12, 0.20, 0.12, 0x111827, 0.3);
-            addDecorCyl(2.85, 0.95, 1.28, 0.02, 0.02, 0.35, 0x1e293b);
-            // Lámpara con lupa articulada y figura resina sobre ala corta
-            addDecorCyl(1.95, 0.98, 0.20, 0.08, 0.08, 0.02, 0x1e293b);
-            addDecorCyl(1.95, 0.83, 0.30, 0.04, 0.05, 0.12, 0x10b981);
+                // - Equipamiento sobre escritorio:
+                // Monitor 27" centrado en Y = 0.80 m
+                addDecorBox(2.82, 1.05, 0.80, 0.05, 0.38, 0.62, 0x0f172a, 0.2);
+                addDecorBox(2.82, 1.25, 0.80, 0.04, 0.02, 0.45, 0x334155);       // Barra de luz LED superior
+                addDecorBox(2.80, 1.25, 0.80, 0.04, 0.03, 0.06, 0x111827);       // Webcam HD
+                // Deskmat negro, teclado y mouse
+                addDecorBox(2.62, 0.765, 0.80, 0.44, 0.008, 0.84, 0x111827, 0.7);
+                addDecorBox(2.62, 0.775, 0.76, 0.16, 0.018, 0.38, 0x1e293b, 0.3);
+                addDecorBox(2.62, 0.775, 0.98, 0.10, 0.025, 0.06, 0x0f172a, 0.3);
+                // Soporte notebook aluminio en Y = 0.35 m
+                addDecorBox(2.62, 0.88, 0.35, 0.26, 0.20, 0.32, 0x94a3b8, 0.3);
+                // Parlantes 2.1 y brazo articulado con micrófono
+                addDecorBox(2.80, 0.88, 0.44, 0.12, 0.20, 0.12, 0x111827, 0.3);
+                addDecorBox(2.80, 0.88, 1.16, 0.12, 0.20, 0.12, 0x111827, 0.3);
+                addDecorCyl(2.85, 0.95, 1.28, 0.02, 0.02, 0.35, 0x1e293b);
+                // Lámpara con lupa articulada y figura resina sobre ala corta
+                addDecorCyl(1.95, 0.98, 0.20, 0.08, 0.08, 0.02, 0x1e293b);
+                addDecorCyl(1.95, 0.83, 0.30, 0.04, 0.05, 0.12, 0x10b981);
+            });
 
             // 3. 3 ESTANTES FLOTANTES (Muro Este X = 3.00 m):
             // Corren por encima del escritorio principal, de Y = 0.10 m a 1.55 m (profundidad 0.25 m):
@@ -3898,40 +3978,46 @@
             setMountWall(null);
 
             // 4. BIBLIOTECA ALTA (Muro Oeste X = 0.00 m):
-            // Mueble negro ubicado entre Y = 0.45 m e Y = 1.55 m (profundidad 0.30 m, altura 1.85 m):
-            setMountWall(0.00, 1.00, false);
-            addDecorBox(0.15, 0.925, 1.00, 0.30, 1.85, 1.10, 0x18181b, 0.6); // Mueble negro grafito
-            // Libros, peluches y figuras en estantes
-            addDecorBox(0.18, 0.45, 0.80, 0.22, 0.20, 0.50, 0x3b82f6, 0.5);
-            addDecorBox(0.18, 0.80, 1.10, 0.22, 0.22, 0.40, 0x10b981, 0.5);
-            addDecorBox(0.18, 1.15, 0.85, 0.20, 0.18, 0.30, 0xeab308, 0.5);
-            // Cajas Switch / Switch 2 arriba de la biblioteca
-            addDecorBox(0.15, 2.00, 0.80, 0.24, 0.26, 0.45, 0xdc2626, 0.4);
-            addDecorBox(0.15, 2.00, 1.25, 0.22, 0.24, 0.35, 0x1e293b, 0.4);
-            setMountWall(null);
+            createCompoundAssembly('Biblioteca Alta con Libros', () => {
+                setMountWall(0.00, 1.00, false);
+                addDecorBox(0.15, 0.925, 1.00, 0.30, 1.85, 1.10, 0x18181b, 0.6); // Mueble negro grafito
+                // Libros, peluches y figuras en estantes
+                addDecorBox(0.18, 0.45, 0.80, 0.22, 0.20, 0.50, 0x3b82f6, 0.5);
+                addDecorBox(0.18, 0.80, 1.10, 0.22, 0.22, 0.40, 0x10b981, 0.5);
+                addDecorBox(0.18, 1.15, 0.85, 0.20, 0.18, 0.30, 0xeab308, 0.5);
+                // Cajas Switch / Switch 2 arriba de la biblioteca
+                addDecorBox(0.15, 2.00, 0.80, 0.24, 0.26, 0.45, 0xdc2626, 0.4);
+                addDecorBox(0.15, 2.00, 1.25, 0.22, 0.24, 0.35, 0x1e293b, 0.4);
+                setMountWall(null);
+            });
 
             // 5. MESITAS OCTOGONALES:
             // - Mesita Ajedrez: en esquina superior izquierda [0.25, 0.25] (entre biblioteca y pared Norte):
-            addOctagonalTable(0.25, 0.25, 0.22, 0.72, 0xb47b48, 0x2b3036);
-            addDecorBox(0.25, 0.735, 0.25, 0.30, 0.015, 0.30, 0x1e293b, 0.3); // Tablero ajedrez clásico
-            addDecorCyl(0.20, 0.76, 0.20, 0.012, 0.012, 0.04, 0xf8fafc);      // Pieza blanca
-            addDecorCyl(0.30, 0.76, 0.30, 0.012, 0.012, 0.04, 0x0f172a);      // Pieza negra
+            createCompoundAssembly('Mesita de Ajedrez', () => {
+                addOctagonalTable(0.25, 0.25, 0.22, 0.72, 0xb47b48, 0x2b3036);
+                addDecorBox(0.25, 0.735, 0.25, 0.30, 0.015, 0.30, 0x1e293b, 0.3); // Tablero ajedrez clásico
+                addDecorCyl(0.20, 0.76, 0.20, 0.012, 0.012, 0.04, 0xf8fafc);      // Pieza blanca
+                addDecorCyl(0.30, 0.76, 0.30, 0.012, 0.012, 0.04, 0x0f172a);      // Pieza negra
+            });
 
             // - Mesita Miniaturas ("Minis"): en esquina inferior izquierda [0.25, 2.00] (al lado de biblioteca y pegada al placard):
-            addOctagonalTable(0.25, 2.00, 0.22, 0.72, 0xd4a373, 0x2b3036);
-            addDecorBox(0.25, 0.735, 2.00, 0.30, 0.015, 0.30, 0x475569, 0.3); // Base pintura / tablero LOTR
-            addDecorCyl(0.20, 0.76, 1.95, 0.015, 0.015, 0.035, 0x64748b);     // Miniatura gris
-            addDecorCyl(0.28, 0.76, 2.05, 0.015, 0.015, 0.04, 0xd97706);      // Miniatura dorada
-            addDecorCyl(0.22, 0.76, 2.05, 0.015, 0.015, 0.035, 0x16a34a);     // Miniatura verde
+            createCompoundAssembly('Mesita de Miniaturas', () => {
+                addOctagonalTable(0.25, 2.00, 0.22, 0.72, 0xd4a373, 0x2b3036);
+                addDecorBox(0.25, 0.735, 2.00, 0.30, 0.015, 0.30, 0x475569, 0.3); // Base pintura / tablero LOTR
+                addDecorCyl(0.20, 0.76, 1.95, 0.015, 0.015, 0.035, 0x64748b);     // Miniatura gris
+                addDecorCyl(0.28, 0.76, 2.05, 0.015, 0.015, 0.04, 0xd97706);      // Miniatura dorada
+                addDecorCyl(0.22, 0.76, 2.05, 0.015, 0.015, 0.035, 0x16a34a);     // Miniatura verde
+            });
 
             // 6. SILLA GAMER ERGONÓMICA:
-            // Centrada frente al tramo largo del escritorio en X = 1.95 m, Y = 0.85 m:
-            addDecorCyl(1.95, 0.22, 0.85, 0.26, 0.26, 0.42, 0x111827, 0.5);  // Base estrella 5 ruedas
-            addDecorBox(1.95, 0.45, 0.85, 0.48, 0.10, 0.48, 0x111827, 0.5);  // Asiento cuero negro
-            addDecorBox(1.73, 0.75, 0.85, 0.08, 0.65, 0.46, 0x111827, 0.5);  // Respaldo alto negro
-            addDecorBox(1.72, 0.75, 0.85, 0.09, 0.62, 0.48, 0xdc2626, 0.5);  // Vivos rojos gamer
-            addDecorBox(1.95, 0.62, 0.60, 0.24, 0.03, 0.08, 0x1e293b, 0.3);  // Apoyabrazos
-            addDecorBox(1.95, 0.62, 1.10, 0.24, 0.03, 0.08, 0x1e293b, 0.3);
+            createCompoundAssembly('Silla Gamer Ergonómica', () => {
+                addDecorCyl(1.95, 0.22, 0.85, 0.26, 0.26, 0.42, 0x111827, 0.5);  // Base estrella 5 ruedas
+                addDecorBox(1.95, 0.45, 0.85, 0.48, 0.10, 0.48, 0x111827, 0.5);  // Asiento cuero negro
+                addDecorBox(1.73, 0.75, 0.85, 0.08, 0.65, 0.46, 0x111827, 0.5);  // Respaldo alto negro
+                addDecorBox(1.72, 0.75, 0.85, 0.09, 0.62, 0.48, 0xdc2626, 0.5);  // Vivos rojos gamer
+                addDecorBox(1.95, 0.62, 0.60, 0.24, 0.03, 0.08, 0x1e293b, 0.3);  // Apoyabrazos
+                addDecorBox(1.95, 0.62, 1.10, 0.24, 0.03, 0.08, 0x1e293b, 0.3);
+            });
 
             // 7. OBJETOS EN BAULERA ABIERTA DEL ESTUDIO (sobre losa plana en Z = 2.20 m):
             // - Sector Izquierdo (X=0.25..0.75):
@@ -4291,7 +4377,8 @@
             wakeRenderer();
         }
 
-        function selectDecorObject(mesh, defaultTitle = 'Elemento Relevado') {
+        function selectDecorObject(obj, defaultTitle = 'Elemento Relevado') {
+            const mesh = getSelectionRoot(obj) || obj;
             // Si ya está seleccionado, toggle para deseleccionar
             if (selectedDecorMesh === mesh) {
                 clearSelection();
@@ -4364,7 +4451,9 @@
                 if (selectedDecorMesh.parent) {
                     selectedDecorMesh.parent.remove(selectedDecorMesh);
                 }
-                if (selectedDecorMesh.geometry) selectedDecorMesh.geometry.dispose();
+                selectedDecorMesh.traverse(child => {
+                    if (child.geometry) child.geometry.dispose();
+                });
                 clearSelection();
                 showToast(`🗑️ "${name}" eliminado`);
             }
