@@ -930,7 +930,7 @@
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0xffffff);
 
-        const perspCam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        const perspCam = new THREE.PerspectiveCamera(32, window.innerWidth / window.innerHeight, 0.1, 150);
         perspCam.position.set(3.50, 10.5, 9.20);
 
         function getOrthoViewSize() {
@@ -965,7 +965,7 @@
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', alpha: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         // Motor de color fotográfico y mapeo tonal cinematográfico (ArchViz PBR)
@@ -1630,7 +1630,7 @@
         floorGroup.add(palierMesh);
 
         const simsWalls = [];
-        const WALL_CUT_H = 0.22; // Altura de corte estilo Los Sims (zócalo de 22 cm)
+        const WALL_CUT_H = 1.35; // Altura de corte arquitectónico de maqueta (Foto Referencia: 1.35 m)
         const pendingWallMounts = [];
         let currentMountWallSpec = null;
 
@@ -2969,6 +2969,20 @@
             dioramaGround.receiveShadow = true;
             dioramaGround.name = 'dioramaGround';
             floorGroup.add(dioramaGround);
+
+            // Suelo exterior blanco puro de estudio que recibe sombras suaves de la maqueta (Foto Referencia)
+            const studioGroundGeo = new THREE.PlaneGeometry(60, 60);
+            const studioGroundMat = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                roughness: 0.95,
+                metalness: 0.0
+            });
+            const studioGround = new THREE.Mesh(studioGroundGeo, studioGroundMat);
+            studioGround.rotation.x = -Math.PI / 2;
+            studioGround.position.set(3.15, -0.05, 4.00);
+            studioGround.receiveShadow = true;
+            studioGround.name = 'studioGround';
+            floorGroup.add(studioGround);
 
             // 2. Vegetación / Arbustos Desérticos Distribuidos alrededor de la Maqueta (Foto Referencia)
             const dioramaFloraGroup = new THREE.Group();
@@ -4678,7 +4692,7 @@
         // ============================================================================
         // 8. CONTROLES DE VISIBILIDAD, NOMBRES Y PAREDES (3D NORMAL, SIMS Y 2D)
         // ============================================================================
-        let wallMode = 'up'; // 'up' (3D Normal con paredes completas) | 'sims' (Corte Dinámico) | 'down' (Paredes Bajas)
+        let wallMode = 'sims'; // 'up' (3D Normal con paredes completas) | 'sims' (Corte Dinámico) | 'down' (Paredes Bajas)
         let current3DPreset = 'isom';
 
         function applyWallHeight(w, h) {
@@ -4924,7 +4938,7 @@
         }
 
         const viewPresets = {
-            isom:   { pos: [3.15, 10.4, 9.60], target: [3.15, 0.3, 3.50] },
+            isom:   { pos: [3.15, 14.5, 13.80], target: [3.15, 0.40, 4.00] },
             living: { pos: [4.90, 3.4, 5.50], target: [4.65, 0.6, 2.00] },
             cocina: { pos: [4.10, 3.4, 4.10], target: [4.10, 0.6, 5.80] },
             cuarto: { pos: [2.40, 3.4, 4.60], target: [1.35, 0.5, 5.80] },
@@ -4935,8 +4949,10 @@
         function switchTo2D() {
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
+            const studioGround = floorGroup.getObjectByName('studioGround');
             if (dioramaGround) dioramaGround.visible = false;
             if (dioramaFlora) dioramaFlora.visible = false;
+            if (studioGround) studioGround.visible = false;
             activeCamera = orthoCam;
             controlsPersp.enabled = false;
             controlsOrtho.enabled = true;
@@ -4954,33 +4970,22 @@
             wakeRenderer();
         }
 
-        function get3DPreset(name) {
-            const v = viewPresets[name] || viewPresets.isom;
-            const aspect = window.innerWidth / window.innerHeight;
-            if (aspect < 1.0) {
-                // En móvil vertical, alejamos la cámara un 40% para que el depto entre entero sin recortarse
-                return {
-                    pos: [v.pos[0], v.pos[1] * 1.45, v.pos[2] * 1.35],
-                    target: v.target
-                };
-            }
-            return v;
-        }
-
         function switchTo3D(presetName = 'isom', mode = wallMode, moveCam = true) {
             ensure3DExtrasBuilt();
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
-            const isDioramaStyle = (currentGraphicStyle === 'archviz' || currentGraphicStyle === 'realist' || currentGraphicStyle === 'night');
+            const studioGround = floorGroup.getObjectByName('studioGround');
+            const isDioramaStyle = (currentGraphicStyle === 'realist' || currentGraphicStyle === 'night');
             if (dioramaGround) dioramaGround.visible = isDioramaStyle;
             if (dioramaFlora) dioramaFlora.visible = isDioramaStyle;
+            if (studioGround) studioGround.visible = (currentGraphicStyle === 'archviz' || currentGraphicStyle === 'zoning');
             current3DPreset = presetName;
             activeCamera = perspCam;
             controlsOrtho.enabled = false;
             controlsPersp.enabled = true;
             ambLight.intensity = 0.85;
             applyWallsVisibility(true, true);
-            setWallMode(mode || 'up');
+            setWallMode(mode || 'sims');
             if (moveCam) {
                 const v = get3DPreset(presetName);
                 perspCam.position.set(v.pos[0], v.pos[1], v.pos[2]);
@@ -5149,8 +5154,8 @@
         // 12. MOTOR DE ESTILOS GRÁFICOS INTERACTIVOS (SIMS, REALISTA, CLAY, BLUEPRINT, BOCETO, NOCHE)
         // ============================================================================
         let currentGraphicStyle = 'archviz'; // Por defecto ArchViz Diorama (idéntico a la foto de referencia)
-        if (localStorage.getItem('dep_graphic_style_v6')) {
-            currentGraphicStyle = localStorage.getItem('dep_graphic_style_v6');
+        if (localStorage.getItem('dep_graphic_style_v7')) {
+            currentGraphicStyle = localStorage.getItem('dep_graphic_style_v7');
         }
 
         const nightLightsGroup = new THREE.Group();
@@ -5317,10 +5322,11 @@
         function applyGraphicStyle(style) {
             ensureOriginalMaterialsCached();
             currentGraphicStyle = style;
-            localStorage.setItem('dep_graphic_style_v6', style);
+            localStorage.setItem('dep_graphic_style_v7', style);
 
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
+            const studioGround = floorGroup.getObjectByName('studioGround');
             
             // 1. Configuración de Iluminación y Cielo según Estilo
             if (style === 'archviz' || style === 'zoning') {
@@ -5343,6 +5349,8 @@
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = false;
                 if (dioramaFlora) dioramaFlora.visible = false;
+            
+            if (studioGround) studioGround.visible = false;
                 zoningGroup.visible = (style === 'zoning');
                 isZoningActive = (style === 'zoning');
                 const btnZ = document.getElementById('btn-toggle-zoning');
@@ -5366,6 +5374,8 @@
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = false;
                 if (dioramaFlora) dioramaFlora.visible = false;
+            
+            if (studioGround) studioGround.visible = false;
                 
             } else if (style === 'realist') {
                 scene.background = new THREE.Color(0xf1f5f9);
@@ -5383,6 +5393,7 @@
                 bedsideLampRight.intensity = 1.2;
                 kitchenLed.intensity = 1.2;
                 nightLightsGroup.visible = false;
+                if (studioGround) studioGround.visible = false;
                 if (dioramaGround) dioramaGround.visible = true;
                 if (dioramaFlora) dioramaFlora.visible = true;
                 
@@ -5400,8 +5411,11 @@
                 bedsideLampRight.intensity = 0;
                 kitchenLed.intensity = 0;
                 nightLightsGroup.visible = false;
+                if (studioGround) studioGround.visible = false;
                 if (dioramaGround) dioramaGround.visible = true;
                 if (dioramaFlora) dioramaFlora.visible = false;
+            
+            if (studioGround) studioGround.visible = false;
                 
             } else if (style === 'blueprint') {
                 scene.background = new THREE.Color(0x061122);
@@ -5419,6 +5433,8 @@
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = false;
                 if (dioramaFlora) dioramaFlora.visible = false;
+            
+            if (studioGround) studioGround.visible = false;
                 
             } else if (style === 'sketch') {
                 scene.background = new THREE.Color(0xfbf8f1);
@@ -5436,6 +5452,8 @@
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = false;
                 if (dioramaFlora) dioramaFlora.visible = false;
+            
+            if (studioGround) studioGround.visible = false;
                 
             } else if (style === 'night') {
                 scene.background = new THREE.Color(0x050814);
@@ -5451,6 +5469,7 @@
                 bedsideLampRight.intensity = 2.0;
                 kitchenLed.intensity = 1.8;
                 nightLightsGroup.visible = true;
+                if (studioGround) studioGround.visible = false;
                 if (dioramaGround) dioramaGround.visible = true;
                 if (dioramaFlora) dioramaFlora.visible = true;
                 
