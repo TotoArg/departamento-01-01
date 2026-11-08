@@ -632,7 +632,8 @@
             <button class="mode-btn" id="btn-mode-2d" title="Plano 2D Técnico Ortogonal"><span>📐</span> 2D</button>
             <button class="mode-btn" id="btn-mode-3d" title="3D Normal con muros completos como antes"><span>🧊</span> 3D</button>
             <button class="mode-btn" id="btn-mode-sims" title="Paredes estilo Los Sims (Corte Dinámico que baja las paredes al rotar)"><span>🏡</span> Sims</button>
-            <button class="mode-btn" id="btn-mode-cut" title="Paredes Bajas a media altura"><span>✂️</span> Bajas</button>
+            <button class="mode-btn" id="btn-mode-cut" title="Paredes Medias cortadas a 1.10m (Maqueta arquitectónica)"><span>✂️</span> Medias</button>
+            <button class="mode-btn" id="btn-mode-zocalo" title="Paredes a nivel zócalo bajo (0.25m) - Vista limpia de planta 3D"><span>📏</span> Zócalo</button>
             <button class="mode-btn" id="btn-mode-nowalls" title="Ocultar todas las paredes"><span>🚫</span> Sin Muros</button>
             <button class="mode-btn" id="btn-toggle-zoning" style="background:rgba(20,184,166,0.22); border:1px solid #14b8a6; color:#2dd4bf; font-weight:700;" title="Ver análisis axonométrico de zonificación funcional por colores (como en la infografía)">
                 <span>📊</span> Zonificación
@@ -3642,9 +3643,9 @@
             });
 
             // 3. Sector Sillón Futón 3 Cuerpos, Torres Traseras, Lámpara de Pie y Mesa Ratona (Muro Oeste X=3.00, centrado en Z=3.10 ALINEADO CON LA TV, fotos #0 a #7):
+            const futonW = 2.00, futonD = 0.88, futonH = 0.82;
+            const futonZ = 3.10;
             createCompoundAssembly('Sillón Futón 3 Cuerpos', () => {
-                const futonW = 2.00, futonD = 0.88, futonH = 0.82;
-                const futonZ = 3.10;
                 // Base y travesaños inferiores de pino
                 addDecorBox(3.44, 0.12, futonZ, futonD - 0.10, 0.20, futonW - 0.10, 0xd4a373, 0.6);
                 // 4 Patas robustas de madera de pino
@@ -4930,11 +4931,10 @@
                 const ratio = Math.max(0.01, h / fullH);
                 w.capGroup.position.y = (w.avgH || fullH) * ratio + 0.012;
             }
-            const showLinked = (h > 1.35);
+            // En The Sims el equipamiento y muebles de pared (como Smart TV, consolas, alacenas, cuadros y estantes)
+            // se mantienen SIEMPRE visibles para que los ambientes sigan completamente amoblados al cortar o bajar paredes
             for (let j = 0; j < w.linkedObjs.length; j++) {
-                if (w.linkedObjs[j].visible !== showLinked) {
-                    w.linkedObjs[j].visible = showLinked;
-                }
+                w.linkedObjs[j].visible = true;
             }
         }
 
@@ -4976,11 +4976,15 @@
                 const fullH = w.maxH || WALL_H;
                 if (is2D || wallMode === 'up') {
                     w.targetH = fullH;
-                } else if (wallMode === 'down') {
-                    w.targetH = WALL_CUT_H;
+                } else if (wallMode === 'zocalo') {
+                    w.targetH = 0.25;
+                } else if (wallMode === 'down' || wallMode === 'cut') {
+                    w.targetH = 1.10;
+                } else if (wallMode === 'nowalls') {
+                    w.targetH = 0.02;
                 } else {
-                    // Modo 'sims' (Corte Dinámico según cámara)
-                    w.targetH = shouldWallBeCutSims(w, cx, cz, tx, tz, vx, vz, distCam) ? WALL_CUT_H : fullH;
+                    // Modo 'sims' (Corte Dinámico The Sims)
+                    w.targetH = shouldWallBeCutSims(w, cx, cz, tx, tz, vx, vz, distCam) ? 1.10 : fullH;
                 }
 
                 if (instant) {
@@ -5016,12 +5020,16 @@
 
         function setWallMode(mode) {
             wallMode = mode;
-            document.getElementById('chk-wall-sims').checked = (mode === 'sims');
-            document.getElementById('chk-wall-cut').checked = (mode === 'down');
+            const chkSims = document.getElementById('chk-wall-sims');
+            if (chkSims) chkSims.checked = (mode === 'sims');
+            const chkCut = document.getElementById('chk-wall-cut');
+            if (chkCut) chkCut.checked = (mode === 'down' || mode === 'cut');
             if (activeCamera === perspCam) {
                 if (mode === 'sims') setActiveTopBtn('btn-mode-sims');
                 else if (mode === 'up') setActiveTopBtn('btn-mode-3d');
-                else if (mode === 'down') setActiveTopBtn('btn-mode-cut');
+                else if (mode === 'down' || mode === 'cut') setActiveTopBtn('btn-mode-cut');
+                else if (mode === 'zocalo') setActiveTopBtn('btn-mode-zocalo');
+                else if (mode === 'nowalls') setActiveTopBtn('btn-mode-nowalls');
             }
             wakeRenderer();
         }
@@ -5210,13 +5218,13 @@
             setWallMode(mode || 'sims');
             
             if (moveCam) {
-                const v = get3DPreset(presetName);
+                const v = viewPresets[presetName] || viewPresets.isom;
                 perspCam.position.set(v.pos[0], v.pos[1], v.pos[2]);
                 controlsPersp.target.set(v.target[0], v.target[1], v.target[2]);
                 controlsPersp.update();
             }
             
-            setActiveTopBtn(mode === 'sims' ? 'btn-mode-sims' : (mode === 'down' ? 'btn-mode-cut' : 'btn-mode-3d'));
+            setActiveTopBtn(mode === 'sims' ? 'btn-mode-sims' : (mode === 'down' || mode === 'cut' ? 'btn-mode-cut' : (mode === 'zocalo' ? 'btn-mode-zocalo' : (mode === 'nowalls' ? 'btn-mode-nowalls' : 'btn-mode-3d'))));
             document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === presetName));
             wakeRenderer();
         }
@@ -5237,6 +5245,13 @@
             applyWallsVisibility(true, true);
             switchTo3D(current3DPreset, 'down', true);
         });
+        const btnZocalo = document.getElementById('btn-mode-zocalo');
+        if (btnZocalo) {
+            btnZocalo.addEventListener('click', () => {
+                applyWallsVisibility(true, true);
+                switchTo3D(current3DPreset, 'zocalo', true);
+            });
+        }
         document.getElementById('btn-mode-nowalls').addEventListener('click', () => {
             if (activeCamera === orthoCam) {
                 switchTo3D(current3DPreset, 'up', true);
