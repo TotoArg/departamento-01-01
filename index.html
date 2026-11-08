@@ -4796,81 +4796,87 @@
                 (currentAssemblyGroup || decorVideoGroup).add(pcCase, pcWindow);
             });
 
-            // Setup de Monitores Gamer Dual (independiente)
-            createCompoundAssembly('Setup Monitores Dual Gamer (FFVII Rebirth)', () => {
-                const monitorBezelMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.10, metalness: 0.75 });
-                const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.30, metalness: 0.60 });
-
-                // Monitor 1 Principal
-                const monGroup = new THREE.Group();
-                monGroup.position.set(2.82, 1.05, 0.80);
-                const monBezel = new THREE.Mesh(UNIT_BOX_GEO, monitorBezelMat);
-                monBezel.scale.set(0.03, 0.38, 0.64);
-                monBezel.castShadow = true;
+            // Monitor Gamer Curvo 27" 1500R (único monitor en el escritorio)
+            createCompoundAssembly('Monitor Gamer Curvo 27"', () => {
+                const monitorBezelMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.15, metalness: 0.80 });
+                const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.25, metalness: 0.70 });
                 const monDisplayMat = new THREE.MeshStandardMaterial({
                     map: ff7ScreenTex,
                     emissive: 0xffffff,
                     emissiveMap: ff7ScreenTex,
-                    emissiveIntensity: 0.80,
+                    emissiveIntensity: 0.85,
                     roughness: 0.10,
-                    metalness: 0.10
+                    metalness: 0.05,
+                    side: THREE.DoubleSide
                 });
-                const monDisplay = new THREE.Mesh(UNIT_BOX_GEO, monDisplayMat);
-                monDisplay.scale.set(0.005, 0.36, 0.62);
-                monDisplay.position.set(-0.015, 0, 0);
-                const monStand = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
-                monStand.scale.set(0.16, 0.012, 0.24);
-                monStand.position.set(-0.06, -0.28, 0);
-                monStand.castShadow = true;
-                const monArm = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
-                monArm.scale.set(0.04, 0.28, 0.05);
-                monArm.position.set(-0.02, -0.15, 0);
-                monArm.castShadow = true;
-                monGroup.add(monBezel, monDisplay, monStand, monArm);
 
-                const monBackLed = new THREE.PointLight(0x00e5ff, 0.95, 2.6, 1.6);
-                monBackLed.position.set(0.06, 0, 0);
-                monGroup.add(monBackLed);
-                (currentAssemblyGroup || decorVideoGroup).add(monGroup);
+                const monGroup = new THREE.Group();
+                // Centrado en el escritorio frente a la silla gamer (X=2.80, Z=0.85, Y=1.05)
+                monGroup.position.set(2.80, 1.05, 0.85);
 
-                // Monitor 2 Secundario
-                const monGroup2 = new THREE.Group();
-                monGroup2.position.set(2.78, 1.05, 1.25);
-                monGroup2.rotation.y = -0.22;
-                const monBezel2 = new THREE.Mesh(UNIT_BOX_GEO, monitorBezelMat);
-                monBezel2.scale.set(0.03, 0.38, 0.58);
-                monBezel2.castShadow = true;
-                const monDisplayMat2 = new THREE.MeshStandardMaterial({
-                    map: proceduralScreenTex,
-                    emissive: 0x00d8f6,
-                    emissiveMap: proceduralScreenTex,
-                    emissiveIntensity: 0.55,
-                    roughness: 0.12,
-                    metalness: 0.10
-                });
-                const monDisplay2 = new THREE.Mesh(UNIT_BOX_GEO, monDisplayMat2);
-                monDisplay2.scale.set(0.005, 0.36, 0.56);
-                monDisplay2.position.set(-0.015, 0, 0);
-                const monStand2 = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
-                monStand2.scale.set(0.15, 0.012, 0.22);
-                monStand2.position.set(-0.05, -0.28, 0);
-                monStand2.castShadow = true;
-                const monArm2 = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
-                monArm2.scale.set(0.04, 0.28, 0.05);
-                monArm2.position.set(-0.02, -0.15, 0);
-                monArm2.castShadow = true;
-                monGroup2.add(monBezel2, monDisplay2, monStand2, monArm2);
+                const curveRadius = 1.40; // Radio 1400R/1500R curvo inmersivo
+                const monW = 0.61; // Ancho panel 27" (~61 cm)
+                const monH = 0.36; // Alto panel 27" (~36 cm)
+                const arcLen = monW / curveRadius;
 
-                const monBackLedRed = new THREE.PointLight(0xff1744, 0.75, 2.2, 1.5);
-                monBackLedRed.position.set(0.06, 0, 0);
-                monGroup2.add(monBackLedRed);
-                (currentAssemblyGroup || decorVideoGroup).add(monGroup2);
+                // Arco de pantalla cóncava mirando hacia el usuario (-X)
+                const screenArcGeo = new THREE.CylinderGeometry(curveRadius, curveRadius, monH, 32, 1, true, -arcLen / 2, arcLen);
+                const screenMesh = new THREE.Mesh(screenArcGeo, monDisplayMat);
+                screenMesh.position.set(curveRadius, 0, 0);
+                screenMesh.rotation.y = -Math.PI / 2;
+                monGroup.add(screenMesh);
 
-                // Barra LED superior (Lightbar)
+                // Carcasa trasera y marco delgado negro
+                const backArcGeo = new THREE.CylinderGeometry(curveRadius + 0.012, curveRadius + 0.012, monH + 0.015, 32, 1, true, -arcLen / 2, arcLen);
+                const backMesh = new THREE.Mesh(backArcGeo, monitorBezelMat);
+                backMesh.position.set(curveRadius, 0, 0);
+                backMesh.rotation.y = -Math.PI / 2;
+                backMesh.castShadow = true;
+                monGroup.add(backMesh);
+
+                // Base metálica gamer elegante en "V" sobre el escritorio
+                const baseGroup = new THREE.Group();
+                baseGroup.position.set(0, -monH / 2 - 0.12, 0);
+
+                // Brazo vertical articulado con ajuste de altura
+                const armMesh = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
+                armMesh.scale.set(0.045, monH + 0.08, 0.06);
+                armMesh.position.set(0.035, monH / 2, 0);
+                armMesh.castShadow = true;
+                baseGroup.add(armMesh);
+
+                // Patas en "V" de soporte metálico
+                const vLeg1 = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
+                vLeg1.scale.set(0.22, 0.012, 0.024);
+                vLeg1.position.set(-0.08, 0.006, -0.15);
+                vLeg1.rotation.y = 0.55;
+                vLeg1.castShadow = true;
+
+                const vLeg2 = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
+                vLeg2.scale.set(0.22, 0.012, 0.024);
+                vLeg2.position.set(-0.08, 0.006, 0.15);
+                vLeg2.rotation.y = -0.55;
+                vLeg2.castShadow = true;
+
+                const vCenter = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
+                vCenter.scale.set(0.08, 0.016, 0.08);
+                vCenter.position.set(0.02, 0.008, 0);
+                vCenter.castShadow = true;
+                baseGroup.add(vLeg1, vLeg2, vCenter);
+                monGroup.add(baseGroup);
+
+                // Barra de luz LED superior (Lightbar curvo/recto montado en el centro del monitor)
                 const lightBar = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
-                lightBar.scale.set(0.04, 0.02, 0.46);
-                lightBar.position.set(2.82, 1.25, 0.80);
-                (currentAssemblyGroup || decorVideoGroup).add(lightBar);
+                lightBar.scale.set(0.035, 0.018, 0.45);
+                lightBar.position.set(-0.01, monH / 2 + 0.02, 0);
+                monGroup.add(lightBar);
+
+                // Luz ambiental trasera de rebote LED suave (RGB / Cyan tenue contra la pared este)
+                const backLed = new THREE.PointLight(0x00e5ff, 0.90, 2.5, 1.8);
+                backLed.position.set(0.08, 0, 0);
+                monGroup.add(backLed);
+
+                (currentAssemblyGroup || decorVideoGroup).add(monGroup);
             });
 
             // Periféricos de Escritorio (Deskmat, Teclado, Mouse)
@@ -5822,6 +5828,7 @@
             const btnQuick = document.getElementById('btn-quick-undo');
             if (btnQuick) {
                 btnQuick.style.display = count > 0 ? 'inline-flex' : 'none';
+                btnQuick.innerText = count > 1 ? `↩️ Deshacer (${count})` : '↩️ Deshacer';
             }
             const btnEditor = document.getElementById('btn-editor-undo');
             if (btnEditor) {
@@ -6261,6 +6268,22 @@
                 controlsOrtho.enabled = true;
                 const curObj = getSelectedObject();
                 if (curObj) {
+                    if (dragStartPos) {
+                        const distMoved = Math.hypot(curObj.position.x - dragStartPos.x, curObj.position.z - dragStartPos.z);
+                        if (distMoved > 0.015) {
+                            const objName = selectedId ? (furnitureList.find(f => f.id === selectedId)?.name || 'Mueble') : (selectedDecorMesh?.userData?.name || selectedDecorMesh?.name || 'Objeto');
+                            undoHistoryStack.push({
+                                type: 'move',
+                                name: objName,
+                                target: selectedId ? { kind: 'furniture', id: selectedId } : { kind: 'decor', mesh: curObj, name: objName },
+                                from: { x: dragStartPos.x, y: dragStartPos.y, z: dragStartPos.z },
+                                to: { x: curObj.position.x, y: curObj.position.y, z: curObj.position.z }
+                            });
+                            updateUndoButtonUI();
+                            showToast(`📍 "${objName}" movido (↩️ Deshacer con botón o Ctrl+Z)`, false, 2400);
+                        }
+                    }
+
                     if (selectedId) {
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
                     } else if (selectedDecorMesh) {
@@ -6276,6 +6299,7 @@
                         }
                     }
                 }
+                dragStartPos = null;
                 wakeRenderer();
                 return;
             }
