@@ -1045,7 +1045,8 @@
         controlsPersp.enableDamping = true;
         controlsPersp.dampingFactor = 0.08;
         controlsPersp.maxPolarAngle = Math.PI / 2 - 0.02;
-        controlsPersp.enabled = false;
+        controlsPersp.enabled = true; // Activo por defecto para permitir navegación inmediata
+        window.controlsPersp = controlsPersp;
 
         // Controles para 2D Ortográfico (Zoom con rueda / pellizco táctil y Pan / desplazamiento)
         const controlsOrtho = new THREE.OrbitControls(orthoCam, renderer.domElement);
@@ -1057,6 +1058,11 @@
         controlsOrtho.minZoom = 0.4;
         controlsOrtho.maxZoom = 4.0;
         controlsOrtho.enabled = true; // Activo para zoom y arrastre desde el inicio
+        window.controlsOrtho = controlsOrtho;
+        window.renderer = renderer;
+        window.scene = scene;
+        window.perspCam = perspCam;
+        window.orthoCam = orthoCam;
 
         // Iluminación rápida sin mapas de sombras pesados
         // ============================================================================
@@ -6037,7 +6043,7 @@
         // ============================================================================
         // MODO SEPARADO: "EDITAR MUEBLES" (BLOQUEO CONTRA ERRORES ACCIDENTALES)
         // ============================================================================
-        let isFurnitureEditMode = false;
+        let isFurnitureEditMode = true;
 
         function setFurnitureEditMode(enable, silent = false) {
             isFurnitureEditMode = enable;
@@ -6660,7 +6666,6 @@
         };
 
         function switchTo2D() {
-            hideRender4K();
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
             const studioGround = floorGroup.getObjectByName('studioGround');
@@ -6685,7 +6690,6 @@
         }
 
         function switchTo3D(presetName = 'isom', mode = wallMode, moveCam = true) {
-            hideRender4K();
             ensure3DExtrasBuilt();
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
@@ -6972,34 +6976,14 @@
         // ============================================================================
         // 12. INICIALIZACIÓN CANÓNICA FOTORREALISTA PBR (DIORAMA DIGITAL TWIN)
         // ============================================================================
-        // Inicializar en 3D Maqueta Realista al cargar
+        // Inicializar en 3D Maqueta Realista al cargar con edición activa
         setTimeout(() => {
             switchTo3D('isom', 'sims', true);
+            setFurnitureEditMode(true, true);
             wakeRenderer();
         }, 120);
 
-        // Control del Modal de Render 4K Cutaway
-        const btnViewRender4K = document.getElementById('btn-view-render4k');
-        const modalRender4K = document.getElementById('render4k-modal');
-        const btnCloseRender4K = document.getElementById('btn-close-render4k');
 
-        if (btnViewRender4K && modalRender4K) {
-            btnViewRender4K.addEventListener('click', (e) => {
-                e.preventDefault();
-                modalRender4K.style.display = 'flex';
-            });
-        }
-        if (btnCloseRender4K && modalRender4K) {
-            btnCloseRender4K.addEventListener('click', (e) => {
-                e.preventDefault();
-                modalRender4K.style.display = 'none';
-            });
-        }
-        if (modalRender4K) {
-            modalRender4K.addEventListener('click', (e) => {
-                if (e.target === modalRender4K) modalRender4K.style.display = 'none';
-            });
-        }
 
 
 
