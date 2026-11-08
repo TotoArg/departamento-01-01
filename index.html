@@ -1308,17 +1308,53 @@
             return m;
         }
 
-        // Textura procedural para el piso cerámico esmaltado beige de 33×33 cm relevado del video
-        function createCeramicTexture(bgHex, lineHex, repeatX, repeatY) {
+        // Textura procedural PBR de alta fidelidad para el piso cerámico esmaltado beige 33.33×33.33 cm real
+        function createRealisticCeramic33Texture(repeatX, repeatY) {
             const canvas = document.createElement('canvas');
-            canvas.width = 64;
-            canvas.height = 64;
+            canvas.width = 1024;
+            canvas.height = 1024;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = bgHex;
-            ctx.fillRect(0, 0, 64, 64);
-            ctx.strokeStyle = lineHex;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(0, 0, 64, 64);
+
+            // Junta de pastina / cemento gris claro suave
+            ctx.fillStyle = '#d5ccc0';
+            ctx.fillRect(0, 0, 1024, 1024);
+
+            const numTiles = 3; // 3 baldosas de 33.33 cm entran exactamente en 1 metro
+            const tileSize = 1024 / numTiles; // ~341.33 px por baldosa
+            const grout = 5; // Ancho de la pastina
+
+            const tileVariations = ['#f5f0e6', '#f2ece0', '#f6f1e8', '#efe9dd', '#f4eee4', '#f1ebe0'];
+
+            for (let ty = 0; ty < numTiles; ty++) {
+                for (let tx = 0; tx < numTiles; tx++) {
+                    const x = tx * tileSize + grout;
+                    const y = ty * tileSize + grout;
+                    const w = tileSize - grout * 2;
+                    const h = tileSize - grout * 2;
+
+                    // Tonalidad sutilmente variable entre baldosas cerámicas
+                    const baseColor = tileVariations[(tx + ty * 3) % tileVariations.length];
+                    ctx.fillStyle = baseColor;
+                    ctx.fillRect(x, y, w, h);
+
+                    // Bisel / borde redondeado suave (cushion edge) del cerámico esmaltado
+                    const grad = ctx.createRadialGradient(x + w / 2, y + h / 2, w * 0.35, x + w / 2, y + h / 2, w * 0.52);
+                    grad.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
+                    grad.addColorStop(0.85, 'rgba(255, 255, 255, 0)');
+                    grad.addColorStop(1, 'rgba(120, 105, 90, 0.12)');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(x, y, w, h);
+
+                    // Micro-texturado de esmalte brillante
+                    for (let p = 0; p < 80; p++) {
+                        const px = x + Math.random() * w;
+                        const py = y + Math.random() * h;
+                        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.04)' : 'rgba(140, 120, 100, 0.03)';
+                        ctx.fillRect(px, py, 2, 2);
+                    }
+                }
+            }
+
             const tex = new THREE.CanvasTexture(canvas);
             tex.wrapS = THREE.RepeatWrapping;
             tex.wrapT = THREE.RepeatWrapping;
@@ -1326,18 +1362,54 @@
             return tex;
         }
 
+        // Bump map para que las juntas de las baldosas 33×33 cm tengan profundidad física real bajo el sol
+        function createCeramic33BumpTexture(repeatX, repeatY) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#101010'; // Juntas hundidas oscuras
+            ctx.fillRect(0, 0, 512, 512);
+
+            const numTiles = 3;
+            const tileSize = 512 / numTiles;
+            const grout = 3;
+            for (let ty = 0; ty < numTiles; ty++) {
+                for (let tx = 0; tx < numTiles; tx++) {
+                    ctx.fillStyle = '#ffffff'; // Superficie de la baldosa elevada
+                    ctx.fillRect(tx * tileSize + grout, ty * tileSize + grout, tileSize - grout * 2, tileSize - grout * 2);
+                }
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(repeatX, repeatY);
+            return tex;
+        }
+
+        function createCeramicTexture(bgHex, lineHex, repeatX, repeatY) {
+            return createRealisticCeramic33Texture(repeatX, repeatY);
+        }
+
         // Materiales arquitectónicos y del relevamiento en video
         const floorMatMain = new THREE.MeshStandardMaterial({
-            map: createCeramicTexture('#fcf9f4', '#e4dccf', 6.30 / 0.333, 5.70 / 0.333),
-            roughness: 0.65
+            map: createRealisticCeramic33Texture(6.30, 6.30),
+            bumpMap: createCeramic33BumpTexture(6.30, 6.30),
+            bumpScale: 0.003,
+            roughness: 0.26,
+            metalness: 0.04
         });
         const floorMatSouth = new THREE.MeshStandardMaterial({
-            map: createCeramicTexture('#fcf9f4', '#e4dccf', 5.20 / 0.333, 1.30 / 0.333),
-            roughness: 0.65
+            map: createRealisticCeramic33Texture(4.85, 1.70),
+            bumpMap: createCeramic33BumpTexture(4.85, 1.70),
+            bumpScale: 0.003,
+            roughness: 0.26,
+            metalness: 0.04
         });
         const bathFloorMat = new THREE.MeshStandardMaterial({
-            map: createCeramicTexture('#f8fafc', '#cbd5e1', 2.30 / 0.25, 1.20 / 0.25),
-            roughness: 0.5
+            map: proceduralTileTex,
+            roughness: 0.20,
+            metalness: 0.05
         });
         const palierMat = new THREE.MeshBasicMaterial({ color: 0xe9ecef });
         const extWallMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.55 });
@@ -1385,6 +1457,7 @@
         const floorMainMesh = new THREE.Mesh(floorMainGeo, floorMatMain);
         floorMainMesh.position.set(3.15, -0.03, 3.15);
         floorMainMesh.receiveShadow = true;
+        floorMainMesh.name = 'floorMainMesh';
         floorGroup.add(floorMainMesh);
 
         // Bloque inferior (Cuarto + Cocina ajustada a X = 4.85 m) [0.00, 6.30] a [4.85, 8.00]
@@ -1392,6 +1465,7 @@
         const floorSouthMesh = new THREE.Mesh(floorSouthGeo, floorMatSouth);
         floorSouthMesh.position.set(2.425, -0.03, 7.15);
         floorSouthMesh.receiveShadow = true;
+        floorSouthMesh.name = 'floorSouthMesh';
         floorGroup.add(floorSouthMesh);
 
         // Piso cerámico blanco del Baño [0.00, 2.80] a [2.30, 4.20]
@@ -1399,12 +1473,14 @@
         const bathFloorMesh = new THREE.Mesh(bathFloorGeo, bathFloorMat);
         bathFloorMesh.position.set(1.15, -0.029, 3.50);
         bathFloorMesh.receiveShadow = true;
+        bathFloorMesh.name = 'bathFloorMesh';
         floorGroup.add(bathFloorMesh);
 
         // Palier Edificio (Exterior sombreado en gris claro) [4.85, 6.30] a [6.30, 8.00]
         const palierGeo = new THREE.BoxGeometry(1.45, 0.05, 1.70);
         const palierMesh = new THREE.Mesh(palierGeo, palierMat);
         palierMesh.position.set(5.575, -0.03, 7.15);
+        palierMesh.name = 'palierMesh';
         floorGroup.add(palierMesh);
 
         const simsWalls = [];
@@ -2779,18 +2855,7 @@
             });
             floorGroup.add(dioramaFloraGroup);
 
-            // 3. Alfombra Tejida Gris Jaspeada en Living (Foto Referencia)
-            const livingRugGeo = new THREE.BoxGeometry(2.40, 0.015, 1.90);
-            const livingRugMat = new THREE.MeshStandardMaterial({
-                color: 0x5b6775,
-                map: proceduralRugTex,
-                roughness: 0.94
-            });
-            const livingRug = new THREE.Mesh(livingRugGeo, livingRugMat);
-            livingRug.position.set(4.65, 0.008, 2.15);
-            livingRug.receiveShadow = true;
-            livingRug.name = 'livingRug';
-            decorVideoGroup.add(livingRug);
+            // Living despejado sin alfombra (piso cerámico continuo visible)
 
             // 4. Paredes Acento Azul Marino detrás de Pantallas con tira LED Cian (Foto Referencia)
             // - Estudio:
@@ -4722,8 +4787,8 @@
         // 12. MOTOR DE ESTILOS GRÁFICOS INTERACTIVOS (SIMS, REALISTA, CLAY, BLUEPRINT, BOCETO, NOCHE)
         // ============================================================================
         let currentGraphicStyle = 'archviz'; // Por defecto ArchViz Diorama (idéntico a la foto de referencia)
-        if (localStorage.getItem('dep_graphic_style_v3')) {
-            currentGraphicStyle = localStorage.getItem('dep_graphic_style_v3');
+        if (localStorage.getItem('dep_graphic_style_v4')) {
+            currentGraphicStyle = localStorage.getItem('dep_graphic_style_v4');
         }
 
         const nightLightsGroup = new THREE.Group();
@@ -4744,15 +4809,24 @@
         // ============================================================================
         // MATERIALES PBR REALISTAS DE ALTA FIDELIDAD (ARCHVIZ DIORAMA)
         // ============================================================================
-        // 1. Maderas Nobles y Pisos
-        const archvizWoodFloorMat = new THREE.MeshStandardMaterial({
-            map: proceduralWoodTex,
-            roughness: 0.35,
+        // 1. Pisos Cerámicos Reales 33×33 cm y Baño (Esmaltados PBR)
+        const archvizCeramicMainFloorMat = new THREE.MeshStandardMaterial({
+            map: createRealisticCeramic33Texture(6.30, 6.30),
+            bumpMap: createCeramic33BumpTexture(6.30, 6.30),
+            bumpScale: 0.003,
+            roughness: 0.26,
             metalness: 0.04
         });
-        const archvizTileFloorMat = new THREE.MeshStandardMaterial({
+        const archvizCeramicSouthFloorMat = new THREE.MeshStandardMaterial({
+            map: createRealisticCeramic33Texture(4.85, 1.70),
+            bumpMap: createCeramic33BumpTexture(4.85, 1.70),
+            bumpScale: 0.003,
+            roughness: 0.26,
+            metalness: 0.04
+        });
+        const archvizBathTileFloorMat = new THREE.MeshStandardMaterial({
             map: proceduralTileTex,
-            roughness: 0.24,
+            roughness: 0.20,
             metalness: 0.05
         });
         const archvizWoodFurnitureMat = new THREE.MeshStandardMaterial({
@@ -4863,12 +4937,11 @@
         function applyGraphicStyle(style) {
             ensureOriginalMaterialsCached();
             currentGraphicStyle = style;
-            localStorage.setItem('dep_graphic_style_v3', style);
+            localStorage.setItem('dep_graphic_style_v4', style);
 
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
-            const livingRug = decorVideoGroup.getObjectByName('livingRug');
-
+            
             // 1. Configuración de Iluminación y Cielo según Estilo
             if (style === 'archviz') {
                 scene.background = new THREE.Color(0xd7bf9e); // Color cálido diorama de la foto de referencia
@@ -4890,7 +4963,7 @@
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = true;
                 if (dioramaFlora) dioramaFlora.visible = true;
-                if (livingRug) livingRug.visible = true;
+                
             } else if (style === 'sims') {
                 scene.background = new THREE.Color(0xffffff);
                 hemiLight.intensity = 0.35;
@@ -4908,7 +4981,7 @@
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = false;
                 if (dioramaFlora) dioramaFlora.visible = false;
-                if (livingRug) livingRug.visible = true;
+                
             } else if (style === 'realist') {
                 scene.background = new THREE.Color(0xf1f5f9);
                 hemiLight.intensity = 0.55;
@@ -4927,7 +5000,7 @@
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = true;
                 if (dioramaFlora) dioramaFlora.visible = true;
-                if (livingRug) livingRug.visible = true;
+                
             } else if (style === 'clay') {
                 scene.background = new THREE.Color(0xdbe4ee);
                 hemiLight.intensity = 0.40;
@@ -4944,7 +5017,7 @@
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = true;
                 if (dioramaFlora) dioramaFlora.visible = false;
-                if (livingRug) livingRug.visible = false;
+                
             } else if (style === 'blueprint') {
                 scene.background = new THREE.Color(0x061122);
                 hemiLight.intensity = 0.20;
@@ -4961,7 +5034,7 @@
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = false;
                 if (dioramaFlora) dioramaFlora.visible = false;
-                if (livingRug) livingRug.visible = false;
+                
             } else if (style === 'sketch') {
                 scene.background = new THREE.Color(0xfbf8f1);
                 hemiLight.intensity = 0.30;
@@ -4978,7 +5051,7 @@
                 nightLightsGroup.visible = false;
                 if (dioramaGround) dioramaGround.visible = false;
                 if (dioramaFlora) dioramaFlora.visible = false;
-                if (livingRug) livingRug.visible = true;
+                
             } else if (style === 'night') {
                 scene.background = new THREE.Color(0x050814);
                 hemiLight.intensity = 0.15;
@@ -4995,14 +5068,14 @@
                 nightLightsGroup.visible = true;
                 if (dioramaGround) dioramaGround.visible = true;
                 if (dioramaFlora) dioramaFlora.visible = true;
-                if (livingRug) livingRug.visible = true;
+                
             }
 
             // 2. Modificación de Materiales en Mallas según Estilo (PBR Universal)
             apartmentGroup.traverse(child => {
                 if (!child.isMesh || !child.userData.origMat) return;
                 if (child.parent === lines2DGroup || child.userData.is2DLine) return;
-                if (child.name === "dioramaGround" || child.name === "livingRug" || child.name === "accentStudyWall" || child.name === "accentLivingWall") return;
+                if (child.name === "dioramaGround"  || child.name === "accentStudyWall" || child.name === "accentLivingWall") return;
                 if (child.parent === dioramaFlora) return;
 
                 const nameLower = (child.userData.name || '').toLowerCase();
@@ -5036,7 +5109,13 @@
                     } else if (isIntWall) {
                         child.material = archvizIntWallMat;
                     } else if (isFloor) {
-                        child.material = isTileFloor ? archvizTileFloorMat : archvizWoodFloorMat;
+                        if (child.name === 'bathFloorMesh' || isBathFloor) {
+                            child.material = archvizBathTileFloorMat;
+                        } else if (child.name === 'floorSouthMesh' || child.position.z > 5.0) {
+                            child.material = archvizCeramicSouthFloorMat;
+                        } else {
+                            child.material = archvizCeramicMainFloorMat;
+                        }
                     } else if (isSofa) {
                         child.material = archvizSofaMat;
                     } else if (isCushion) {
@@ -5197,7 +5276,7 @@
                         <span class="style-badge badge-rec">Tu Referencia</span>
                     </div>
                     <div class="style-desc">
-                        Piso de roble miel, paredes de ladrillo visto, tira LED cian gamer, albardillas oscuras, alfombra nórdica y sombras solares volumétricas.
+                        Piso cerámico esmaltado beige 33×33 cm real, sin alfombra en living, paredes de ladrillo visto, tira LED cian y sombras solares suaves.
                     </div>
                 </div>
                 <!-- 1. Sims Color Vivo -->
