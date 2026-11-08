@@ -638,6 +638,7 @@
                 <span id="btn-styles-icon">🎨</span> <span id="btn-styles-text">Estilos</span>
             </button>
             <select id="select-quick-style" class="mode-btn" style="background:#0f172a; border:1px solid #38bdf8; color:#38bdf8; padding:5px 8px; border-radius:8px; font-weight:700; cursor:pointer;" title="Cambiar estilo gráfico al instante">
+                <option value="archviz" selected>🏠 ArchViz Diorama (Foto Referencia)</option>
                 <option value="sims">🎨 Sims (Color Real)</option>
                 <option value="realist">✨ Realista Cálido</option>
                 <option value="clay">🏛️ Maqueta Blanca</option>
@@ -961,7 +962,8 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-        renderer.shadowMap.enabled = false;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(renderer.domElement);
 
         const controlsPersp = new THREE.OrbitControls(perspCam, renderer.domElement);
@@ -983,14 +985,135 @@
         controlsOrtho.enabled = true; // Activo para zoom y arrastre desde el inicio
 
         // Iluminación rápida sin mapas de sombras pesados
-        const ambLight = new THREE.AmbientLight(0xffffff, 0.96);
+        // ============================================================================
+        // GENERADORES DE TEXTURAS PROCEDURALES CANVAS (PBR RENDER ARCHVIZ)
+        // ============================================================================
+        function createProceduralWoodTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#c79b63';
+            ctx.fillRect(0, 0, 512, 512);
+
+            const rowH = 64;
+            const colors = ['#c89d67', '#bf935d', '#d0a46e', '#b88c56', '#ca9f69', '#c49760', '#be915a', '#cca06b'];
+            for (let y = 0; y < 512; y += rowH) {
+                ctx.fillStyle = colors[Math.floor(y / rowH) % colors.length];
+                ctx.fillRect(0, y, 512, rowH - 2);
+                ctx.fillStyle = 'rgba(70, 45, 20, 0.40)';
+                ctx.fillRect(0, y + rowH - 2, 512, 2);
+
+                const offset = ((y / rowH) * 173) % 256;
+                for (let x = offset; x < 512; x += 192) {
+                    ctx.fillStyle = 'rgba(70, 45, 20, 0.35)';
+                    ctx.fillRect(x, y, 2, rowH - 2);
+                }
+            }
+            for (let i = 0; i < 2800; i++) {
+                const gx = Math.random() * 512;
+                const gy = Math.random() * 512;
+                const gw = 12 + Math.random() * 45;
+                ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.05)' : 'rgba(50, 30, 10, 0.05)';
+                ctx.fillRect(gx, gy, gw, 1);
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(4, 4);
+            return tex;
+        }
+
+        function createProceduralBrickTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#dfd8ce'; // Junta de mortero claro
+            ctx.fillRect(0, 0, 512, 512);
+
+            const rowH = 32;
+            const brickW = 76;
+            const mortar = 4;
+            const brickColors = ['#b86d49', '#c27650', '#a9603d', '#cb7f58', '#b36744', '#ba6f4b', '#9e5533', '#c67b53'];
+            let rowIndex = 0;
+            for (let y = 0; y < 512; y += rowH) {
+                const isOffset = (rowIndex % 2 === 1);
+                const startX = isOffset ? -brickW / 2 : 0;
+                for (let x = startX; x < 512 + brickW; x += brickW + mortar) {
+                    ctx.fillStyle = brickColors[Math.floor(Math.random() * brickColors.length)];
+                    ctx.fillRect(x + mortar, y + mortar, brickW, rowH - mortar);
+                }
+                rowIndex++;
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(3, 2);
+            return tex;
+        }
+
+        function createProceduralRugTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#5b6775';
+            ctx.fillRect(0, 0, 256, 256);
+            for (let i = 0; i < 4000; i++) {
+                const x = Math.random() * 256;
+                const y = Math.random() * 256;
+                ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.12)';
+                ctx.fillRect(x, y, 2, 2);
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(2, 2);
+            return tex;
+        }
+
+        const proceduralWoodTex = createProceduralWoodTexture();
+        const proceduralBrickTex = createProceduralBrickTexture();
+        const proceduralRugTex = createProceduralRugTexture();
+
+        // ============================================================================
+        // ILUMINACIÓN REALISTA FOTOGRÁFICA (SOL RASANTE + SOMBRAS VOLUMÉTRICAS)
+        // ============================================================================
+        const ambLight = new THREE.AmbientLight(0xe0e7ff, 0.55); // Luz de cielo celeste suave
         scene.add(ambLight);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.38);
-        dirLight.position.set(6, 15, 8);
+
+        // Sol dorado cálido rasante con mapa de sombras suaves (idéntico a la foto de referencia)
+        const dirLight = new THREE.DirectionalLight(0xfff3db, 0.95);
+        dirLight.position.set(-6.5, 17.0, -4.5);
+        dirLight.target.position.set(3.15, 0.80, 4.00);
+        scene.add(dirLight.target);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.near = 0.5;
+        dirLight.shadow.camera.far = 42;
+        dirLight.shadow.camera.left = -9.5;
+        dirLight.shadow.camera.right = 9.5;
+        dirLight.shadow.camera.top = 9.5;
+        dirLight.shadow.camera.bottom = -9.5;
+        dirLight.shadow.bias = -0.0005;
+        dirLight.shadow.normalBias = 0.025;
+        dirLight.shadow.radius = 2.5;
         scene.add(dirLight);
-        const fillLight = new THREE.DirectionalLight(0xffffff, 0.18);
-        fillLight.position.set(-5, 10, -4);
+
+        const fillLight = new THREE.DirectionalLight(0xffedd5, 0.26);
+        fillLight.position.set(7, 12, 9);
         scene.add(fillLight);
+
+        // Luces LED Cian de Acento (Detrás de monitores de Estudio y Smart TV en Living como en la referencia)
+        const cyanLedStudy = new THREE.PointLight(0x00f0ff, 2.0, 3.4, 1.8);
+        cyanLedStudy.position.set(2.45, 1.25, 1.15);
+        scene.add(cyanLedStudy);
+
+        const cyanLedLiving = new THREE.PointLight(0x00f0ff, 1.6, 3.2, 1.8);
+        cyanLedLiving.position.set(6.15, 1.45, 3.10);
+        scene.add(cyanLedLiving);
 
         // Pool global de geometrías y materiales para compilación instantánea en WebGL
         const UNIT_BOX_GEO = new THREE.BoxGeometry(1, 1, 1);
@@ -1048,7 +1171,7 @@
         const palierMat = new THREE.MeshBasicMaterial({ color: 0xe9ecef });
         const extWallMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.55 });
         const intWallMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.55 });
-        const topCapMat = new THREE.MeshBasicMaterial({ color: 0x262d34 }); // Trazo arquitectónico oscuro
+        const topCapMat = new THREE.MeshStandardMaterial({ color: 0x252d35, roughness: 0.60, metalness: 0.05 }); // Trazo arquitectónico oscuro
         const winFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e242b, roughness: 0.35, metalness: 0.4 });
         const winGlassMat = new THREE.MeshBasicMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.42 });
         const woodRoofMat = new THREE.MeshStandardMaterial({ color: 0xb87a3d, roughness: 0.65, side: THREE.DoubleSide });
@@ -1201,11 +1324,14 @@
             const bodyMesh = new THREE.Mesh(UNIT_BOX_GEO, isExterior ? extWallMat : intWallMat);
             bodyMesh.scale.set(len, wallH, thickness);
             bodyMesh.position.set(0, wallH / 2, 0);
+            bodyMesh.userData.isExtWall = isExterior;
+            bodyMesh.userData.isIntWall = !isExterior;
             holder.add(bodyMesh);
 
             const capMesh = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
             capMesh.scale.set(len + 0.01, 0.02, thickness + 0.01);
             capMesh.position.set(0, wallH + 0.01, 0);
+            capMesh.userData.isCap = true;
             holder.add(capMesh);
 
             group.add(holder);
@@ -1264,6 +1390,8 @@
             const bodyMesh = new THREE.Mesh(geo, mat);
             bodyMesh.castShadow = true;
             bodyMesh.receiveShadow = true;
+            bodyMesh.userData.isExtWall = isExterior;
+            bodyMesh.userData.isIntWall = !isExterior;
             holder.add(bodyMesh);
 
             const capLen = Math.hypot(len, h2 - h1);
@@ -1272,6 +1400,7 @@
             capMesh.scale.set(capLen + 0.01, 0.02, thickness + 0.01);
             capMesh.position.set(0, (h1 + h2) / 2 + 0.01, 0);
             capMesh.rotation.z = capAngle;
+            capMesh.userData.isCap = true;
             holder.add(capMesh);
 
             group.add(holder);
@@ -2432,6 +2561,54 @@
         function ensure3DExtrasBuilt() {
             if (extras3DBuilt) return;
             extras3DBuilt = true;
+
+            // Suelo exterior diorama arena/tierra calida (como en la imagen de referencia)
+            const dioramaGroundGeo = new THREE.PlaneGeometry(36, 36);
+            const dioramaGroundMat = new THREE.MeshStandardMaterial({
+                color: 0xd4b896,
+                roughness: 0.95
+            });
+            const dioramaGround = new THREE.Mesh(dioramaGroundGeo, dioramaGroundMat);
+            dioramaGround.rotation.x = -Math.PI / 2;
+            dioramaGround.position.set(3.15, -0.05, 4.00);
+            dioramaGround.receiveShadow = true;
+            dioramaGround.name = 'dioramaGround';
+            floorGroup.add(dioramaGround);
+
+            // Alfombra tejida gris calida nordica bajo el sillon y mesa ratona del Living (foto referencia)
+            const livingRugGeo = new THREE.BoxGeometry(2.35, 0.012, 1.85);
+            const livingRugMat = new THREE.MeshStandardMaterial({
+                color: 0x5b6775,
+                map: proceduralRugTex,
+                roughness: 0.92
+            });
+            const livingRug = new THREE.Mesh(livingRugGeo, livingRugMat);
+            livingRug.position.set(4.65, 0.006, 2.15);
+            livingRug.receiveShadow = true;
+            livingRug.name = 'livingRug';
+            decorVideoGroup.add(livingRug);
+
+            // Paredes Acento Azul Marino detras de Pantallas con tira LED Cian (como en la referencia)
+            // 1. Pared acento detras del escritorio gamer en Estudio:
+            const accentStudyWall = new THREE.Mesh(new THREE.BoxGeometry(0.02, 1.60, 2.40), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 }));
+            accentStudyWall.position.set(2.98, 1.30, 1.20);
+            accentStudyWall.receiveShadow = true;
+            decorVideoGroup.add(accentStudyWall);
+
+            // 2. Pared acento detras de la Smart TV en Living:
+            const accentLivingWall = new THREE.Mesh(new THREE.BoxGeometry(0.02, 1.60, 1.80), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 }));
+            accentLivingWall.position.set(6.28, 1.30, 3.10);
+            accentLivingWall.receiveShadow = true;
+            decorVideoGroup.add(accentLivingWall);
+
+            // Activar sombras en todas las mallas del departamento
+            apartmentGroup.traverse(child => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+
             buildWoodenRoof();
             // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 3.85, ancho 0.85 m)
             // Remata a 3.30 m bajo las vigas de madera para evitar perforaciones en la cubierta
@@ -2445,11 +2622,11 @@
             attachWallMount(cocinaLintel, 4.35, 4.80, true);
             // Instanciar puertas 3D interactivas con dintel a 3.56 m bajo la viga cumbrera:
             addMainEntranceDoor3D(5.34, 6.30, 6.18, 6.30);
-            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 90, "Puerta Estudio", 3.56);
-            addInteriorWoodDoor3D(2.30, 3.15, 2.30, 3.85, false, 1, 75, "Puerta Baño", 3.56);
-            addInteriorWoodDoor3D(2.30, 4.70, 3.00, 4.70, false, 1, 75, "Puerta Cuarto", 3.56);
-            addSlidingPlacardFront3D(0.00, 2.30, 2.30, -1, "Placard Estudio");
-            addSlidingPlacardFront3D(0.00, 2.30, 4.70, 1, "Placard Cuarto");
+            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 90, 'Puerta Estudio', 3.56);
+            addInteriorWoodDoor3D(2.30, 3.15, 2.30, 3.85, false, 1, 75, 'Puerta Bano', 3.56);
+            addInteriorWoodDoor3D(2.30, 4.70, 3.00, 4.70, false, 1, 75, 'Puerta Cuarto', 3.56);
+            addSlidingPlacardFront3D(0.00, 2.30, 2.30, -1, 'Placard Estudio');
+            addSlidingPlacardFront3D(0.00, 2.30, 4.70, 1, 'Placard Cuarto');
             resolveWallMounts();
             updateRoofCapsVisibility();
         }
@@ -4310,12 +4487,14 @@
         // ============================================================================
         // 12. MOTOR DE ESTILOS GRÁFICOS INTERACTIVOS (SIMS, REALISTA, CLAY, BLUEPRINT, BOCETO, NOCHE)
         // ============================================================================
-        let currentGraphicStyle = localStorage.getItem('dep_graphic_style') || 'sims';
+        let currentGraphicStyle = 'archviz'; // Por defecto ArchViz Diorama (idéntico a la foto de referencia)
+        if (localStorage.getItem('dep_graphic_style_v2')) {
+            currentGraphicStyle = localStorage.getItem('dep_graphic_style_v2');
+        }
         const nightLightsGroup = new THREE.Group();
         nightLightsGroup.name = "nightLights";
         scene.add(nightLightsGroup);
 
-        // Luces interiores para el modo noche:
         const nightLightLiving = new THREE.PointLight(0xf59e0b, 1.8, 6.5, 1.4);
         nightLightLiving.position.set(4.50, 2.40, 2.80);
         const nightLightKitchen = new THREE.PointLight(0xfbbf24, 1.4, 4.5, 1.5);
@@ -4327,7 +4506,27 @@
         nightLightsGroup.add(nightLightLiving, nightLightKitchen, nightLightBed, nightLightDesk);
         nightLightsGroup.visible = false;
 
-        // Caché de materiales especiales por estilo
+        // Materiales específicos para el estilo ArchViz Diorama (idéntico a la foto enviada)
+        const archvizWoodFloorMat = new THREE.MeshStandardMaterial({
+            map: proceduralWoodTex,
+            roughness: 0.38,
+            metalness: 0.05
+        });
+        const archvizBrickWallMat = new THREE.MeshStandardMaterial({
+            map: proceduralBrickTex,
+            roughness: 0.75,
+            metalness: 0.02
+        });
+        const archvizIntWallMat = new THREE.MeshStandardMaterial({
+            color: 0xf5f0ea,
+            roughness: 0.85
+        });
+        const archvizSofaMat = new THREE.MeshStandardMaterial({
+            color: 0x555e6c, // Gris cálido moderno / heather charcoal (foto referencia)
+            roughness: 0.82
+        });
+
+        // Materiales para otros estilos
         const clayWallMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.88, metalness: 0.05 });
         const clayFloorMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.85, metalness: 0.05 });
         const clayFurnMat = new THREE.MeshStandardMaterial({ color: 0xedebe8, roughness: 0.72, metalness: 0.08 });
@@ -4340,6 +4539,7 @@
         const sketchFloorMat = new THREE.MeshStandardMaterial({ color: 0xf1ebe1, roughness: 0.95 });
 
         const STYLE_METADATA = {
+            archviz: { icon: '🏠', name: 'ArchViz' },
             sims: { icon: '🎨', name: 'Sims' },
             realist: { icon: '✨', name: 'Realista' },
             clay: { icon: '🏛️', name: 'Maqueta' },
@@ -4359,26 +4559,53 @@
         function applyGraphicStyle(style) {
             ensureOriginalMaterialsCached();
             currentGraphicStyle = style;
-            localStorage.setItem('dep_graphic_style', style);
+            localStorage.setItem('dep_graphic_style_v2', style);
 
-            // 1. Configuración de Escena y Fondo
-            if (style === 'sims') {
+            const dioramaGround = floorGroup.getObjectByName('dioramaGround');
+            const livingRug = decorVideoGroup.getObjectByName('livingRug');
+
+            // 1. Iluminación y Ambiente
+            if (style === 'archviz') {
+                scene.background = new THREE.Color(0xd6be9e); // Entorno cálido diorama maqueta
+                ambLight.color.setHex(0xe0f2fe);
+                ambLight.intensity = 0.55;
+                dirLight.color.setHex(0xfff3db);
+                dirLight.intensity = 0.92;
+                dirLight.position.set(-8.5, 16.0, -7.0);
+                fillLight.color.setHex(0xffedd5);
+                fillLight.intensity = 0.28;
+                cyanLedStudy.intensity = 2.2;
+                cyanLedLiving.intensity = 1.8;
+                nightLightsGroup.visible = false;
+                if (dioramaGround) dioramaGround.visible = true;
+                if (livingRug) livingRug.visible = true;
+            } else if (style === 'sims') {
                 scene.background = new THREE.Color(0xffffff);
                 ambLight.color.setHex(0xffffff);
                 ambLight.intensity = 0.96;
                 dirLight.color.setHex(0xffffff);
                 dirLight.intensity = 0.38;
+                dirLight.position.set(6, 15, 8);
                 fillLight.intensity = 0.18;
+                cyanLedStudy.intensity = 0;
+                cyanLedLiving.intensity = 0;
                 nightLightsGroup.visible = false;
+                if (dioramaGround) dioramaGround.visible = false;
+                if (livingRug) livingRug.visible = true;
             } else if (style === 'realist') {
                 scene.background = new THREE.Color(0xf1f5f9);
                 ambLight.color.setHex(0xe0f2fe);
                 ambLight.intensity = 0.58;
                 dirLight.color.setHex(0xfef3c7);
                 dirLight.intensity = 0.92;
+                dirLight.position.set(-8.5, 16.0, -7.0);
                 fillLight.color.setHex(0xffedd5);
                 fillLight.intensity = 0.28;
+                cyanLedStudy.intensity = 1.6;
+                cyanLedLiving.intensity = 1.4;
                 nightLightsGroup.visible = false;
+                if (dioramaGround) dioramaGround.visible = true;
+                if (livingRug) livingRug.visible = true;
             } else if (style === 'clay') {
                 scene.background = new THREE.Color(0xdbe4ee);
                 ambLight.color.setHex(0xffffff);
@@ -4386,7 +4613,11 @@
                 dirLight.color.setHex(0xffffff);
                 dirLight.intensity = 0.88;
                 fillLight.intensity = 0.14;
+                cyanLedStudy.intensity = 0;
+                cyanLedLiving.intensity = 0;
                 nightLightsGroup.visible = false;
+                if (dioramaGround) dioramaGround.visible = true;
+                if (livingRug) livingRug.visible = false;
             } else if (style === 'blueprint') {
                 scene.background = new THREE.Color(0x061122);
                 ambLight.color.setHex(0x1e3a5f);
@@ -4394,7 +4625,11 @@
                 dirLight.color.setHex(0x38bdf8);
                 dirLight.intensity = 0.65;
                 fillLight.intensity = 0.25;
+                cyanLedStudy.intensity = 2.4;
+                cyanLedLiving.intensity = 2.0;
                 nightLightsGroup.visible = false;
+                if (dioramaGround) dioramaGround.visible = false;
+                if (livingRug) livingRug.visible = false;
             } else if (style === 'sketch') {
                 scene.background = new THREE.Color(0xfbf8f1);
                 ambLight.color.setHex(0xffffff);
@@ -4402,7 +4637,11 @@
                 dirLight.color.setHex(0x475569);
                 dirLight.intensity = 0.30;
                 fillLight.intensity = 0.15;
+                cyanLedStudy.intensity = 0;
+                cyanLedLiving.intensity = 0;
                 nightLightsGroup.visible = false;
+                if (dioramaGround) dioramaGround.visible = false;
+                if (livingRug) livingRug.visible = true;
             } else if (style === 'night') {
                 scene.background = new THREE.Color(0x050814);
                 ambLight.color.setHex(0x1e293b);
@@ -4410,30 +4649,46 @@
                 dirLight.color.setHex(0x1d4ed8);
                 dirLight.intensity = 0.22;
                 fillLight.intensity = 0.08;
+                cyanLedStudy.intensity = 2.5;
+                cyanLedLiving.intensity = 2.2;
                 nightLightsGroup.visible = true;
+                if (dioramaGround) dioramaGround.visible = true;
+                if (livingRug) livingRug.visible = true;
             }
 
-            // 2. Modificación de Materiales en Mallas (sin alterar líneas 2D)
+            // 2. Modificación de Materiales en Mallas
             apartmentGroup.traverse(child => {
                 if (!child.isMesh || !child.userData.origMat) return;
                 if (child.parent === lines2DGroup || child.userData.is2DLine) return;
+                if (child.name === "dioramaGround" || child.name === "livingRug") return;
 
-                const isWall = (child.parent === exteriorWallsGroup || child.parent === interiorWallsGroup || child.userData.isWall);
+                const isCap = child.userData.isCap || (child.material === topCapMat);
+                const isExtWall = child.userData.isExtWall || (child.parent && child.parent.parent === exteriorWallsGroup);
+                const isIntWall = child.userData.isIntWall || (child.parent && child.parent.parent === interiorWallsGroup);
                 const isFloor = (child.parent === floorGroup || child.userData.isFloor || child.name?.includes('Floor'));
+                const isBathFloor = isFloor && (child.position.x < 2.4 && child.position.z > 2.5 && child.position.z < 4.5);
                 const isRoof = (child.parent === roofGroup || child.userData.isRoof);
+                const isSofa = child.userData.name?.toLowerCase().includes('sillón') || child.userData.name?.toLowerCase().includes('futón') || child.userData.name?.toLowerCase().includes('sofa');
 
-                if (style === 'sims') {
+                if (style === 'archviz') {
+                    if (isCap) child.material = topCapMat;
+                    else if (isExtWall) child.material = archvizBrickWallMat;
+                    else if (isIntWall) child.material = archvizIntWallMat;
+                    else if (isFloor && !isBathFloor) child.material = archvizWoodFloorMat;
+                    else if (isSofa) child.material = archvizSofaMat;
+                    else child.material = child.userData.origMat;
+                } else if (style === 'sims') {
                     child.material = child.userData.origMat;
                 } else if (style === 'clay') {
-                    if (isWall || isRoof) child.material = clayWallMat;
+                    if ((isExtWall || isIntWall || isRoof) && !child.userData.isCap) child.material = clayWallMat;
                     else if (isFloor) child.material = clayFloorMat;
                     else child.material = clayFurnMat;
                 } else if (style === 'blueprint') {
-                    if (isWall || isRoof) child.material = bpWallMat;
+                    if ((isExtWall || isIntWall || isRoof) && !child.userData.isCap) child.material = bpWallMat;
                     else if (isFloor) child.material = bpFloorMat;
                     else child.material = bpFurnMat;
                 } else if (style === 'sketch') {
-                    if (isWall || isRoof) child.material = sketchWallMat;
+                    if ((isExtWall || isIntWall || isRoof) && !child.userData.isCap) child.material = sketchWallMat;
                     else if (isFloor) child.material = sketchFloorMat;
                     else child.material = child.userData.origMat;
                 } else if (style === 'realist') {
@@ -4446,7 +4701,7 @@
                 }
             });
 
-            // 3. Sincronizar UI (Tarjetas del Modal, Dropdown y Botón)
+            // 3. Sincronizar UI
             document.querySelectorAll('.style-card').forEach(card => {
                 card.classList.toggle('active', card.dataset.style === style);
             });
@@ -4465,7 +4720,7 @@
             wakeRenderer();
         }
 
-        // Control y apertura/cierre del Modal de Estilos
+        // Control del Modal de Estilos
         const stylesModal = document.getElementById('styles-modal');
         const btnToggleStyles = document.getElementById('btn-toggle-styles');
         const btnCloseStyles = document.getElementById('btn-close-styles');
@@ -4551,6 +4806,17 @@
             </div>
 
             <div class="styles-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:10px;">
+                <!-- 0. ArchViz Diorama (Foto Referencia) -->
+                <div class="style-card active" data-style="archviz" style="border-color:#38bdf8; background:rgba(56,189,248,0.20);">
+                    <div class="style-card-header">
+                        <span class="style-icon">🏠</span>
+                        <span class="style-title">ArchViz Diorama</span>
+                        <span class="style-badge badge-rec">Tu Referencia</span>
+                    </div>
+                    <div class="style-desc">
+                        Piso de roble miel, paredes de ladrillo visto, tira LED cian gamer, albardillas oscuras, alfombra nórdica y sombras solares volumétricas.
+                    </div>
+                </div>
                 <!-- 1. Sims Color Vivo -->
                 <div class="style-card active" data-style="sims">
                     <div class="style-card-header">
