@@ -1455,9 +1455,11 @@
         // Eje Vertical X = 5.20 (separa Cocina de Entrada): de Y = 4.50 a Y = 5.70
         addWallSegment(5.20, 4.50, 5.20, 5.70, INT_T, interiorWallsGroup, false);
 
-        // Eje Horizontal Y = 2.30 (Base Estudio):
-        // - Muro sólido de X = 0.00 a X = 2.30
-        addWallSegment(0.00, 2.30, 2.30, 2.30, INT_T, interiorWallsGroup, false);
+        // Eje Horizontal Y = 2.30 (Frente Placard y Puerta Estudio):
+        // - Mochetas laterales del placard (0.00..0.22 y 2.12..2.30; entre 0.22 y 2.12 van las hojas corredizas y baulera abierta arriba hacia adentro)
+        addWallSegment(0.00, 2.30, 0.22, 2.30, INT_T, interiorWallsGroup, false);
+        addWallSegment(2.12, 2.30, 2.30, 2.30, INT_T, interiorWallsGroup, false);
+        addDashedLine(0.22, 2.30, 2.12, 2.30);
         // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Estudio sobre muro Este, fotos #39 y #40)
         addDashedLine(2.30, 2.30, 3.00, 2.30);
         addDoorSymbol2D(2.95, 2.30, 2.75, 2.08, 2.55, 2.08, 2.42, 2.30);
@@ -1468,9 +1470,11 @@
         // Eje Horizontal Y = 4.00 (Divide Baño y Placard Inferior): de X = 0.00 a X = 2.30
         addWallSegment(0.00, 4.00, 2.30, 4.00, INT_T, interiorWallsGroup, false);
 
-        // Eje Horizontal Y = 4.50 (Línea Cuarto y Cocina):
-        // - Muro sólido de X = 0.00 a X = 2.30 (divide Placard Inferior y Cuarto)
-        addWallSegment(0.00, 4.50, 2.30, 4.50, INT_T, interiorWallsGroup, false);
+        // Eje Horizontal Y = 4.50 (Frente Placard, Puerta Cuarto y Vano Cocina):
+        // - Mochetas laterales del placard (0.00..0.22 y 2.12..2.30; entre 0.22 y 2.12 van las hojas corredizas y baulera abierta arriba hacia adentro)
+        addWallSegment(0.00, 4.50, 0.22, 4.50, INT_T, interiorWallsGroup, false);
+        addWallSegment(2.12, 4.50, 2.30, 4.50, INT_T, interiorWallsGroup, false);
+        addDashedLine(0.22, 4.50, 2.12, 4.50);
         // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Cuarto sobre muro Este, fotos #17 y #22)
         addDashedLine(2.30, 4.50, 3.00, 4.50);
         addDoorSymbol2D(2.95, 4.50, 2.75, 4.72, 2.55, 4.72, 2.42, 4.50);
@@ -1625,12 +1629,12 @@
         // 3) Constructor de Frentes de Placard (Fotos #20, #37, #38):
         //    Placard embutido de 2 hojas corredizas de madera barnizada con tirador circular oscuro
         //    + INTERIOR REAL (módulo cajonera blanca de 4 cajones + estantes blancos)
-        //    + BAULERA ABIERTA SUPERIOR (sin puertas corredizas arriba, piso voladizo blanco
-        //      sobre el cual se apoyan valijas, cajas PS5/Monitor, rueda de auxilio y casco bajo el techo en pendiente).
+        //    + BAULERA ABIERTA SUPERIOR HACIA ADENTRO (sin puertas corredizas arriba, nicho profundo
+        //      hacia la pared del baño bajo el techo en pendiente con parapeto frontal blanco).
         function addSlidingPlacardFront3D(x1, x2, zWall, facingSign = -1) {
             const w = x2 - x1;
             const holder = new THREE.Group();
-            holder.position.set((x1 + x2) / 2, 0, zWall + facingSign * (INT_T / 2 + 0.012));
+            holder.position.set((x1 + x2) / 2, 0, zWall);
 
             // Marco metálico perimetral oscuro de chapa doblada (va desde piso Y=0.08 hasta dintel Y=2.08)
             const PLACARD_H = 2.00;
@@ -1650,16 +1654,22 @@
             plinth.position.set(0, 0.04, 0);
             holder.add(plinth);
 
-            // Piso divisorio voladizo de la baulera abierta superior (estante losa blanca a 2.08 m)
-            const shelfDepth = 0.55;
+            // Parapeto / borde frontal blanco de la baulera (entre 2.08m y 2.15m, alineado al plomo de las mochetas)
+            const frontCurb = new THREE.Mesh(UNIT_BOX_GEO, extWallMat);
+            frontCurb.scale.set(w, 0.07, INT_T);
+            frontCurb.position.set(0, 0.08 + PLACARD_H + 0.035, 0);
+            holder.add(frontCurb);
+
+            // Piso / losa estante de la baulera abierta que se adentra hacia el nicho del baño (hacia adentro: -facingSign)
+            const shelfDepth = 0.48;
             const bauleraFloor = new THREE.Mesh(UNIT_BOX_GEO, extWallMat);
-            bauleraFloor.scale.set(w + 0.04, 0.05, shelfDepth);
-            bauleraFloor.position.set(0, 0.08 + PLACARD_H + 0.025, facingSign * (shelfDepth / 2 - 0.05));
+            bauleraFloor.scale.set(w + 0.04, 0.04, shelfDepth);
+            bauleraFloor.position.set(0, 0.08 + PLACARD_H + 0.02, -facingSign * (shelfDepth / 2));
             holder.add(bauleraFloor);
 
             // --- INTERIOR VISIBLE DEL PLACARD (visto en fotos #20 y #38 cuando la hoja izquierda está abierta) ---
-            const interiorDepth = 0.46;
-            const interiorZ = facingSign * (-interiorDepth / 2);
+            const interiorDepth = 0.44;
+            const interiorZ = -facingSign * (interiorDepth / 2);
             // Cajonera blanca de 4 cajones amplios en sector izquierdo
             const chestW = (w - 0.10) / 2;
             const chestH = 0.88;
@@ -1691,24 +1701,24 @@
             // 1. Hoja derecha (exterior, frente cerrado)
             const rightLeaf = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
             rightLeaf.scale.set(leafW, leafH, leafT);
-            rightLeaf.position.set(w / 4 + 0.01, 0.08 + leafH / 2 + 0.01, 0.010);
+            rightLeaf.position.set(w / 4 + 0.01, 0.08 + leafH / 2 + 0.01, facingSign * 0.012);
             // Tirador circular embutido oscuro (cubeta)
             const pullRight = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.032, 16), doorFrameMat);
             pullRight.rotation.x = Math.PI / 2;
-            pullRight.position.set(w / 4 + 0.01 + leafW * 0.36, 0.08 + 1.00, 0.010);
+            pullRight.position.set(w / 4 + 0.01 + leafW * 0.36, 0.08 + 1.00, facingSign * 0.012);
             holder.add(rightLeaf, pullRight);
 
             // 2. Hoja izquierda (interior, entreabierta hacia el centro permitiendo ver la cajonera y estantes como en fotos)
             const leftLeaf = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
             leftLeaf.scale.set(leafW, leafH, leafT);
-            leftLeaf.position.set(0.04, 0.08 + leafH / 2 + 0.01, -0.012);
+            leftLeaf.position.set(0.04, 0.08 + leafH / 2 + 0.01, -facingSign * 0.014);
             const pullLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.032, 16), doorFrameMat);
             pullLeft.rotation.x = Math.PI / 2;
-            pullLeft.position.set(0.04 - leafW * 0.36, 0.08 + 1.00, -0.012);
+            pullLeft.position.set(0.04 - leafW * 0.36, 0.08 + 1.00, -facingSign * 0.014);
             holder.add(leftLeaf, pullLeft);
 
             doors3DGroup.add(holder);
-            attachWallMount(holder, (x1 + x2) / 2, zWall, true);
+            attachWallMount(holder, 0.11, zWall, true);
         }
 
         // Construcción diferida de puertas 3D y techo de madera (se ejecuta tras el primer render 2D para carga instantánea)
@@ -1733,8 +1743,8 @@
             addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 55);
             addInteriorWoodDoor3D(2.30, 3.02, 2.30, 3.65, false, 1, 55);
             addInteriorWoodDoor3D(2.30, 4.50, 3.00, 4.50, false, 1, 55);
-            addSlidingPlacardFront3D(0.22, 1.92, 2.30, -1);
-            addSlidingPlacardFront3D(0.22, 1.92, 4.50, 1);
+            addSlidingPlacardFront3D(0.22, 2.12, 2.30, -1);
+            addSlidingPlacardFront3D(0.22, 2.12, 4.50, 1);
             resolveWallMounts();
         }
         setTimeout(ensure3DExtrasBuilt, 60);
@@ -2000,15 +2010,32 @@
             addDecorCyl(0.28, 0.72, 4.90, 0.07, 0.07, 0.18, 0xffffff, 0.2);  // Humidificador blanco
             // - Mesa de luz Sur (X=0.28, Z=6.72, en esquina Suroeste) con reloj digital blanco y peluches
             addDecorBox(0.28, 0.31, 6.72, 0.42, 0.62, 0.42, 0x4a3222, 0.5);
-            // 4. Panel calefactor eléctrico negro en muro Sur (X=2.48, Z=6.88) + Cesto de ropa sucia gris en muro Este (X=2.72, Z=6.20, foto #17) + Valijas sobre baulera del placard (foto #20)
+            // 4. Panel calefactor eléctrico negro en muro Sur (X=2.48, Z=6.88) + Cesto de ropa sucia gris en muro Este (X=2.72, Z=6.20, foto #17)
             addDecorBox(2.48, 0.48, 6.88, 0.50, 0.50, 0.05, 0x0f172a, 0.2);  // Panel calefactor vidrio negro
             addDecorBox(2.72, 0.35, 6.20, 0.38, 0.70, 0.44, 0x475569, 0.8);  // Cesto ropa sucia gris con ropa arriba
-            setMountWall(1.38, 4.50, true);
-            // Equipaje y cajas sobre la losa voladiza de la baulera abierta del cuarto (foto #20):
-            addDecorBox(1.65, 2.38, 4.28, 0.52, 0.46, 0.38, 0x1e293b, 0.4);  // Valija rígida negra grande parada
-            addDecorBox(1.10, 2.26, 4.28, 0.54, 0.28, 0.36, 0x0f172a, 0.5);  // Valija rígida negra mediana acostada
-            addDecorBox(0.68, 2.38, 4.28, 0.38, 0.52, 0.34, 0x475569, 0.4);  // Mueblecito organizador gris / bolso
-            addDecorBox(1.22, 2.58, 4.28, 0.56, 0.24, 0.22, 0xd4a373, 0.6);  // Caja de cartón Samsung Curved Monitor 27" arriba
+
+            // Equipaje, organizador y cajas guardados HACIA ADENTRO en la baulera abierta del cuarto (relevado fielmente de la foto):
+            // La baulera está a Y=2.17m y se adentra entre Z=4.02 y Z=4.48 (profundidad ~0.46m hacia el muro del baño Z=4.00)
+            setMountWall(0.11, 4.50, true);
+            // - Sector Izquierdo:
+            addDecorBox(0.40, 2.29, 4.26, 0.26, 0.24, 0.28, 0x18181b, 0.6);   // Caja negra encintada a la izquierda
+            addDecorBox(0.60, 2.31, 4.30, 0.24, 0.28, 0.24, 0xe2e8f0, 0.5);   // Caja electrodoméstico Oster blanca
+            addDecorBox(0.60, 2.49, 4.28, 0.20, 0.09, 0.20, 0x556b2f, 0.8);   // Bolso de lona verde oliva con correas
+            addDecorBox(0.62, 2.30, 4.10, 0.20, 0.26, 0.16, 0x1d4ed8, 0.5);   // Caja azul al fondo
+            // - Sector Central:
+            // Mueble organizador gris de 2 puertas con tiradores negros
+            const cabW = 0.48, cabH = 0.52, cabD = 0.36;
+            addDecorBox(1.05, 2.17 + cabH / 2, 4.25, cabW, cabH, cabD, 0x64748b, 0.4);
+            addDecorBox(0.99, 2.24, 4.44, 0.07, 0.016, 0.02, 0x0f172a, 0.3); // Tirador negro izquierdo
+            addDecorBox(1.11, 2.24, 4.44, 0.07, 0.016, 0.02, 0x0f172a, 0.3); // Tirador negro derecho
+            // Caja del Monitor Samsung Essential Curved 27" arriba del mueble organizador
+            addDecorBox(1.05, 2.17 + cabH + 0.09, 4.25, 0.56, 0.18, 0.36, 0xd4a373, 0.6);
+            // - Sector Derecho:
+            // Valija / bolso negro de tela vertical contra el fondo
+            addDecorBox(1.68, 2.45, 4.12, 0.46, 0.56, 0.20, 0x18181b, 0.8);
+            // Valija rígida grafito oscuro acostada en primer plano con candado TSA
+            addDecorBox(1.68, 2.31, 4.32, 0.58, 0.28, 0.26, 0x334155, 0.35);
+            addDecorBox(1.66, 2.455, 4.32, 0.12, 0.015, 0.04, 0x0f172a, 0.2); // Candado TSA y manija superior
             setMountWall(null);
             // 5. Cortina gris topo con barral de madera en la ventana Sur del Cuarto (V5: X=0.90..2.10, Z=7.00)
             addCurtainAssembly(0.90, 7.00, 2.10, 7.00, 0, -0.12, 0x78716c);
@@ -2059,13 +2086,13 @@
             addDecorCyl(0.28, 0.36, 2.04, 0.22, 0.22, 0.72, 0xd4a373, 0.55); // Mesita redonda plegable de madera clara en esquina SO junto al placard (foto #37)
             addDecorCyl(0.28, 0.74, 2.04, 0.20, 0.20, 0.04, 0x475569, 0.3);  // Tablero de Ajedrez El Señor de los Anillos (LOTR)
             addDecorCyl(1.12, 0.18, 2.04, 0.14, 0.14, 0.34, 0xeab308, 0.3);  // Aspiradora Kärcher amarilla y negra frente al placard del estudio (foto #37 y #38)
-            setMountWall(1.48, 2.30, true);
-            // Cosas guardadas en la baulera abierta sobre el placard del estudio (fotos #37 y #38):
-            addDecorCyl(1.78, 2.22, 2.52, 0.26, 0.26, 0.18, 0x27272a, 0.8);  // Rueda de auxilio cubierta con lona
-            addDecorCyl(1.78, 2.38, 2.52, 0.12, 0.12, 0.12, 0xd97706, 0.5);  // Casco de moto arriba
-            addDecorBox(1.25, 2.22, 2.52, 0.42, 0.22, 0.32, 0x1e293b, 0.5);  // Bolso deportivo negro/violeta
-            addDecorBox(0.82, 2.22, 2.52, 0.36, 0.24, 0.30, 0xd4a373, 0.6);  // Caja de cartón marrón de zapatos
-            addDecorBox(0.42, 2.24, 2.52, 0.32, 0.26, 0.26, 0x3b82f6, 0.5);  // Caja de PS5 PlayStation 5 / Mirage
+            setMountWall(0.11, 2.30, true);
+            // Cosas guardadas HACIA ADENTRO en la baulera abierta sobre el placard del estudio (fotos #37 y #38, entre Z=2.32 y Z=2.78):
+            addDecorCyl(1.78, 2.26, 2.55, 0.26, 0.26, 0.18, 0x27272a, 0.8);  // Rueda de auxilio cubierta con lona
+            addDecorCyl(1.78, 2.42, 2.55, 0.12, 0.12, 0.12, 0xd97706, 0.5);  // Casco de moto arriba
+            addDecorBox(1.25, 2.28, 2.55, 0.42, 0.22, 0.32, 0x1e293b, 0.5);  // Bolso deportivo negro/violeta
+            addDecorBox(0.82, 2.29, 2.55, 0.36, 0.24, 0.30, 0xd4a373, 0.6);  // Caja de cartón marrón de zapatos
+            addDecorBox(0.42, 2.30, 2.55, 0.32, 0.26, 0.26, 0x3b82f6, 0.5);  // Caja de PS5 PlayStation 5 / Mirage
             setMountWall(null);
 
             // 6. Cortina gris oscura con visillo blanco en la ventana Norte del Estudio (V4: X=1.35..2.55, Z=0.00, encuadrada sobre el ala Norte del escritorio en L)

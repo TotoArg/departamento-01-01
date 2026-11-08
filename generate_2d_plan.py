@@ -316,8 +316,13 @@ def main():
     # Eje Vertical X = 5.20 (separa Cocina de Entrada): de Y = 4.50 a Y = 5.70
     draw.line([px(5.20, 4.50), px(5.20, 5.70)], fill=WALL_COLOR, width=INT_W)
 
-    # Eje Horizontal Y = 2.30 (Base Estudio):
-    draw.line([px(0.00, 2.30), px(2.30, 2.30)], fill=WALL_COLOR, width=INT_W)
+    # Eje Horizontal Y = 2.30 (Frente Placard y Puerta Estudio):
+    # - Mochetas laterales del placard (0.00..0.22 y 2.12..2.30)
+    draw.line([px(0.00, 2.30), px(0.22, 2.30)], fill=WALL_COLOR, width=INT_W)
+    draw.line([px(2.12, 2.30), px(2.30, 2.30)], fill=WALL_COLOR, width=INT_W)
+    # - Frente de hojas corredizas del placard (líneas técnicas dobles)
+    draw.line([px(0.22, 2.285), px(1.19, 2.285)], fill=(100, 116, 139), width=3)
+    draw.line([px(1.15, 2.315), px(2.12, 2.315)], fill=(100, 116, 139), width=3)
     # - Puerta Estudio (de X = 2.30 a X = 3.00): bisagra al Este (X=3.00), abre HACIA ADENTRO del Estudio sobre muro Este (fotos #39 y #40)
     draw_dashed_line(draw, *px(2.30, 2.30), *px(3.00, 2.30), fill=DASH_COLOR, width=3)
     draw_door_symbol(draw, px, (2.95, 2.30), (2.75, 2.08), (2.55, 2.08), (2.42, 2.30), DOOR_COLOR, width=3)
@@ -328,8 +333,13 @@ def main():
     # Eje Horizontal Y = 4.00 (Divide Baño y Placard Inferior): de X = 0.00 a X = 2.30
     draw.line([px(0.00, 4.00), px(2.30, 4.00)], fill=WALL_COLOR, width=INT_W)
 
-    # Eje Horizontal Y = 4.50 (Línea Cuarto y Cocina):
-    draw.line([px(0.00, 4.50), px(2.30, 4.50)], fill=WALL_COLOR, width=INT_W)
+    # Eje Horizontal Y = 4.50 (Línea Cuarto y Cocina / Frente Placard):
+    # - Mochetas laterales del placard (0.00..0.22 y 2.12..2.30)
+    draw.line([px(0.00, 4.50), px(0.22, 4.50)], fill=WALL_COLOR, width=INT_W)
+    draw.line([px(2.12, 4.50), px(2.30, 4.50)], fill=WALL_COLOR, width=INT_W)
+    # - Frente de hojas corredizas del placard (líneas técnicas dobles)
+    draw.line([px(0.22, 4.485), px(1.19, 4.485)], fill=(100, 116, 139), width=3)
+    draw.line([px(1.15, 4.515), px(2.12, 4.515)], fill=(100, 116, 139), width=3)
     # - Puerta Cuarto (de X = 2.30 a X = 3.00): bisagra al Este (X=3.00), abre HACIA ADENTRO del Cuarto sobre muro Este (fotos #17 y #22)
     draw_dashed_line(draw, *px(2.30, 4.50), *px(3.00, 4.50), fill=DASH_COLOR, width=3)
     draw_door_symbol(draw, px, (2.95, 4.50), (2.75, 4.72), (2.55, 4.72), (2.42, 4.50), DOOR_COLOR, width=3)
