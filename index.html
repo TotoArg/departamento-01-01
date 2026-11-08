@@ -2086,6 +2086,58 @@
         apartmentGroup.add(floorGroup, exteriorWallsGroup, interiorWallsGroup, doors3DGroup, fixturesGroup, decorVideoGroup, roofGroup, furnitureGroup, lines2DGroup);
         scene.add(apartmentGroup);
 
+        let currentAssemblyGroup = null;
+
+        function createCompoundAssembly(name, buildFn, customParent) {
+            const parentGroup = currentAssemblyGroup || customParent || decorVideoGroup;
+            const tempGroup = new THREE.Group();
+            const prevGroup = currentAssemblyGroup;
+            currentAssemblyGroup = tempGroup;
+            try {
+                buildFn();
+            } finally {
+                currentAssemblyGroup = prevGroup;
+            }
+
+            if (tempGroup.children.length === 0) return null;
+
+            // Calcular bounding box para centrar el origen del grupo en el centro geométrico
+            const box = new THREE.Box3().setFromObject(tempGroup);
+            const center = new THREE.Vector3();
+            box.getCenter(center);
+
+            // Crear el grupo definitivo ubicado en center
+            const assemblyGroup = new THREE.Group();
+            assemblyGroup.name = name;
+            assemblyGroup.userData.name = name;
+            assemblyGroup.userData.isAssembly = true;
+            assemblyGroup.userData.isDecor = true;
+            assemblyGroup.position.copy(center);
+
+            // Reparentar hijos con offset relativo al centro
+            while (tempGroup.children.length > 0) {
+                const child = tempGroup.children[0];
+                child.position.sub(center);
+                assemblyGroup.add(child);
+            }
+
+            parentGroup.add(assemblyGroup);
+            return assemblyGroup;
+        }
+
+        function getSelectionRoot(obj) {
+            if (!obj) return obj;
+            let curr = obj;
+            let assemblyRoot = null;
+            while (curr && curr !== decorVideoGroup && curr !== fixturesGroup && curr !== apartmentGroup && curr !== scene) {
+                if (curr.userData && curr.userData.isAssembly) {
+                    assemblyRoot = curr;
+                }
+                curr = curr.parent;
+            }
+            return assemblyRoot || obj;
+        }
+
         const WALL_H = 2.60;
         const EXT_T = 0.12;
         const INT_T = 0.08;
@@ -2701,9 +2753,9 @@
             roughness: 0.15
         });
         const mirrorAbsoluteMat = new THREE.MeshStandardMaterial({
-            color: 0xffffff,
-            metalness: 1.0,
-            roughness: 0.0
+            color: 0xf8fafc,
+            metalness: 0.95,
+            roughness: 0.05
         });
         const woodVanitoryMat = new THREE.MeshStandardMaterial({
             color: 0x7c431d,
@@ -2718,14 +2770,12 @@
             roughness: 0.25,
             metalness: 0.05
         });
-        const glassShowerDoorMat = new THREE.MeshPhysicalMaterial({
+        const glassShowerDoorMat = new THREE.MeshStandardMaterial({
             color: 0xe0f2fe,
             transparent: true,
             opacity: 0.35,
             roughness: 0.05,
-            metalness: 0.10,
-            transmission: 0.85,
-            ior: 1.5
+            metalness: 0.10
         });
 
         // A) BAÑERA EMPOTRADA DE LOZA CON CUADRO DE DUCHA CROMADO Y MAMPARA
@@ -3966,63 +4016,11 @@
 // ============================================================================
 
 
-        // ============================================================================
+                // ============================================================================
         // 4C. MUEBLES, ELECTRODOMÉSTICOS, CORTINAS Y DECORACIÓN EXTRAÍDOS DEL 2° VIDEO
         //     (https://photos.app.goo.gl/8k4MQeY4BcyoqhDK8 - video_34)
         // ============================================================================
-        let currentAssemblyGroup = null;
 
-        function createCompoundAssembly(name, buildFn) {
-            const parentGroup = currentAssemblyGroup || decorVideoGroup;
-            const tempGroup = new THREE.Group();
-            const prevGroup = currentAssemblyGroup;
-            currentAssemblyGroup = tempGroup;
-            try {
-                buildFn();
-            } finally {
-                currentAssemblyGroup = prevGroup;
-            }
-
-            if (tempGroup.children.length === 0) return null;
-
-            // Calcular bounding box para centrar el origen del grupo en el centro geométrico
-            const box = new THREE.Box3().setFromObject(tempGroup);
-            const center = new THREE.Vector3();
-            box.getCenter(center);
-
-            // Crear el grupo definitivo ubicado en `center`
-            const assemblyGroup = new THREE.Group();
-            assemblyGroup.name = name;
-            assemblyGroup.userData.name = name;
-            assemblyGroup.userData.isAssembly = true;
-            assemblyGroup.userData.isDecor = true;
-            assemblyGroup.position.copy(center);
-
-            // Reparentar hijos con offset relativo al centro
-            while (tempGroup.children.length > 0) {
-                const child = tempGroup.children[0];
-                child.position.sub(center);
-                assemblyGroup.add(child);
-            }
-
-            parentGroup.add(assemblyGroup);
-            return assemblyGroup;
-        }
-
-        function getSelectionRoot(obj) {
-            if (!obj) return obj;
-            let curr = obj;
-            let assemblyRoot = null;
-            while (curr && curr !== decorVideoGroup && curr !== fixturesGroup && curr !== apartmentGroup && curr !== scene) {
-                if (curr.userData && curr.userData.isAssembly) {
-                    assemblyRoot = curr;
-                }
-                curr = curr.parent;
-            }
-            return assemblyRoot || obj;
-        }
-
-        
         // Creador de plantas de interior con maceta cerámica y esferas deformadas cruzadas
         function addDecorPlantCeramic(x, y, z, potRTop, potRBot, potH, folScaleX, folScaleY, folScaleZ, folH, name = 'Planta de Interior') {
             const g = new THREE.Group();
