@@ -4,6 +4,8 @@ __pycache__/
 *.pyc
 
 # Videos pesados (3.5 GB) y frames temporales extraídos
+node_modules/
+*.tmp
 videos/
 video_frames/
 walkthrough/

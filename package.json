@@ -1,0 +1,13 @@
+{
+  "name": "departamento-01-01",
+  "version": "1.0.0",
+  "description": "Plano 2D y Maqueta 3D Interactiva del Departamento",
+  "scripts": {
+    "start": "node dev-server.js",
+    "dev": "node dev-server.js",
+    "serve": "node dev-server.js --no-open"
+  },
+  "keywords": ["threejs", "architecture", "floorplan", "3d", "bim"],
+  "author": "Tomas",
+  "license": "ISC"
+}
