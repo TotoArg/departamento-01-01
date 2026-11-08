@@ -1095,16 +1095,86 @@
 
             group.add(holder);
 
+            const maxH = (typeof customH === 'number') ? customH : WALL_H;
             simsWalls.push({
                 type: 'wall',
                 holder,
                 bodyMesh,
                 capMesh,
                 isExterior,
-                currentH: WALL_H,
-                targetH: WALL_H,
+                maxH,
+                currentH: maxH,
+                targetH: maxH,
                 linkedObjs: [],
                 ...getWallNormals(x1, z1, x2, z2, isExterior)
+            });
+        }
+
+        function addSlopedWallSegment(...args) {
+            let x1, z1, x2, z2, h1, h2, thickness, group, isExterior = false;
+            if (typeof args[7] === 'object' || typeof args[6] === 'object') {
+                if (typeof args[3] === 'number' && typeof args[4] === 'number' && typeof args[5] === 'number' && typeof args[6] === 'number') {
+                    [x1, z1, x2, z2, h1, h2, thickness, group, isExterior] = args;
+                } else {
+                    let z;
+                    [x1, z, x2, h1, h2, thickness, group, isExterior] = args;
+                    z1 = z;
+                    z2 = z;
+                }
+            } else {
+                [x1, z1, x2, z2, h1, h2, thickness, group, isExterior] = args;
+            }
+
+            const dx = x2 - x1;
+            const dz = z2 - z1;
+            const len = Math.hypot(dx, dz);
+            if (len < 0.005) return;
+            const angle = Math.atan2(dz, dx);
+
+            const holder = new THREE.Group();
+            holder.position.set((x1 + x2) / 2, 0, (z1 + z2) / 2);
+            holder.rotation.y = -angle;
+
+            const shape = new THREE.Shape();
+            shape.moveTo(-len / 2, 0);
+            shape.lineTo(len / 2, 0);
+            shape.lineTo(len / 2, h2);
+            shape.lineTo(-len / 2, h1);
+            shape.closePath();
+
+            const geo = new THREE.ExtrudeGeometry(shape, { steps: 1, depth: thickness, bevelEnabled: false });
+            geo.translate(0, 0, -thickness / 2);
+
+            const mat = isExterior ? extWallMat : intWallMat;
+            const bodyMesh = new THREE.Mesh(geo, mat);
+            bodyMesh.castShadow = true;
+            bodyMesh.receiveShadow = true;
+            holder.add(bodyMesh);
+
+            const capLen = Math.hypot(len, h2 - h1);
+            const capAngle = Math.atan2(h2 - h1, len);
+            const capMesh = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            capMesh.scale.set(capLen + 0.01, 0.02, thickness + 0.01);
+            capMesh.position.set(0, (h1 + h2) / 2 + 0.01, 0);
+            capMesh.rotation.z = capAngle;
+            holder.add(capMesh);
+
+            group.add(holder);
+
+            const maxH = Math.max(h1, h2);
+            simsWalls.push({
+                type: 'slopedWall',
+                holder,
+                bodyMesh,
+                capMesh,
+                h1,
+                h2,
+                isExterior: !!isExterior,
+                maxH,
+                currentH: maxH,
+                targetH: maxH,
+                linkedObjs: [],
+                ...getWallNormals(Math.min(x1, x2), Math.min(z1, z2), Math.max(x1, x2), Math.max(z1, z2), !!isExterior)
             });
         }
 
@@ -1257,11 +1327,19 @@
         // 3. PERÍMETRO EXTERIOR CON LAS 7 VENTANAS REALES DEL VIDEO
         // ============================================================================
         // Muro Superior (Norte, Y = 0.00):
-        // - Ventana Estudio V4 (X = 1.35 a 2.55, encuadrada sobre el ala Norte del escritorio en L)
-        // - Ventanas gemelas Living V1 (X = 3.35 a 4.55) y V2 (X = 4.90 a 6.00)
-        addWallSegment(0.00, 0.00, 1.35, 0.00, EXT_T, exteriorWallsGroup, true);
-        addWindowSegment(1.35, 0.00, 2.55, 0.00, 0.95, 1.10);
-        addWallSegment(2.55, 0.00, 3.35, 0.00, EXT_T, exteriorWallsGroup, true);
+        // 1) SECTOR ESTUDIO (X = 0.00 a 3.00 m) - Especificación Item 5:
+        //    - Tramo izquierdo plano (X = 0.00 a 1.65 m): apoyo horizontal de techo a Z = 2.35 m
+        //    - Ventana Norte pegada a la derecha (X = 1.65 a 2.95 m, ancho 1.30 m, dintel a 2.15 m)
+        //    - Quiebre y tímpano triangular alto en diagonal sobre ventana (sube de 2.35 m en X=1.65 a 3.40 m en X=3.00)
+        //    - Mocheta derecha de cierre (X = 2.95 a 3.00 m)
+        addWallSegment(0.00, 0.00, 1.65, 0.00, EXT_T, exteriorWallsGroup, true, 2.35);
+        addWindowSegment(1.65, 0.00, 2.95, 0.00, 0.95, 1.10);
+        addSlopedWallSegment(1.65, 0.00, 3.00, 0.00, 2.35, 3.40, EXT_T, exteriorWallsGroup, true);
+        addWallSegment(2.95, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 3.40);
+
+        // 2) SECTOR LIVING (X = 3.00 a 6.30 m):
+        //    - Ventanas gemelas Living V1 (X = 3.35 a 4.55) y V2 (X = 4.90 a 6.00)
+        addWallSegment(3.00, 0.00, 3.35, 0.00, EXT_T, exteriorWallsGroup, true);
         addWindowSegment(3.35, 0.00, 4.55, 0.00, 0.95, 1.10);
         addWallSegment(4.55, 0.00, 4.90, 0.00, EXT_T, exteriorWallsGroup, true);
         addWindowSegment(4.90, 0.00, 6.00, 0.00, 0.95, 1.10);
@@ -1383,23 +1461,22 @@
         //    Techo de madera con limahoya / quiebre en X = 2.30 m
         function buildWoodenRoof() {
             // =========================================================================
-            // A) BLOQUE IZQUIERDO: SECTOR A (Faldón inclinado de X = 0.00 a X = 2.30 m)
-            //    Nace en muro exterior izquierdo (X = 0.00, Y = 2.35 m) y sube hasta Z = 3.40 m en X = 2.30 m.
-            //    Tirantes de madera paralelos al eje X.
+            // A) BLOQUE IZQUIERDO SUR: PLACARDS, BAÑO Y CUARTO (Z = 2.30 a 7.00 m)
+            //    - Sector A (X = 0.00 a 2.30 m): faldón inclinado de 2.35 m a 3.40 m
+            //    - Sector B (X = 2.30 a 3.00 m): plano superior horizontal a 3.40 m
             // =========================================================================
             const dxA = 2.30, dyA = 3.40 - 2.35; // 1.05 m
             const lenSlopeA = Math.hypot(dxA, dyA); // 2.5283 m
             const angSlopeA = Math.atan2(dyA, dxA); // ~24.56°
-            const roofDeckZ = 7.00; // Todo el bloque de Norte a Sur (Z = 0.00 a 7.00)
+            const deckZSouth = 4.70; // De Z = 2.30 a Z = 7.00 m
 
-            const roofSectorA = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
-            roofSectorA.scale.set(lenSlopeA, 0.04, roofDeckZ);
-            roofSectorA.position.set(1.15, 2.35 + dyA / 2, 3.50);
-            roofSectorA.rotation.z = angSlopeA;
-            roofGroup.add(roofSectorA);
+            const roofSouthA = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofSouthA.scale.set(lenSlopeA, 0.04, deckZSouth);
+            roofSouthA.position.set(1.15, 2.35 + dyA / 2, 4.65);
+            roofSouthA.rotation.z = angSlopeA;
+            roofGroup.add(roofSouthA);
 
-            // Tirantes de madera paralelos al eje X corriendo a lo largo de la pendiente (de X = 0 a X = 2.30):
-            for (let zBeam = 0.35; zBeam <= 6.70; zBeam += 0.55) {
+            for (let zBeam = 2.55; zBeam <= 6.70; zBeam += 0.55) {
                 const beamA = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
                 beamA.scale.set(lenSlopeA, 0.11, 0.07);
                 beamA.position.set(1.15, 2.35 + dyA / 2 - 0.055, zBeam);
@@ -1407,19 +1484,56 @@
                 roofGroup.add(beamA);
             }
 
-            // =========================================================================
-            // B) BLOQUE IZQUIERDO: SECTOR B (Plano superior horizontal sobre Pasillo y Puertas, X = 2.30 a 3.00 m)
-            //    Mantiene Z = 3.40 m en el borde superior del muro sobre las puertas.
-            // =========================================================================
-            const widthB = 0.70; // 3.00 - 2.30
-            const roofSectorB = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
-            roofSectorB.scale.set(widthB, 0.04, roofDeckZ);
-            roofSectorB.position.set(2.30 + widthB / 2, 3.40, 3.50);
-            roofGroup.add(roofSectorB);
+            const widthB = 0.70;
+            const roofSouthB = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofSouthB.scale.set(widthB, 0.04, deckZSouth);
+            roofSouthB.position.set(2.65, 3.40, 4.65);
+            roofGroup.add(roofSouthB);
 
-            // Viga cumbrera / limahoya estructural de encuentro en X = 2.30 m a cota Y = 3.40 m:
+            // =========================================================================
+            // B) ESTUDIO (Z = 0.00 a 2.30 m) - Especificación Item 5.1:
+            //    - Tramo izquierdo plano (X = 0.00 a 1.65 m): apoyo en muro Norte horizontal a Z = 2.35 m,
+            //      subiendo suavemente hacia el Sur (baulera)
+            //    - Quiebre y tramo diagonal (X = 1.65 a 3.00 m): tímpano triangular alto sobre ventana
+            //      que sube de 2.35 m en X=1.65 m a 3.40 m en X=3.00 m
+            //    - Viga limahoya diagonal en X = 1.65 m
+            // =========================================================================
+            const deckZEst = 2.30;
+            // 1. Sector izquierdo Estudio (X = 0.00 a 1.65 m)
+            const lenEstA = 1.65;
+            const roofEstA = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofEstA.scale.set(lenEstA, 0.04, deckZEst);
+            roofEstA.position.set(lenEstA / 2, 2.35 + 0.15, deckZEst / 2);
+            roofGroup.add(roofEstA);
+
+            for (let zBeam = 0.35; zBeam <= 2.10; zBeam += 0.55) {
+                const bEstA = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
+                bEstA.scale.set(lenEstA, 0.11, 0.07);
+                bEstA.position.set(lenEstA / 2, 2.35 + 0.10, zBeam);
+                roofGroup.add(bEstA);
+            }
+
+            // 2. Sector derecho Estudio sobre ventana (X = 1.65 a 3.00 m, sube a 3.40 m)
+            const dxEstB = 1.35; // 3.00 - 1.65
+            const dyEstB = 3.40 - 2.35; // 1.05 m
+            const lenSlopeEstB = Math.hypot(dxEstB, dyEstB);
+            const angSlopeEstB = Math.atan2(dyEstB, dxEstB);
+
+            const roofEstB = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
+            roofEstB.scale.set(lenSlopeEstB, 0.04, deckZEst);
+            roofEstB.position.set(1.65 + dxEstB / 2, 2.35 + dyEstB / 2, deckZEst / 2);
+            roofEstB.rotation.z = angSlopeEstB;
+            roofGroup.add(roofEstB);
+
+            // Viga limahoya diagonal de quiebre en X = 1.65 m apoyada en [1.65, 0.00, 2.35]
+            const valleyBeam = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
+            valleyBeam.scale.set(0.12, 0.16, deckZEst);
+            valleyBeam.position.set(1.65, 2.35 + 0.10, deckZEst / 2);
+            roofGroup.add(valleyBeam);
+
+            // Cumbrera central de quiebre sobre el pasillo en X = 2.30 m
             const ridgeBeam = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-            ridgeBeam.scale.set(0.12, 0.16, roofDeckZ);
+            ridgeBeam.scale.set(0.12, 0.16, 7.00);
             ridgeBeam.position.set(2.30, 3.32, 3.50);
             roofGroup.add(ridgeBeam);
 
@@ -1505,9 +1619,9 @@
         // Eje Horizontal Y = 2.30 (Frente Placard Estudio y Puerta Estudio - Items 2.5 y 3):
         // - Línea de frente en 2D:
         addDashedLine(0.00, 2.30, 2.30, 2.30);
-        // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Estudio sobre muro Este, fotos #39 y #40)
+        // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (bisagra a la derecha en [3.00, 2.30], abre 90° hacia el Norte rebatida contra muro Este de Y=2.30 a Y=1.60)
         addDashedLine(2.30, 2.30, 3.00, 2.30);
-        addDoorSymbol2D(2.95, 2.30, 2.75, 2.08, 2.55, 2.08, 2.42, 2.30);
+        addDoorSymbol2D(2.95, 2.30, 2.95, 1.62, 2.32, 1.62, 2.32, 2.30);
 
         // Eje Horizontal Y = 2.80 (Cierre de fondo de Baulera Estudio / Divide con Baño - Item 2.4):
         // Sube de X = 0.00 (Y = 2.35 m) a X = 2.30 (Y = 3.40 m) tocando el faldón inclinado del techo.
@@ -2019,7 +2133,7 @@
             attachWallMount(cocinaLintel, 4.60, 4.50, true);
             // Instanciar puertas 3D interactivas con dintel a Z = 3.40 m (Item 3) y Placards de X = 0.00 a 2.30 m (Item 2):
             addMainEntranceDoor3D(5.38, 5.70, 6.12, 5.70);
-            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 75, "Puerta Estudio", 3.40);
+            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 90, "Puerta Estudio", 3.40);
             addInteriorWoodDoor3D(2.30, 3.02, 2.30, 3.65, false, 1, 75, "Puerta Baño", 3.40);
             addInteriorWoodDoor3D(2.30, 4.50, 3.00, 4.50, false, 1, 75, "Puerta Cuarto", 3.40);
             addSlidingPlacardFront3D(0.00, 2.30, 2.30, -1, "Placard Estudio");
@@ -2465,90 +2579,155 @@
             addCurtainAssembly(0.90, 7.00, 2.10, 7.00, 0, -0.12, 0x78716c);
 
             // ------------------------------------------------------------------------
-            // D) ESTUDIO ([0.00, 0.00] a [3.00, 2.30], fotos #31 a #40)
+            // D) ESTUDIO ([0.00, 0.00] a [3.00, 2.30]) - ESPECIFICACIÓN EXACTA ITEM 5
             // ------------------------------------------------------------------------
-            // 1. Escritorio en "L" de madera lustrada caoba/cedro rojizo (#8f3818):
-            // - Tramo principal sobre Muro Este (X=2.64, Z=0.14..1.78)
-            addDecorBox(2.64, 0.38, 0.96, 0.64, 0.76, 1.64, 0x8f3818, 0.38);
-            // - Ala en "L" bajo la ventana Norte (X=1.35..2.32, Z=0.38)
-            addDecorBox(1.84, 0.38, 0.38, 0.98, 0.76, 0.58, 0x8f3818, 0.38);
-            // - Gabinete PC Gamer negro bajo el extremo sur del escritorio (X=2.66, Z=1.54) + impresora bajo el ala norte
-            addDecorBox(2.66, 0.24, 1.54, 0.44, 0.46, 0.22, 0x0f172a, 0.3);  // PC Gamer negra Thermaltake
-            addDecorBox(1.92, 0.22, 0.38, 0.42, 0.28, 0.36, 0x1e293b, 0.4);  // Impresora multifunción abajo
-            // - Equipamiento sobre el escritorio (foto #40): Deskmat negro + Monitor 27" + Soporte notebook aluminio + Micrófono en brazo + Parlantes + Lámpara lupa LED
-            addDecorBox(2.54, 0.77, 1.02, 0.42, 0.01, 0.88, 0x111827, 0.6);  // Deskmat negro
-            addDecorBox(2.80, 1.06, 0.98, 0.05, 0.38, 0.62, 0x0f172a, 0.2);  // Monitor 27" con webcam y barra LED
-            addDecorBox(2.58, 0.90, 0.52, 0.22, 0.22, 0.24, 0x94a3b8, 0.3);  // Soporte aluminio de notebook
-            addDecorBox(2.74, 0.92, 1.50, 0.16, 0.26, 0.22, 0x111827, 0.3);  // Parlantes 2.1 + auriculares en soporte + brazo micrófono
-            addDecorBox(2.58, 0.81, 1.58, 0.26, 0.08, 0.32, 0xf8fafc, 0.3);  // Papeles y bandeja blanca
-            addDecorCyl(2.12, 1.05, 0.42, 0.10, 0.10, 0.02, 0x1e293b);       // Lámpara articulada con aro LED / lupa
-            addDecorCyl(2.12, 0.84, 0.48, 0.05, 0.06, 0.14, 0x10b981);       // Escultura impresa en 3D resina verde
+            // Función auxiliar para mesitas octogonales estilizadas
+            function addOctagonalTable(cx, cz, radius, tableH, colorTop = 0xb47b48, colorLegs = 0x2b3036) {
+                // Tapa octogonal de 8 lados (cilindro facetado a 8 lados)
+                const topGeo = new THREE.CylinderGeometry(radius, radius, 0.03, 8);
+                const topMesh = new THREE.Mesh(topGeo, getStdMat(colorTop, 0.45));
+                topMesh.position.set(cx, tableH - 0.015, cz);
+                topMesh.rotation.y = Math.PI / 8; // Orientado a ejes ortogonales
+                topMesh.castShadow = true;
+                topMesh.receiveShadow = true;
+                decorVideoGroup.add(topMesh);
 
-            // 2. Silla Gamer ergonómica negra con detalles rojos frente al escritorio (X=1.95, Z=1.12)
-            addDecorCyl(1.95, 0.22, 1.12, 0.26, 0.26, 0.42, 0x111827, 0.5);  // Base giratoria y asiento negro
-            addDecorBox(1.75, 0.72, 1.12, 0.12, 0.68, 0.48, 0x111827, 0.5);  // Respaldo alto negro
-            addDecorBox(1.74, 0.72, 1.12, 0.13, 0.64, 0.50, 0xdc2626, 0.5);  // Bordes rojos silla gamer
+                // 4 patas inclinadas de madera
+                const legH = tableH - 0.03;
+                const legRadius = radius * 0.65;
+                for (let a = 0; a < 4; a++) {
+                    const ang = a * (Math.PI / 2) + Math.PI / 4;
+                    const lx = cx + Math.cos(ang) * legRadius;
+                    const lz = cz + Math.sin(ang) * legRadius;
+                    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.018, legH, 12), getStdMat(colorLegs, 0.4));
+                    leg.position.set(lx, legH / 2, lz);
+                    leg.castShadow = true;
+                    decorVideoGroup.add(leg);
+                }
+                return topMesh;
+            }
 
-            // 3. 3 Estantes flotantes largos de madera sobre Muro Este (X=2.84, Z=0.22..1.80, foto #40) con libros Tolkien, consolas Game Boy/Switch y potus
-            setMountWall(3.00, 1.02, false);
-            addDecorBox(2.84, 1.38, 1.02, 0.22, 0.03, 1.58, 0x9a441e, 0.45); // 1° Estante inferior (Consolas Game Boy / DS / Switch Pikachu / Globo / Estuches)
-            addDecorBox(2.84, 1.72, 1.02, 0.22, 0.03, 1.58, 0x9a441e, 0.45); // 2° Estante medio (Colección Libros Tolkien + Bolso cámara + Potus)
-            addDecorBox(2.84, 2.06, 0.85, 0.22, 0.03, 1.20, 0x9a441e, 0.45); // 3° Estante superior (Maceta potus y figura Goku, foto #40)
-            addDecorBox(2.84, 1.86, 1.15, 0.18, 0.24, 0.96, 0x7f1d1d, 0.6);  // Hilera de libros encuadernados Tolkien
-            addDecorCyl(2.84, 1.86, 0.30, 0.09, 0.08, 0.24, 0x16a34a, 0.6);  // Planta Potus colgante en el extremo norte
+            // 1. MURO NORTE (Y = 0.00 m):
+            // - Panel Calefactor Negro (X = 0.95 a 1.55 m, ancho 0.60 m) inmediatamente a la izquierda de la ventana:
+            addDecorBox(1.25, 0.48, 0.04, 0.60, 0.50, 0.03, 0x0f172a, 0.15); // Vidrio negro templado
+            addDecorBox(1.50, 0.68, 0.056, 0.04, 0.02, 0.01, 0x38bdf8);      // Display LED digital azul
+            // - Cortina de ventana Norte (V4: X = 1.65 a 2.95 m, barral a Z = 2.15 m):
+            addCurtainAssembly(1.65, 0.00, 2.95, 0.00, 0, 0.12, 0x57534e);
+
+            // 2. ESCRITORIO EN "L" (Madera lustrada cedro/caoba rojizo #8f3818):
+            // - Tramo Largo Principal (contra pared Este X = 3.00 m, lado de la puerta):
+            //   Mide 1.60 m de largo (de Y = 0.00 a 1.60 m, llegando justo al borde de la puerta abierta)
+            //   por 0.65 m de profundidad (de X = 2.35 a 3.00 m).
+            addDecorBox(2.675, 0.745, 0.80, 0.65, 0.035, 1.60, 0x8f3818, 0.38); // Tapa principal
+            addDecorBox(2.675, 0.36, 1.58, 0.63, 0.72, 0.035, 0x6b2810, 0.4);   // Pata lateral Sur (límite puerta)
+
+            // - Ala Corta (contra pared Norte Y = 0.00 m, bajo la ventana):
+            //   Sale hacia la izquierda desde X = 2.35 m hasta X = 1.75 m (0.60 m de extensión libre)
+            //   por 0.45 m de profundidad (de Y = 0.00 a 0.45 m).
+            addDecorBox(2.05, 0.745, 0.225, 0.60, 0.035, 0.45, 0x8f3818, 0.38); // Tapa ala corta en L
+            addDecorBox(1.77, 0.36, 0.225, 0.035, 0.72, 0.43, 0x6b2810, 0.4);   // Pata lateral izquierda
+
+            // - Gabinete PC Gamer abajo a la derecha (en Y = 1.45 m, ocupando X = 2.65..2.95, Y = 1.30..1.58):
+            addDecorBox(2.80, 0.24, 1.45, 0.24, 0.46, 0.42, 0x0f172a, 0.25); // Chasis Thermaltake negro
+            addDecorBox(2.675, 0.24, 1.45, 0.01, 0.42, 0.38, 0x38bdf8, 0.2); // Ventana vidrio con iluminación RGB
+
+            // - Equipamiento sobre escritorio:
+            // Monitor 27" centrado en Y = 0.80 m
+            addDecorBox(2.82, 1.05, 0.80, 0.05, 0.38, 0.62, 0x0f172a, 0.2);
+            addDecorBox(2.82, 1.25, 0.80, 0.04, 0.02, 0.45, 0x334155);       // Barra de luz LED superior
+            addDecorBox(2.80, 1.25, 0.80, 0.04, 0.03, 0.06, 0x111827);       // Webcam HD
+            // Deskmat negro, teclado y mouse
+            addDecorBox(2.62, 0.765, 0.80, 0.44, 0.008, 0.84, 0x111827, 0.7);
+            addDecorBox(2.62, 0.775, 0.76, 0.16, 0.018, 0.38, 0x1e293b, 0.3);
+            addDecorBox(2.62, 0.775, 0.98, 0.10, 0.025, 0.06, 0x0f172a, 0.3);
+            // Soporte notebook aluminio en Y = 0.35 m
+            addDecorBox(2.62, 0.88, 0.35, 0.26, 0.20, 0.32, 0x94a3b8, 0.3);
+            // Parlantes 2.1 y brazo articulado con micrófono
+            addDecorBox(2.80, 0.88, 0.44, 0.12, 0.20, 0.12, 0x111827, 0.3);
+            addDecorBox(2.80, 0.88, 1.16, 0.12, 0.20, 0.12, 0x111827, 0.3);
+            addDecorCyl(2.85, 0.95, 1.28, 0.02, 0.02, 0.35, 0x1e293b);
+            // Lámpara con lupa articulada y figura resina sobre ala corta
+            addDecorCyl(1.95, 0.98, 0.20, 0.08, 0.08, 0.02, 0x1e293b);
+            addDecorCyl(1.95, 0.83, 0.30, 0.04, 0.05, 0.12, 0x10b981);
+
+            // 3. 3 ESTANTES FLOTANTES (Muro Este X = 3.00 m):
+            // Corren por encima del escritorio principal, de Y = 0.10 m a 1.55 m (profundidad 0.25 m):
+            // a alturas Z = 1.35 m, Z = 1.70 m y Z = 2.05 m:
+            setMountWall(3.00, 0.85, false);
+            // 1° Estante (Z = 1.35 m): consolas portátiles y estuches
+            addDecorBox(2.875, 1.35, 0.85, 0.25, 0.03, 1.40, 0x9a441e, 0.45);
+            addDecorBox(2.86, 1.42, 0.45, 0.16, 0.10, 0.18, 0xfacc15, 0.3); // Game Boy / Switch Pikachu
+            addDecorBox(2.86, 1.42, 0.75, 0.16, 0.10, 0.24, 0x38bdf8, 0.4); // Consola azul
+            addDecorBox(2.86, 1.44, 1.20, 0.18, 0.14, 0.30, 0x334155, 0.5); // Estuches negros
+            // 2° Estante (Z = 1.70 m): colección libros Tolkien y bolso cámara
+            addDecorBox(2.875, 1.70, 0.85, 0.25, 0.03, 1.40, 0x9a441e, 0.45);
+            addDecorBox(2.86, 1.83, 0.95, 0.18, 0.22, 0.75, 0x7f1d1d, 0.6); // Libros Tolkien bordó
+            addDecorBox(2.86, 1.80, 0.45, 0.18, 0.16, 0.26, 0x18181b, 0.7); // Bolso cámara
+            // 3° Estante (Z = 2.05 m): planta Potus colgante y figura Goku
+            addDecorBox(2.875, 2.05, 0.85, 0.25, 0.03, 1.40, 0x9a441e, 0.45);
+            addDecorCyl(2.86, 2.14, 0.35, 0.08, 0.06, 0.14, 0xf8fafc, 0.3); // Maceta Potus
+            addDecorBox(2.86, 1.95, 0.35, 0.12, 0.30, 0.18, 0x16a34a, 0.6);  // Ramas colgantes
+            addDecorBox(2.86, 2.16, 1.15, 0.10, 0.18, 0.12, 0xf97316, 0.4); // Figura Goku naranja
             setMountWall(null);
 
-            // 4. Muro Norte (izquierda de la ventana, foto #33): Panel calefactor eléctrico negro (X=0.92, Z=0.08) + Mesa plegable con Ajedrez clásico en esquina NO (X=0.28, Z=0.28)
-            addDecorBox(0.92, 0.48, 0.08, 0.50, 0.50, 0.05, 0x0f172a, 0.2);  // Panel calefactor eléctrico vidrio negro en pared Norte (foto #33)
-            addDecorBox(0.28, 0.35, 0.28, 0.44, 0.70, 0.44, 0xb47b48, 0.55); // Mesa plegable cuadrada en esquina Noroeste (foto #33)
-            addDecorBox(0.28, 0.72, 0.28, 0.38, 0.03, 0.38, 0x1e293b, 0.3);  // Tablero de ajedrez clásico en esquina NO
+            // 4. BIBLIOTECA ALTA (Muro Oeste X = 0.00 m):
+            // Mueble negro ubicado entre Y = 0.45 m e Y = 1.55 m (profundidad 0.30 m, altura 1.85 m):
+            setMountWall(0.00, 1.00, false);
+            addDecorBox(0.15, 0.925, 1.00, 0.30, 1.85, 1.10, 0x18181b, 0.6); // Mueble negro grafito
+            // Libros, peluches y figuras en estantes
+            addDecorBox(0.18, 0.45, 0.80, 0.22, 0.20, 0.50, 0x3b82f6, 0.5);
+            addDecorBox(0.18, 0.80, 1.10, 0.22, 0.22, 0.40, 0x10b981, 0.5);
+            addDecorBox(0.18, 1.15, 0.85, 0.20, 0.18, 0.30, 0xeab308, 0.5);
+            // Cajas Switch / Switch 2 arriba de la biblioteca
+            addDecorBox(0.15, 2.00, 0.80, 0.24, 0.26, 0.45, 0xdc2626, 0.4);
+            addDecorBox(0.15, 2.00, 1.25, 0.22, 0.24, 0.35, 0x1e293b, 0.4);
+            setMountWall(null);
 
-            // 5. Muro Oeste (X=0.00, fotos #35 a #38): Biblioteca alta de 6 niveles (X=0.20, Z=1.18) + Funda Guitarra (Z=1.68) + Mesita redonda con Ajedrez LOTR en esquina SO (X=0.28, Z=2.04) + Aspiradora Kärcher amarilla
-            addDecorBox(0.20, 0.92, 1.18, 0.32, 1.84, 0.84, 0x3b2314, 0.55); // Biblioteca 6 estantes (libros, Buzz/Woody, peluches Pokémon, cajas Switch/Switch 2 y Torre Eiffel arriba)
-            addDecorBox(0.20, 2.02, 1.18, 0.26, 0.32, 0.72, 0xdc2626, 0.5);  // Cajas Nintendo Switch / Switch 2 / Funko sobre la biblioteca (foto #35)
-            addDecorCyl(0.22, 0.52, 1.72, 0.12, 0.18, 1.02, 0x1e293b, 0.7);  // Funda negra acolchada de guitarra acústica (foto #35 y #37)
-            addDecorCyl(0.28, 0.36, 2.04, 0.22, 0.22, 0.72, 0xd4a373, 0.55); // Mesita redonda plegable de madera clara en esquina SO junto al placard (foto #37)
-            addDecorCyl(0.28, 0.74, 2.04, 0.20, 0.20, 0.04, 0x475569, 0.3);  // Tablero de Ajedrez El Señor de los Anillos (LOTR)
-            addDecorCyl(1.12, 0.18, 2.04, 0.14, 0.14, 0.34, 0xeab308, 0.3);  // Aspiradora Kärcher amarilla y negra frente al placard del estudio (foto #37 y #38)
-            // Cosas guardadas HACIA ADENTRO en la baulera abierta del estudio (relevado fielmente de la foto real):
-            // La baulera está a Y=2.17m y se adentra entre Z=2.32 y Z=2.78 (profundidad ~0.46m hacia el muro del baño Z=2.80)
-            
-            // 1. Sector Izquierdo (X=0.25..0.75):
-            // - Caja Sony / tecnología azul abajo
-            addDecorBox(0.44, 2.25, 2.62, 0.34, 0.16, 0.26, 0x1e3a8a, 0.4);
-            // - Caja blanca Mirage L120 (Aerocool) arriba de la caja Sony
-            addDecorBox(0.44, 2.42, 2.62, 0.26, 0.18, 0.22, 0xf8fafc, 0.3);
-            // - Bolso para cámara / morral negro adelante con libreta/papeles en el bolsillo frontal
-            addDecorBox(0.38, 2.27, 2.42, 0.28, 0.20, 0.18, 0x18181b, 0.7);
-            addDecorBox(0.38, 2.23, 2.32, 0.14, 0.10, 0.03, 0xf1f5f9, 0.3); // Libreta blanca en bolsillo
-            // Tira/correa negra del bolso que cuelga sobre el dintel blanco
-            addDecorBox(0.41, 2.08, 2.29, 0.035, 0.18, 0.015, 0x18181b, 0.8);
+            // 5. MESITAS OCTOGONALES:
+            // - Mesita Ajedrez: en esquina superior izquierda [0.25, 0.25] (entre biblioteca y pared Norte):
+            addOctagonalTable(0.25, 0.25, 0.22, 0.72, 0xb47b48, 0x2b3036);
+            addDecorBox(0.25, 0.735, 0.25, 0.30, 0.015, 0.30, 0x1e293b, 0.3); // Tablero ajedrez clásico
+            addDecorCyl(0.20, 0.76, 0.20, 0.012, 0.012, 0.04, 0xf8fafc);      // Pieza blanca
+            addDecorCyl(0.30, 0.76, 0.30, 0.012, 0.012, 0.04, 0x0f172a);      // Pieza negra
 
-            // 2. Sector Central-Izquierdo (X=0.75..1.30):
-            // - Bolso deportivo azul marino / lona al fondo
-            addDecorBox(0.92, 2.32, 2.64, 0.42, 0.24, 0.22, 0x1e293b, 0.7);
-            // - Mat / colchoneta de yoga lila/rosa enrollada con correas negras
-            addDecorBox(0.94, 2.33, 2.48, 0.46, 0.13, 0.13, 0xd9779f, 0.6);
-            // - Funda tubular negra alargada adelante (trípode o bolso porta colchoneta)
-            addDecorBox(0.94, 2.22, 2.38, 0.52, 0.10, 0.12, 0x111827, 0.8);
+            // - Mesita Miniaturas ("Minis"): en esquina inferior izquierda [0.25, 2.00] (al lado de biblioteca y pegada al placard):
+            addOctagonalTable(0.25, 2.00, 0.22, 0.72, 0xd4a373, 0x2b3036);
+            addDecorBox(0.25, 0.735, 2.00, 0.30, 0.015, 0.30, 0x475569, 0.3); // Base pintura / tablero LOTR
+            addDecorCyl(0.20, 0.76, 1.95, 0.015, 0.015, 0.035, 0x64748b);     // Miniatura gris
+            addDecorCyl(0.28, 0.76, 2.05, 0.015, 0.015, 0.04, 0xd97706);      // Miniatura dorada
+            addDecorCyl(0.22, 0.76, 2.05, 0.015, 0.015, 0.035, 0x16a34a);     // Miniatura verde
 
-            // 3. Sector Central-Derecho (X=1.30..1.65):
-            // - Caja de zapatos CAT gris grafito abajo con logo amarillo CAT en esquina
-            addDecorBox(1.44, 2.24, 2.52, 0.34, 0.14, 0.28, 0x27272a, 0.5);
-            addDecorBox(1.58, 2.24, 2.37, 0.05, 0.045, 0.01, 0xfacc15, 0.2); // Logo amarillo CAT
-            // - Caja de zapatos de cartón marrón Lippi arriba de la caja CAT
-            addDecorBox(1.42, 2.375, 2.52, 0.32, 0.13, 0.26, 0xb48a64, 0.6);
+            // 6. SILLA GAMER ERGONÓMICA:
+            // Centrada frente al tramo largo del escritorio en X = 1.95 m, Y = 0.85 m:
+            addDecorCyl(1.95, 0.22, 0.85, 0.26, 0.26, 0.42, 0x111827, 0.5);  // Base estrella 5 ruedas
+            addDecorBox(1.95, 0.45, 0.85, 0.48, 0.10, 0.48, 0x111827, 0.5);  // Asiento cuero negro
+            addDecorBox(1.73, 0.75, 0.85, 0.08, 0.65, 0.46, 0x111827, 0.5);  // Respaldo alto negro
+            addDecorBox(1.72, 0.75, 0.85, 0.09, 0.62, 0.48, 0xdc2626, 0.5);  // Vivos rojos gamer
+            addDecorBox(1.95, 0.62, 0.60, 0.24, 0.03, 0.08, 0x1e293b, 0.3);  // Apoyabrazos
+            addDecorBox(1.95, 0.62, 1.10, 0.24, 0.03, 0.08, 0x1e293b, 0.3);
 
-            // 4. Sector Derecho (X=1.65..2.10):
-            // - Rueda de auxilio de auto apoyada sobre la losa
-            addDecorCyl(1.84, 2.26, 2.56, 0.26, 0.26, 0.18, 0x27272a, 0.9);
-            // - Casco de ciclismo / moto apoyado encima del neumático
-            addDecorBox(1.80, 2.42, 2.54, 0.20, 0.12, 0.24, 0x1e293b, 0.3);
-            // - Manta / lona verde salvia clara doblada al costado del neumático
-            addDecorBox(1.98, 2.27, 2.44, 0.26, 0.18, 0.26, 0xb5bda0, 0.7);
+            // 7. OBJETOS EN BAULERA ABIERTA DEL ESTUDIO (sobre losa plana en Z = 2.20 m):
+            // - Sector Izquierdo (X=0.25..0.75):
+            addDecorBox(0.44, 2.20 + 0.08, 2.62, 0.34, 0.16, 0.26, 0x1e3a8a, 0.4); // Caja Sony azul
+            addDecorBox(0.44, 2.20 + 0.25, 2.62, 0.26, 0.18, 0.22, 0xf8fafc, 0.3); // Caja Mirage L120 blanca
+            addDecorBox(0.38, 2.20 + 0.10, 2.42, 0.28, 0.20, 0.18, 0x18181b, 0.7); // Morral negro
+            addDecorBox(0.38, 2.20 + 0.05, 2.32, 0.14, 0.10, 0.03, 0xf1f5f9, 0.3); // Libreta
+            addDecorBox(0.41, 2.20 - 0.06, 2.29, 0.035, 0.18, 0.015, 0x18181b, 0.8);// Correa colgante
 
-            // 6. Cortina gris oscura con visillo blanco en la ventana Norte del Estudio (V4: X=1.35..2.55, Z=0.00, encuadrada sobre el ala Norte del escritorio en L)
-            addCurtainAssembly(1.35, 0.00, 2.55, 0.00, 0, 0.12, 0x57534e);
+            // - Sector Central-Izquierdo (X=0.75..1.30):
+            addDecorBox(0.92, 2.20 + 0.12, 2.64, 0.42, 0.24, 0.22, 0x1e293b, 0.7); // Bolso deportivo azul
+            addDecorBox(0.94, 2.20 + 0.13, 2.48, 0.46, 0.13, 0.13, 0xd9779f, 0.6); // Mat yoga lila
+            addDecorBox(0.94, 2.20 + 0.05, 2.38, 0.52, 0.10, 0.12, 0x111827, 0.8); // Funda tubular negra
+
+            // - Sector Central-Derecho (X=1.30..1.65):
+            addDecorBox(1.44, 2.20 + 0.07, 2.52, 0.34, 0.14, 0.28, 0x27272a, 0.5); // Caja zapatos CAT
+            addDecorBox(1.58, 2.20 + 0.07, 2.37, 0.05, 0.045, 0.01, 0xfacc15, 0.2);// Logo amarillo CAT
+            addDecorBox(1.42, 2.20 + 0.20, 2.52, 0.32, 0.13, 0.26, 0xb48a64, 0.6); // Caja zapatos Lippi
+
+            // - Sector Derecho (X=1.65..2.10):
+            addDecorCyl(1.84, 2.20 + 0.09, 2.56, 0.26, 0.26, 0.18, 0x27272a, 0.9); // Neumático auxilio
+            addDecorBox(1.80, 2.20 + 0.24, 2.54, 0.20, 0.12, 0.24, 0x1e293b, 0.3); // Casco ciclismo
+            addDecorBox(1.98, 2.20 + 0.09, 2.44, 0.26, 0.18, 0.26, 0xb5bda0, 0.7); // Manta verde salvia
         }
         buildFurnishedVideoDecor();
         resolveWallMounts();
@@ -2564,6 +2743,31 @@
             document.getElementById('labels-container').appendChild(el);
             labelElements.push({ el, pos: new THREE.Vector3(x, 0.1, z), isDecor });
         }
+
+        // --- LÍNEAS 2D DE EQUIPAMIENTO EXACTO DEL ESTUDIO ---
+        // Calefactor negro en pared Norte [0.95..1.55, 0.00..0.04]
+        addLine2DSegment(0.95, 0.03, 1.55, 0.03, 0.035, 0x0f172a);
+        // Escritorio en L:
+        // - Tramo Largo Principal [2.35..3.00, 0.00..1.60]
+        addLine2DSegment(2.35, 0.00, 2.35, 1.60, 0.018, 0x8f3818);
+        addLine2DSegment(2.35, 1.60, 3.00, 1.60, 0.018, 0x8f3818);
+        // - Ala Corta [1.75..2.35, 0.00..0.45]
+        addLine2DSegment(1.75, 0.00, 1.75, 0.45, 0.018, 0x8f3818);
+        addLine2DSegment(1.75, 0.45, 2.35, 0.45, 0.018, 0x8f3818);
+        // 3 Estantes Flotantes Este [2.75..3.00, 0.10..1.55]
+        addDashedLine(2.75, 0.10, 2.75, 1.55);
+        // Biblioteca Alta Oeste [0.00..0.30, 0.45..1.55]
+        addLine2DSegment(0.30, 0.45, 0.30, 1.55, 0.018, 0x18181b);
+        addLine2DSegment(0.00, 0.45, 0.30, 0.45, 0.018, 0x18181b);
+        addLine2DSegment(0.00, 1.55, 0.30, 1.55, 0.018, 0x18181b);
+        // Mesita Ajedrez [0.25, 0.25]
+        addLine2DSegment(0.12, 0.25, 0.38, 0.25, 0.016, 0xb47b48);
+        addLine2DSegment(0.25, 0.12, 0.25, 0.38, 0.016, 0xb47b48);
+        // Mesita Miniaturas [0.25, 2.00]
+        addLine2DSegment(0.12, 2.00, 0.38, 2.00, 0.016, 0xd4a373);
+        addLine2DSegment(0.25, 1.87, 0.25, 2.13, 0.016, 0xd4a373);
+        // Silla Gamer [1.95, 0.85]
+        addLine2DSegment(1.80, 0.85, 2.10, 0.85, 0.02, 0xdc2626);
 
         // Estudio: [0.00, 0.00] a [3.00, 2.30]
         addPlanLabel(1.15, 1.35, "ESTUDIO");
@@ -3034,6 +3238,10 @@
                 w.bodyMesh.scale.y = h;
                 w.bodyMesh.position.y = h / 2;
                 w.capMesh.position.y = h + 0.01;
+            } else if (w.type === 'slopedWall') {
+                const ratio = Math.max(0.01, h / (w.maxH || WALL_H));
+                w.bodyMesh.scale.y = ratio;
+                w.capMesh.position.y = ((w.h1 + w.h2) / 2) * ratio + 0.01;
             } else if (w.type === 'window') {
                 const curSill = Math.min(w.sillH, h);
                 w.sillMesh.scale.y = curSill;
