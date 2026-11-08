@@ -234,10 +234,10 @@ def main():
 
     # B) COCINA: Heladera con Freezer + Bodega al Noreste (X=4.55..5.15, Y=4.56..5.20), Lavarropas + Estación Café bajo ventana Sur (lado Oeste: X=3.24..3.86, Y=6.38..6.94) y Cestos + Portero sobre pared Oeste (X=3.06..3.42, Y=5.30..6.26)
     draw.rounded_rectangle([*px(4.55, 4.56), *px(5.15, 5.20)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
-    draw.rounded_rectangle([*px(3.24, 6.38), *px(3.86, 6.94)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
+    draw.rounded_rectangle([*px(3.25, 6.38), *px(3.85, 6.94)], radius=6, fill=(248, 250, 252), outline=(71, 85, 105), width=2)
     cx_w, cy_w = px(3.55, 6.66)
     draw.ellipse([cx_w - 14, cy_w - 14, cx_w + 14, cy_w + 14], fill=(226, 232, 240), outline=(100, 116, 139), width=2)
-    draw.rounded_rectangle([*px(3.06, 5.30), *px(3.42, 6.26)], radius=5, fill=(226, 232, 240), outline=(100, 116, 139), width=2)
+    draw.rounded_rectangle([*px(3.25, 5.30), *px(3.55, 6.26)], radius=5, fill=(226, 232, 240), outline=(100, 116, 139), width=2)
 
     # C) CUARTO AMPLIADO: Cama 2 Plazas (X=0.10..2.00, Y=5.12..6.52) + Respaldo Ancho Nogal y 2 Mesas de Luz sobre pared Oeste (X=0.00) + Cesto Ropa al Este
     draw.rounded_rectangle([*px(0.10, 5.12), *px(2.00, 6.52)], radius=8, fill=(226, 232, 240), outline=(71, 85, 105), width=2)
@@ -311,7 +311,8 @@ def main():
     # Eje Vertical Central X = 3.00:
     draw.line([px(3.00, 0.00), px(3.00, 3.70)], fill=WALL_COLOR, width=INT_W)
     draw_dashed_line(draw, *px(3.00, 3.70), *px(3.00, 4.50), fill=DASH_COLOR, width=3)
-    draw.line([px(3.00, 4.50), px(3.00, 7.00)], fill=WALL_COLOR, width=INT_W)
+    draw.line([px(3.00, 4.50), px(3.20, 4.50)], fill=WALL_COLOR, width=INT_W)
+    draw.line([px(3.20, 4.50), px(3.20, 7.00)], fill=WALL_COLOR, width=INT_W)
 
     # Eje Vertical X = 5.20 (separa Cocina de Entrada): de Y = 4.50 a Y = 5.70
     draw.line([px(5.20, 4.50), px(5.20, 5.70)], fill=WALL_COLOR, width=INT_W)
@@ -344,7 +345,7 @@ def main():
     draw_dashed_line(draw, *px(2.30, 4.50), *px(3.00, 4.50), fill=DASH_COLOR, width=3)
     draw_door_symbol(draw, px, (2.95, 4.50), (2.75, 4.72), (2.55, 4.72), (2.42, 4.50), DOOR_COLOR, width=3)
     # - Cocina SIN PUERTA (vano abierto libre de X = 3.00 a X = 4.45; mocheta de X = 4.45 a X = 5.20 delante de la heladera)
-    draw_dashed_line(draw, *px(3.00, 4.50), *px(4.45, 4.50), fill=DASH_COLOR, width=3)
+    draw_dashed_line(draw, *px(3.20, 4.50), *px(4.45, 4.50), fill=DASH_COLOR, width=3)
     draw.line([px(4.45, 4.50), px(5.20, 4.50)], fill=WALL_COLOR, width=INT_W)
 
     # -------------------------------------------------------------------------
@@ -365,7 +366,7 @@ def main():
     draw.text(px(1.72, 4.88), "CUARTO", fill=TEXT_COLOR, font=f_room, anchor="mm")
     draw.text(px(4.92, 3.68), "LIVING", fill=TEXT_COLOR, font=f_living, anchor="mm")
     draw.text(px(4.92, 3.94), "(Techo madera + vigas vistas)", fill=SUB_COLOR, font=f_sub, anchor="mm")
-    draw.text(px(3.98, 5.50), "COCINA", fill=TEXT_COLOR, font=f_room, anchor="mm")
+    draw.text(px(4.15, 5.50), "COCINA", fill=TEXT_COLOR, font=f_room, anchor="mm")
     draw.text(px(5.58, 5.38), "ENTRADA", fill=TEXT_COLOR, font=f_sm, anchor="mm")
     draw.text(px(5.75, 6.23), "PALIER", fill=PALIER_TEXT, font=f_palier, anchor="mm")
     draw.text(px(5.75, 6.42), "EDIFICIO", fill=PALIER_TEXT, font=f_palier, anchor="mm")

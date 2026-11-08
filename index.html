@@ -1489,14 +1489,13 @@
         addWallSegment(4.85, 6.30, 4.85, 8.00, EXT_T, exteriorWallsGroup, true, 3.26);
 
         // Muro Inferior (Sur, Z = 8.00): cierra de [0.00, 8.00] a [4.85, 8.00]
-        // - Sector Cuarto (X = 0.00 a 3.00 m):
+        // - Sector Cuarto (X = 0.00 a 3.20 m):
         addSlopedWallSegment(0.00, 8.00, 0.90, 8.00, 2.48, 2.91, EXT_T, exteriorWallsGroup, true);
         addWindowSegment(0.90, 8.00, 2.10, 8.00, 0.95, 1.10, 2.91, 3.48);
         addSlopedWallSegment(2.10, 8.00, 2.30, 8.00, 3.48, 3.58, EXT_T, exteriorWallsGroup, true);
-        addWallSegment(2.30, 8.00, 3.00, 8.00, EXT_T, exteriorWallsGroup, true, 3.58);
+        addWallSegment(2.30, 8.00, 3.20, 8.00, EXT_T, exteriorWallsGroup, true, 3.58);
 
-        // - Sector Cocina ajustada (X = 3.00 a 4.85 m):
-        addSlopedWallSegment(3.00, 8.00, 3.25, 8.00, 3.58, 3.53, EXT_T, exteriorWallsGroup, true);
+        // - Sector Cocina (X = 3.20 a 4.85 m, pared divisoria toca justo el lavarropas en X = 3.25):
         addWindowSegment(3.25, 8.00, 4.55, 8.00, 1.05, 0.95, 3.53, 3.30);
         addSlopedWallSegment(4.55, 8.00, 4.85, 8.00, 3.30, 3.26, EXT_T, exteriorWallsGroup, true);
 
@@ -1757,8 +1756,8 @@
         addWallSegment(3.00, 0.00, 3.00, 4.05, INT_T, interiorWallsGroup, false, 3.56);
         // - VANO ABIERTO (Paso Living-Pasillo): Sin muro entre Z = 4.05 y Z = 4.80 (0.75 m de paso libre al pasillo)
         addDashedLine(3.00, 4.05, 3.00, 4.80);
-        // - Muro sólido de Z = 4.80 a Z = 8.00 (separa Cuarto de Cocina, remata a 3.56 m bajo el techo)
-        addWallSegment(3.00, 4.80, 3.00, 8.00, INT_T, interiorWallsGroup, false, 3.56);
+        // - Muro sólido divisorio Cuarto-Cocina (trasladado a X = 3.20 para que la pared derecha de Cocina toque justo el lavarropas en X = 3.25):
+        addWallSegment(3.20, 4.80, 3.20, 8.00, INT_T, interiorWallsGroup, false, 3.56);
 
         // Eje Vertical X = 4.85 (separa Cocina de Entrada): de Z = 4.80 a Z = 6.30 a cota 3.26 m
         addWallSegment(4.85, 4.80, 4.85, 6.30, INT_T, interiorWallsGroup, false, 3.26);
@@ -1782,10 +1781,12 @@
         // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Cuarto)
         addDashedLine(2.30, 4.70, 3.00, 4.70);
         addDoorSymbol2D(2.95, 4.70, 2.75, 4.92, 2.55, 4.92, 2.42, 4.70);
-        // - VANO ABIERTO COCINA (Corregido a ancho reglamentario de 0.85 m; mocheta de 1.00 m cubre la heladera):
-        //   Paso libre de X = 3.00 a X = 3.85; mocheta de X = 3.85 a X = 4.85 (3.44 m a 3.26 m)
-        addDashedLine(3.00, 4.80, 3.85, 4.80);
-        addSlopedWallSegment(3.85, 4.80, 4.85, 4.80, 3.38, 3.20, INT_T, interiorWallsGroup);
+        // Mocheta de unión entre marco puerta Cuarto (X=3.00) y tabique divisorio Cocina (X=3.20):
+        addWallSegment(3.00, 4.70, 3.20, 4.70, INT_T, interiorWallsGroup, false, 3.56);
+        // - VANO ABIERTO COCINA:
+        //   Paso libre de X = 3.20 a X = 3.95 (0.75 m); mocheta de X = 3.95 a X = 4.85 (cubre la heladera)
+        addDashedLine(3.20, 4.80, 3.95, 4.80);
+        addSlopedWallSegment(3.95, 4.80, 4.85, 4.80, 3.36, 3.20, INT_T, interiorWallsGroup);
 
         // ============================================================================
         // 4B. PUERTAS 3D REALES EXTRAÍDAS DEL VIDEO (MARCOS DE CHAPA, HOJAS MADERA,
@@ -2246,12 +2247,12 @@
             buildWoodenRoof();
             // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 3.85, ancho 0.85 m)
             // Remata a 3.30 m bajo las vigas de madera para evitar perforaciones en la cubierta
-            const wCocinaVano = 0.85;
+            const wCocinaVano = 0.75;
             const lintelTopH = 3.30;
             const lintelH = lintelTopH - DOOR_H;
             const cocinaLintel = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
             cocinaLintel.scale.set(wCocinaVano, lintelH, INT_T);
-            cocinaLintel.position.set(3.00 + wCocinaVano / 2, DOOR_H + lintelH / 2, 4.80);
+            cocinaLintel.position.set(3.20 + wCocinaVano / 2, DOOR_H + lintelH / 2, 4.80);
             doors3DGroup.add(cocinaLintel);
             attachWallMount(cocinaLintel, 4.35, 4.80, true);
             // Instanciar puertas 3D interactivas con dintel a 3.56 m bajo la viga cumbrera:
@@ -2648,24 +2649,24 @@
             setMountWall(null);
             // - Escurridor de platos negro sobre el retorno Sur de la mesada (mitad izquierda bajo la ventana: X=4.22, Z=7.68)
             addDecorBox(4.22, 0.93, 7.68, 0.38, 0.10, 0.36, 0x1e293b, 0.4, 0, 'Escurridor de Platos Negro');
-            // - Lavarropas automático blanco de carga frontal bajo la mitad derecha de la ventana Sur (lado Oeste: X=3.54, Z=7.67, mirando al Norte) + tapa de madera
-            addDecorBox(3.54, 0.42, 7.67, 0.60, 0.84, 0.58, 0xf8fafc, 0.3, 0, 'Lavarropas Automático');  // Cuerpo lavarropas
-            const drum = addDecorCyl(3.54, 0.44, 7.37, 0.18, 0.18, 0.04, 0x334155, 0.2, 'Puerta Lavarropas'); // Ojo de buey mirando al Norte
+            // - Lavarropas automático blanco de carga frontal bajo la ventana Sur (X=3.25..3.85, Z=7.67, mirando al Norte) que toca justo la pared Oeste en X=3.25
+            addDecorBox(3.55, 0.42, 7.67, 0.60, 0.84, 0.58, 0xf8fafc, 0.3, 0, 'Lavarropas Automático');  // Cuerpo lavarropas
+            const drum = addDecorCyl(3.55, 0.44, 7.37, 0.18, 0.18, 0.04, 0x334155, 0.2, 'Puerta Lavarropas'); // Ojo de buey mirando al Norte
             drum.rotation.x = Math.PI / 2;
-            addDecorBox(3.54, 0.86, 7.67, 0.64, 0.04, 0.60, 0xb47b48, 0.45, 0, 'Tapa Madera Lavarropas'); // Tapa de madera sobre lavarropas
+            addDecorBox(3.55, 0.86, 7.67, 0.60, 0.04, 0.60, 0xb47b48, 0.45, 0, 'Tapa Madera Lavarropas'); // Tapa de madera que apoya exacta contra la pared en X=3.25
             // - Estación de café sobre la tapa de madera del lavarropas (frente a la ventana): Cafetera expreso + Pava eléctrica negra
-            addDecorBox(3.62, 1.04, 7.68, 0.28, 0.32, 0.28, 0x334155, 0.3, 0, 'Cafetera Espresso');  // Cafetera expreso plateada/negra
-            addDecorCyl(3.32, 0.98, 7.68, 0.08, 0.09, 0.20, 0x0f172a, 0.3, 'Pava Eléctrica Negra');  // Pava eléctrica negra
-            // 4. Pared Oeste de la Cocina (X=3.00): 2 Cestos de basura en fila + bolso térmico + escoba azul con pala + portero eléctrico + aplique luz
-            addDecorBox(3.24, 0.26, 7.08, 0.34, 0.52, 0.34, 0xf8fafc, 0.4, 0, 'Cesto Basura Blanco');  // Cesto blanco (más cercano al lavarropas)
-            addDecorBox(3.24, 0.53, 7.08, 0.30, 0.03, 0.30, 0x1e293b, 0.4, 0, 'Tapa Cesto Blanco');  // Tapa vaivén negra del cesto blanco
-            addDecorBox(3.24, 0.28, 6.68, 0.34, 0.56, 0.36, 0x64748b, 0.5, 0, 'Cesto Basura Gris');  // Cesto gris con tapa
-            addDecorBox(3.24, 0.14, 6.32, 0.28, 0.26, 0.26, 0x1e1b4b, 0.7, 0, 'Bolso Térmico');  // Bolso térmico negro/rosa delante del cesto gris
-            addDecorCyl(3.07, 0.65, 6.68, 0.015, 0.015, 1.25, 0x1d4ed8, 0.4, 'Escoba Azul'); // Escoba cabo azul apoyada en pared Oeste
-            addDecorBox(3.08, 0.36, 6.68, 0.08, 0.22, 0.20, 0xf8fafc, 0.4, 0, 'Pala de Basura');  // Pala blanca colgada en la escoba
-            setMountWall(3.00, 6.00, false);
-            addDecorBox(3.06, 1.42, 5.50, 0.05, 0.22, 0.10, 0xfef3c7, 0.4, 0, 'Portero Eléctrico Intercom');  // Teléfono portero eléctrico beige
-            addDecorBox(3.06, 2.15, 5.75, 0.06, 0.16, 0.24, 0xffffff, 0.3, 0, 'Aplique de Pared Cocina');  // Aplique de pared medialuna blanco
+            addDecorBox(3.65, 1.04, 7.68, 0.26, 0.32, 0.26, 0x334155, 0.3, 0, 'Cafetera Espresso');  // Cafetera expreso plateada/negra
+            addDecorCyl(3.38, 0.98, 7.68, 0.08, 0.09, 0.20, 0x0f172a, 0.3, 'Pava Eléctrica Negra');  // Pava eléctrica negra
+            // 4. Pared Oeste de la Cocina (X=3.20): 2 Cestos de basura en fila + bolso térmico + escoba azul con pala + portero eléctrico + aplique luz
+            addDecorBox(3.42, 0.26, 7.08, 0.30, 0.52, 0.30, 0xf8fafc, 0.4, 0, 'Cesto Basura Blanco');  // Cesto blanco (junto a pared X=3.20)
+            addDecorBox(3.42, 0.53, 7.08, 0.28, 0.03, 0.28, 0x1e293b, 0.4, 0, 'Tapa Cesto Blanco');  // Tapa vaivén negra del cesto blanco
+            addDecorBox(3.42, 0.28, 6.68, 0.30, 0.56, 0.32, 0x64748b, 0.5, 0, 'Cesto Basura Gris');  // Cesto gris con tapa
+            addDecorBox(3.42, 0.14, 6.32, 0.26, 0.26, 0.24, 0x1e1b4b, 0.7, 0, 'Bolso Térmico');  // Bolso térmico negro/rosa delante del cesto gris
+            addDecorCyl(3.27, 0.65, 6.68, 0.015, 0.015, 1.25, 0x1d4ed8, 0.4, 'Escoba Azul'); // Escoba cabo azul apoyada en pared Oeste
+            addDecorBox(3.28, 0.36, 6.68, 0.08, 0.22, 0.20, 0xf8fafc, 0.4, 0, 'Pala de Basura');  // Pala blanca colgada en la escoba
+            setMountWall(3.20, 6.00, false);
+            addDecorBox(3.26, 1.42, 5.50, 0.05, 0.22, 0.10, 0xfef3c7, 0.4, 0, 'Portero Eléctrico Intercom');  // Teléfono portero eléctrico beige
+            addDecorBox(3.26, 2.15, 5.75, 0.06, 0.16, 0.24, 0xffffff, 0.3, 0, 'Aplique de Pared Cocina');  // Aplique de pared medialuna blanco
             setMountWall(null);
 
             // ------------------------------------------------------------------------
@@ -3339,7 +3340,7 @@
             { id: 'vid_mesa_red', name: 'Mesa Comedor Redonda + 4 Sillas', room: 'Living', x: 4.55, z: 0.95, y: 0.38, w: 1.00, d: 1.00, h: 0.76, rot: 0, color: 0x882915 },
             { id: 'vid_cucha_ne', name: 'Cucha Perro Esquina NE', room: 'Living', x: 5.55, z: 0.38, y: 0.05, w: 0.92, d: 0.62, h: 0.10, rot: 0, color: 0x94a3b8 },
             { id: 'vid_heladera', name: 'Heladera c/ Freezer + Bodega', room: 'Cocina', x: 4.85, z: 4.88, y: 0.84, w: 0.60, d: 0.62, h: 1.68, rot: 0, color: 0xe2e8f0 },
-            { id: 'vid_lavarropas', name: 'Lavarropas + Estación Café (Bajo Ventana)', room: 'Cocina', x: 3.54, z: 6.67, y: 0.43, w: 0.60, d: 0.58, h: 0.86, rot: 0, color: 0xcbd5e1 },
+            { id: 'vid_lavarropas', name: 'Lavarropas + Estación Café (Bajo Ventana)', room: 'Cocina', x: 3.55, z: 6.67, y: 0.43, w: 0.60, d: 0.58, h: 0.86, rot: 0, color: 0xcbd5e1 },
             { id: 'vid_cama_2p', name: 'Cama 2 Plazas + Respaldo Nogal', room: 'Cuarto', x: 1.05, z: 5.80, y: 0.24, w: 1.90, d: 1.45, h: 0.48, rot: 0, color: 0x475569 },
             { id: 'vid_luz_n', name: 'Mesa de Luz Norte', room: 'Cuarto', x: 0.28, z: 4.84, y: 0.31, w: 0.42, d: 0.44, h: 0.62, rot: 0, color: 0x4a3222 },
             { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.28, z: 6.72, y: 0.31, w: 0.42, d: 0.42, h: 0.62, rot: 0, color: 0x4a3222 },

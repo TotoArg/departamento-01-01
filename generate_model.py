@@ -184,7 +184,8 @@ def build_apartment():
     b.add_box(2.30 - INT / 2, 0.00, 3.65, 2.30 + INT / 2, H, 4.50)
 
     b.add_box(3.00 - INT / 2, 0.00, 0.00, 3.00 + INT / 2, H, 3.70)
-    b.add_box(3.00 - INT / 2, 0.00, 4.50, 3.00 + INT / 2, H, 7.00)
+    b.add_box(3.00 - INT / 2, 0.00, 4.50 - INT / 2, 3.20 + INT / 2, H, 4.50 + INT / 2)
+    b.add_box(3.20 - INT / 2, 0.00, 4.50, 3.20 + INT / 2, H, 7.00)
 
     b.add_box(5.20 - INT / 2, 0.00, 4.50, 5.20 + INT / 2, H, 5.70)
 
@@ -196,7 +197,7 @@ def build_apartment():
 
     b.add_box(0.00, 0.00, 4.50 - INT / 2, 2.30, H, 4.50 + INT / 2)
     b.add_box(2.30, 2.05, 4.50 - INT / 2, 3.00, H, 4.50 + INT / 2)
-    b.add_box(3.00, 2.05, 4.50 - INT / 2, 4.45, H, 4.50 + INT / 2)  # Dintel sobre vano abierto Cocina
+    b.add_box(3.20, 2.05, 4.50 - INT / 2, 4.45, H, 4.50 + INT / 2)  # Dintel sobre vano abierto Cocina
     b.add_box(4.45, 0.00, 4.50 - INT / 2, 5.20, H, 4.50 + INT / 2)  # Mocheta delante de la heladera
 
     # 3B. PUERTAS 3D Y PLACARDS EXTRAÍDOS DEL VIDEO
