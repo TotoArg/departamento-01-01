@@ -1473,17 +1473,17 @@
         addWallSegment(6.30, 1.45, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
 
         // Retranqueo Palier (Puerta Principal en Z = 6.30): de [4.85, 6.30] a [6.30, 6.30] a 2.98 m
-        addWallSegment(4.85, 6.30, 5.38, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
-        addWallSegment(6.12, 6.30, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
-        // Umbral y símbolo arquitectónico 2D de Puerta Principal (abre 90° hacia el Norte dentro de Entrada)
+        addWallSegment(4.85, 6.30, 5.34, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
+        addWallSegment(6.18, 6.30, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
+        // Umbral y símbolo arquitectónico 2D de Puerta Principal (abre 90° hacia el Norte dentro de Entrada batiendo sobre pared Este)
         const entranceThreshold = new THREE.Mesh(
-            new THREE.BoxGeometry(0.74, 0.01, 0.06),
+            new THREE.BoxGeometry(0.84, 0.01, 0.06),
             new THREE.MeshBasicMaterial({ color: 0xcbd5e1 })
         );
-        entranceThreshold.position.set(5.75, 0.01, 6.30);
+        entranceThreshold.position.set(5.76, 0.01, 6.30);
         lines2DGroup.add(entranceThreshold);
-        addDashedLine(5.38, 6.30, 6.12, 6.30);
-        addDoorSymbol2D(5.42, 6.30, 5.42, 5.64, 6.08, 5.64, 6.08, 6.30);
+        addDashedLine(5.34, 6.30, 6.18, 6.30);
+        addDoorSymbol2D(6.14, 6.30, 6.14, 5.50, 5.40, 5.50, 5.40, 6.30);
 
         // Muro Derecho Cocina (Límite con Palier): de [4.85, 6.30] a [4.85, 8.00] a 3.26 m
         addWallSegment(4.85, 6.30, 4.85, 8.00, EXT_T, exteriorWallsGroup, true, 3.26);
@@ -1929,6 +1929,16 @@
             capMesh.userData.isCap = true;
             holder.add(capMesh);
 
+            // Cruz de madera oscura centrada sobre el dintel en el interior de la entrada (fotos #1, #2, #3)
+            const crossMat = getStdMat(0x3e2723, 0.6); // Madera oscura caoba/nogal
+            const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.032, 0.22, 0.016), crossMat);
+            crossV.position.set(0, DOOR_H + 0.18, -EXT_T / 2 - 0.009);
+            const crossH = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.032, 0.016), crossMat);
+            crossH.position.set(0, DOOR_H + 0.22, -EXT_T / 2 - 0.009);
+            crossV.castShadow = true;
+            crossH.castShadow = true;
+            holder.add(crossV, crossH);
+
             // Marco pesado de chapa gris grafito oscuro
             const frameDepth = EXT_T + 0.028;
             const jambW = 0.042;
@@ -1940,47 +1950,97 @@
             topJamb.position.set(0, DOOR_H - jambW / 2, 0);
             holder.add(leftJamb, rightJamb, topJamb);
 
-            // Hoja principal gris con tableros moldurados (abre hacia adentro de ENTRADA, Z < 6.30)
+            // Hoja principal gris con tableros moldurados (abre hacia adentro de ENTRADA, Z < 6.30, pivotando desde el lado Este)
             const leafW = w - jambW * 2;
             const leafH = DOOR_H - jambW - 0.01;
             const leafT = 0.048;
 
+            // PIVOT EN EL LADO ESTE (w / 2 - jambW) para batir hacia adentro contra el muro Este (fotos #1 y #3)
             const pivot = new THREE.Group();
-            pivot.position.set(-w / 2 + jambW, 0, 0);
-            const openAngleRad = 75 * Math.PI / 180;
+            pivot.position.set(w / 2 - jambW, 0, 0);
+            const openAngleRad = -75 * Math.PI / 180;
             const initAngleRad = 0; // Inicialmente cerrada para prolijidad
             pivot.rotation.y = initAngleRad;
 
+            // La hoja se extiende hacia el -X local (hacia el lado Oeste / picaporte)
             const leafMesh = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, leafT), mainDoorMat);
-            leafMesh.position.set(leafW / 2, leafH / 2 + 0.005, 0);
+            leafMesh.position.set(-leafW / 2, leafH / 2 + 0.005, 0);
             leafMesh.castShadow = true;
             leafMesh.receiveShadow = true;
             pivot.add(leafMesh);
 
-            // Tablero moldurado superior (con travesaño curvo/escalonado como en sec_000 y video_34_s00)
-            const topPanel = new THREE.Mesh(new THREE.BoxGeometry(leafW * 0.68, 0.92, leafT + 0.010), mainDoorPanelMat);
-            topPanel.position.set(leafW / 2, 1.36, 0);
-            const topArch = new THREE.Mesh(new THREE.BoxGeometry(leafW * 0.46, 0.08, leafT + 0.012), mainDoorPanelMat);
-            topArch.position.set(leafW / 2, 1.84, 0);
-            // Tablero moldurado inferior
-            const botPanel = new THREE.Mesh(new THREE.BoxGeometry(leafW * 0.68, 0.52, leafT + 0.010), mainDoorPanelMat);
-            botPanel.position.set(leafW / 2, 0.46, 0);
+            // Tablero moldurado superior con travesaño curvo/escalonado (fotos #1, #2, #3)
+            const topPanel = new THREE.Mesh(new THREE.BoxGeometry(leafW * 0.70, 0.94, leafT + 0.010), mainDoorPanelMat);
+            topPanel.position.set(-leafW / 2, 1.36, 0);
+            const topArch = new THREE.Mesh(new THREE.BoxGeometry(leafW * 0.48, 0.08, leafT + 0.012), mainDoorPanelMat);
+            topArch.position.set(-leafW / 2, 1.84, 0);
+            // Tablero moldurado inferior rectangular
+            const botPanel = new THREE.Mesh(new THREE.BoxGeometry(leafW * 0.70, 0.52, leafT + 0.010), mainDoorPanelMat);
+            botPanel.position.set(-leafW / 2, 0.46, 0);
             pivot.add(topPanel, topArch, botPanel);
 
-            // Manijón vertical cromado interior (visto en sec_000) + picaporte exterior (video_34_s00)
-            const barHandle = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.36, 0.028), chromeMat);
-            barHandle.position.set(leafW - 0.075, 1.02, -leafT / 2 - 0.018);
-            const extLever = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.02, 0.025), chromeMat);
-            extLever.position.set(leafW - 0.11, 0.98, leafT / 2 + 0.018);
-            pivot.add(barHandle, extLever);
+            // Picaporte curvo horizontal cromado en lado Oeste (extremo libre -leafW + 0.07 m) + cerradura con llaves (fotos #1 y #2)
+            const freeEndOffset = -leafW + 0.07;
+            const handleY = 0.99;
+
+            // Picaporte interior: roseta, vástago y manija curva ergonómica
+            const inRosette = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.010, 16), chromeMat);
+            inRosette.rotation.x = Math.PI / 2;
+            inRosette.position.set(freeEndOffset, handleY, -leafT / 2 - 0.005);
+            const inStem = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.038, 12), chromeMat);
+            inStem.rotation.x = Math.PI / 2;
+            inStem.position.set(freeEndOffset, handleY, -leafT / 2 - 0.024);
+            const inLever = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.018, 0.016), chromeMat);
+            inLever.position.set(freeEndOffset + 0.05, handleY, -leafT / 2 - 0.043); // Manija orientada hacia las bisagras
+            pivot.add(inRosette, inStem, inLever);
+
+            // Picaporte exterior:
+            const outRosette = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.010, 16), chromeMat);
+            outRosette.rotation.x = Math.PI / 2;
+            outRosette.position.set(freeEndOffset, handleY, leafT / 2 + 0.005);
+            const outStem = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.038, 12), chromeMat);
+            outStem.rotation.x = Math.PI / 2;
+            outStem.position.set(freeEndOffset, handleY, leafT / 2 + 0.024);
+            const outLever = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.018, 0.016), chromeMat);
+            outLever.position.set(freeEndOffset + 0.05, handleY, leafT / 2 + 0.043);
+            pivot.add(outRosette, outStem, outLever);
+
+            // Bocallave europerfil y manojo de llaves colgando en el interior (foto #2)
+            const lockY = 0.915;
+            const inLockRosette = new THREE.Mesh(new THREE.BoxGeometry(0.026, 0.042, 0.008), chromeMat);
+            inLockRosette.position.set(freeEndOffset, lockY, -leafT / 2 - 0.004);
+            const outLockRosette = new THREE.Mesh(new THREE.BoxGeometry(0.026, 0.042, 0.008), chromeMat);
+            outLockRosette.position.set(freeEndOffset, lockY, leafT / 2 + 0.004);
+            pivot.add(inLockRosette, outLockRosette);
+
+            // Llaves colgando de la cerradura interior (argolla + 2 llaves de paleta/yale + llavero cuero)
+            const keyRing = new THREE.Mesh(new THREE.TorusGeometry(0.014, 0.0025, 8, 16), chromeMat);
+            keyRing.position.set(freeEndOffset, lockY - 0.022, -leafT / 2 - 0.014);
+            const keyFob = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.038, 0.006), getStdMat(0xb45309, 0.5)); // Llavero cuero/bronce
+            keyFob.position.set(freeEndOffset, lockY - 0.052, -leafT / 2 - 0.014);
+            const keyBlade1 = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.032, 0.002), chromeMat);
+            keyBlade1.position.set(freeEndOffset - 0.004, lockY - 0.048, -leafT / 2 - 0.012);
+            keyBlade1.rotation.z = 0.15;
+            const keyBlade2 = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.030, 0.002), chromeMat);
+            keyBlade2.position.set(freeEndOffset + 0.004, lockY - 0.046, -leafT / 2 - 0.016);
+            keyBlade2.rotation.z = -0.15;
+            pivot.add(keyRing, keyFob, keyBlade1, keyBlade2);
 
             // Mirilla óptica cromada en el centro de la puerta
             const peephole = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, leafT + 0.02, 16), chromeMat);
             peephole.rotation.x = Math.PI / 2;
-            peephole.position.set(leafW / 2, 1.48, 0);
+            peephole.position.set(-leafW / 2, 1.48, 0);
             pivot.add(peephole);
 
+            // 3 Bisagras de perno cilíndrico de acero en el lateral Este (fotos #1 y #3)
+            [-0.30, 0.00, 0.30].forEach(offset => {
+                const hingeMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.065, 12), doorFrameMat);
+                hingeMesh.position.set(0, DOOR_H / 2 + offset * 1.8, -leafT / 2 - 0.006);
+                pivot.add(hingeMesh);
+            });
+
             // Registrar en sistema de puertas animadas
+            const interactiveParts = [leafMesh, topPanel, topArch, botPanel, inLever, outLever, inStem, outStem, inRosette, outRosette, peephole, keyFob];
             const animEntry = {
                 name: "Puerta Principal",
                 type: 'swing',
@@ -1990,7 +2050,7 @@
                 openVal: openAngleRad,
                 closedVal: 0,
                 isOpen: false,
-                interactiveMeshes: [leafMesh, topPanel, topArch, botPanel, barHandle, extLever, peephole],
+                interactiveMeshes: interactiveParts,
                 toggle: function() {
                     this.isOpen = !this.isOpen;
                     this.targetVal = this.isOpen ? this.openVal : this.closedVal;
@@ -1999,7 +2059,7 @@
                 }
             };
             animDoors.push(animEntry);
-            [leafMesh, topPanel, topArch, botPanel, barHandle, extLever, peephole].forEach(m => {
+            interactiveParts.forEach(m => {
                 m.userData.animDoor = animEntry;
                 doorClickCandidates.push(m);
             });
@@ -2272,7 +2332,7 @@
             doors3DGroup.add(cocinaLintel);
             attachWallMount(cocinaLintel, 4.35, 4.80, true);
             // Instanciar puertas 3D interactivas con dintel a 3.56 m bajo la viga cumbrera:
-            addMainEntranceDoor3D(5.38, 6.30, 6.12, 6.30);
+            addMainEntranceDoor3D(5.34, 6.30, 6.18, 6.30);
             addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 90, "Puerta Estudio", 3.56);
             addInteriorWoodDoor3D(2.30, 3.15, 2.30, 3.85, false, 1, 75, "Puerta Baño", 3.56);
             addInteriorWoodDoor3D(2.30, 4.70, 3.00, 4.70, false, 1, 75, "Puerta Cuarto", 3.56);
@@ -2428,16 +2488,77 @@
             // Tablero eléctrico sobre pared divisoria con Cocina (cara Entrada X = 4.85 + INT_T/2)
             addDecorBox(4.91, 1.45, 5.22, 0.02, 0.22, 0.26, 0x1e293b);
             setMountWall(null);
-            // - Perchero de hierro negro con estante superior de madera y camperas + Zapatero de 3 niveles abajo (Muro Este Entrada Z=5.08..5.72)
-            addDecorBox(6.08, 0.26, 5.40, 0.30, 0.52, 0.64, 0x1e293b); // Zapatero 3 niveles con calzados
-            setMountWall(6.30, 5.40, false);
-            addDecorBox(6.08, 1.35, 5.40, 0.24, 0.85, 0.62, 0x334155); // Camperas colgadas (negra / gris / azul)
-            addDecorBox(6.08, 1.86, 5.40, 0.26, 0.03, 0.66, 0x9a5b32); // Estante superior madera perchero
+            // ============================================================================
+            // SECTOR ENTRADA Y PUERTA PRINCIPAL (FOTOS REALES #0 A #4):
+            // Dimensiones y distribución fiel de objetos:
+            // ============================================================================
+
+            // 1. Muro Sur a la derecha de la puerta (lado Oeste, X = 4.85 a 5.34, Z = 6.30):
+            // - Rejilla de ventilación blanca superior (cerca del techo, fotos #2 y #3)
+            setMountWall(5.25, 6.30, true);
+            addDecorBox(5.25, 2.48, 6.22, 0.16, 0.16, 0.015, 0xf8fafc, 0.6, 0, 'Rejilla de Ventilación');
+            // - Cuadrito / placa religiosa dorada (santito) en muro derecho (foto #2)
+            addDecorBox(5.25, 1.45, 6.22, 0.09, 0.14, 0.022, 0xd4af37, 0.35, 0, 'Placa Religiosa Dorada');
+            addDecorBox(5.25, 1.45, 6.21, 0.065, 0.11, 0.024, 0x78350f, 0.7); // Lámina interior
+            // - Tecla de luz blanca en el muro derecho (foto #2)
+            addDecorBox(5.25, 1.05, 6.22, 0.08, 0.12, 0.014, 0xf1f5f9, 0.4);
+            // - Recipiente / macetita verde en el zócalo de la esquina derecha (foto #2)
+            addDecorCyl(5.25, 0.07, 6.22, 0.045, 0.045, 0.14, 0x4d7c0f, 0.5);
+
+            // 2. Muro Este de Entrada (X = 6.30, de Z = 4.80 a Z = 6.30):
+            setMountWall(6.30, 6.05, false);
+            // - Panel de alarma / portero visor con pantalla negra táctil y marco blanco (fotos #1 y #3)
+            addDecorBox(6.20, 1.38, 6.05, 0.018, 0.13, 0.18, 0xf8fafc, 0.4, 0, 'Panel Alarma / Pantalla');
+            addDecorBox(6.19, 1.38, 6.05, 0.019, 0.09, 0.13, 0x09090b, 0.15); // Pantalla negra
+            // - Tecla de luz blanca bajo el panel de alarma
+            addDecorBox(6.20, 1.05, 6.05, 0.014, 0.12, 0.08, 0xf1f5f9, 0.4);
             setMountWall(null);
-            // - Maceta blanca redonda sobre pie nórdico de madera con Sansevieria (Lengua de suegra) en X=6.05, Z=3.95 (entre Rack TV y paso Entrada)
-            addDecorBox(6.05, 0.14, 3.95, 0.24, 0.28, 0.24, 0xc2844f); // Pie nórdico madera
-            addDecorCyl(6.05, 0.28, 3.95, 0.13, 0.11, 0.24, 0xf8fafc); // Maceta cerámica blanca
-            addDecorCyl(6.05, 0.58, 3.95, 0.04, 0.09, 0.45, 0x3f6212); // Hojas Sansevieria
+
+            // - Bolsos / mochila sobre el piso cerca de la puerta (fotos #1 y #3)
+            addDecorBox(6.10, 0.14, 5.85, 0.28, 0.28, 0.36, 0x0f766e, 0.85, 0.12, 'Bolso Estampado Entrada'); // Bolso teal/estampado
+            addDecorBox(6.08, 0.18, 5.72, 0.24, 0.32, 0.22, 0x1e293b, 0.9, -0.15, 'Mochila Negra Entrada'); // Mochila
+
+            // - Perchero industrial de hierro negro + zapatero de 3 niveles + estante superior (fotos #0, #1, #3):
+            //   Zapatero 3 niveles abajo con calzado (Z = 5.20 a 5.56, X = 6.10):
+            addDecorBox(6.10, 0.03, 5.38, 0.28, 0.02, 0.65, 0x0f172a); // Estante inferior metal
+            addDecorBox(6.10, 0.19, 5.38, 0.28, 0.02, 0.65, 0x0f172a); // Estante medio metal
+            addDecorBox(6.10, 0.35, 5.38, 0.28, 0.02, 0.65, 0x0f172a); // Estante superior metal
+            // Patas y estructura lateral de hierro negro:
+            addDecorBox(6.10, 0.90, 5.06, 0.025, 1.80, 0.025, 0x0f172a); // Columna Norte
+            addDecorBox(6.10, 0.90, 5.70, 0.025, 1.80, 0.025, 0x0f172a); // Columna Sur
+            // Calzados en el zapatero:
+            addDecorBox(6.08, 0.09, 5.22, 0.22, 0.09, 0.26, 0x1e293b, 0.8); // Zapatillas negras
+            addDecorBox(6.08, 0.09, 5.52, 0.22, 0.09, 0.24, 0x94a3b8, 0.8); // Zapatillas grises
+            addDecorBox(6.08, 0.25, 5.30, 0.22, 0.09, 0.24, 0x475569, 0.8); // Calzado estante 2
+            // Zapatillas sobre el piso frente al zapatero (fotos #0 y #3):
+            addDecorBox(5.72, 0.05, 5.14, 0.18, 0.08, 0.26, 0x1e293b, 0.85, 0.25, 'Zapatillas Piso Entrada');
+            addDecorBox(5.72, 0.05, 4.96, 0.18, 0.08, 0.26, 0xf1f5f9, 0.85, -0.20);
+
+            // Camperas colgadas del perchero (fotos #0, #1, #3):
+            setMountWall(6.30, 5.38, false);
+            // Campera inflable negra/azul oscuro:
+            addDecorBox(6.10, 1.25, 5.25, 0.24, 0.82, 0.38, 0x1e293b, 0.85, 0, 'Campera Abrigada');
+            // Bolsa de tela con manija ("Ochenta y Cinco Accesorios", foto #1):
+            addDecorBox(6.11, 1.35, 5.46, 0.16, 0.32, 0.26, 0xfef08a, 0.9, 0.05, 'Bolsa Tela Accesorios');
+            // Estante superior de madera natural (pino/paraíso):
+            addDecorBox(6.10, 1.78, 5.38, 0.26, 0.03, 0.68, 0x9a5b32, 0.6, 0, 'Estante Madera Perchero');
+            // Adornos sobre el estante superior (fotos #0, #1, #3):
+            addDecorCyl(6.10, 1.88, 5.20, 0.035, 0.025, 0.16, 0xf1f5f9, 0.4); // Florero cerámico claro
+            addDecorCyl(6.10, 1.88, 5.34, 0.025, 0.025, 0.15, 0x1c1917, 0.2); // Botella de vidrio oscuro
+            addDecorBox(6.10, 1.88, 5.48, 0.045, 0.16, 0.045, 0x78350f, 0.6); // Escultura / caja de madera
+            setMountWall(null);
+
+            // - Maceta redonda blanca sobre pie nórdico de madera con Sansevieria (Lengua de suegra, fotos #0 y #3):
+            //   Ubicada en X = 6.05, Z = 4.45 (entre el Perchero y el Rack de TV):
+            addDecorBox(6.05, 0.14, 4.45, 0.24, 0.28, 0.24, 0xc2844f, 0.6, 0, 'Pie Nórdico Maceta'); // Patas madera
+            addDecorCyl(6.05, 0.28, 4.45, 0.13, 0.11, 0.24, 0xf8fafc, 0.3, 0, 'Maceta Cerámica Sansevieria'); // Maceta cilíndrica blanca
+            addDecorCyl(6.05, 0.62, 4.45, 0.04, 0.10, 0.52, 0x3f6212, 0.7); // Follaje Sansevieria hojas verdes
+            addDecorBox(6.05, 0.62, 4.45, 0.03, 0.50, 0.16, 0xca8a04, 0.7); // Franja amarilla variegada
+
+            // 3. Comederos / bebederos del perro junto al zócalo de la pared de cocina (fotos #0, #3 y #4):
+            //    Ubicados en el zócalo Oeste de Entrada justo al doblar hacia el paso de la cocina:
+            addDecorCyl(4.94, 0.04, 4.80, 0.10, 0.08, 0.08, 0x22c55e, 0.4, 0, 'Comedero Verde Mascota'); // Plato verde
+            addDecorCyl(4.94, 0.04, 4.52, 0.10, 0.08, 0.08, 0xef4444, 0.4, 0, 'Bebedero Rojo Mascota'); // Plato rojo
 
             // 2. Sector Rack TV, Torres de Sonido LG y Decoración (Muro Este X=6.30, centrado en Z=3.10 ALINEADO CON EL SILLÓN Y MESA RATONA, fotos #0 a #7 del álbum):
             // - Rack de TV rústico de madera cálida (cedro/pino rústico con vetas oscuras, de Z=2.30 a Z=3.90, centro Z=3.10)

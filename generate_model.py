@@ -145,9 +145,9 @@ def build_apartment():
     b.add_box(6.30 - EXT / 2, 0.00, 1.45, 6.30 + EXT / 2, H, 5.70)
 
     # Retranqueo Palier Y = 5.70 (Puerta Principal X = 5.38..6.12)
-    b.add_box(5.20, 0.00, 5.70 - EXT / 2, 5.38, H, 5.70 + EXT / 2)
-    b.add_box(6.12, 0.00, 5.70 - EXT / 2, 6.30, H, 5.70 + EXT / 2)
-    b.add_box(5.38, 2.05, 5.70 - EXT / 2, 6.12, H, 5.70 + EXT / 2)
+    b.add_box(5.20, 0.00, 5.70 - EXT / 2, 5.34, H, 5.70 + EXT / 2)
+    b.add_box(6.18, 0.00, 5.70 - EXT / 2, 6.30, H, 5.70 + EXT / 2)
+    b.add_box(5.34, 2.05, 5.70 - EXT / 2, 6.18, H, 5.70 + EXT / 2)
 
     # Muro Derecho Cocina X = 5.20 (Y = 5.70..7.00)
     b.add_box(5.20 - EXT / 2, 0.00, 5.70, 5.20 + EXT / 2, H, 7.00)
@@ -204,9 +204,9 @@ def build_apartment():
     # Marcos de chapa gris oscuro
     b.set_group("02B_Marcos_Puertas_Chapa", "Door_Frame_Dark")
     # Marco Puerta Principal (Y=5.70, X=5.38..6.12)
-    b.add_box(5.38, 0.00, 5.62, 5.42, 2.05, 5.78)
-    b.add_box(6.08, 0.00, 5.62, 6.12, 2.05, 5.78)
-    b.add_box(5.38, 2.01, 5.62, 6.12, 2.05, 5.78)
+    b.add_box(5.34, 0.00, 5.62, 5.38, 2.05, 5.78)
+    b.add_box(6.14, 0.00, 5.62, 6.18, 2.05, 5.78)
+    b.add_box(5.34, 2.01, 5.62, 6.18, 2.05, 5.78)
     # Marco Puerta Estudio (Y=2.30, X=2.30..3.00)
     b.add_box(2.30, 0.00, 2.24, 2.34, 2.05, 2.36)
     b.add_box(2.96, 0.00, 2.24, 3.00, 2.05, 2.36)
@@ -228,7 +228,7 @@ def build_apartment():
 
     # Hoja Puerta Principal Gris Moldurada (abierta hacia adentro de Entrada)
     b.set_group("02D_Puerta_Principal_Gris", "Door_Main_Grey")
-    b.add_box(5.42, 0.01, 5.04, 5.47, 2.01, 5.70)
+    b.add_box(6.09, 0.01, 4.96, 6.14, 2.01, 5.70)
 
     # Frentes de Placard Corredizos de Madera (2 hojas enteras, riel exterior izquierdo y riel interior derecho)
     b.set_group("02E_Placards_Corredizos_Madera", "Placard_Wood")

@@ -273,11 +273,18 @@ def main():
         draw.rectangle([x - r_ext, y - r_ext, x + r_ext, y + r_ext], fill=WALL_COLOR)
 
     # Retranqueo Palier / Puerta Principal en Y = 5.70 (X = 5.20 a 6.30)
-    draw.line([px(5.20, 5.70), px(5.38, 5.70)], fill=WALL_COLOR, width=EXT_W - 2)
-    draw.line([px(6.12, 5.70), px(6.30, 5.70)], fill=WALL_COLOR, width=EXT_W - 2)
-    draw.line([px(5.38, 5.70), px(6.12, 5.70)], fill=(195, 202, 210), width=7)
-    draw.line([px(5.38, 5.58), px(5.38, 5.82)], fill=WALL_COLOR, width=5)
-    draw.line([px(6.12, 5.58), px(6.12, 5.82)], fill=WALL_COLOR, width=5)
+    draw.line([px(5.20, 5.70), px(5.34, 5.70)], fill=WALL_COLOR, width=EXT_W - 2)
+    draw.line([px(6.18, 5.70), px(6.30, 5.70)], fill=WALL_COLOR, width=EXT_W - 2)
+    draw.line([px(5.34, 5.70), px(6.18, 5.70)], fill=(195, 202, 210), width=7)
+    draw.line([px(5.34, 5.58), px(5.34, 5.82)], fill=WALL_COLOR, width=5)
+    draw.line([px(6.18, 5.58), px(6.18, 5.82)], fill=WALL_COLOR, width=5)
+    # Símbolo arquitectónico de puerta de entrada batiendo 90° hacia el Norte sobre pared Este (fotos reales #1 y #3)
+    draw_door_symbol(draw, px, (6.14, 5.70), (6.14, 4.96), (5.40, 4.96), (5.40, 5.70), DOOR_COLOR, width=3)
+    # Comederos de mascota junto al zócalo de la pared divisoria Cocina-Entrada (fotos #0 y #3)
+    cx_g, cy_g = px(5.12, 4.80)
+    draw.ellipse([cx_g - 6, cy_g - 6, cx_g + 6, cy_g + 6], fill=(34, 197, 94), outline=(21, 128, 61), width=1)
+    cx_r, cy_r = px(5.12, 4.52)
+    draw.ellipse([cx_r - 6, cy_r - 6, cx_r + 6, cy_r + 6], fill=(239, 68, 68), outline=(185, 28, 28), width=1)
 
     # -------------------------------------------------------------------------
     # 3. VENTANAS EXTERIORES EXTRAÍDAS DEL VIDEO (7 ABERTURAS)
