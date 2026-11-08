@@ -1029,6 +1029,86 @@
         // GENERADORES DE TEXTURAS PROCEDURALES CANVAS DE ALTA RESOLUCIÓN (PBR REALISTA)
         // ============================================================================
         // 1. Piso Parquet de Roble Miel Calibrado (Tablones biselados con veta natural)
+        
+        // ============================================================================
+        // MACHIMBRE DE TECHO INCLINADO REAL (CALCADO DE fotos_techos/techo_00.jpg a 03)
+        // Tablas continuas de pino/abeto de 11 cm con ranura V, veta longitudinal y nudos
+        // ============================================================================
+        function createProceduralMachimbreRoofTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+
+            // Fondo base pino cálido tostado (muestreado de fotos reales: #979188 a #c49760)
+            ctx.fillStyle = '#bfa580';
+            ctx.fillRect(0, 0, 1024, 1024);
+
+            const slatW = 1024 / 9; // ~113.7 px por tabla (~11.5 cm a escala)
+            const woodPlankTones = [
+                '#c7ab82', '#be9f77', '#caa980', '#b5976e',
+                '#cca77c', '#c3a279', '#bd9b70', '#c9a57b',
+                '#b9986d'
+            ];
+
+            for (let i = 0; i < 9; i++) {
+                const x = i * slatW;
+                const tone = woodPlankTones[i % woodPlankTones.length];
+                ctx.fillStyle = tone;
+                ctx.fillRect(x + 1, 0, slatW - 2, 1024);
+
+                // Vetas finas longitudinales a lo largo de la tabla (dirección de la pendiente)
+                ctx.strokeStyle = 'rgba(70, 40, 15, 0.08)';
+                ctx.lineWidth = 1.0;
+                for (let v = 0; v < 16; v++) {
+                    const vx = x + 4 + (v * (slatW - 8) / 16);
+                    ctx.beginPath();
+                    ctx.moveTo(vx, 0);
+                    ctx.bezierCurveTo(
+                        vx + Math.sin(i * 3 + v) * 5, 340,
+                        vx - Math.sin(i * 2 + v) * 4, 680,
+                        vx + Math.cos(v) * 3, 1024
+                    );
+                    ctx.stroke();
+                }
+
+                // Nudo de madera ocasional en algunas tablas
+                if (i % 3 === 1) {
+                    const knotY = ((i * 317) % 700) + 150;
+                    const knotX = x + slatW * 0.45;
+                    const gradKnot = ctx.createRadialGradient(knotX, knotY, 3, knotX, knotY, 18);
+                    gradKnot.addColorStop(0, '#542e12');
+                    gradKnot.addColorStop(0.5, '#7c431b');
+                    gradKnot.addColorStop(1, 'rgba(124, 67, 27, 0)');
+                    ctx.fillStyle = gradKnot;
+                    ctx.beginPath();
+                    ctx.arc(knotX, knotY, 18, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Ranura en V profunda entre tablas machimbradas (sombra y bisel)
+                ctx.fillStyle = 'rgba(35, 18, 8, 0.65)';
+                ctx.fillRect(x + slatW - 2.5, 0, 2.5, 1024);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+                ctx.fillRect(x + 1, 0, 1.2, 1024);
+            }
+
+            // Texturizado táctil mate satinado de madera real
+            for (let p = 0; p < 8000; p++) {
+                const px = Math.random() * 1024;
+                const py = Math.random() * 1024;
+                ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.035)' : 'rgba(40, 20, 5, 0.04)';
+                ctx.fillRect(px, py, 1, 6 + Math.random() * 18);
+            }
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(2.5, 3.5);
+            return tex;
+        }
+        const machimbreRoofTex = createProceduralMachimbreRoofTexture();
+
         function createProceduralWoodTexture() {
             const canvas = document.createElement('canvas');
             canvas.width = 1024;
@@ -1904,8 +1984,21 @@
             metalness: 0.12
         });
 
-        const floorMatMain = pbrWoodFloorMat;
-        const floorMatSouth = pbrWoodFloorMat;
+        // Piso Cerámico Esmaltado 33×33 cm real (fotos/foto_01.jpg, foto_04.jpg y corridor_floor.jpg)
+        const ceramicTile33MainTex = createRealisticCeramic33Texture(6.30, 6.30);
+        const ceramicTile33SouthTex = createRealisticCeramic33Texture(4.85, 1.70);
+        const pbrCeramicFloorMat = new THREE.MeshStandardMaterial({
+            map: ceramicTile33MainTex,
+            roughness: 0.36,
+            metalness: 0.08
+        });
+        const pbrCeramicSouthFloorMat = new THREE.MeshStandardMaterial({
+            map: ceramicTile33SouthTex,
+            roughness: 0.36,
+            metalness: 0.08
+        });
+        const floorMatMain = pbrCeramicFloorMat;
+        const floorMatSouth = pbrCeramicSouthFloorMat;
         const bathFloorMat = new THREE.MeshStandardMaterial({
             map: proceduralTileTex,
             roughness: 0.35,
@@ -1917,10 +2010,11 @@
         const topCapMat = wallCapCutMat; // Trazo arquitectónico oscuro de corte
         const winFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e242b, roughness: 0.35, metalness: 0.4 });
         const winGlassMat = new THREE.MeshPhysicalMaterial({ color: 0xcfe2ff, transparent: true, opacity: 0.35, roughness: 0.08, metalness: 0.15, transmission: 0.85, ior: 1.5 });
+        // Machimbre PBR del techo inclinado (Digital Twin exacto con ranuras en V y veta de pino)
         const woodRoofMat = new THREE.MeshStandardMaterial({
-            map: proceduralWoodTex,
-            roughness: 0.42,
-            metalness: 0.04,
+            map: machimbreRoofTex,
+            roughness: 0.50,
+            metalness: 0.02,
             side: THREE.DoubleSide
         });
         const woodBeamMat = new THREE.MeshStandardMaterial({
