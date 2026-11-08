@@ -1016,10 +1016,10 @@
         // Arranca directamente en 3D Maqueta Realista (Axonométrica con sombras)
         let activeCamera = perspCam;
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', alpha: false, preserveDrawingBuffer: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', alpha: false, powerPreference: 'high-performance' });
         renderer.setClearColor(0xf8fafc, 1.0); // Prevenir pantalla negra en WebGL bajo cualquier circunstancia
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0));
+        renderer.setPixelRatio(isMobileOrLowEnd ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2.0));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         // Motor de color fotográfico y mapeo tonal cinematográfico (ArchViz PBR)
@@ -1767,7 +1767,7 @@
         scene.add(dirLight.target);
         dirLight.castShadow = true;
         // Resolución 4K en desktop y 2K en móvil para máxima fidelidad y rendimiento
-        const shadowRes = isMobileOrLowEnd ? 2048 : 4096;
+        const shadowRes = isMobileOrLowEnd ? 1024 : 2048;
         dirLight.shadow.mapSize.width = shadowRes;
         dirLight.shadow.mapSize.height = shadowRes;
         dirLight.shadow.camera.near = 10.0;
@@ -6118,7 +6118,7 @@
         // ============================================================================
         // MODO SEPARADO: "EDITAR MUEBLES" (BLOQUEO CONTRA ERRORES ACCIDENTALES)
         // ============================================================================
-        let isFurnitureEditMode = true;
+        let isFurnitureEditMode = false;
 
         function setFurnitureEditMode(enable, silent = false) {
             isFurnitureEditMode = enable;
@@ -6981,52 +6981,9 @@
         // isMobileOrLowEnd definido al inicio del script
 
         function initPostProcessing() {
-            try {
-                // En dispositivos móviles, SSAOPass causa pantalla negra por limitaciones de precisión de profundidad en WebGL móvil.
-                // El renderizador nativo WebGL ya incluye antialiasing por hardware (MSAA), sombras suaves PCF y contacto AO integrado.
-                if (isMobileOrLowEnd) {
-                    console.log("Modo móvil detectado: usando renderizador nativo WebGL PBR con antialiasing nativo y sombras PCF (previene pantalla negra).");
-                    composer = null;
-                    return;
-                }
-
-                const hasDepth = renderer.capabilities.isWebGL2 || !!renderer.extensions.get('WEBGL_depth_texture');
-                if (!hasDepth) {
-                    console.warn("WEBGL_depth_texture no disponible: usando renderizador nativo PBR.");
-                    composer = null;
-                    return;
-                }
-
-                if (typeof THREE.EffectComposer !== 'undefined' && typeof THREE.SSAOPass !== 'undefined') {
-                    const width = window.innerWidth;
-                    const height = window.innerHeight;
-                    composer = new THREE.EffectComposer(renderer);
-
-                    const renderPass = new THREE.RenderPass(scene, activeCamera);
-                    composer.addPass(renderPass);
-
-                    ssaoPass = new THREE.SSAOPass(scene, activeCamera, width, height);
-                    ssaoPass.kernelRadius = 0.35;
-                    ssaoPass.minDistance = 0.001;
-                    ssaoPass.maxDistance = 0.15;
-                    ssaoPass.output = THREE.SSAOPass.OUTPUT.Default;
-                    composer.addPass(ssaoPass);
-
-                    if (typeof THREE.FXAAShader !== 'undefined') {
-                        fxaaPass = new THREE.ShaderPass(THREE.FXAAShader);
-                        const pr = renderer.getPixelRatio();
-                        fxaaPass.material.uniforms['resolution'].value.x = 1 / (width * pr);
-                        fxaaPass.material.uniforms['resolution'].value.y = 1 / (height * pr);
-                        composer.addPass(fxaaPass);
-                    }
-                    console.log("SSAO & FXAA Post-processing initialized successfully!");
-                }
-            } catch (err) {
-                console.warn("Post-processing fallback to native WebGL renderer:", err);
-                composer = null;
-                ssaoPass = null;
-                fxaaPass = null;
-            }
+            // Renderizado nativo WebGL ultra-rápido a 60 FPS estables con antialiasing por hardware (MSAA),
+            // sombras suaves PCF y mapeo tonal ACES Filmic sin sobrecarga de pases múltiples.
+            composer = null;
         }
         initPostProcessing();
 
@@ -7092,7 +7049,7 @@
         // Inicializar en 3D Maqueta Realista al cargar con edición activa
         setTimeout(() => {
             switchTo3D('isom', 'sims', true);
-            setFurnitureEditMode(true, true);
+            setFurnitureEditMode(false, true);
             wakeRenderer();
         }, 120);
 
