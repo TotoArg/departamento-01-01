@@ -1239,11 +1239,22 @@
             glass.scale.set(len - 0.08, winH - 0.08, 0.025);
             glass.position.set(0, sillH + winH / 2, 0);
             upperWinGroup.add(glass);
-            // Parante central corredizo
-            const mullion = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
-            mullion.scale.set(0.035, winH, 0.065);
-            mullion.position.set(0, sillH + winH / 2, 0);
-            upperWinGroup.add(mullion);
+            // Parantes verticales corredizos adaptados a la longitud del vano
+            const numPanels = len > 3.0 ? 4 : (len > 1.8 ? 2 : 1);
+            if (numPanels > 1) {
+                for (let p = 1; p < numPanels; p++) {
+                    const mulX = -len / 2 + p * (len / numPanels);
+                    const mullion = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                    mullion.scale.set(0.035, winH, 0.065);
+                    mullion.position.set(mulX, sillH + winH / 2, 0);
+                    upperWinGroup.add(mullion);
+                }
+            } else {
+                const mullion = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                mullion.scale.set(0.035, winH, 0.065);
+                mullion.position.set(0, sillH + winH / 2, 0);
+                upperWinGroup.add(mullion);
+            }
             // Marcos horizontales (superior/inferior) y jambas verticales (izquierda/derecha) de la ventana
             const topBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
             topBar.scale.set(len, 0.04, 0.065);
@@ -1454,10 +1465,10 @@
         addSlopedWallSegment(6.00, 0.00, 6.30, 0.00, 3.03, 2.98, EXT_T, exteriorWallsGroup, true);
 
         // Muro Derecho (Este, X = 6.30): remata en 2.98 m bajo la solera del techo
-        // - Ventana lateral Living V3 (Z = 0.55 a 1.55)
-        addWallSegment(6.30, 0.00, 6.30, 0.55, EXT_T, exteriorWallsGroup, true, 2.98);
-        addWindowSegment(6.30, 0.55, 6.30, 1.55, 0.95, 1.10, 2.98);
-        addWallSegment(6.30, 1.55, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
+        // - Ventana corrida lateral Living V3 (Z = 0.50 a 4.60 m, casi de largo de la pared del living)
+        addWallSegment(6.30, 0.00, 6.30, 0.50, EXT_T, exteriorWallsGroup, true, 2.98);
+        addWindowSegment(6.30, 0.50, 6.30, 4.60, 0.95, 1.10, 2.98);
+        addWallSegment(6.30, 4.60, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
 
         // Retranqueo Palier (Puerta Principal en Z = 6.30): de [4.85, 6.30] a [6.30, 6.30] a 2.98 m
         addWallSegment(4.85, 6.30, 5.38, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
@@ -2398,16 +2409,16 @@
             // Tablero eléctrico sobre pared divisoria con Cocina (cara Entrada X = 4.85 + INT_T/2)
             addDecorBox(4.91, 1.45, 5.22, 0.02, 0.22, 0.26, 0x1e293b);
             setMountWall(null);
-            // - Perchero de hierro negro con estante superior de madera y camperas + Zapatero de 3 niveles abajo (Muro Este Z=4.06..4.70)
-            addDecorBox(6.08, 0.26, 4.38, 0.30, 0.52, 0.64, 0x1e293b); // Zapatero 3 niveles con calzados
-            setMountWall(6.30, 4.38, false);
-            addDecorBox(6.08, 1.35, 4.38, 0.24, 0.85, 0.62, 0x334155); // Camperas colgadas (negra / gris / azul)
-            addDecorBox(6.08, 1.86, 4.38, 0.26, 0.03, 0.66, 0x9a5b32); // Estante superior madera perchero
+            // - Perchero de hierro negro con estante superior de madera y camperas + Zapatero de 3 niveles abajo (Muro Este Entrada Z=5.08..5.72)
+            addDecorBox(6.08, 0.26, 5.40, 0.30, 0.52, 0.64, 0x1e293b); // Zapatero 3 niveles con calzados
+            setMountWall(6.30, 5.40, false);
+            addDecorBox(6.08, 1.35, 5.40, 0.24, 0.85, 0.62, 0x334155); // Camperas colgadas (negra / gris / azul)
+            addDecorBox(6.08, 1.86, 5.40, 0.26, 0.03, 0.66, 0x9a5b32); // Estante superior madera perchero
             setMountWall(null);
-            // - Maceta blanca redonda sobre pie nórdico de madera con Sansevieria (Lengua de suegra) en X=6.05, Z=3.75 (entre Rack TV y Perchero)
-            addDecorBox(6.05, 0.14, 3.75, 0.24, 0.28, 0.24, 0xc2844f); // Pie nórdico madera
-            addDecorCyl(6.05, 0.28, 3.75, 0.13, 0.11, 0.24, 0xf8fafc); // Maceta cerámica blanca
-            addDecorCyl(6.05, 0.58, 3.75, 0.04, 0.09, 0.45, 0x3f6212); // Hojas Sansevieria
+            // - Maceta blanca redonda sobre pie nórdico de madera con Sansevieria (Lengua de suegra) en X=6.05, Z=4.75 (remate ventana corrida)
+            addDecorBox(6.05, 0.14, 4.75, 0.24, 0.28, 0.24, 0xc2844f); // Pie nórdico madera
+            addDecorCyl(6.05, 0.28, 4.75, 0.13, 0.11, 0.24, 0xf8fafc); // Maceta cerámica blanca
+            addDecorCyl(6.05, 0.58, 4.75, 0.04, 0.09, 0.45, 0x3f6212); // Hojas Sansevieria
 
             // 2. Sector Rack TV, Torres de Sonido LG y Decoración (Muro Este X=6.30, centrado en Z=3.10 ALINEADO CON EL SILLÓN Y MESA RATONA, fotos #0 a #7 del álbum):
             // - Rack de TV rústico de madera cálida (cedro/pino rústico con vetas oscuras, de Z=2.30 a Z=3.90, centro Z=3.10)
@@ -2595,7 +2606,7 @@
             // - Cortinas beige con barral de madera en las 3 ventanas del Living (V1, V2 y V3)
             addCurtainAssembly(3.35, 0.00, 4.55, 0.00, 0, 0.12, 0xd6ccc2);
             addCurtainAssembly(4.90, 0.00, 6.00, 0.00, 0, 0.12, 0xd6ccc2);
-            addCurtainAssembly(6.30, 0.55, 6.30, 1.55, -0.12, 0, 0xd6ccc2);
+            addCurtainAssembly(6.30, 0.50, 6.30, 4.60, -0.12, 0, 0xd6ccc2);
 
             // ------------------------------------------------------------------------
             // B) COCINA ([3.00, 4.80] a [5.20, 8.00]) - Relevamiento exacto de las fotos reales
@@ -3322,7 +3333,7 @@
             { id: 'vid_futon', name: 'Futón 3 Cuerpos Azul', room: 'Living', x: 3.44, z: 3.10, y: 0.41, w: 0.88, d: 2.00, h: 0.82, rot: 0, color: 0x23486a },
             { id: 'vid_ratona', name: 'Mesa Ratona Elevable', room: 'Living', x: 4.38, z: 3.10, y: 0.28, w: 0.50, d: 1.05, h: 0.42, rot: 0, color: 0x3e2723 },
             { id: 'vid_rack_tv', name: 'Rack TV + Home Theater', room: 'Living', x: 6.02, z: 3.10, y: 0.40, w: 0.44, d: 1.60, h: 0.80, rot: 0, color: 0x7c2d12 },
-            { id: 'vid_perchero', name: 'Perchero + Zapatero Entrada', room: 'Entrada', x: 6.08, z: 4.38, y: 0.93, w: 0.30, d: 0.64, h: 1.86, rot: 0, color: 0x1e293b },
+            { id: 'vid_perchero', name: 'Perchero + Zapatero Entrada', room: 'Entrada', x: 6.08, z: 5.40, y: 0.93, w: 0.30, d: 0.64, h: 1.86, rot: 0, color: 0x1e293b },
             { id: 'vid_mesa_red', name: 'Mesa Comedor Redonda + 4 Sillas', room: 'Living', x: 4.55, z: 0.95, y: 0.38, w: 1.00, d: 1.00, h: 0.76, rot: 0, color: 0x882915 },
             { id: 'vid_cucha_ne', name: 'Cucha Perro Esquina NE', room: 'Living', x: 5.55, z: 0.38, y: 0.05, w: 0.92, d: 0.62, h: 0.10, rot: 0, color: 0x94a3b8 },
             { id: 'vid_heladera', name: 'Heladera c/ Freezer + Bodega', room: 'Cocina', x: 4.85, z: 4.88, y: 0.84, w: 0.60, d: 0.62, h: 1.68, rot: 0, color: 0xe2e8f0 },
