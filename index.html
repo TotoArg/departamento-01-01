@@ -3049,12 +3049,14 @@
                     const mullion = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
                     mullion.scale.set(0.035, winH, 0.065);
                     mullion.position.set(mulX, sillH + winH / 2, 0);
+                    mullion.castShadow = true; mullion.receiveShadow = true;
                     upperWinGroup.add(mullion);
                 }
             } else {
                 const mullion = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
                 mullion.scale.set(0.035, winH, 0.065);
                 mullion.position.set(0, sillH + winH / 2, 0);
+                mullion.castShadow = true; mullion.receiveShadow = true;
                 upperWinGroup.add(mullion);
             }
             // Marcos horizontales (superior/inferior) y jambas verticales (izquierda/derecha) de la ventana
@@ -4942,9 +4944,7 @@
             // - Maceta redonda blanca sobre pie nórdico de madera con Sansevieria (Lengua de suegra, fotos #0 y #3):
             createCompoundAssembly('Sansevieria en Pie Nórdico', () => {
                 addDecorBox(6.05, 0.14, 4.45, 0.24, 0.28, 0.24, 0xc2844f, 0.6, 0, 'Pie Nórdico Maceta'); // Patas madera
-                addDecorCyl(6.05, 0.28, 4.45, 0.13, 0.11, 0.24, 0xf8fafc, 0.3, 0, 'Maceta Cerámica Sansevieria'); // Maceta cilíndrica blanca
-                addDecorCyl(6.05, 0.62, 4.45, 0.04, 0.10, 0.52, 0x3f6212, 0.7); // Follaje Sansevieria hojas verdes
-                addDecorBox(6.05, 0.62, 4.45, 0.03, 0.50, 0.16, 0xca8a04, 0.7); // Franja amarilla variegada
+                addDecorPlantCeramic(6.05, 0.28, 4.45, 0.13, 0.10, 0.22, 0.28, 0.55, 0.28, 0.52, 'Sansevieria en Pie Nórdico');
             });
 
             // 3. Comederos / bebederos del perro junto al zócalo de la pared de cocina (fotos #0, #3 y #4):
@@ -5604,7 +5604,7 @@
             addDecorBox(4.76, 1.24, 6.80, 0.02, 0.16, 0.28, 0x334155, 0.3, 0, 'Imán Portacuchillos');    // Imán portacuchillos en pared azulejada
             // - Estante esquinero abierto de madera de 3 niveles en esquina Sureste (Z=7.82) con planta y cafetera Moka
             addDecorBox(4.61, 1.74, 7.82, 0.30, 0.62, 0.26, 0x9a5b32, 0.5, 0, 'Estante Esquinero Madera');
-            addDecorCyl(4.61, 2.12, 7.82, 0.06, 0.05, 0.16, 0x15803d, 0.6, 'Planta Estante Esquina');    // Plantita en estante superior
+            addDecorPlantCeramic(4.61, 2.05, 7.82, 0.05, 0.04, 0.10, 0.12, 0.16, 0.12, 0.16, 'Planta Estante Esquina');    // Plantita en estante superior
             setMountWall(null);
             // - Rollo de cocina y termo sobre el 1° tramo de mesada (Z=5.60..5.82) + contenedor celeste sobre mesada
             addDecorCyl(4.33, 0.98, 5.60, 0.06, 0.06, 0.22, 0xffffff, 0.4, 'Rollo de Cocina');    // Rollo de papel de cocina
@@ -5855,7 +5855,7 @@
                 addDecorBox(1.50, 0.68, 0.056, 0.04, 0.02, 0.01, 0x38bdf8, 0.2, 0, 'Display Digital Calefactor Estudio');
             });
             // - Cortina de ventana Norte (V4: X = 1.65 a 2.95 m, barral a Z = 2.15 m):
-            addCurtainAssembly(1.65, 0.00, 2.95, 0.00, 0, 0.12, 0x57534e);
+            addCurtainAssembly(0.90, 0.00, 2.10, 0.00, 0, 0.12, 0x57534e);
 
             // 2. ESCRITORIO GAMER EN "L" (Setup Detallado con FFVII Rebirth, Rebote LED, Mate y Termo)
             createCompoundAssembly('Escritorio Gamer en "L"', () => {
@@ -6115,8 +6115,7 @@
                 addDecorBox(2.86, 1.80, 0.45, 0.18, 0.16, 0.26, 0x18181b, 0.7, 0, 'Bolso Cámara Fotográfica');
                 // 3° Estante (Z = 2.05 m): planta Potus colgante y figura Goku
                 addDecorBox(2.875, 2.05, 0.85, 0.25, 0.03, 1.40, 0x9a441e, 0.45, 0, 'Estante Flotante Superior');
-                addDecorCyl(2.86, 2.14, 0.35, 0.08, 0.06, 0.14, 0xf8fafc, 0.3, 'Maceta Cerámica Potus');
-                addDecorBox(2.86, 1.95, 0.35, 0.12, 0.30, 0.18, 0x16a34a, 0.6, 0, 'Ramas Colgantes Potus');
+                addDecorPlantCeramic(2.86, 2.065, 0.35, 0.07, 0.05, 0.12, 0.16, 0.26, 0.16, 0.24, 'Planta Potus Colgante');
                 addDecorBox(2.86, 2.16, 1.15, 0.10, 0.18, 0.12, 0xf97316, 0.4, 0, 'Figura Coleccionable Goku');
             });
 
@@ -6641,7 +6640,7 @@
 
         // --- LÍNEAS 2D DE EQUIPAMIENTO EXACTO DEL ESTUDIO ---
         // Calefactor negro en pared Norte [0.95..1.55, 0.00..0.04]
-        addLine2DSegment(0.95, 0.03, 1.55, 0.03, 0.035, 0x0f172a);
+        addLine2DSegment(0.20, 0.03, 0.70, 0.03, 0.035, 0x0f172a);
         // Escritorio en L:
         // - Tramo Largo Principal [2.35..3.00, 0.00..1.60]
         addLine2DSegment(2.35, 0.00, 2.35, 1.60, 0.018, 0x8f3818);

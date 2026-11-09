@@ -206,7 +206,7 @@ def main():
     # 2) Cuarto Sur-Este (X=2.25 a 2.72, Y=6.78 a 6.96)
     draw.rectangle([*px(2.25, 6.78), *px(2.72, 6.96)], fill=heater_fill, outline=heater_border, width=2)
     # 3) Estudio Norte (X=0.68 a 1.16, Y=0.05 a 0.20, a la izquierda de la ventana V4, foto #33)
-    draw.rectangle([*px(0.68, 0.05), *px(1.16, 0.20)], fill=heater_fill, outline=heater_border, width=2)
+    draw.rectangle([*px(0.20, 0.05), *px(0.70, 0.20)], fill=heater_fill, outline=heater_border, width=2)
 
     # --- MUEBLES, ELECTRODOMÉSTICOS Y DECORACIÓN (SIN TEXTOS SOBRE MUEBLES) ---
     # A) LIVING Y ENTRADA (Futón, Mesa Ratona y Rack + TV 50" alineados sobre el mismo eje Y = 2.80):
@@ -295,7 +295,7 @@ def main():
     # V3: Ventana lateral corrida Este del Living (X=6.30, Y=0.50 a 4.60)
     draw_window_v(draw, px, 6.30, 0.25, 1.45, EXT_W)
     # V4: Ventana Norte del Estudio Ampliado (Y=0.00, X=1.35 a 2.55, encuadrada sobre el ala Norte del escritorio en L)
-    draw_window_h(draw, px, 1.35, 2.55, 0.00, EXT_W)
+    draw_window_h(draw, px, 0.90, 2.10, 0.00, EXT_W)
     # V5: Ventana Sur del Cuarto Ampliado (Y=7.00, X=0.90 a 2.10)
     draw_window_h(draw, px, 0.90, 2.10, 7.00, EXT_W)
     # V6: Ventana Sur de la Cocina sobre escurridor y lavarropas (Y=7.00, X=3.25 a 4.55)
