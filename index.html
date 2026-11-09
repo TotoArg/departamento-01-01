@@ -2588,9 +2588,9 @@
         createRealWallSpotlight(4.60, 2.10, 0.08, -Math.PI / 2, 0.58, true, 'Comedor (Muro Norte sobre Mesa)');
         createRealWallSpotlight(4.78, 2.10, 6.10, Math.PI, 0.55, true, 'Cocina Este (Sobre Anafes y Sherman)');
         createRealWallSpotlight(3.28, 2.10, 5.75, 0, 0.52, true, 'Cocina Barra (Muro Desayunador)');
-        createRealWallSpotlight(2.34, 2.10, 3.40, 0, 0.52, true, 'Pasillo Distribuidor (Muro Baño)');
-        createRealWallSpotlight(0.08, 2.10, 6.00, 0, 0.52, true, 'Dormitorio General (Muro Cabecera)');
-        createRealWallSpotlight(2.94, 2.10, 1.15, Math.PI, 0.58, false, 'Estudio Foco 4000K (Muro Escritorio)');
+        createRealWallSpotlight(2.34, 2.45, 3.40, 0, 0.52, true, 'Pasillo Distribuidor (Muro Baño)');
+        createRealWallSpotlight(0.08, 2.45, 6.00, 0, 0.52, true, 'Dormitorio General (Muro Cabecera)');
+        createRealWallSpotlight(2.94, 2.45, 1.15, Math.PI, 0.58, false, 'Estudio Foco 4000K (Muro Escritorio)');
 
         // ============================================================================
         // SISTEMA DE CARGA GLTF/GLB PARA MOBILIARIO EXTERNO DETALLADO
@@ -3245,40 +3245,39 @@
         // 3. PERÍMETRO EXTERIOR CON LAS 7 VENTANAS REALES DEL VIDEO
         // ============================================================================
         // Muro Superior (Norte, Z = 0.00):
-        // 1) SECTOR ESTUDIO (X = 0.00 a 3.00 m):
-        //    - Tramo izquierdo ciego: de X = 0.00 a 1.65 m (sube de 2.48 m a 3.27 m bajo el faldón)
-        addSlopedWallSegment(0.00, 0.00, 1.65, 0.00, 2.48, 3.27, EXT_T, exteriorWallsGroup, true);
-        //    - Ventana Norte Estudio: de X = 1.65 a 2.95 m (ancho 1.30 m)
-        //      Tramo izquierdo bajo pendiente (X = 1.65 a 2.30 m, sube de 3.27 m a 3.58 m)
-        addWindowSegment(1.65, 0.00, 2.30, 0.00, 0.95, 1.10, 3.27, 3.58);
-        //      Tramo derecho bajo cota plana (X = 2.30 a 2.95 m, cota 3.58 m)
-        addWindowSegment(2.30, 0.00, 2.95, 0.00, 0.95, 1.10, 3.58, 3.58);
-        //    - Mocheta derecha de cierre (X = 2.95 a 3.00 m, cota 3.58 m)
-        addWallSegment(2.95, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 3.58);
+        // 1) SECTOR ESTUDIO (X = 0.00 a 3.00 m, idéntica a ventana Cuarto, techo catedral cumbrera 5.20 m):
+        //    - Tramo izquierdo ciego: de X = 0.00 a 0.90 m (sube de 3.20 m a 3.98 m bajo faldón)
+        addSlopedWallSegment(0.00, 0.00, 0.90, 0.00, 3.20, 3.98, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Estudio: de X = 0.90 a 2.10 m (ancho 1.20 m, idéntica a la ventana del Cuarto)
+        addWindowSegment(0.90, 0.00, 2.10, 0.00, 0.95, 1.10, 3.98, 5.03);
+        //    - Tramo derecho ciego en pendiente (X = 2.10 a 2.30 m, sube de 5.03 m a 5.20 m)
+        addSlopedWallSegment(2.10, 0.00, 2.30, 0.00, 5.03, 5.20, EXT_T, exteriorWallsGroup, true);
+        //    - Tramo derecho plano hasta el tabique divisorio central (X = 2.30 a 3.00 m, cumbrera 5.20 m)
+        addWallSegment(2.30, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 5.20);
 
-        // 2) SECTOR LIVING (X = 3.00 a 6.30 m, verificado con video 2024 depto vacío):
-        //    - Muro inicial junto al eje central (X = 3.00 a 3.25 m, baja de 3.58 m a 3.53 m)
-        addSlopedWallSegment(3.00, 0.00, 3.25, 0.00, 3.58, 3.53, EXT_T, exteriorWallsGroup, true);
-        //    - Ventana Norte Living V1 (X = 3.25 a 4.35 m, baja de 3.53 m a 3.33 m, ancho 1.10 m)
-        addWindowSegment(3.25, 0.00, 4.35, 0.00, 0.95, 1.10, 3.53, 3.33);
-        //    - Muro intermedio entre ventanales (X = 4.35 a 4.95 m, baja de 3.33 m a 3.22 m, pilar central 60 cm)
-        addSlopedWallSegment(4.35, 0.00, 4.95, 0.00, 3.33, 3.22, EXT_T, exteriorWallsGroup, true);
-        //    - Ventana Norte Living V2 (X = 4.95 a 6.05 m, baja de 3.22 m a 3.03 m, ancho 1.10 m)
-        addWindowSegment(4.95, 0.00, 6.05, 0.00, 0.95, 1.10, 3.22, 3.03);
-        //    - Muro esquinero Este (X = 6.05 a 6.30 m, baja de 3.03 m a 2.98 m, columna esquina 25 cm)
-        addSlopedWallSegment(6.05, 0.00, 6.30, 0.00, 3.03, 2.98, EXT_T, exteriorWallsGroup, true);
+        // 2) SECTOR LIVING (X = 3.00 a 6.30 m, faldón este baja de 5.20 m a 3.80 m):
+        //    - Muro inicial junto al eje central (X = 3.00 a 3.25 m, baja de 5.20 m a 5.09 m)
+        addSlopedWallSegment(3.00, 0.00, 3.25, 0.00, 5.20, 5.09, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Living V1 (X = 3.25 a 4.35 m, baja de 5.09 m a 4.63 m, ancho 1.10 m)
+        addWindowSegment(3.25, 0.00, 4.35, 0.00, 0.95, 1.10, 5.09, 4.63);
+        //    - Muro intermedio entre ventanales (X = 4.35 a 4.95 m, baja de 4.63 m a 4.37 m, pilar central 60 cm)
+        addSlopedWallSegment(4.35, 0.00, 4.95, 0.00, 4.63, 4.37, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Living V2 (X = 4.95 a 6.05 m, baja de 4.37 m a 3.91 m, ancho 1.10 m)
+        addWindowSegment(4.95, 0.00, 6.05, 0.00, 0.95, 1.10, 4.37, 3.91);
+        //    - Muro esquinero Este (X = 6.05 a 6.30 m, baja de 3.91 m a 3.80 m, columna esquina 25 cm)
+        addSlopedWallSegment(6.05, 0.00, 6.30, 0.00, 3.91, 3.80, EXT_T, exteriorWallsGroup, true);
 
-        // Muro Derecho (Este, X = 6.30): remata en 2.98 m bajo la solera del techo
+        // Muro Derecho (Este, X = 6.30): remata en 3.80 m bajo la solera del techo catedral
         // - Columna esquinera Norte (Z = 0.00 a 0.25 m)
-        addWallSegment(6.30, 0.00, 6.30, 0.25, EXT_T, exteriorWallsGroup, true, 2.98);
+        addWallSegment(6.30, 0.00, 6.30, 0.25, EXT_T, exteriorWallsGroup, true, 3.80);
         // - Ventana lateral Living V3 (Z = 0.25 a 1.45 m, ancho 1.20 m, 2 hojas corredizas)
-        addWindowSegment(6.30, 0.25, 6.30, 1.45, 0.95, 1.10, 2.98);
+        addWindowSegment(6.30, 0.25, 6.30, 1.45, 0.95, 1.10, 3.80);
         // - Muro sólido Este (Z = 1.45 a 5.70 m, aloja Calefactor en Z=1.85, Rack TV y Perchero Entrada)
-        addWallSegment(6.30, 1.45, 6.30, 5.70, EXT_T, exteriorWallsGroup, true, 2.98);
+        addWallSegment(6.30, 1.45, 6.30, 5.70, EXT_T, exteriorWallsGroup, true, 3.80);
 
-        // Retranqueo Palier (Puerta Principal en Z = 5.70): de [4.85, 5.70] a [6.30, 5.70] a 2.98 m
-        addWallSegment(4.85, 5.70, 5.34, 5.70, EXT_T, exteriorWallsGroup, true, 2.98);
-        addWallSegment(6.18, 5.70, 6.30, 5.70, EXT_T, exteriorWallsGroup, true, 2.98);
+        // Retranqueo Palier (Puerta Principal en Z = 5.70): de [4.85, 5.70] a [6.30, 5.70] a 4.41 m
+        addWallSegment(4.85, 5.70, 5.34, 5.70, EXT_T, exteriorWallsGroup, true, 4.41);
+        addWallSegment(6.18, 5.70, 6.30, 5.70, EXT_T, exteriorWallsGroup, true, 3.80);
         // Umbral y símbolo arquitectónico 2D de Puerta Principal (abre 90° hacia el Norte dentro de Entrada batiendo sobre pared Este)
         const entranceThreshold = new THREE.Mesh(
             new THREE.BoxGeometry(0.84, 0.01, 0.06),
@@ -3289,25 +3288,25 @@
         addDashedLine(5.34, 5.70, 6.18, 5.70);
         addDoorSymbol2D(6.14, 5.70, 6.14, 4.96, 5.40, 4.96, 5.40, 5.70);
 
-        // Muro Derecho Cocina (Límite con Palier exterior): de [4.85, 5.70] a [4.85, 8.00] a 3.26 m
-        addWallSegment(4.85, 5.70, 4.85, 8.00, EXT_T, exteriorWallsGroup, true, 3.26);
+        // Muro Derecho Cocina (Límite con Palier exterior): de [4.85, 5.70] a [4.85, 8.00] a 4.41 m
+        addWallSegment(4.85, 5.70, 4.85, 8.00, EXT_T, exteriorWallsGroup, true, 4.41);
 
-        // Muro Inferior (Sur, Z = 8.00): cierra de [0.00, 8.00] a [4.85, 8.00]
-        // - Sector Cuarto (X = 0.00 a 3.20 m):
-        addSlopedWallSegment(0.00, 8.00, 0.90, 8.00, 2.48, 2.91, EXT_T, exteriorWallsGroup, true);
-        addWindowSegment(0.90, 8.00, 2.10, 8.00, 0.95, 1.10, 2.91, 3.48);
-        addSlopedWallSegment(2.10, 8.00, 2.30, 8.00, 3.48, 3.58, EXT_T, exteriorWallsGroup, true);
-        addWallSegment(2.30, 8.00, 3.20, 8.00, EXT_T, exteriorWallsGroup, true, 3.58);
+        // Muro Inferior (Sur, Z = 8.00): cierra de [0.00, 8.00] a [4.85, 8.00] (techo catedral a 5.20 m)
+        // - Sector Cuarto (X = 0.00 a 3.20 m, simétrico al Estudio):
+        addSlopedWallSegment(0.00, 8.00, 0.90, 8.00, 3.20, 3.98, EXT_T, exteriorWallsGroup, true);
+        addWindowSegment(0.90, 8.00, 2.10, 8.00, 0.95, 1.10, 3.98, 5.03);
+        addSlopedWallSegment(2.10, 8.00, 2.30, 8.00, 5.03, 5.20, EXT_T, exteriorWallsGroup, true);
+        addWallSegment(2.30, 8.00, 3.20, 8.00, EXT_T, exteriorWallsGroup, true, 5.20);
 
-        // - Sector Cocina (X = 3.20 a 4.85 m, pared divisoria toca justo el lavarropas en X = 3.25):
-        addWindowSegment(3.25, 8.00, 4.55, 8.00, 1.05, 0.95, 3.53, 3.30);
-        addSlopedWallSegment(4.55, 8.00, 4.85, 8.00, 3.30, 3.26, EXT_T, exteriorWallsGroup, true);
+        // - Sector Cocina (X = 3.20 a 4.85 m, bajo faldón Este):
+        addWindowSegment(3.25, 8.00, 4.55, 8.00, 1.05, 0.95, 5.09, 4.54);
+        addSlopedWallSegment(4.55, 8.00, 4.85, 8.00, 4.54, 4.41, EXT_T, exteriorWallsGroup, true);
 
-        // Muro Izquierdo (Oeste, X = 0.00): sube de [0.00, 0.00] a [0.00, 8.00] a cota exterior 2.48 m
+        // Muro Izquierdo (Oeste, X = 0.00): sube de [0.00, 0.00] a [0.00, 8.00] a cota exterior 3.20 m
         // - Ventiluz Baño V7 sobre bañera (Z = 3.15 a 3.85)
-        addWallSegment(0.00, 0.00, 0.00, 3.15, EXT_T, exteriorWallsGroup, true, 2.48);
-        addWindowSegment(0.00, 3.15, 0.00, 3.85, 1.35, 0.65, 2.48);
-        addWallSegment(0.00, 3.85, 0.00, 8.00, EXT_T, exteriorWallsGroup, true, 2.48);
+        addWallSegment(0.00, 0.00, 0.00, 3.15, EXT_T, exteriorWallsGroup, true, 3.20);
+        addWindowSegment(0.00, 3.15, 0.00, 3.85, 1.35, 0.65, 3.20);
+        addWallSegment(0.00, 3.85, 0.00, 8.00, EXT_T, exteriorWallsGroup, true, 3.20);
 
         // ============================================================================
         // 3B. EQUIPAMIENTO FIJO, CALEFACTORES Y TECHO DE MADERA EXTRAÍDOS DEL VIDEO
@@ -3717,16 +3716,16 @@
             const totalDepth = zEnd - zStart; // 8.30 m
             const zCenter = (zStart + zEnd) / 2; // 4.00 m
 
-            // Sector A: Faldón inclinado izquierdo
+            // Sector A: Faldón inclinado izquierdo (sube de X = -0.15 m [3.07m] a cumbrera X = 2.30 m [5.20m])
             const xA1 = -eave; // -0.15 m
             const xA2 = 2.30;
             const dxA = xA2 - xA1; // 2.45 m
-            const slopeA = (3.60 - 2.50) / 2.30; // 0.47826 (pendiente original continua)
-            const yA1 = 3.60 - dxA * slopeA; // ~2.428 m en el borde del alero exterior
-            const yA2 = 3.60;
-            const dyA = yA2 - yA1; // ~1.172 m
-            const lenSlopeA = Math.hypot(dxA, dyA); // ~2.716 m
-            const angSlopeA = Math.atan2(dyA, dxA); // ~25.56°
+            const slopeA = (5.20 - 3.20) / 2.30; // 0.869565 (pendiente pronunciada catedral)
+            const yA1 = 5.20 - dxA * slopeA; // ~3.069 m en el borde del alero exterior Oeste
+            const yA2 = 5.20;
+            const dyA = yA2 - yA1; // ~2.131 m
+            const lenSlopeA = Math.hypot(dxA, dyA); // ~3.246 m
+            const angSlopeA = Math.atan2(dyA, dxA); // ~41.01°
 
             // Cubierta machimbrada Sector A
             const roofLeftA = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
@@ -3736,67 +3735,65 @@
             roofGroup.add(roofLeftA);
 
             // Tirantes de madera vistos bajo Sector A (en el interior de las habitaciones, bajo el entablonado)
-            // Desplazamiento normal exacto bajo el entablonado: -(0.04 + 0.11)/2 = -0.075 m
             const beamOffsetA_X = 0.075 * Math.sin(angSlopeA);
             const beamOffsetA_Y = -0.075 * Math.cos(angSlopeA);
             for (let zBeam = 0.35; zBeam <= 7.75; zBeam += 0.55) {
                 const beamA = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-                beamA.scale.set(lenSlopeA, 0.11, 0.07);
+                beamA.scale.set(lenSlopeA, 0.12, 0.075);
                 beamA.position.set((xA1 + xA2) / 2 + beamOffsetA_X, (yA1 + yA2) / 2 + beamOffsetA_Y, zBeam);
                 beamA.rotation.z = angSlopeA;
                 roofGroup.add(beamA);
             }
 
-            // Cubierta machimbrada Sector B (Plano superior horizontal sobre pasillo, X = 2.30 a 3.00 m)
+            // Cubierta machimbrada Sector B (Plano superior horizontal sobre pasillo, X = 2.30 a 3.00 m a 5.20 m)
             const widthB = 0.70;
             const roofLeftB = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
             roofLeftB.scale.set(widthB, 0.04, totalDepth);
-            roofLeftB.position.set(2.30 + widthB / 2, 3.60, zCenter);
+            roofLeftB.position.set(2.30 + widthB / 2, 5.20, zCenter);
             roofGroup.add(roofLeftB);
 
             // Tirantes horizontales bajo Sector B
             for (let zBeam = 0.35; zBeam <= 7.75; zBeam += 0.55) {
                 const beamB = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-                beamB.scale.set(widthB, 0.08, 0.07);
-                beamB.position.set(2.30 + widthB / 2, 3.54, zBeam);
+                beamB.scale.set(widthB, 0.09, 0.075);
+                beamB.position.set(2.30 + widthB / 2, 5.14, zBeam);
                 roofGroup.add(beamB);
             }
 
             // Viga cumbrera/quiebre longitudinal en X = 2.30 m
             const ridgeLeft = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-            ridgeLeft.scale.set(0.12, 0.16, totalDepth);
-            ridgeLeft.position.set(2.30, 3.50, zCenter);
+            ridgeLeft.scale.set(0.14, 0.18, totalDepth);
+            ridgeLeft.position.set(2.30, 5.10, zCenter);
             roofGroup.add(ridgeLeft);
 
             // Viga cumbrera central en X = 3.00 m
             const ridgeSpine = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-            ridgeSpine.scale.set(0.12, 0.16, totalDepth);
-            ridgeSpine.position.set(3.00, 3.50, zCenter);
+            ridgeSpine.scale.set(0.14, 0.18, totalDepth);
+            ridgeSpine.position.set(3.00, 5.10, zCenter);
             roofGroup.add(ridgeSpine);
 
             // =========================================================================
             // 2) BLOQUE DERECHO ELEVADO (LIVING, ENTRADA Y COCINA: X = 3.00 a 6.45 m)
-            //    - Techo continuo desde la cumbrera central X = 3.00 m (Z = 3.60 m)
-            //      hasta el alero Este X = 6.45 m (Z = 2.973 m)
-            //    - Alero cubre el muro Este y fachadas Norte/Sur
+            //    - Techo continuo desde la cumbrera central X = 3.00 m (Y = 5.20 m)
+            //      hasta el alero Este X = 6.45 m (Y = 3.736 m)
             // =========================================================================
             const xR1 = 3.00;
             const xR2 = 6.30 + eave; // 6.45 m
             const dxRight = xR2 - xR1; // 3.45 m
-            const slopeRight = (3.60 - 3.00) / 3.30; // 0.181818
-            const yR1 = 3.60;
-            const yR2 = 3.60 - dxRight * slopeRight; // ~2.973 m
-            const dyRight = yR1 - yR2; // ~0.627 m
-            const lenSlopeRight = Math.hypot(dxRight, dyRight); // ~3.506 m
-            const angSlopeRight = -Math.atan2(dyRight, dxRight); // ~ -10.30°
+            const slopeRight = (5.20 - 3.80) / 3.30; // 0.424242 (pendiente este de gran altura)
+            const yR1 = 5.20;
+            const yR2 = 5.20 - dxRight * slopeRight; // ~3.736 m
+            const dyRight = yR1 - yR2; // ~1.464 m
+            const lenSlopeRight = Math.hypot(dxRight, dyRight); // ~3.748 m
+            const angSlopeRight = -Math.atan2(dyRight, dxRight); // ~ -23.0°
 
-            // Desplazamiento normal exacto bajo el entablonado derecho: -(0.04 + 0.11)/2 = -0.075 m
+            // Desplazamiento normal exacto bajo el entablonado derecho
             const beamOffsetR_X = -0.075 * Math.sin(angSlopeRight);
             const beamOffsetR_Y = -0.075 * Math.cos(angSlopeRight);
 
             // 1. Cubierta machimbrada Living + Entrada (de Z = -0.15 a 5.75 m, X = 3.00 a 6.45 m)
             const zLivStart = -eave; // -0.15 m
-            const zLivEnd = 5.75; // Cubre puerta de entrada y muro divisorio con palier
+            const zLivEnd = 5.75;
             const depthLivingEnt = zLivEnd - zLivStart; // 5.90 m
             const zLivCenter = (zLivStart + zLivEnd) / 2; // 2.80 m
 
@@ -3807,11 +3804,10 @@
             roofGroup.add(roofLivingEnt);
 
             // 2. Cubierta machimbrada Cocina (de Z = 5.70 a 8.15 m, X = 3.00 a 4.95 m)
-            //    Encuentro continuo a 5.70 m sin quiebres, cubriendo muro divisorio Este X = 4.85 m con 10 cm de alero
             const xCocinaEnd = 4.85 + 0.10; // 4.95 m
             const dxCocina = xCocinaEnd - xR1; // 1.95 m
-            const dyCocina = dxCocina * slopeRight; // ~0.355 m
-            const lenSlopeCocina = Math.hypot(dxCocina, dyCocina); // ~1.982 m
+            const dyCocina = dxCocina * slopeRight; // ~0.827 m
+            const lenSlopeCocina = Math.hypot(dxCocina, dyCocina); // ~2.118 m
             const zCocinaStart = 5.70;
             const zCocinaEnd = 8.00 + eave; // 8.15 m
             const depthCocinaSouth = zCocinaEnd - zCocinaStart; // 2.45 m
@@ -3826,7 +3822,7 @@
             // Tirantes de madera vistos en Living (Z = 0.35 a 4.65 m)
             for (let zBeam = 0.35; zBeam <= 4.65; zBeam += 0.55) {
                 const beamL = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-                beamL.scale.set(lenSlopeRight - 0.15, 0.11, 0.07);
+                beamL.scale.set(lenSlopeRight - 0.15, 0.12, 0.075);
                 beamL.position.set((xR1 + xR2) / 2 + beamOffsetR_X, (yR1 + yR2) / 2 + beamOffsetR_Y, zBeam);
                 beamL.rotation.z = angSlopeRight;
                 roofGroup.add(beamL);
@@ -3838,8 +3834,8 @@
             const lenSlopeEnt = Math.hypot(dxEnt, dyEnt);
             for (let zBeam = 4.95; zBeam <= 5.60; zBeam += 0.55) {
                 const beamE = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-                beamE.scale.set(lenSlopeEnt, 0.11, 0.07);
-                beamE.position.set(4.85 + dxEnt / 2 + beamOffsetR_X, 3.264 - dyEnt / 2 + beamOffsetR_Y, zBeam);
+                beamE.scale.set(lenSlopeEnt, 0.12, 0.075);
+                beamE.position.set(4.85 + dxEnt / 2 + beamOffsetR_X, 4.415 - dyEnt / 2 + beamOffsetR_Y, zBeam);
                 beamE.rotation.z = angSlopeRight;
                 roofGroup.add(beamE);
             }
@@ -3847,7 +3843,7 @@
             // Tirantes de madera en Cocina (Z = 4.95 a 7.75 m, X = 3.00 a 4.85 m)
             for (let zBeam = 4.95; zBeam <= 7.75; zBeam += 0.55) {
                 const beamC = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-                beamC.scale.set(lenSlopeCocina - 0.10, 0.11, 0.07);
+                beamC.scale.set(lenSlopeCocina - 0.10, 0.12, 0.075);
                 beamC.position.set(xR1 + dxCocina / 2 + beamOffsetR_X, yR1 - dyCocina / 2 + beamOffsetR_Y, zBeam);
                 beamC.rotation.z = angSlopeRight;
                 roofGroup.add(beamC);
@@ -3855,14 +3851,14 @@
 
             // Viga solera de remate sobre muro Este (X = 6.30 m)
             const eaveBeamEast = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-            eaveBeamEast.scale.set(0.12, 0.14, depthLivingEnt);
-            eaveBeamEast.position.set(6.30, 2.91, zLivCenter);
+            eaveBeamEast.scale.set(0.14, 0.16, depthLivingEnt);
+            eaveBeamEast.position.set(6.30, 3.73, zLivCenter);
             roofGroup.add(eaveBeamEast);
 
             // Viga solera de remate sobre muro Oeste (X = 0.00 m)
             const eaveBeamWest = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
-            eaveBeamWest.scale.set(0.12, 0.14, totalDepth);
-            eaveBeamWest.position.set(0.00, 2.40, zCenter);
+            eaveBeamWest.scale.set(0.14, 0.16, totalDepth);
+            eaveBeamWest.position.set(0.00, 3.12, zCenter);
             roofGroup.add(eaveBeamWest);
         }
         
@@ -3871,23 +3867,23 @@
         // ============================================================================
         // Eje Vertical X = 2.30 (Cierre lateral de Bauleras y Baño):
         // En X = 2.30 m, el tabique vertical remata a 3.56 m bajo la cubierta machimbrada
-        addWallSegment(2.30, 2.30, 2.30, 3.15, INT_T, interiorWallsGroup, false, 3.56);
+        addWallSegment(2.30, 2.30, 2.30, 3.15, INT_T, interiorWallsGroup, false, 5.20);
         // - PUERTA BAÑO: Entre Z = 3.15 y Z = 3.85 (abre HACIA ADENTRO del Baño hacia la izquierda X < 2.30)
         addDashedLine(2.30, 3.15, 2.30, 3.85);
         addDoorSymbol2D(2.30, 3.82, 2.08, 3.62, 2.04, 3.40, 2.30, 3.18);
         // - Muro sólido abajo: de Z = 3.85 a Z = 4.70
-        addWallSegment(2.30, 3.85, 2.30, 4.70, INT_T, interiorWallsGroup, false, 3.56);
+        addWallSegment(2.30, 3.85, 2.30, 4.70, INT_T, interiorWallsGroup, false, 5.20);
 
         // Eje Vertical Central X = 3.00:
-        // - Muro sólido de Z = 0.00 a Z = 4.05 (remata a 3.56 m bajo la viga cumbrera)
-        addWallSegment(3.00, 0.00, 3.00, 4.05, INT_T, interiorWallsGroup, false, 3.56);
+        // - Muro sólido de Z = 0.00 a Z = 4.05 (remata a 5.20 m bajo la viga cumbrera)
+        addWallSegment(3.00, 0.00, 3.00, 4.05, INT_T, interiorWallsGroup, false, 5.20);
         // - VANO ABIERTO (Paso Living-Pasillo): Sin muro entre Z = 4.05 y Z = 4.80 (0.75 m de paso libre al pasillo)
         addDashedLine(3.00, 4.05, 3.00, 4.80);
         // - Muro sólido divisorio Cuarto-Cocina (trasladado a X = 3.20 para que la pared derecha de Cocina toque justo el lavarropas en X = 3.25):
-        addWallSegment(3.20, 4.80, 3.20, 8.00, INT_T, interiorWallsGroup, false, 3.56);
+        addWallSegment(3.20, 4.80, 3.20, 8.00, INT_T, interiorWallsGroup, false, 5.20);
 
-        // Eje Vertical X = 4.85 (separa Cocina de Entrada corta): de Z = 4.80 a Z = 5.70 a cota 3.26 m
-        addWallSegment(4.85, 4.80, 4.85, 5.70, INT_T, interiorWallsGroup, false, 3.26);
+        // Eje Vertical X = 4.85 (separa Cocina de Entrada corta): de Z = 4.80 a Z = 5.70 a cota 4.41 m
+        addWallSegment(4.85, 4.80, 4.85, 5.70, INT_T, interiorWallsGroup, false, 4.41);
 
         // Eje Horizontal Z = 2.30 (Frente Placard Estudio con 2 hojas enteras corredizas y Puerta Estudio):
         addSlidingPlacard2D(0.00, 2.30, 2.30, -1);
@@ -3896,12 +3892,12 @@
         addDoorSymbol2D(2.95, 2.30, 2.95, 1.62, 2.32, 1.62, 2.32, 2.30);
 
         // Eje Horizontal Z = 2.80 (Cierre de fondo de Baulera Estudio / Divide con Baño):
-        // Sube de X = 0.00 (2.48 m) a X = 2.30 (3.56 m) tocando la cara inferior del faldón.
-        addSlopedWallSegment(0.00, 2.80, 2.30, 2.48, 3.56, INT_T, interiorWallsGroup);
+        // Sube de X = 0.00 (3.20 m) a X = 2.30 (5.20 m) tocando la cara inferior del faldón catedral.
+        addSlopedWallSegment(0.00, 2.80, 2.30, 3.20, 5.20, INT_T, interiorWallsGroup);
 
         // Eje Horizontal Z = 4.20 (Cierre de fondo de Baulera Cuarto / Divide con Baño):
-        // Sube de X = 0.00 (2.48 m) a X = 2.30 (3.56 m) tocando la cara inferior del faldón.
-        addSlopedWallSegment(0.00, 4.20, 2.30, 2.48, 3.56, INT_T, interiorWallsGroup);
+        // Sube de X = 0.00 (3.20 m) a X = 2.30 (5.20 m) tocando la cara inferior del faldón catedral.
+        addSlopedWallSegment(0.00, 4.20, 2.30, 3.20, 5.20, INT_T, interiorWallsGroup);
 
         // Eje Horizontal Z = 4.70 (Frente Placard Cuarto con 2 hojas enteras corredizas, Puerta Cuarto y Vano Cocina):
         addSlidingPlacard2D(0.00, 2.30, 4.70, 1);
@@ -3909,11 +3905,11 @@
         addDashedLine(2.30, 4.70, 3.00, 4.70);
         addDoorSymbol2D(2.95, 4.70, 2.75, 4.92, 2.55, 4.92, 2.42, 4.70);
         // Mocheta de unión entre marco puerta Cuarto (X=3.00) y tabique divisorio Cocina (X=3.20):
-        addWallSegment(3.00, 4.70, 3.20, 4.70, INT_T, interiorWallsGroup, false, 3.56);
+        addWallSegment(3.00, 4.70, 3.20, 4.70, INT_T, interiorWallsGroup, false, 5.20);
         // - VANO ABIERTO COCINA:
         //   Paso libre de X = 3.20 a X = 3.95 (0.75 m); mocheta de X = 3.95 a X = 4.85 (cubre la heladera)
         addDashedLine(3.20, 4.80, 3.95, 4.80);
-        addSlopedWallSegment(3.95, 4.80, 4.85, 4.80, 3.36, 3.20, INT_T, interiorWallsGroup);
+        addSlopedWallSegment(3.95, 4.80, 4.85, 4.80, 4.80, 4.41, INT_T, interiorWallsGroup);
 
         // ============================================================================
         // 4B. PUERTAS 3D REALES EXTRAÍDAS DEL VIDEO (MARCOS DE CHAPA, HOJAS MADERA,
@@ -5125,7 +5121,7 @@
             // - Calefactor a gas metálico gris a la izquierda del rack con caño vertical de escape (en Z=1.85, fotos #1 y #7)
             createCompoundAssembly('Calefactor a Gas con Conducto', () => {
                 addDecorBox(6.05, 0.36, 1.85, 0.28, 0.68, 0.40, 0x475569, 0.35); // Calefactor
-                addDecorCyl(6.12, 1.65, 1.85, 0.045, 0.045, 1.90, 0x94a3b8, 0.3); // Caño de ventilación al techo
+                addDecorCyl(6.12, 2.25, 1.85, 0.045, 0.045, 3.10, 0x94a3b8, 0.3); // Caño de ventilación al techo catedral
             });
 
             // 3. Sector Sillón Seccional / Futón 3 Cuerpos con Cojines Individuales (roughness: 1.0)
@@ -5849,10 +5845,10 @@
             }
 
             // 1. MURO NORTE (Y = 0.00 m):
-            // - Panel Calefactor Negro (X = 0.95 a 1.55 m, ancho 0.60 m) inmediatamente a la izquierda de la ventana:
+            // - Panel Calefactor Negro (X = 0.15 a 0.75 m, ancho 0.60 m) sobre muro ciego a la izquierda de la ventana:
             createCompoundAssembly('Panel Calefactor Estudio', () => {
-                addDecorBox(1.25, 0.48, 0.04, 0.60, 0.50, 0.03, 0x0f172a, 0.15, 0, 'Vidrio Templado Calefactor Estudio');
-                addDecorBox(1.50, 0.68, 0.056, 0.04, 0.02, 0.01, 0x38bdf8, 0.2, 0, 'Display Digital Calefactor Estudio');
+                addDecorBox(0.45, 0.48, 0.04, 0.60, 0.50, 0.03, 0x0f172a, 0.15, 0, 'Vidrio Templado Calefactor Estudio');
+                addDecorBox(0.70, 0.68, 0.056, 0.04, 0.02, 0.01, 0x38bdf8, 0.2, 0, 'Display Digital Calefactor Estudio');
             });
             // - Cortina de ventana Norte (V4: X = 1.65 a 2.95 m, barral a Z = 2.15 m):
             addCurtainAssembly(0.90, 0.00, 2.10, 0.00, 0, 0.12, 0x57534e);
