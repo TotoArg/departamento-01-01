@@ -2839,9 +2839,7 @@
             }
             const nx = isHoriz ? 0 : 1;
             const nz = isHoriz ? 1 : 0;
-            // El muro Este de la Cocina (X=5.20, Z=4.50..7.00) actúa de forma unificada hacia el Este
-            const isKitchenEastFull = (!isHoriz && Math.abs(mx - 4.85) < 0.05 && mz >= 4.80);
-            const actsAsExterior = isExterior || isKitchenEastFull;
+            const actsAsExterior = !!isExterior;
             let outNx = 0, outNz = 0;
             if (actsAsExterior) {
                 if (isHoriz) {
@@ -2989,6 +2987,22 @@
             capMesh.userData.isCap = true;
             holder.add(capMesh);
 
+            // Mallas de corte plano horizontal (para maqueta 3D Sims / Bajas a WALL_CUT_H)
+            const cutBodyMesh = new THREE.Mesh(UNIT_BOX_GEO, mat);
+            cutBodyMesh.scale.set(len, WALL_CUT_H, thickness);
+            cutBodyMesh.position.set(0, WALL_CUT_H / 2, 0);
+            cutBodyMesh.visible = false;
+            cutBodyMesh.userData.isExtWall = isExterior;
+            cutBodyMesh.userData.isIntWall = !isExterior;
+            holder.add(cutBodyMesh);
+
+            const cutCapMesh = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            cutCapMesh.scale.set(len + 0.01, 0.02, thickness + 0.01);
+            cutCapMesh.position.set(0, WALL_CUT_H + 0.01, 0);
+            cutCapMesh.visible = false;
+            cutCapMesh.userData.isCap = true;
+            holder.add(cutCapMesh);
+
             group.add(holder);
 
             const maxH = Math.max(h1, h2);
@@ -2997,6 +3011,8 @@
                 holder,
                 bodyMesh,
                 capMesh,
+                cutBodyMesh,
+                cutCapMesh,
                 h1,
                 h2,
                 isExterior: !!isExterior,
@@ -6981,7 +6997,8 @@
             const hideCaps = !!(roofGroup && roofGroup.visible);
             for (let i = 0; i < simsWalls.length; i++) {
                 const w = simsWalls[i];
-                if (w.capMesh) w.capMesh.visible = !hideCaps;
+                if (w.capMesh) w.capMesh.visible = !hideCaps && (w.bodyMesh ? w.bodyMesh.visible : true);
+                if (w.cutCapMesh) w.cutCapMesh.visible = !hideCaps && (w.cutBodyMesh ? w.cutBodyMesh.visible : true);
                 if (w.capGroup) w.capGroup.visible = !hideCaps;
             }
             if (doors3DGroup) {
@@ -8410,33 +8427,58 @@
         let current3DPreset = 'isom';
 
         function applyWallHeight(w, h) {
+            const hideCaps = !!(roofGroup && roofGroup.visible);
             if (w.type === 'doorLintel') {
                 const isCut = (h < ((w.wallTopH || 2.60) - 0.25));
                 if (w.lintelMesh) w.lintelMesh.visible = !isCut;
-                if (w.capMesh) w.capMesh.visible = !isCut;
+                if (w.capMesh) w.capMesh.visible = !isCut && !hideCaps;
             } else if (w.type === 'wall') {
                 w.bodyMesh.scale.y = h;
                 w.bodyMesh.position.y = h / 2;
-                w.capMesh.position.y = h + 0.01;
+                if (w.capMesh) {
+                    w.capMesh.position.y = h + 0.01;
+                    w.capMesh.visible = !hideCaps;
+                }
             } else if (w.type === 'slopedWall') {
                 const fullH = w.maxH || WALL_H;
-                const ratio = Math.max(0.01, h / fullH);
-                w.bodyMesh.scale.y = ratio;
-                w.capMesh.position.y = ((w.h1 + w.h2) / 2) * ratio + 0.01;
+                const isCut = (h < fullH - 0.15);
+                if (isCut) {
+                    w.bodyMesh.visible = false;
+                    if (w.capMesh) w.capMesh.visible = false;
+                    if (w.cutBodyMesh) {
+                        w.cutBodyMesh.visible = true;
+                        w.cutBodyMesh.scale.y = h;
+                        w.cutBodyMesh.position.y = h / 2;
+                    }
+                    if (w.cutCapMesh) {
+                        w.cutCapMesh.visible = !hideCaps;
+                        w.cutCapMesh.position.y = h + 0.01;
+                    }
+                } else {
+                    w.bodyMesh.visible = true;
+                    if (w.capMesh) w.capMesh.visible = !hideCaps;
+                    if (w.cutBodyMesh) w.cutBodyMesh.visible = false;
+                    if (w.cutCapMesh) w.cutCapMesh.visible = false;
+                }
             } else if (w.type === 'window') {
+                const isCut = (h < (w.maxH || WALL_H) - 0.25);
                 const curSill = Math.min(w.sillH, h);
                 w.sillMesh.scale.y = curSill;
                 w.sillMesh.position.y = curSill / 2;
-                w.upperWinGroup.visible = (h > w.sillH + 0.25);
-                if (w.upperWinGroup.visible) {
-                    const fullH = w.maxH || WALL_H;
-                    const t = Math.max(0.01, (h - w.sillH) / (fullH - w.sillH));
-                    w.upperWinGroup.scale.y = t;
-                    w.upperWinGroup.position.y = w.sillH * (1 - t);
+                w.upperWinGroup.visible = !isCut;
+                if (!isCut) {
+                    w.upperWinGroup.scale.y = 1.0;
+                    w.upperWinGroup.position.y = 0;
+                    if (w.capGroup) {
+                        w.capGroup.position.y = (w.avgH || w.maxH || WALL_H) + 0.012;
+                        w.capGroup.visible = !hideCaps;
+                    }
+                } else {
+                    if (w.capGroup) {
+                        w.capGroup.position.y = curSill + 0.012;
+                        w.capGroup.visible = !hideCaps;
+                    }
                 }
-                const fullH = w.maxH || WALL_H;
-                const ratio = Math.max(0.01, h / fullH);
-                w.capGroup.position.y = (w.avgH || fullH) * ratio + 0.012;
             }
             // En The Sims el equipamiento y muebles de pared (como Smart TV, consolas, alacenas, cuadros y estantes)
             // se mantienen SIEMPRE visibles para que los ambientes sigan completamente amoblados al cortar o bajar paredes
@@ -8465,9 +8507,9 @@
         }
 
         function shouldWallBeCutSims(w, cx, cz, tx, tz, vx, vz, distCam) {
-            const projFromTarget = (w.mx - tx) * vx + (w.mz - tz) * vz;
             if (w.actsAsExterior) {
-                // Si estamos enfocados dentro de un ambiente y este muro está detrás del centro que miramos, queda levantado
+                const projFromTarget = (w.mx - tx) * vx + (w.mz - tz) * vz;
+                // Si estamos enfocados dentro de un ambiente y este muro exterior está detrás del centro que miramos, queda levantado
                 if (distCam < 5.2 && projFromTarget < -0.15) return false;
                 const wx = cx - w.mx;
                 const wz = cz - w.mz;
@@ -8476,11 +8518,9 @@
                 const dotViewOut = vx * w.outNx + vz * w.outNz;
                 return (dotCamOut > 0.08 || dotViewOut > 0.28);
             } else {
-                // Tabique interior: en vista general de maqueta baja para despejar toda la planta estilo Los Sims;
-                // en vista cercana de habitación sólo baja si se interpone entre la cámara y el ambiente.
-                if (distCam >= 5.2) return true;
-                const align = Math.abs(vx * w.nx + vz * w.nz);
-                return (projFromTarget > 0.12 && align > 0.25);
+                // Tabique interior: en corte dinámico estilo Los Sims se corta siempre a WALL_CUT_H (1.35m)
+                // para que ningún muro interior se eleve a 5.20m bloqueando la visibilidad del plano o dividiendo ambientes.
+                return true;
             }
         }
 
@@ -8496,21 +8536,23 @@
             const vx = dxCam / distCam;
             const vz = dzCam / distCam;
 
+            const isRoofOn = !!(roofGroup && roofGroup.visible);
+
             let anyAnimating = false;
             for (let i = 0; i < simsWalls.length; i++) {
                 const w = simsWalls[i];
                 const fullH = w.maxH || WALL_H;
-                if (is2D || wallMode === 'up') {
+                if (is2D || wallMode === 'up' || isRoofOn) {
                     w.targetH = fullH;
                 } else if (wallMode === 'zocalo') {
                     w.targetH = 0.25;
                 } else if (wallMode === 'down' || wallMode === 'cut') {
-                    w.targetH = 2.00;
+                    w.targetH = WALL_CUT_H;
                 } else if (wallMode === 'nowalls') {
                     w.targetH = 0.02;
                 } else {
                     // Modo 'sims' (Corte Dinámico The Sims)
-                    w.targetH = shouldWallBeCutSims(w, cx, cz, tx, tz, vx, vz, distCam) ? 2.00 : fullH;
+                    w.targetH = shouldWallBeCutSims(w, cx, cz, tx, tz, vx, vz, distCam) ? WALL_CUT_H : fullH;
                 }
 
                 if (instant) {
