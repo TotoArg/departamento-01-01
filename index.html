@@ -2436,8 +2436,8 @@
         });
 
         // Piso Cerámico Esmaltado 33×33 cm real (fotos/foto_01.jpg, foto_04.jpg y corridor_floor.jpg)
-        const ceramicTile33MainTex = createRealisticCeramic33Texture(6.30, 6.30);
-        const ceramicTile33SouthTex = createRealisticCeramic33Texture(4.85, 1.70);
+        const ceramicTile33MainTex = createRealisticCeramic33Texture(6.30, 5.70);
+        const ceramicTile33SouthTex = createRealisticCeramic33Texture(4.85, 2.30);
         const pbrCeramicFloorMat = new THREE.MeshStandardMaterial({
             color: 0xe2dcd3, // Baldosas cerámicas beige cálidas con juntas oscuras
             map: ceramicTile33MainTex,
@@ -2766,18 +2766,18 @@
         // ============================================================================
         // 2. PISO CERÁMICO 33×33 cm EN "L" (6.30 m × 8.00 m) + BAÑO + PALIER EXTERIOR
         // ============================================================================
-        // Bloque superior [0.00, 0.00] a [6.30, 6.30]
-        const floorMainGeo = new THREE.BoxGeometry(6.30, 0.06, 6.30);
+        // Bloque superior (Estudio, Living y Entrada) [0.00, 0.00] a [6.30, 5.70]
+        const floorMainGeo = new THREE.BoxGeometry(6.30, 0.06, 5.70);
         const floorMainMesh = new THREE.Mesh(floorMainGeo, floorMatMain);
-        floorMainMesh.position.set(3.15, -0.03, 3.15);
+        floorMainMesh.position.set(3.15, -0.03, 2.85);
         floorMainMesh.receiveShadow = true;
         floorMainMesh.name = 'floorMainMesh';
         floorGroup.add(floorMainMesh);
 
-        // Bloque inferior (Cuarto + Cocina ajustada a X = 4.85 m) [0.00, 6.30] a [4.85, 8.00]
-        const floorSouthGeo = new THREE.BoxGeometry(4.85, 0.06, 1.70);
+        // Bloque inferior (Cuarto + Cocina) [0.00, 5.70] a [4.85, 8.00] (2.30 m de profundidad)
+        const floorSouthGeo = new THREE.BoxGeometry(4.85, 0.06, 2.30);
         const floorSouthMesh = new THREE.Mesh(floorSouthGeo, floorMatSouth);
-        floorSouthMesh.position.set(2.425, -0.03, 7.15);
+        floorSouthMesh.position.set(2.425, -0.03, 6.85);
         floorSouthMesh.receiveShadow = true;
         floorSouthMesh.name = 'floorSouthMesh';
         floorGroup.add(floorSouthMesh);
@@ -2790,10 +2790,10 @@
         bathFloorMesh.name = 'bathFloorMesh';
         floorGroup.add(bathFloorMesh);
 
-        // Palier Edificio (Exterior sombreado en gris claro) [4.85, 6.30] a [6.30, 8.00]
-        const palierGeo = new THREE.BoxGeometry(1.45, 0.05, 1.70);
+        // Palier Edificio Exterior [4.85, 5.70] a [6.30, 8.00] (2.30 m de profundidad)
+        const palierGeo = new THREE.BoxGeometry(1.45, 0.05, 2.30);
         const palierMesh = new THREE.Mesh(palierGeo, palierMat);
-        palierMesh.position.set(5.575, -0.03, 7.15);
+        palierMesh.position.set(5.575, -0.03, 6.85);
         palierMesh.name = 'palierMesh';
         floorGroup.add(palierMesh);
 
@@ -2809,7 +2809,7 @@
             const mz = (z1 + z2) / 2;
             let isHoriz = Math.abs(dx) >= Math.abs(dz);
             // Jambas cortas de la puerta de entrada en Z=5.70 se comportan como parte del muro horizontal Sur
-            if (isExterior && mz > 6.15 && mz < 6.45 && mx > 5.30 && mx < 6.20) {
+            if (isExterior && mz > 5.55 && mz < 5.85 && mx > 5.30 && mx < 6.20) {
                 isHoriz = true;
             }
             const nx = isHoriz ? 0 : 1;
@@ -3271,24 +3271,24 @@
         addWallSegment(6.30, 0.00, 6.30, 0.25, EXT_T, exteriorWallsGroup, true, 2.98);
         // - Ventana lateral Living V3 (Z = 0.25 a 1.45 m, ancho 1.20 m, 2 hojas corredizas)
         addWindowSegment(6.30, 0.25, 6.30, 1.45, 0.95, 1.10, 2.98);
-        // - Muro sólido Este (Z = 1.45 a 6.30 m, aloja Calefactor en Z=1.85, Rack TV y Perchero Entrada)
-        addWallSegment(6.30, 1.45, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
+        // - Muro sólido Este (Z = 1.45 a 5.70 m, aloja Calefactor en Z=1.85, Rack TV y Perchero Entrada)
+        addWallSegment(6.30, 1.45, 6.30, 5.70, EXT_T, exteriorWallsGroup, true, 2.98);
 
-        // Retranqueo Palier (Puerta Principal en Z = 6.30): de [4.85, 6.30] a [6.30, 6.30] a 2.98 m
-        addWallSegment(4.85, 6.30, 5.34, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
-        addWallSegment(6.18, 6.30, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 2.98);
+        // Retranqueo Palier (Puerta Principal en Z = 5.70): de [4.85, 5.70] a [6.30, 5.70] a 2.98 m
+        addWallSegment(4.85, 5.70, 5.34, 5.70, EXT_T, exteriorWallsGroup, true, 2.98);
+        addWallSegment(6.18, 5.70, 6.30, 5.70, EXT_T, exteriorWallsGroup, true, 2.98);
         // Umbral y símbolo arquitectónico 2D de Puerta Principal (abre 90° hacia el Norte dentro de Entrada batiendo sobre pared Este)
         const entranceThreshold = new THREE.Mesh(
             new THREE.BoxGeometry(0.84, 0.01, 0.06),
             new THREE.MeshBasicMaterial({ color: 0xcbd5e1 })
         );
-        entranceThreshold.position.set(5.76, 0.01, 6.30);
+        entranceThreshold.position.set(5.76, 0.01, 5.70);
         lines2DGroup.add(entranceThreshold);
-        addDashedLine(5.34, 6.30, 6.18, 6.30);
-        addDoorSymbol2D(6.14, 6.30, 6.14, 5.50, 5.40, 5.50, 5.40, 6.30);
+        addDashedLine(5.34, 5.70, 6.18, 5.70);
+        addDoorSymbol2D(6.14, 5.70, 6.14, 4.96, 5.40, 4.96, 5.40, 5.70);
 
-        // Muro Derecho Cocina (Límite con Palier): de [4.85, 6.30] a [4.85, 8.00] a 3.26 m
-        addWallSegment(4.85, 6.30, 4.85, 8.00, EXT_T, exteriorWallsGroup, true, 3.26);
+        // Muro Derecho Cocina (Límite con Palier exterior): de [4.85, 5.70] a [4.85, 8.00] a 3.26 m
+        addWallSegment(4.85, 5.70, 4.85, 8.00, EXT_T, exteriorWallsGroup, true, 3.26);
 
         // Muro Inferior (Sur, Z = 8.00): cierra de [0.00, 8.00] a [4.85, 8.00]
         // - Sector Cuarto (X = 0.00 a 3.20 m):
@@ -3792,11 +3792,11 @@
             const beamOffsetR_X = -0.075 * Math.sin(angSlopeRight);
             const beamOffsetR_Y = -0.075 * Math.cos(angSlopeRight);
 
-            // 1. Cubierta machimbrada Living + Entrada (de Z = -0.15 a 6.35 m, X = 3.00 a 6.45 m)
+            // 1. Cubierta machimbrada Living + Entrada (de Z = -0.15 a 5.75 m, X = 3.00 a 6.45 m)
             const zLivStart = -eave; // -0.15 m
-            const zLivEnd = 6.35; // Cubre puerta de entrada y muro divisorio con palier
-            const depthLivingEnt = zLivEnd - zLivStart; // 6.50 m
-            const zLivCenter = (zLivStart + zLivEnd) / 2; // 3.10 m
+            const zLivEnd = 5.75; // Cubre puerta de entrada y muro divisorio con palier
+            const depthLivingEnt = zLivEnd - zLivStart; // 5.90 m
+            const zLivCenter = (zLivStart + zLivEnd) / 2; // 2.80 m
 
             const roofLivingEnt = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
             roofLivingEnt.scale.set(lenSlopeRight, 0.04, depthLivingEnt);
@@ -3804,16 +3804,16 @@
             roofLivingEnt.rotation.z = angSlopeRight;
             roofGroup.add(roofLivingEnt);
 
-            // 2. Cubierta machimbrada Cocina (de Z = 6.30 a 8.15 m, X = 3.00 a 4.95 m)
-            //    Encuentro continuo a 6.30 m sin quiebres, cubriendo muro divisorio Este X = 4.85 m con 10 cm de alero
+            // 2. Cubierta machimbrada Cocina (de Z = 5.70 a 8.15 m, X = 3.00 a 4.95 m)
+            //    Encuentro continuo a 5.70 m sin quiebres, cubriendo muro divisorio Este X = 4.85 m con 10 cm de alero
             const xCocinaEnd = 4.85 + 0.10; // 4.95 m
             const dxCocina = xCocinaEnd - xR1; // 1.95 m
             const dyCocina = dxCocina * slopeRight; // ~0.355 m
             const lenSlopeCocina = Math.hypot(dxCocina, dyCocina); // ~1.982 m
-            const zCocinaStart = 6.30;
+            const zCocinaStart = 5.70;
             const zCocinaEnd = 8.00 + eave; // 8.15 m
-            const depthCocinaSouth = zCocinaEnd - zCocinaStart; // 1.85 m
-            const zCocinaCenter = (zCocinaStart + zCocinaEnd) / 2; // 7.225 m
+            const depthCocinaSouth = zCocinaEnd - zCocinaStart; // 2.45 m
+            const zCocinaCenter = (zCocinaStart + zCocinaEnd) / 2; // 6.925 m
 
             const roofCocinaSouth = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
             roofCocinaSouth.scale.set(lenSlopeCocina, 0.04, depthCocinaSouth);
@@ -3830,11 +3830,11 @@
                 roofGroup.add(beamL);
             }
 
-            // Tirantes de madera en Entrada (Z = 4.95 a 6.20 m, X = 4.85 a 6.30 m)
+            // Tirantes de madera en Entrada (Z = 4.95 a 5.60 m, X = 4.85 a 6.30 m)
             const dxEnt = 1.45;
             const dyEnt = dxEnt * slopeRight;
             const lenSlopeEnt = Math.hypot(dxEnt, dyEnt);
-            for (let zBeam = 4.95; zBeam <= 6.20; zBeam += 0.55) {
+            for (let zBeam = 4.95; zBeam <= 5.60; zBeam += 0.55) {
                 const beamE = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
                 beamE.scale.set(lenSlopeEnt, 0.11, 0.07);
                 beamE.position.set(4.85 + dxEnt / 2 + beamOffsetR_X, 3.264 - dyEnt / 2 + beamOffsetR_Y, zBeam);
@@ -3884,8 +3884,8 @@
         // - Muro sólido divisorio Cuarto-Cocina (trasladado a X = 3.20 para que la pared derecha de Cocina toque justo el lavarropas en X = 3.25):
         addWallSegment(3.20, 4.80, 3.20, 8.00, INT_T, interiorWallsGroup, false, 3.56);
 
-        // Eje Vertical X = 4.85 (separa Cocina de Entrada): de Z = 4.80 a Z = 6.30 a cota 3.26 m
-        addWallSegment(4.85, 4.80, 4.85, 6.30, INT_T, interiorWallsGroup, false, 3.26);
+        // Eje Vertical X = 4.85 (separa Cocina de Entrada corta): de Z = 4.80 a Z = 5.70 a cota 3.26 m
+        addWallSegment(4.85, 4.80, 4.85, 5.70, INT_T, interiorWallsGroup, false, 3.26);
 
         // Eje Horizontal Z = 2.30 (Frente Placard Estudio con 2 hojas enteras corredizas y Puerta Estudio):
         addSlidingPlacard2D(0.00, 2.30, 2.30, -1);
@@ -4638,7 +4638,7 @@
             doors3DGroup.add(cocinaLintel);
             attachWallMount(cocinaLintel, 4.35, 4.80, true);
             // Instanciar puertas 3D interactivas con dintel a 3.56 m bajo la viga cumbrera:
-            addMainEntranceDoor3D(5.34, 6.30, 6.18, 6.30);
+            addMainEntranceDoor3D(5.34, 5.70, 6.18, 5.70);
             addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 90, 'Puerta Estudio', 3.56);
             addInteriorWoodDoor3D(2.30, 3.15, 2.30, 3.85, false, 1, 75, 'Puerta Bano', 3.56);
             addInteriorWoodDoor3D(2.30, 4.70, 3.00, 4.70, false, 1, 75, 'Puerta Cuarto', 3.56);
@@ -4869,13 +4869,13 @@
             // ------------------------------------------------------------------------
             // A) ENTRADA Y LIVING-COMEDOR ([3.00, 0.00] a [6.30, 5.70])
             // ------------------------------------------------------------------------
-            // 1. Entrada (X = 5.20..6.30, Z = 4.00..6.30):
+            // 1. Entrada (X = 5.20..6.30, Z = 4.80..5.70):
             // - Crucifijo de madera oscura sobre dintel de puerta principal + retablo dorado sobre muro + tablero eléctrico
-            setMountWall(5.75, 6.30, true);
-            // Crucifijo montado sobre el dintel interior de la puerta (Z = 6.23 pegado a la cara interna del muro en Z = 6.30)
-            addDecorBox(5.75, 2.30, 6.23, 0.14, 0.24, 0.02, 0x3b2314);
-            // Retablo dorado montado sobre el muro derecho junto a la puerta (X = 6.21, Z = 6.23)
-            addDecorBox(6.21, 1.48, 6.23, 0.08, 0.13, 0.02, 0xd4af37);
+            setMountWall(5.75, 5.70, true);
+            // Crucifijo montado sobre el dintel interior de la puerta (Z = 5.63 pegado a la cara interna del muro en Z = 5.70)
+            addDecorBox(5.75, 2.30, 5.63, 0.14, 0.24, 0.02, 0x3b2314);
+            // Retablo dorado montado sobre el muro derecho junto a la puerta (X = 6.21, Z = 5.63)
+            addDecorBox(6.21, 1.48, 5.63, 0.08, 0.13, 0.02, 0xd4af37);
             setMountWall(4.85, 5.22, false);
             // Tablero eléctrico sobre pared divisoria con Cocina (cara Entrada X = 4.85 + INT_T/2)
             addDecorBox(4.91, 1.45, 5.22, 0.02, 0.22, 0.26, 0x1e293b);
@@ -4885,58 +4885,58 @@
             // Dimensiones y distribución fiel de objetos:
             // ============================================================================
 
-            // 1. Muro Sur a la derecha de la puerta (lado Oeste, X = 4.85 a 5.34, Z = 6.30):
+            // 1. Muro Sur a la derecha de la puerta (lado Oeste, X = 4.85 a 5.34, Z = 5.70):
             // - Rejilla de ventilación blanca superior (cerca del techo, fotos #2 y #3)
-            setMountWall(5.25, 6.30, true);
-            addDecorBox(5.25, 2.48, 6.22, 0.16, 0.16, 0.015, 0xf8fafc, 0.6, 0, 'Rejilla de Ventilación');
+            setMountWall(5.25, 5.70, true);
+            addDecorBox(5.25, 2.48, 5.62, 0.16, 0.16, 0.015, 0xf8fafc, 0.6, 0, 'Rejilla de Ventilación');
             // - Cuadrito / placa religiosa dorada (santito) en muro derecho (foto #2)
-            addDecorBox(5.25, 1.45, 6.22, 0.09, 0.14, 0.022, 0xd4af37, 0.35, 0, 'Placa Religiosa Dorada');
-            addDecorBox(5.25, 1.45, 6.21, 0.065, 0.11, 0.024, 0x78350f, 0.7); // Lámina interior
+            addDecorBox(5.25, 1.45, 5.62, 0.09, 0.14, 0.022, 0xd4af37, 0.35, 0, 'Placa Religiosa Dorada');
+            addDecorBox(5.25, 1.45, 5.61, 0.065, 0.11, 0.024, 0x78350f, 0.7); // Lámina interior
             // - Tecla de luz blanca en el muro derecho (foto #2)
-            addDecorBox(5.25, 1.05, 6.22, 0.08, 0.12, 0.014, 0xf1f5f9, 0.4);
+            addDecorBox(5.25, 1.05, 5.62, 0.08, 0.12, 0.014, 0xf1f5f9, 0.4);
             // - Recipiente / macetita verde en el zócalo de la esquina derecha (foto #2)
-            addDecorCyl(5.25, 0.07, 6.22, 0.045, 0.045, 0.14, 0x4d7c0f, 0.5);
+            addDecorCyl(5.25, 0.07, 5.62, 0.045, 0.045, 0.14, 0x4d7c0f, 0.5);
 
-            // 2. Muro Este de Entrada (X = 6.30, de Z = 4.80 a Z = 6.30):
-            setMountWall(6.30, 6.05, false);
+            // 2. Muro Este de Entrada (X = 6.30, de Z = 4.80 a Z = 5.70):
+            setMountWall(6.30, 5.58, false);
             // - Panel de alarma / portero visor con pantalla negra táctil y marco blanco (fotos #1 y #3)
-            addDecorBox(6.20, 1.38, 6.05, 0.018, 0.13, 0.18, 0xf8fafc, 0.4, 0, 'Panel Alarma / Pantalla');
-            addDecorBox(6.19, 1.38, 6.05, 0.019, 0.09, 0.13, 0x09090b, 0.15); // Pantalla negra
+            addDecorBox(6.20, 1.38, 5.58, 0.018, 0.13, 0.18, 0xf8fafc, 0.4, 0, 'Panel Alarma / Pantalla');
+            addDecorBox(6.19, 1.38, 5.58, 0.019, 0.09, 0.13, 0x09090b, 0.15); // Pantalla negra
             // - Tecla de luz blanca bajo el panel de alarma
-            addDecorBox(6.20, 1.05, 6.05, 0.014, 0.12, 0.08, 0xf1f5f9, 0.4);
+            addDecorBox(6.20, 1.05, 5.58, 0.014, 0.12, 0.08, 0xf1f5f9, 0.4);
             setMountWall(null);
 
             // - Bolsos / mochila sobre el piso cerca de la puerta (fotos #1 y #3): conjunto unificado seleccionable
             createCompoundAssembly('Mochila y Bolso Entrada', () => {
-                addDecorBox(6.10, 0.14, 5.85, 0.28, 0.28, 0.36, 0x0f766e, 0.85, 0.12, 'Bolso Estampado Entrada');
-                addDecorBox(6.08, 0.18, 5.72, 0.24, 0.32, 0.22, 0x1e293b, 0.9, -0.15, 'Mochila Negra Entrada');
+                addDecorBox(6.10, 0.14, 5.48, 0.28, 0.28, 0.36, 0x0f766e, 0.85, 0.12, 'Bolso Estampado Entrada');
+                addDecorBox(6.08, 0.18, 5.36, 0.24, 0.32, 0.22, 0x1e293b, 0.9, -0.15, 'Mochila Negra Entrada');
             });
 
             // - Perchero industrial de hierro negro + zapatero de 3 niveles + estante superior (fotos #0, #1, #3):
             createCompoundAssembly('Perchero y Zapatero Entrada', () => {
-                // Zapatero 3 niveles abajo con calzado (Z = 5.06 a 5.70, X = 6.10):
-                addDecorBox(6.10, 0.03, 5.38, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Inferior Zapatero');
-                addDecorBox(6.10, 0.19, 5.38, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Medio Zapatero');
-                addDecorBox(6.10, 0.35, 5.38, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Superior Zapatero');
+                // Zapatero 3 niveles abajo con calzado (Z = 4.80 a 5.40, X = 6.10):
+                addDecorBox(6.10, 0.03, 5.10, 0.28, 0.02, 0.58, 0x0f172a, 0.45, 0, 'Estante Inferior Zapatero');
+                addDecorBox(6.10, 0.19, 5.10, 0.28, 0.02, 0.58, 0x0f172a, 0.45, 0, 'Estante Medio Zapatero');
+                addDecorBox(6.10, 0.35, 5.10, 0.28, 0.02, 0.58, 0x0f172a, 0.45, 0, 'Estante Superior Zapatero');
                 // Patas y estructura lateral de hierro negro:
-                addDecorBox(6.10, 0.90, 5.06, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Norte Perchero');
-                addDecorBox(6.10, 0.90, 5.70, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Sur Perchero');
+                addDecorBox(6.10, 0.90, 4.82, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Norte Perchero');
+                addDecorBox(6.10, 0.90, 5.38, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Sur Perchero');
                 // Calzados ordenados dentro de los estantes del mueble zapatero:
-                addDecorBox(6.08, 0.09, 5.22, 0.22, 0.09, 0.24, 0x1e293b, 0.8, 0, 'Zapatillas Negras Estante 1');
-                addDecorBox(6.08, 0.09, 5.52, 0.22, 0.09, 0.24, 0x94a3b8, 0.8, 0, 'Zapatillas Grises Estante 1');
-                addDecorBox(6.08, 0.25, 5.22, 0.22, 0.09, 0.24, 0x475569, 0.8, 0, 'Zapatillas Cuero Estante 2');
-                addDecorBox(6.08, 0.25, 5.52, 0.22, 0.09, 0.24, 0xf1f5f9, 0.8, 0, 'Zapatillas Blancas Estante 2');
+                addDecorBox(6.08, 0.09, 4.96, 0.22, 0.09, 0.24, 0x1e293b, 0.8, 0, 'Zapatillas Negras Estante 1');
+                addDecorBox(6.08, 0.09, 5.24, 0.22, 0.09, 0.24, 0x94a3b8, 0.8, 0, 'Zapatillas Grises Estante 1');
+                addDecorBox(6.08, 0.25, 4.96, 0.22, 0.09, 0.24, 0x475569, 0.8, 0, 'Zapatillas Cuero Estante 2');
+                addDecorBox(6.08, 0.25, 5.24, 0.22, 0.09, 0.24, 0xf1f5f9, 0.8, 0, 'Zapatillas Blancas Estante 2');
 
                 // Camperas colgadas del perchero (sin setMountWall que altere alturas):
-                addDecorBox(6.10, 1.25, 5.25, 0.24, 0.82, 0.38, 0x1e293b, 0.85, 0, 'Campera Abrigada');
+                addDecorBox(6.10, 1.25, 5.02, 0.24, 0.82, 0.38, 0x1e293b, 0.85, 0, 'Campera Abrigada');
                 // Bolsa de tela con manija ("Ochenta y Cinco Accesorios", foto #1):
-                addDecorBox(6.11, 1.35, 5.46, 0.16, 0.32, 0.26, 0xfef08a, 0.9, 0.05, 'Bolsa Tela Accesorios');
+                addDecorBox(6.11, 1.35, 5.22, 0.16, 0.32, 0.26, 0xfef08a, 0.9, 0.05, 'Bolsa Tela Accesorios');
                 // Estante superior de madera natural (pino/paraíso):
-                addDecorBox(6.10, 1.78, 5.38, 0.26, 0.03, 0.68, 0x9a5b32, 0.6, 0, 'Estante Madera Perchero');
+                addDecorBox(6.10, 1.78, 5.10, 0.26, 0.03, 0.60, 0x9a5b32, 0.6, 0, 'Estante Madera Perchero');
                 // Adornos sobre el estante superior (fotos #0, #1, #3):
-                addDecorCyl(6.10, 1.88, 5.20, 0.035, 0.025, 0.16, 0xf1f5f9, 0.4, 'Florero Cerámico Perchero');
-                addDecorCyl(6.10, 1.88, 5.34, 0.025, 0.025, 0.15, 0x1c1917, 0.2, 'Botella Vidrio Perchero');
-                addDecorBox(6.10, 1.88, 5.48, 0.045, 0.16, 0.045, 0x78350f, 0.6, 0, 'Escultura Madera Perchero');
+                addDecorCyl(6.10, 1.88, 4.94, 0.035, 0.025, 0.16, 0xf1f5f9, 0.4, 'Florero Cerámico Perchero');
+                addDecorCyl(6.10, 1.88, 5.08, 0.025, 0.025, 0.15, 0x1c1917, 0.2, 'Botella Vidrio Perchero');
+                addDecorBox(6.10, 1.88, 5.22, 0.045, 0.16, 0.045, 0x78350f, 0.6, 0, 'Escultura Madera Perchero');
             });
 
             // - Maceta redonda blanca sobre pie nórdico de madera con Sansevieria (Lengua de suegra, fotos #0 y #3):
@@ -6677,9 +6677,9 @@
         // Cocina: [3.00, 4.80] a [4.85, 8.00]
         addPlanLabel(3.92, 6.20, "COCINA");
         // Entrada: [4.85, 4.80] a [6.30, 6.30]
-        addPlanLabel(5.57, 5.55, "ENTRADA", "arch-label sm");
+        addPlanLabel(5.57, 5.25, "ENTRADA", "arch-label sm");
         // Palier Edificio (Exterior): [4.85, 6.30] a [6.30, 8.00]
-        addPlanLabel(5.57, 7.15, "PALIER\nEDIFICIO", "arch-label palier");
+        addPlanLabel(5.57, 6.85, "PALIER\nEDIFICIO", "arch-label palier");
 
         // Cotas Exteriores
         addPlanLabel(3.15, -0.30, "6.30 m", "arch-label dim");
