@@ -678,10 +678,13 @@
             <button class="mode-btn" id="btn-toggle-edit-mode" style="background:rgba(245,158,11,0.20); border:1px solid #f59e0b; color:#fde68a;" title="Activar/Desactivar modo de edición de muebles">
                 <span id="btn-edit-mode-icon">🔒</span> <span id="btn-edit-mode-text">Editar muebles</span>
             </button>
-            <button class="mode-btn" id="btn-save-layout" style="background:rgba(16,185,129,0.22); border:1px solid #10b981; color:#6ee7b7; display:none;" title="Guardar modificaciones de muebles">
+            <button class="mode-btn" id="btn-save-layout" style="background:rgba(16,185,129,0.24); border:1.5px solid #10b981; color:#6ee7b7; font-weight:700;" title="Guardar modificaciones de muebles permanentemente (Ctrl+S)">
                 <span>💾</span> <span id="btn-save-text">Guardar</span>
             </button>
-            <button class="mode-btn" id="btn-reset-layout" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); display:none;" title="Restablecer posiciones originales">
+            <button class="mode-btn" id="btn-backup-menu" style="background:rgba(56,189,248,0.18); border:1px solid #0284c7; color:#bae6fd;" title="Opciones de respaldo (Descargar/Cargar archivo)">
+                <span>📦</span> <span id="btn-backup-text">Respaldo</span>
+            </button>
+            <button class="mode-btn" id="btn-reset-layout" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#cbd5e1;" title="Restablecer posiciones originales del video">
                 <span>↺</span> Restablecer
             </button>
             <button class="mode-btn active" id="btn-toggle-labels" title="Mostrar/Ocultar Nombres de los Ambientes"><span>🏷️</span> Etiquetas</button>
@@ -968,6 +971,58 @@
             <div style="display:flex; gap:8px;">
                 <button class="action-btn btn-export" id="btn-copy-clipboard">📋 Copiar al Portapapeles</button>
                 <button class="action-btn btn-delete" id="btn-clear-all">🗑️ Vaciar Todos</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gestión de Respaldo y Persistencia -->
+    <div class="modal-overlay" id="backup-modal" style="display:none;">
+        <div class="modal-box glass-panel" style="max-width:480px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="font-size:15px; color:#38bdf8; display:flex; align-items:center; gap:8px; margin:0;">
+                    <span>📦</span> Respaldo y Guardado del Plano
+                </h3>
+                <button class="icon-btn" id="btn-close-backup">✕</button>
+            </div>
+            
+            <p style="font-size:12px; color:#cbd5e1; line-height:1.45; margin:0 0 14px 0;">
+                Tus cambios se guardan automáticamente en la memoria de este navegador. Para asegurarte de nunca perderlos o pasarlos a otro dispositivo (PC o celular), podés descargar un archivo de respaldo.
+            </p>
+
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button class="action-btn" id="btn-backup-save-now" style="background:#059669; border:1px solid #10b981; color:#fff; padding:9px 14px; font-size:12.5px; font-weight:700; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <span>💾</span> Guardar ahora en este navegador
+                </button>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
+                    <button class="action-btn" id="btn-backup-download" style="background:rgba(56,189,248,0.20); border:1px solid #38bdf8; color:#7dd3fc; padding:8px 12px; font-size:12px; font-weight:600; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+                        <span>📥</span> Descargar archivo (.json)
+                    </button>
+                    <label class="action-btn" style="background:rgba(168,85,247,0.20); border:1px solid #a855f7; color:#d8b4fe; padding:8px 12px; font-size:12px; font-weight:600; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; margin:0; text-align:center;">
+                        <span>📤</span> Cargar archivo (.json)
+                        <input type="file" id="inp-backup-file" accept=".json,application/json" style="display:none;">
+                    </label>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <button class="action-btn" id="btn-backup-copy" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#f8fafc; padding:8px 12px; font-size:12px; font-weight:600; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+                        <span>📋</span> Copiar código JSON
+                    </button>
+                    <button class="action-btn" id="btn-backup-paste" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#f8fafc; padding:8px 12px; font-size:12px; font-weight:600; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+                        <span>📝</span> Pegar código JSON
+                    </button>
+                </div>
+
+                <div id="backup-paste-box" style="display:none; flex-direction:column; gap:6px; margin-top:6px;">
+                    <textarea id="txt-backup-paste" rows="4" placeholder="Pegá aquí el contenido JSON del respaldo..." style="width:100%; background:#090d16; color:#38bdf8; border:1px solid #38bdf8; border-radius:6px; padding:6px; font-family:monospace; font-size:11px;"></textarea>
+                    <button id="btn-apply-paste" style="background:#0284c7; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer;">Aplicar cambios pegados</button>
+                </div>
+
+                <div style="border-top:1px solid rgba(255,255,255,0.12); margin-top:8px; padding-top:8px;">
+                    <button class="action-btn btn-delete" id="btn-modal-reset" style="width:100%; padding:7px 12px; font-size:11.5px; border-radius:8px; display:flex; align-items:center; justify-content:center; gap:6px;">
+                        <span>↺</span> Restablecer plano original de fábrica
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -5809,7 +5864,7 @@
             // 1. Eliminar objetos marcados como eliminados por el usuario
             if (decorOverrides.deleted && decorOverrides.deleted.length > 0) {
                 const toRemove = [];
-                decorVideoGroup.traverse(child => {
+                apartmentGroup.traverse(child => {
                     const root = getSelectionRoot(child) || child;
                     const name = root.userData?.name || root.name;
                     if (name && decorOverrides.deleted.includes(name)) {
@@ -5821,11 +5876,14 @@
                 });
             }
             // 2. Aplicar posiciones y rotaciones guardadas
+            const transformedRoots = new Set();
             if (decorOverrides.transforms) {
-                decorVideoGroup.traverse(child => {
+                apartmentGroup.traverse(child => {
                     const root = getSelectionRoot(child) || child;
+                    if (transformedRoots.has(root)) return;
                     const name = root.userData?.name || root.name;
                     if (name && decorOverrides.transforms[name]) {
+                        transformedRoots.add(root);
                         const t = decorOverrides.transforms[name];
                         if (t.x !== undefined && t.y !== undefined && t.z !== undefined) {
                             root.position.set(t.x, t.y, t.z);
@@ -6183,6 +6241,7 @@
             if (field === 'rot') item.rot = (parseFloat(val) % 360 + 360) % 360;
 
             renderFurniture3D();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
         }
 
         document.querySelectorAll('.step-btn[data-field]').forEach(btn => {
@@ -6572,9 +6631,196 @@
 
         // Guardar cambios manualmente y restablecer plano
         function saveCurrentModifications() {
-            saveDecorOverrides(true);
+            saveDecorOverrides(false);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
+
+            const btnSave = document.getElementById('btn-save-layout');
+            const saveText = document.getElementById('btn-save-text');
+            if (btnSave) {
+                btnSave.style.background = '#10b981';
+                btnSave.style.color = '#022c22';
+                btnSave.style.borderColor = '#34d399';
+                if (saveText) saveText.innerText = '¡Guardado!';
+                setTimeout(() => {
+                    if (btnSave) {
+                        btnSave.style.background = 'rgba(16,185,129,0.24)';
+                        btnSave.style.color = '#6ee7b7';
+                        btnSave.style.borderColor = '#10b981';
+                    }
+                    if (saveText) saveText.innerText = 'Guardar';
+                }, 2200);
+            }
+
+            const btnQuickSave = document.getElementById('btn-quick-save');
+            if (btnQuickSave) {
+                btnQuickSave.innerHTML = '✓ Guardado';
+                setTimeout(() => {
+                    if (btnQuickSave) btnQuickSave.innerHTML = '💾 Guardar';
+                }, 2200);
+            }
+
+            showToast('💾 Cambios guardados permanentemente (no se perderán al recargar)', false, 3500);
         }
+
+        // ============================================================================
+        // CONTROLADOR DEL MODAL DE RESPALDO Y ARCHIVOS JSON
+        // ============================================================================
+        const backupModal = document.getElementById('backup-modal');
+        const btnBackupMenu = document.getElementById('btn-backup-menu');
+        const btnCloseBackup = document.getElementById('btn-close-backup');
+        if (btnBackupMenu && backupModal) {
+            btnBackupMenu.addEventListener('click', () => {
+                backupModal.style.display = 'flex';
+            });
+        }
+        if (btnCloseBackup && backupModal) {
+            btnCloseBackup.addEventListener('click', () => {
+                backupModal.style.display = 'none';
+            });
+        }
+
+        const btnBackupSaveNow = document.getElementById('btn-backup-save-now');
+        if (btnBackupSaveNow) {
+            btnBackupSaveNow.addEventListener('click', () => {
+                saveCurrentModifications();
+                if (backupModal) backupModal.style.display = 'none';
+            });
+        }
+
+        const btnBackupDownload = document.getElementById('btn-backup-download');
+        if (btnBackupDownload) {
+            btnBackupDownload.addEventListener('click', () => {
+                const data = {
+                    app: 'departamento-01-01',
+                    version: '1.0',
+                    savedAt: new Date().toISOString(),
+                    decorOverrides: decorOverrides,
+                    furnitureList: furnitureList
+                };
+                const jsonStr = JSON.stringify(data, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `depto_muebles_personalizados_${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('📥 Archivo de respaldo descargado');
+            });
+        }
+
+        const inpBackupFile = document.getElementById('inp-backup-file');
+        if (inpBackupFile) {
+            inpBackupFile.addEventListener('change', (e) => {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const parsed = JSON.parse(event.target.result);
+                        if (parsed.decorOverrides) {
+                            decorOverrides = parsed.decorOverrides;
+                            localStorage.setItem(DECOR_OVERRIDES_KEY, JSON.stringify(decorOverrides));
+                        }
+                        if (Array.isArray(parsed.furnitureList)) {
+                            furnitureList = parsed.furnitureList;
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
+                            renderFurniture3D();
+                        }
+                        applyDecorOverrides();
+                        showToast('✓ Respaldo cargado y guardado correctamente');
+                        if (backupModal) backupModal.style.display = 'none';
+                        wakeRenderer();
+                    } catch (err) {
+                        alert('Error al leer el archivo JSON: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            });
+        }
+
+        const btnBackupCopy = document.getElementById('btn-backup-copy');
+        if (btnBackupCopy) {
+            btnBackupCopy.addEventListener('click', () => {
+                const data = {
+                    app: 'departamento-01-01',
+                    version: '1.0',
+                    savedAt: new Date().toISOString(),
+                    decorOverrides: decorOverrides,
+                    furnitureList: furnitureList
+                };
+                const jsonStr = JSON.stringify(data, null, 2);
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(jsonStr).then(() => {
+                        showToast('📋 Configuración copiada al portapapeles');
+                    }).catch(() => {
+                        prompt('Copiá tu código JSON:', jsonStr);
+                    });
+                } else {
+                    prompt('Copiá tu código JSON:', jsonStr);
+                }
+            });
+        }
+
+        const btnBackupPaste = document.getElementById('btn-backup-paste');
+        const backupPasteBox = document.getElementById('backup-paste-box');
+        if (btnBackupPaste && backupPasteBox) {
+            btnBackupPaste.addEventListener('click', () => {
+                backupPasteBox.style.display = backupPasteBox.style.display === 'none' ? 'flex' : 'none';
+            });
+        }
+
+        const btnApplyPaste = document.getElementById('btn-apply-paste');
+        const txtBackupPaste = document.getElementById('txt-backup-paste');
+        if (btnApplyPaste && txtBackupPaste) {
+            btnApplyPaste.addEventListener('click', () => {
+                const text = txtBackupPaste.value.trim();
+                if (!text) return;
+                try {
+                    const parsed = JSON.parse(text);
+                    if (parsed.decorOverrides) {
+                        decorOverrides = parsed.decorOverrides;
+                        localStorage.setItem(DECOR_OVERRIDES_KEY, JSON.stringify(decorOverrides));
+                    }
+                    if (Array.isArray(parsed.furnitureList)) {
+                        furnitureList = parsed.furnitureList;
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
+                        renderFurniture3D();
+                    }
+                    applyDecorOverrides();
+                    showToast('✓ Cambios pegados y guardados con éxito');
+                    if (backupModal) backupModal.style.display = 'none';
+                    wakeRenderer();
+                } catch (err) {
+                    alert('El texto pegado no es un JSON válido: ' + err.message);
+                }
+            });
+        }
+
+        const btnModalReset = document.getElementById('btn-modal-reset');
+        if (btnModalReset) {
+            btnModalReset.addEventListener('click', () => {
+                if (confirm("¿Restablecer todo el plano, muebles y decoración al estado original del video? Se borrarán las modificaciones guardadas.")) {
+                    localStorage.removeItem(DECOR_OVERRIDES_KEY);
+                    localStorage.removeItem(STORAGE_KEY);
+                    showToast("🔄 Plano restablecido al estado original");
+                    setTimeout(() => {
+                        location.reload();
+                    }, 400);
+                }
+            });
+        }
+
+        // Atajo de teclado global Ctrl+S / Cmd+S para Guardar
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                saveCurrentModifications();
+            }
+        });
 
         // Eventos del Modo Editar Muebles
         const btnToggleEditMode = document.getElementById('btn-toggle-edit-mode');
