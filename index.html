@@ -501,89 +501,217 @@
         }
         .add-preset-btn:hover { background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; }
 
+        /* Modo Pantalla Completa / Ocultar UI */
+        body.clean-screen #top-ui-wrapper,
+        body.clean-screen #bottom-bar,
+        body.clean-screen #furniture-editor,
+        body.clean-screen #selected-object-bar,
+        body.clean-screen #sidebar-right {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.22s ease;
+        }
+        body.clean-screen #btn-exit-clean-screen {
+            display: flex !important;
+        }
+
+        /* Estilos Compactos para Barra de Selección Flotante */
+        #selected-object-bar {
+            position: fixed;
+            bottom: 56px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 16px);
+            max-width: 440px;
+            padding: 8px 12px;
+            border-radius: 18px;
+            border: 1.5px solid #38bdf8;
+            z-index: 95;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(14px);
+            box-sizing: border-box;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .sel-bar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 8px;
+        }
+        .sel-bar-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+        }
+        .sel-bar-text {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+        #selected-obj-title {
+            color: #f8fafc;
+            font-weight: 700;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #selected-obj-pos {
+            color: #38bdf8;
+            font-size: 10px;
+            font-family: monospace;
+            font-weight: 600;
+        }
+        .sel-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 2px;
+        }
+        .sel-bar-actions::-webkit-scrollbar { display: none; }
+
         /* Mobile UI Optimization */
         @media (max-width: 900px) {
             #top-ui-wrapper {
-                top: 6px;
-                left: 6px;
-                right: 6px;
+                top: 4px;
+                left: 4px;
+                right: 4px;
                 flex-direction: column;
-                gap: 5px;
+                gap: 3px;
+                pointer-events: none;
+            }
+            #top-ui-wrapper > * {
+                pointer-events: auto;
             }
 
             #header-card {
                 max-width: none;
                 width: 100%;
-                padding: 6px 10px;
+                padding: 4px 8px;
                 border-radius: 10px;
                 gap: 2px;
             }
-            #header-card h1 { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .badge { font-size: 9px; padding: 2px 7px; }
-            .metrics-row { gap: 8px; margin-top: 2px; padding-top: 3px; }
-            .metric-val { font-size: 11px; }
-            .metric-lbl { font-size: 7.5px; }
-            .icon-btn { font-size: 9px; padding: 2px 6px; }
+            #header-card h1 {
+                font-size: 11px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .badge { font-size: 8.5px; padding: 2px 6px; }
+            .metrics-row {
+                display: none; /* Oculto en móvil por defecto para liberar el 100% de la pantalla */
+                gap: 6px;
+                margin-top: 2px;
+                padding-top: 3px;
+            }
+            .metrics-row.show-mobile {
+                display: flex;
+            }
+            .metric-val { font-size: 10.5px; }
+            .metric-lbl { font-size: 7px; }
+            .icon-btn { font-size: 8.5px; padding: 3px 6px; }
 
+            /* Barra de modos y botones en una sola fila desplazable horizontalmente */
             #top-toolbar {
                 width: 100%;
-                justify-content: space-between;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
                 padding: 4px 6px;
                 border-radius: 10px;
-                gap: 3px;
+                gap: 4px;
+                justify-content: flex-start;
             }
+            #top-toolbar::-webkit-scrollbar { display: none; }
             .mode-btn {
-                padding: 4px 6px;
+                padding: 4px 8px;
                 font-size: 10px;
-                flex: 1;
+                flex-shrink: 0;
                 justify-content: center;
                 gap: 3px;
+                white-space: nowrap;
             }
-            #top-toolbar .icon-btn {
-                padding: 3px 6px !important;
-                font-size: 10px !important;
+            #solar-time-group {
+                flex-shrink: 0;
             }
 
             #sidebar-right {
-                top: 92px;
+                top: 80px;
                 right: 6px;
                 display: none;
                 width: 210px;
                 z-index: 30;
-                padding: 10px;
+                padding: 8px;
             }
             #sidebar-right.show-mobile { display: flex; }
 
+            #empty-furniture-msg {
+                display: none;
+            }
+
             #furniture-editor {
-                bottom: 44px;
-                left: 6px;
-                right: 6px;
+                bottom: 48px;
+                left: 4px;
+                right: auto;
                 width: auto;
-                padding: 6px 10px;
+                max-width: calc(100vw - 8px);
+                padding: 4px 8px;
                 border-radius: 10px;
             }
-            .editor-title { font-size: 11px; }
+            #furniture-editor.minimized {
+                padding: 4px 6px;
+            }
+            .editor-title { font-size: 10.5px; }
+
+            #selected-object-bar {
+                bottom: 48px;
+                width: calc(100% - 10px);
+                max-width: 380px;
+                padding: 6px 10px;
+                border-radius: 14px;
+            }
 
             #bottom-bar {
-                bottom: 4px;
-                left: 6px;
-                right: 6px;
+                bottom: 3px;
+                left: 4px;
+                right: 4px;
                 transform: none;
                 max-width: none;
                 padding: 3px 6px;
                 border-radius: 20px;
-                gap: 4px;
+                gap: 3px;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
             }
+            #bottom-bar::-webkit-scrollbar { display: none; }
             .view-chip {
-                padding: 4px 8px;
-                font-size: 9.5px;
+                padding: 3px 7px;
+                font-size: 9px;
+                white-space: nowrap;
+                flex-shrink: 0;
             }
 
             .arch-label {
-                font-size: 10px;
+                font-size: 9.5px;
             }
             .arch-label.sm {
-                font-size: 8.5px;
+                font-size: 8px;
             }
         }
     
@@ -646,6 +774,7 @@
     </style>
 </head>
 <body>
+    <button id="btn-exit-clean-screen" style="display:none; position:fixed; top:12px; right:12px; z-index:9999; background:rgba(15,23,42,0.92); border:1.5px solid #38bdf8; color:#38bdf8; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; backdrop-filter:blur(12px); box-shadow:0 4px 20px rgba(0,0,0,0.6); align-items:center; gap:6px;">👁️ Mostrar controles</button>
 
     <div id="webgl-container"></div>
     <div id="labels-container"></div>
@@ -657,8 +786,10 @@
             <div class="header-top">
                 <div class="badge" style="background: linear-gradient(135deg, #10b981, #059669);">Escritura: 54,16 m²</div>
                 <div class="header-actions">
-                    <a href="plano_arquitectonico_2d.png" download="Plano_2D_63x80.png" class="icon-btn">⬇️ PNG 2D</a>
-                    <button class="icon-btn" id="btn-toggle-layers">⚙️ Capas</button>
+                    <button class="icon-btn" id="btn-toggle-metrics" title="Ver medidas oficiales" style="padding: 2px 6px;">ℹ️ Medidas</button>
+                    <button class="icon-btn" id="btn-clean-screen" title="Pantalla completa / Ocultar controles" style="padding: 2px 6px; background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #38bdf8;">👁️</button>
+                    <a href="plano_arquitectonico_2d.png" download="Plano_2D_63x80.png" class="icon-btn">⬇️ PNG</a>
+                    <button class="icon-btn" id="btn-toggle-layers">⚙️</button>
                 </div>
             </div>
             <h1>Plano Arquitectónico Exacto (6.30m × 8.00m)</h1>
@@ -887,62 +1018,46 @@
     </div>
 
     <!-- Barra flotante de Selección y Eliminación Rápida de Objetos -->
-    <!-- Barra Flotante de Selección, Movimiento y Edición de Objetos -->
-    <div id="selected-object-bar" class="glass-panel" style="display:none; position:fixed; bottom:74px; left:50%; transform:translateX(-50%); padding:8px 16px; border-radius:24px; border:1.5px solid #38bdf8; z-index:90; align-items:center; gap:8px; box-shadow:0 10px 25px rgba(0,0,0,0.55); font-size:12px; flex-wrap:wrap; justify-content:center; max-width:94vw;">
-        <span style="color:#38bdf8; font-size:15px;">🎯</span>
-        <div style="display:flex; flex-direction:column; min-width:110px; max-width:180px;">
-            <span id="selected-obj-title" style="color:#f8fafc; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px;">Objeto</span>
-            <span id="selected-obj-pos" style="color:#38bdf8; font-size:10px; font-family:monospace; font-weight:600;">X: 0.00 | Z: 0.00</span>
+    <!-- Barra Flotante de Selección, Movimiento y Edición de Objetos (Compacta y Adaptable) -->
+    <div id="selected-object-bar" class="glass-panel" style="display:none;">
+        <div class="sel-bar-header">
+            <div class="sel-bar-info">
+                <span style="color:#38bdf8; font-size:14px; flex-shrink:0;">🎯</span>
+                <div class="sel-bar-text">
+                    <span id="selected-obj-title">Objeto</span>
+                    <span id="selected-obj-pos">X: 0.00 | Z: 0.00</span>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+                <button id="btn-quick-lock-edit" class="action-btn" style="background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fbbf24; font-size:11px; padding:4px 8px; border-radius:10px; font-weight:700;" title="Finalizar edición y proteger plano">🔒 Listo</button>
+                <button id="btn-quick-close" class="action-btn" style="background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:#f8fafc; font-size:12px; padding:4px 9px; border-radius:10px; font-weight:700; line-height:1;" title="Deseleccionar">✕</button>
+            </div>
         </div>
         
-        <!-- Botón Mover (abre/cierra D-Pad en pantalla) -->
-        <button id="btn-toggle-move-pad" class="action-btn" style="background:rgba(56,189,248,0.22); border:1px solid #38bdf8; color:#38bdf8; padding:6px 12px; font-size:11.5px; border-radius:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;" title="Abrir flechas de movimiento táctiles">
-            🕹️ Mover
-        </button>
-        
-        <!-- Botón Girar 45° -->
-        <button id="btn-quick-rot" class="action-btn" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#f8fafc; padding:6px 12px; font-size:11.5px; border-radius:14px; font-weight:600; cursor:pointer;" title="Girar 45° (o tecla R)">
-            🔄 Girar
-        </button>
-        
-        <!-- Botón Eliminar -->
-        <button id="btn-quick-del" class="action-btn btn-delete" style="padding:6px 12px; font-size:11.5px; margin:0; border-radius:14px; font-weight:600;" title="Eliminar objeto (o tecla Supr / Backspace)">
-            🗑️ Eliminar
-        </button>
-        <!-- Botón Guardar rápido -->
-        <button id="btn-quick-save" class="action-btn" style="background:rgba(16,185,129,0.22); border:1px solid #10b981; color:#34d399; padding:6px 12px; font-size:11.5px; border-radius:14px; font-weight:700; cursor:pointer;" title="Guardar posición y cambios del plano">
-            💾 Guardar
-        </button>
-        <!-- Botón Deshacer rápido -->
-        <button id="btn-quick-undo" class="action-btn" style="display:none; background:rgba(56,189,248,0.22); border:1px solid #38bdf8; color:#38bdf8; padding:6px 12px; font-size:11.5px; border-radius:14px; font-weight:700; cursor:pointer;" title="Deshacer última eliminación (Ctrl+Z)">
-            ↩️ Deshacer
-        </button>
-        
-        <!-- Botón Deseleccionar grande y accesible para móviles -->
-        <button id="btn-quick-close" class="action-btn" style="background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.3); color:#f8fafc; font-size:11.5px; cursor:pointer; padding:6px 14px; border-radius:14px; font-weight:700;" title="Deseleccionar (o tocar el piso / tecla Esc)">
-            ✕ Deseleccionar
-        </button>
-        <!-- Botón Bloquear / Salir de edición -->
-        <button id="btn-quick-lock-edit" class="action-btn" style="background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fbbf24; font-size:11.5px; cursor:pointer; padding:6px 12px; border-radius:14px; font-weight:700;" title="Finalizar edición y bloquear muebles contra errores">
-            🔒 Listo (Bloquear)
-        </button>
+        <div class="sel-bar-actions">
+            <button id="btn-toggle-move-pad" class="action-btn" style="background:rgba(56,189,248,0.22); border:1px solid #38bdf8; color:#38bdf8; padding:5px 10px; font-size:11px; border-radius:10px; font-weight:700; flex-shrink:0;" title="Abrir/Cerrar flechas de movimiento">🕹️ Mover</button>
+            <button id="btn-quick-rot" class="action-btn" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#f8fafc; padding:5px 10px; font-size:11px; border-radius:10px; font-weight:600; flex-shrink:0;" title="Girar 45°">🔄 Girar</button>
+            <button id="btn-quick-save" class="action-btn" style="background:rgba(16,185,129,0.22); border:1px solid #10b981; color:#34d399; padding:5px 10px; font-size:11px; border-radius:10px; font-weight:700; flex-shrink:0;" title="Guardar cambios permanentemente">💾 Guardar</button>
+            <button id="btn-quick-undo" class="action-btn" style="display:none; background:rgba(56,189,248,0.22); border:1px solid #38bdf8; color:#38bdf8; padding:5px 10px; font-size:11px; border-radius:10px; font-weight:700; flex-shrink:0;" title="Deshacer última acción">↩️ Deshacer</button>
+            <button id="btn-quick-del" class="action-btn btn-delete" style="padding:5px 10px; font-size:11px; margin:0; border-radius:10px; font-weight:600; flex-shrink:0;" title="Eliminar del plano">🗑️ Eliminar</button>
+        </div>
 
         <!-- Panel D-Pad desplegable de Flechas para mover con precisión en pantalla -->
-        <div id="move-dpad-panel" style="display:none; width:100%; justify-content:center; align-items:center; gap:12px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.12); margin-top:4px;">
-            <div style="display:grid; grid-template-columns:repeat(3, 38px); grid-template-rows:repeat(3, 36px); gap:5px;">
+        <div id="move-dpad-panel" style="display:none; width:100%; justify-content:center; align-items:center; gap:12px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.12); margin-top:2px;">
+            <div style="display:grid; grid-template-columns:repeat(3, 34px); grid-template-rows:repeat(3, 32px); gap:4px;">
                 <div></div>
-                <button class="dpad-dir-btn" data-dx="0" data-dz="-0.10" data-dy="0" style="background:#1e293b; border:1px solid #475569; color:#38bdf8; border-radius:8px; font-size:15px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;" title="Mover Norte / Adelante (Z-)">⬆</button>
+                <button class="dpad-dir-btn" data-dx="0" data-dz="-0.10" data-dy="0" style="background:#1e293b; border:1px solid #475569; color:#38bdf8; border-radius:6px; font-size:13px; font-weight:bold; display:flex; align-items:center; justify-content:center;" title="Norte (Z-)">⬆</button>
                 <div></div>
-                <button class="dpad-dir-btn" data-dx="-0.10" data-dz="0" data-dy="0" style="background:#1e293b; border:1px solid #475569; color:#38bdf8; border-radius:8px; font-size:15px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;" title="Mover Oeste / Izquierda (X-)">⬅</button>
-                <button class="dpad-dir-btn" id="btn-dpad-rot-center" style="background:#0284c7; border:1px solid #38bdf8; color:#fff; border-radius:8px; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center;" title="Girar 45°">🔄</button>
-                <button class="dpad-dir-btn" data-dx="0.10" data-dz="0" data-dy="0" style="background:#1e293b; border:1px solid #475569; color:#38bdf8; border-radius:8px; font-size:15px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;" title="Mover Este / Derecha (X+)">➡</button>
+                <button class="dpad-dir-btn" data-dx="-0.10" data-dz="0" data-dy="0" style="background:#1e293b; border:1px solid #475569; color:#38bdf8; border-radius:6px; font-size:13px; font-weight:bold; display:flex; align-items:center; justify-content:center;" title="Oeste (X-)">⬅</button>
+                <button class="dpad-dir-btn" id="btn-dpad-rot-center" style="background:#0284c7; border:1px solid #38bdf8; color:#fff; border-radius:6px; font-size:12px; display:flex; align-items:center; justify-content:center;" title="Girar 45°">🔄</button>
+                <button class="dpad-dir-btn" data-dx="0.10" data-dz="0" data-dy="0" style="background:#1e293b; border:1px solid #475569; color:#38bdf8; border-radius:6px; font-size:13px; font-weight:bold; display:flex; align-items:center; justify-content:center;" title="Este (X+)">➡</button>
                 <div></div>
-                <button class="dpad-dir-btn" data-dx="0" data-dz="0.10" data-dy="0" style="background:#1e293b; border:1px solid #475569; color:#38bdf8; border-radius:8px; font-size:15px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;" title="Mover Sur / Atrás (Z+)">⬇</button>
+                <button class="dpad-dir-btn" data-dx="0" data-dz="0.10" data-dy="0" style="background:#1e293b; border:1px solid #475569; color:#38bdf8; border-radius:6px; font-size:13px; font-weight:bold; display:flex; align-items:center; justify-content:center;" title="Sur (Z+)">⬇</button>
                 <div></div>
             </div>
-            <div style="display:flex; flex-direction:column; gap:6px;">
-                <button class="dpad-elev-btn" data-dy="0.05" style="background:#1e293b; border:1px solid #475569; color:#f8fafc; border-radius:6px; font-size:11px; padding:5px 9px; cursor:pointer; font-weight:600;" title="Subir (+5cm)">▲ Alto</button>
-                <button class="dpad-elev-btn" data-dy="-0.05" style="background:#1e293b; border:1px solid #475569; color:#f8fafc; border-radius:6px; font-size:11px; padding:5px 9px; cursor:pointer; font-weight:600;" title="Bajar (-5cm)">▼ Bajo</button>
+            <div style="display:flex; flex-direction:column; gap:4px;">
+                <button class="dpad-elev-btn" data-dy="0.05" style="background:#1e293b; border:1px solid #475569; color:#f8fafc; border-radius:6px; font-size:10px; padding:4px 8px; font-weight:600;" title="Subir (+5cm)">▲ Alto</button>
+                <button class="dpad-elev-btn" data-dy="-0.05" style="background:#1e293b; border:1px solid #475569; color:#f8fafc; border-radius:6px; font-size:10px; padding:4px 8px; font-weight:600;" title="Bajar (-5cm)">▼ Bajo</button>
             </div>
         </div>
     </div>
@@ -7215,6 +7330,30 @@
             });
         });
 
+        // Modo Pantalla Completa / Ocultar Controles (Inmersión 100%)
+        const btnCleanScreen = document.getElementById('btn-clean-screen');
+        const btnExitCleanScreen = document.getElementById('btn-exit-clean-screen');
+        if (btnCleanScreen) {
+            btnCleanScreen.addEventListener('click', () => {
+                document.body.classList.add('clean-screen');
+                showToast('👁️ Pantalla limpia activa. Tocá "Mostrar controles" para volver.', false, 3000);
+            });
+        }
+        if (btnExitCleanScreen) {
+            btnExitCleanScreen.addEventListener('click', () => {
+                document.body.classList.remove('clean-screen');
+            });
+        }
+
+        // Toggle Medidas oficiales en móviles
+        const btnToggleMetrics = document.getElementById('btn-toggle-metrics');
+        const metricsRow = document.querySelector('.metrics-row');
+        if (btnToggleMetrics && metricsRow) {
+            btnToggleMetrics.addEventListener('click', () => {
+                metricsRow.classList.toggle('show-mobile');
+            });
+        }
+
         // Listeners de la barra de selección y controles de movimiento
         document.getElementById('btn-del-furniture').addEventListener('click', deleteCurrentSelected);
         document.getElementById('btn-quick-del').addEventListener('click', deleteCurrentSelected);
@@ -7586,9 +7725,11 @@
                 if (textQuick) textQuick.innerText = 'Editando muebles';
 
                 const ed = document.getElementById('furniture-editor');
-                if (ed) ed.classList.remove('minimized');
-                const minBtn = document.getElementById('btn-min-editor');
-                if (minBtn) minBtn.innerText = '▼';
+                if (ed && window.innerWidth > 900) {
+                    ed.classList.remove('minimized');
+                    const minBtn = document.getElementById('btn-min-editor');
+                    if (minBtn) minBtn.innerText = '▼';
+                }
 
                 if (!silent) {
                     showToast('✏️ Modo "Editar muebles" activado: Tocá cualquier mueble para moverlo, rotarlo o eliminarlo', false, 3200);
@@ -7624,41 +7765,21 @@
             downTs = Date.now();
             downPos = { x: e.clientX, y: e.clientY };
 
-            // Si el modo edición NO está activo, nunca permitir arrastre accidental de muebles
+            // Si el modo edición NO está activo, nunca permitir arrastre
             if (!isFurnitureEditMode) return;
+
+            // SOLO iniciar arrastre si el usuario toca un objeto que YA ESTÁ PREVIAMENTE SELECCIONADO.
+            // Esto permite que el usuario rote o mueva la cámara libremente sin seleccionar objetos por error al tocar la pantalla.
+            const curObj = getSelectedObject();
+            if (!curObj) return;
 
             const rect = renderer.domElement.getBoundingClientRect();
             pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(pointer, activeCamera);
 
-            // Comprobar primero sobre el objeto ya seleccionado (si existe)
-            let curObj = getSelectedObject();
-            let hits = curObj ? raycaster.intersectObject(curObj, true) : [];
-
-            // Si no golpeó el seleccionado o no había ninguno, raycast sobre todos los candidatos
-            if (hits.length === 0) {
-                const candidates = [];
-                decorVideoGroup.traverse(child => {
-                    if (child.isMesh && child.name !== 'contactShadow') candidates.push(child);
-                });
-                fixturesGroup.traverse(child => {
-                    if (child.isMesh && child.name !== 'contactShadow') candidates.push(child);
-                });
-                furnitureMeshes.forEach(fm => {
-                    fm.traverse(child => {
-                        if (child.isMesh && child.name !== 'contactShadow') candidates.push(child);
-                    });
-                });
-                const testHits = raycaster.intersectObjects(candidates, false);
-                if (testHits.length > 0) {
-                    selectDecorObject(testHits[0].object);
-                    curObj = getSelectedObject();
-                    if (curObj) hits = raycaster.intersectObject(curObj, true);
-                }
-            }
-
-            if (curObj && hits.length > 0) {
+            const hits = raycaster.intersectObject(curObj, true);
+            if (hits.length > 0) {
                 isDraggingSelected = true;
                 dragStartPos = { x: curObj.position.x, y: curObj.position.y, z: curObj.position.z };
                 dragPlane.setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 1, 0), curObj.position);
@@ -7802,7 +7923,7 @@
                 const item = furnitureList.find(f => f.id === selectedId);
                 showSelectionBar(item ? item.name : 'Mueble Interactivo');
                 const ed = document.getElementById('furniture-editor');
-                if (ed) {
+                if (ed && window.innerWidth > 900) {
                     ed.classList.remove('minimized');
                     const minBtn = document.getElementById('btn-min-editor');
                     if (minBtn) minBtn.innerText = '−';
