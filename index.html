@@ -14,6 +14,10 @@
 
 
 </script>
+        <!-- Loaders para modelos 3D externos (.glb / .gltf) y HDRI (RGBELoader) -->
+    <script src="libs/loaders/GLTFLoader.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js'"></script>
+    <script src="libs/loaders/DRACOLoader.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js'"></script>
+    <script src="libs/loaders/RGBELoader.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js'"></script>
     <!-- Post-processing SSAO (Screen Space Ambient Occlusion) PBR -->
     <script src="libs/postprocessing/EffectComposer.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js'">
 
@@ -1084,6 +1088,7 @@
 
         // Arranca directamente en 3D Maqueta Realista (Axonométrica con sombras)
         let activeCamera = perspCam;
+            updateComposerCamera();
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', alpha: false, powerPreference: 'high-performance' });
         renderer.setClearColor(0xf8fafc, 1.0); // Prevenir pantalla negra en WebGL bajo cualquier circunstancia
@@ -1812,13 +1817,28 @@
             return tex;
         }
 
-        try {
-            const pmremGen = new THREE.PMREMGenerator(renderer);
-            pmremGen.compileEquirectangularShader();
+        // Environment Map HDRI para Iluminación Global (IBL) y reflexiones realistas en metales
+        const pmremGen = new THREE.PMREMGenerator(renderer);
+        pmremGen.compileEquirectangularShader();
+
+        if (typeof THREE.RGBELoader !== 'undefined') {
+            const rgbeLoader = new THREE.RGBELoader();
+            rgbeLoader.setDataType(THREE.UnsignedByteType);
+            rgbeLoader.load('textures/hdr/ferndale_studio_04_1k.hdr', function(hdrEquirect) {
+                const hdrTarget = pmremGen.fromEquirectangular(hdrEquirect);
+                scene.environment = hdrTarget.texture;
+                hdrEquirect.dispose();
+                wakeRenderer();
+                console.log('HDRI Environment map cargado exitosamente!');
+            }, undefined, function(err) {
+                console.warn('Fallback a HDRI procedural por error en carga de archivo:', err);
+                const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
+                scene.environment = studioEnvTarget.texture;
+                wakeRenderer();
+            });
+        } else {
             const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
             scene.environment = studioEnvTarget.texture;
-        } catch (errPmrem) {
-            console.warn("PMREM environment generation skipped (using physical lights fallback):", errPmrem);
         }
 
         // 1. Rebote natural cielo-suelo (HemisphereLight suave)
@@ -2424,6 +2444,121 @@
         createRealWallSpotlight(2.34, 2.10, 3.40, 0, 0.52, true, 'Pasillo Distribuidor (Muro Baño)');
         createRealWallSpotlight(0.08, 2.10, 6.00, 0, 0.52, true, 'Dormitorio General (Muro Cabecera)');
         createRealWallSpotlight(2.94, 2.10, 1.15, Math.PI, 0.58, false, 'Estudio Foco 4000K (Muro Escritorio)');
+
+        // ============================================================================
+        // SISTEMA DE CARGA GLTF/GLB PARA MOBILIARIO EXTERNO DETALLADO
+        // ============================================================================
+        const gltfLoader = (typeof THREE.GLTFLoader !== 'undefined') ? new THREE.GLTFLoader() : null;
+        if (gltfLoader && typeof THREE.DRACOLoader !== 'undefined') {
+            const dracoLoader = new THREE.DRACOLoader();
+            dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/');
+            gltfLoader.setDRACOLoader(dracoLoader);
+        }
+
+        const glbCache = new Map();
+
+        /**
+         * Carga un modelo .glb/.gltf externo detallado, lo escala a cotas arquitectónicas
+         * precisas, activa sombras PBR completas (castShadow/receiveShadow) y reflejos HDRI.
+         */
+        function loadGLBFurniture(options) {
+            const url = options.url;
+            const container = options.container;
+            const targetSize = options.targetSize;
+            const position = options.position || [0, 0, 0];
+            const rotation = options.rotation || [0, 0, 0];
+            const fallbackFn = options.fallbackFn;
+            const onLoaded = options.onLoaded;
+
+            const parent = container || currentAssemblyGroup || decorVideoGroup;
+            const modelHolder = new THREE.Group();
+            modelHolder.name = "GLB_Holder_" + url;
+            parent.add(modelHolder);
+
+            let placeholder = null;
+            if (fallbackFn) {
+                placeholder = new THREE.Group();
+                placeholder.name = "Placeholder_" + url;
+                modelHolder.add(placeholder);
+                const prev = currentAssemblyGroup;
+                currentAssemblyGroup = placeholder;
+                try {
+                    fallbackFn();
+                } finally {
+                    currentAssemblyGroup = prev;
+                }
+            }
+
+            if (!gltfLoader) {
+                return modelHolder;
+            }
+
+            function applyScene(sourceScene) {
+                const model = sourceScene.clone(true);
+                
+                // Configurar sombras completas y PBR en todas las mallas
+                model.traverse(child => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                        if (child.material) {
+                            child.material.shadowSide = THREE.DoubleSide;
+                            if (child.material.isMeshStandardMaterial) {
+                                child.material.roughness = Math.min(child.material.roughness, 0.88);
+                                child.material.envMapIntensity = 1.35;
+                            }
+                        }
+                    }
+                });
+
+                // Centrar origen local en la base (suelo) del modelo
+                const bbox = new THREE.Box3().setFromObject(model);
+                const size = new THREE.Vector3();
+                bbox.getSize(size);
+                const center = new THREE.Vector3();
+                bbox.getCenter(center);
+
+                model.position.x -= center.x;
+                model.position.y -= bbox.min.y;
+                model.position.z -= center.z;
+
+                const wrapper = new THREE.Group();
+                wrapper.add(model);
+
+                // Escalar a las cotas arquitectónicas deseadas
+                if (targetSize && targetSize.length === 3) {
+                    const sx = (targetSize[0] > 0 && size.x > 0.001) ? targetSize[0] / size.x : 1;
+                    const sy = (targetSize[1] > 0 && size.y > 0.001) ? targetSize[1] / size.y : 1;
+                    const sz = (targetSize[2] > 0 && size.z > 0.001) ? targetSize[2] / size.z : 1;
+                    wrapper.scale.set(sx, sy, sz);
+                }
+
+                wrapper.position.set(position[0], position[1], position[2]);
+                wrapper.rotation.set(rotation[0], rotation[1], rotation[2]);
+
+                if (placeholder) {
+                    modelHolder.remove(placeholder);
+                    placeholder = null;
+                }
+                modelHolder.add(wrapper);
+                if (onLoaded) onLoaded(wrapper);
+                wakeRenderer();
+            }
+
+            if (glbCache.has(url)) {
+                applyScene(glbCache.get(url));
+            } else {
+                gltfLoader.load(url, (gltf) => {
+                    glbCache.set(url, gltf.scene);
+                    applyScene(gltf.scene);
+                }, undefined, (err) => {
+                    console.warn("Aviso: No se pudo cargar GLB " + url + ", usando geometría fallback:", err);
+                    wakeRenderer();
+                });
+            }
+
+            return modelHolder;
+        }
 
         let currentAssemblyGroup = null;
 
@@ -3119,6 +3254,13 @@
 
         // A) BAÑERA EMPOTRADA DE LOZA CON CUADRO DE DUCHA CROMADO Y MAMPARA
         createCompoundAssembly('Bañera y Ducha Cromada', () => {
+                loadGLBFurniture({
+                    url: 'models/bathtub.glb',
+                    targetSize: [0.72,0.58,1.45],
+                    position: [0.38,0,3.4],
+                    rotation: [0,1.5707963267948966,0],
+                    fallbackFn: () => {
+
             const bathGroup = new THREE.Group();
             
             // Faldón exterior y estructura de bañera [0.05..0.75, 2.85..4.15]
@@ -3206,7 +3348,10 @@
             bathGroup.add(screenFrame, screenGlass, towelBar);
 
             (currentAssemblyGroup || decorVideoGroup).add(bathGroup);
-        });
+        
+                    }
+                });
+            });
 
         // B) VANITORY DE MADERA CON BACHA DE PORCELANA Y GRIFERÍA CROMADA
         createCompoundAssembly('Vanitory y Bacha de Baño', () => {
@@ -3312,6 +3457,13 @@
 
         // D) SANITARIOS ORGÁNICOS EN LOZA BLANCA (INODORO Y BIDET EN MURO SUR Z=4.20)
         createCompoundAssembly('Inodoro y Mochila de Doble Descarga', () => {
+                loadGLBFurniture({
+                    url: 'models/toilet.glb',
+                    targetSize: [0.42,0.78,0.65],
+                    position: [1.88,0,3.82],
+                    rotation: [0,0,0],
+                    fallbackFn: () => {
+
             const toiGroup = new THREE.Group();
             toiGroup.position.set(1.74, 0, 3.96);
 
@@ -3358,7 +3510,10 @@
             toiGroup.add(tank, tankLid, dualFlush);
 
             (currentAssemblyGroup || decorVideoGroup).add(toiGroup);
-        });
+        
+                    }
+                });
+            });
 
         createCompoundAssembly('Bidet con Grifería Cromada Completa', () => {
             const bidGroup = new THREE.Group();
@@ -4834,6 +4989,13 @@
             const futonW = 2.00, futonD = 0.88, futonH = 0.82;
             const futonZ = 3.10;
             createCompoundAssembly('Sillón Futón 3 Cuerpos', () => {
+                loadGLBFurniture({
+                    url: 'models/sofa.glb',
+                    targetSize: [0.88,0.82,2],
+                    position: [3.44,0,3.1],
+                    rotation: [0,1.5707963267948966,0],
+                    fallbackFn: () => {
+
                 const sofaWoodMat = new THREE.MeshStandardMaterial({ color: 0xd4a373, roughness: 0.70, metalness: 0.05 });
                 const sofaFabricMat = new THREE.MeshStandardMaterial({ color: 0x224c78, roughness: 1.0, metalness: 0.0 }); // Denim azul mate sin brillo
                 const sofaArmCushionMat = new THREE.MeshStandardMaterial({ color: 0x1d4066, roughness: 1.0, metalness: 0.0 });
@@ -4915,6 +5077,9 @@
                 p3.position.set(3.34, 0.45, futonZ - 0.20);
                 p3.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(p1, p2, p3);
+            
+                    }
+                });
             });
             // - Cuadro Panorámico de Montañas en Blanco y Negro (Living, sobre pared Oeste X=3.00, ref. Francisco Alles)
             createCompoundAssembly('Cuadro Panorámico de Montañas (Living)', () => {
@@ -4964,7 +5129,17 @@
 
             // - Planta de interior en maceta cerámica cónica con follaje botánico realista
             createCompoundAssembly('Planta Calathea en Maceta', () => {
+                loadGLBFurniture({
+                    url: 'models/plant.glb',
+                    targetSize: [0.45,0.75,0.45],
+                    position: [3.25,0,1.66],
+                    rotation: [0,0,0],
+                    fallbackFn: () => {
+
                 addDecorPlantCeramic(3.25, 0.00, 1.66, 0.14, 0.10, 0.28, 0.28, 0.35, 0.28, 0.48, 'Planta Calathea en Maceta');
+            
+                    }
+                });
             });
 
             // - Mesa ratona (fotos #0, #1, #2 y #7):
@@ -5253,6 +5428,13 @@
             // ------------------------------------------------------------------------
             // 1. Cama de 2 plazas con Base de Madera, Colchón Biselado, 2 Almohadas Inclinadas y Acolchado Mate
             createCompoundAssembly('Cama Matrimonial 2 Plazas', () => {
+                loadGLBFurniture({
+                    url: 'models/bed.glb',
+                    targetSize: [1.95,0.95,1.55],
+                    position: [1.06,0,6.2],
+                    rotation: [0,-1.5707963267948966,0],
+                    fallbackFn: () => {
+
                 const bedWoodMat = new THREE.MeshStandardMaterial({ color: 0x4a3222, roughness: 0.70, metalness: 0.05 });
                 const mattressMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.90, metalness: 0.0 });
                 const pillowMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 1.0, metalness: 0.0 }); // Algodón mate sin brillo
@@ -5322,6 +5504,9 @@
                 runner.position.set(1.76, 0.58, 6.20);
                 runner.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(duvet, sheetFold, runner);
+            
+                    }
+                });
             });
             // - Cuadro del Glaciar Perito Moreno (Dormitorio, sobre cabecero en Muro Oeste X=0.00, ref. Francisco Alles)
             createCompoundAssembly('Cuadro Glaciar Perito Moreno (Dormitorio)', () => {
@@ -5433,6 +5618,13 @@
 
             // 2. ESCRITORIO GAMER EN "L" (Setup Detallado con FFVII Rebirth, Rebote LED, Mate y Termo)
             createCompoundAssembly('Escritorio Gamer en "L"', () => {
+                loadGLBFurniture({
+                    url: 'models/desk.glb',
+                    targetSize: [0.75,0.76,1.6],
+                    position: [2.675,0,0.8],
+                    rotation: [0,3.141592653589793,0],
+                    fallbackFn: () => {
+
                 const deskWoodMat = new THREE.MeshStandardMaterial({ color: 0xa65e18, roughness: 0.68, metalness: 0.04 });
                 const legWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c3a0e, roughness: 0.72, metalness: 0.04 });
 
@@ -5457,6 +5649,9 @@
                 wingLeg.position.set(1.77, 0.36, 0.225);
                 wingLeg.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(wingTop, wingLeg);
+            
+                    }
+                });
             });
 
             // Gabinete PC Gamer Thermaltake con iluminación RGB (independiente)
@@ -7933,6 +8128,7 @@
             if (dioramaFlora) dioramaFlora.visible = false;
             if (studioGround) studioGround.visible = false;
             activeCamera = orthoCam;
+            updateComposerCamera();
             controlsPersp.enabled = false;
             controlsOrtho.enabled = true;
             dirLight.castShadow = false;
@@ -8119,19 +8315,61 @@
         }
 
         // ============================================================================
-        // MOTOR DE POST-PROCESAMIENTO SEGURO (Screen Space Ambient Occlusion / Nativo)
+        // MOTOR DE POST-PROCESAMIENTO PBR: EffectComposer + SSAO + Antialiasing (FXAA)
         // ============================================================================
         let composer = null;
         let ssaoPass = null;
         let fxaaPass = null;
-        // isMobileOrLowEnd definido al inicio del script
+        let renderPass = null;
 
         function initPostProcessing() {
-            // Renderizado nativo WebGL ultra-rápido a 60 FPS estables con antialiasing por hardware (MSAA),
-            // sombras suaves PCF y mapeo tonal ACES Filmic sin sobrecarga de pases múltiples.
-            composer = null;
+            try {
+                if (typeof THREE.EffectComposer === 'undefined' || typeof THREE.SSAOPass === 'undefined') {
+                    console.warn("EffectComposer o SSAOPass no disponibles, usando render nativo.");
+                    composer = null;
+                    return;
+                }
+
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+
+                composer = new THREE.EffectComposer(renderer);
+
+                // 1. Pase de Render principal
+                renderPass = new THREE.RenderPass(scene, activeCamera);
+                composer.addPass(renderPass);
+
+                // 2. Pase SSAO (Screen Space Ambient Occlusion) para sombras de contacto profundas
+                ssaoPass = new THREE.SSAOPass(scene, activeCamera, width, height);
+                ssaoPass.kernelRadius = 14;
+                ssaoPass.kernelSize = 32;
+                ssaoPass.minDistance = 0.001;
+                ssaoPass.maxDistance = 0.12;
+                ssaoPass.output = THREE.SSAOPass.OUTPUT.Default;
+                composer.addPass(ssaoPass);
+
+                // 3. Pase Antialiasing (FXAA) para bordes nítidos y sin dentado
+                if (typeof THREE.FXAAShader !== 'undefined' && typeof THREE.ShaderPass !== 'undefined') {
+                    fxaaPass = new THREE.ShaderPass(THREE.FXAAShader);
+                    const pr = renderer.getPixelRatio();
+                    fxaaPass.material.uniforms['resolution'].value.x = 1 / (width * pr);
+                    fxaaPass.material.uniforms['resolution'].value.y = 1 / (height * pr);
+                    composer.addPass(fxaaPass);
+                }
+
+                console.log("EffectComposer con SSAO y FXAA inicializado exitosamente.");
+            } catch (err) {
+                console.warn("Error al inicializar EffectComposer / SSAO:", err);
+                composer = null;
+            }
         }
         initPostProcessing();
+
+        function updateComposerCamera() {
+            if (!composer) return;
+            if (renderPass) renderPass.camera = activeCamera;
+            if (ssaoPass) ssaoPass.camera = activeCamera;
+        }
 
         function animate() {
             requestAnimationFrame(animate);
@@ -8146,12 +8384,11 @@
                 updateLabels();
                 if (selectionBox) selectionBox.update();
                 
-                if (composer && activeCamera === perspCam && !isMobileOrLowEnd) {
+                if (composer && activeCamera === perspCam) {
                     try {
                         composer.render();
                     } catch (e) {
-                        console.warn("Error en composer.render(), cayendo permanentemente a renderizador nativo:", e);
-                        composer = null;
+                        console.warn("Fallo transitorio en composer.render(), cayendo a renderizador nativo:", e);
                         renderer.render(scene, activeCamera);
                     }
                 } else {
