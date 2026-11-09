@@ -1088,7 +1088,10 @@
 
         // Arranca directamente en 3D Maqueta Realista (Axonométrica con sombras)
         let activeCamera = perspCam;
-            updateComposerCamera();
+        var composer = null;
+        var ssaoPass = null;
+        var fxaaPass = null;
+        var renderPass = null;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', alpha: false, powerPreference: 'high-performance' });
         renderer.setClearColor(0xf8fafc, 1.0); // Prevenir pantalla negra en WebGL bajo cualquier circunstancia
@@ -8317,10 +8320,7 @@
         // ============================================================================
         // MOTOR DE POST-PROCESAMIENTO PBR: EffectComposer + SSAO + Antialiasing (FXAA)
         // ============================================================================
-        let composer = null;
-        let ssaoPass = null;
-        let fxaaPass = null;
-        let renderPass = null;
+        // composer, ssaoPass, fxaaPass, renderPass declarados previamente
 
         function initPostProcessing() {
             try {
@@ -8366,9 +8366,10 @@
         initPostProcessing();
 
         function updateComposerCamera() {
-            if (!composer) return;
-            if (renderPass) renderPass.camera = activeCamera;
-            if (ssaoPass) ssaoPass.camera = activeCamera;
+            if (typeof composer !== 'undefined' && composer) {
+                if (typeof renderPass !== 'undefined' && renderPass) renderPass.camera = activeCamera;
+                if (typeof ssaoPass !== 'undefined' && ssaoPass) ssaoPass.camera = activeCamera;
+            }
         }
 
         function animate() {
