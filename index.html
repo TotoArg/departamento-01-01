@@ -5136,9 +5136,9 @@
 
                 // Materiales PBR de alta fidelidad: Madera lustrada cálida y tela denim texturizada
                 const sofaWoodMat = new THREE.MeshStandardMaterial({
-                    color: 0xa46838,
-                    roughness: 0.55,
-                    metalness: 0.04
+                    color: 0xc28546,
+                    roughness: 0.50,
+                    metalness: 0.02
                 });
                 const sofaFabricMat = new THREE.MeshStandardMaterial({
                     color: 0x264464, // Denim azul marino texturizado
@@ -5177,47 +5177,74 @@
                 baseFrame.castShadow = true; baseFrame.receiveShadow = true;
                 futonGroup.add(baseFrame);
 
-                // 4 Patas robustas de madera torneadas cónicas con regatones
-                const legCoords = [
-                    [3.14, futonZ - futonW / 2 + 0.08],
-                    [3.74, futonZ - futonW / 2 + 0.08],
-                    [3.14, futonZ + futonW / 2 - 0.08],
-                    [3.74, futonZ + futonW / 2 - 0.08]
-                ];
-                legCoords.forEach(([lx, lz]) => {
-                    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.024, 0.18, 14), sofaWoodMat);
-                    leg.position.set(lx, 0.09, lz);
-                    leg.castShadow = true;
-                    futonGroup.add(leg);
-                });
+                // Pata central de refuerzo estructural bajo el bastidor
+                const centerLeg = new THREE.Mesh(createRoundedBoxGeo(0.05, 0.14, 0.05, 0.008, 2), sofaWoodMat);
+                centerLeg.position.set(3.44, 0.07, futonZ);
+                centerLeg.castShadow = true;
+                futonGroup.add(centerLeg);
 
-                // 2. Apoyabrazos laterales en madera noble con barral superior curvo y listones
+                // 2. Apoyabrazos laterales auténticos de futón de pino (Foto Real: Armazón de madera con Cruz en "X")
                 [-1, 1].forEach(side => {
-                    const az = futonZ + side * (futonW / 2 - 0.035);
+                    const az = futonZ + side * (futonW / 2 - 0.04);
                     const armGroup = new THREE.Group();
 
-                    // Barral pasamanos superior redondeado
-                    const topRail = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, futonD - 0.04, 16), sofaWoodMat);
-                    topRail.rotation.x = Math.PI / 2;
-                    topRail.position.set(3.44, 0.52, az);
-                    topRail.castShadow = true;
-                    armGroup.add(topRail);
+                    // Tapa pasamanos superior de madera maciza plana y pulida (0.86m x 0.095m x 0.028m)
+                    const armTop = new THREE.Mesh(createRoundedBoxGeo(futonD - 0.02, 0.028, 0.095, 0.008, 3), sofaWoodMat);
+                    armTop.position.set(3.44, 0.53, az);
+                    armTop.castShadow = true; armTop.receiveShadow = true;
+                    armGroup.add(armTop);
 
-                    // Postes verticales anterior y posterior
-                    [-1, 1].forEach(pSide => {
-                        const px = 3.44 + pSide * (futonD / 2 - 0.06);
-                        const post = new THREE.Mesh(createRoundedBoxGeo(0.045, 0.44, 0.045, 0.01, 2), sofaWoodMat);
-                        post.position.set(px, 0.28, az);
-                        post.castShadow = true;
-                        armGroup.add(post);
-                    });
+                    // Postes verticales de pino macizo que bajan hasta el suelo actuando como patas (0.055m x 0.516m x 0.045m)
+                    const pxFront = 3.44 + (futonD / 2 - 0.075); // X=3.805m
+                    const pxRear  = 3.44 - (futonD / 2 - 0.075); // X=3.075m
+                    const postH = 0.516;
 
-                    // Almohadilla / booster interior acolchada suave
-                    const armCushion = new THREE.Mesh(createRoundedBoxGeo(futonD - 0.16, 0.09, 0.075, 0.03, 3), armPadMat);
-                    armCushion.position.set(3.44, 0.38, az - side * 0.045);
-                    armCushion.castShadow = true;
-                    armGroup.add(armCushion);
+                    const postFront = new THREE.Mesh(createRoundedBoxGeo(0.055, postH, 0.045, 0.006, 2), sofaWoodMat);
+                    postFront.position.set(pxFront, postH / 2, az);
+                    postFront.castShadow = true; postFront.receiveShadow = true;
+                    armGroup.add(postFront);
 
+                    const postRear = new THREE.Mesh(createRoundedBoxGeo(0.055, postH, 0.045, 0.006, 2), sofaWoodMat);
+                    postRear.position.set(pxRear, postH / 2, az);
+                    postRear.castShadow = true; postRear.receiveShadow = true;
+                    armGroup.add(postRear);
+
+                    // Larguero horizontal inferior (conecta postes a nivel del bastidor)
+                    const spanX = (pxFront - 0.0275) - (pxRear + 0.0275); // ~0.675m
+                    const railBottom = new THREE.Mesh(createRoundedBoxGeo(spanX, 0.038, 0.032, 0.005, 2), sofaWoodMat);
+                    railBottom.position.set(3.44, 0.14, az);
+                    railBottom.castShadow = true;
+                    armGroup.add(railBottom);
+
+                    // Larguero horizontal superior (bajo la tapa del apoyabrazos)
+                    const railTop = new THREE.Mesh(createRoundedBoxGeo(spanX, 0.030, 0.032, 0.005, 2), sofaWoodMat);
+                    railTop.position.set(3.44, 0.501, az);
+                    railTop.castShadow = true;
+                    armGroup.add(railTop);
+
+                    // Cruz de San Andrés ("X" de listones de madera cruzados según foto real de referencia)
+                    const openH = 0.501 - 0.14 - (0.030 + 0.038) / 2; // ~0.327m
+                    const diagL = Math.hypot(spanX, openH); // ~0.75m
+                    const diagAngle = Math.atan2(openH, spanX); // ~25.8°
+                    const centerY = (0.14 + 0.019 + 0.501 - 0.015) / 2; // ~0.3225m
+
+                    const diag1 = new THREE.Mesh(createRoundedBoxGeo(diagL, 0.036, 0.020, 0.004, 2), sofaWoodMat);
+                    diag1.rotation.z = diagAngle;
+                    diag1.position.set(3.44, centerY, az + 0.003);
+                    diag1.castShadow = true;
+
+                    const diag2 = new THREE.Mesh(createRoundedBoxGeo(diagL, 0.036, 0.020, 0.004, 2), sofaWoodMat);
+                    diag2.rotation.z = -diagAngle;
+                    diag2.position.set(3.44, centerY, az - 0.003);
+                    diag2.castShadow = true;
+
+                    // Perno o remate de madera torneada en la intersección central de la "X"
+                    const centerPin = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.028, 14), sofaWoodMat);
+                    centerPin.rotation.x = Math.PI / 2;
+                    centerPin.position.set(3.44, centerY, az);
+                    centerPin.castShadow = true;
+
+                    armGroup.add(diag1, diag2, centerPin);
                     futonGroup.add(armGroup);
                 });
 
@@ -5265,12 +5292,7 @@
                 p3.rotation.set(0.05, 0.08, 0.14);
                 p3.castShadow = true;
 
-                // Manta suave plegada sobre el apoyabrazos izquierdo
-                const blanket = new THREE.Mesh(createRoundedBoxGeo(0.48, 0.025, 0.22, 0.015, 2), throwBlanketMat);
-                blanket.position.set(3.44, 0.54, futonZ - futonW / 2 + 0.035);
-                blanket.castShadow = true;
-
-                futonGroup.add(p1, p2, p3, blanket);
+                futonGroup.add(p1, p2, p3);
                 (currentAssemblyGroup || decorVideoGroup).add(futonGroup);
             });
             
