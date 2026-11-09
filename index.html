@@ -826,6 +826,8 @@
             <button class="mode-btn active" id="btn-toggle-video-decor" title="Mostrar/Ocultar Muebles, Electrodomésticos y Decoración Real"><span>🛋️</span> Muebles</button>
             <button class="mode-btn" id="btn-toggle-roof" title="Mostrar/Ocultar Techo de Madera y Vigas"><span>🏠</span> Techo</button>
             <button class="mode-btn" id="btn-toggle-doors" title="Abrir / Cerrar todas las puertas y placards del departamento"><span>🚪</span> Puertas</button>
+            <button class="mode-btn" id="btn-toggle-windows" title="Abrir / Cerrar todas las ventanas corredizas y ventiluz del departamento (Entra brisa patagónica)"><span>🪟</span> Ventanas</button>
+            <button class="mode-btn" id="btn-toggle-curtains" title="Abrir / Cerrar todas las cortinas recogibles del departamento"><span>🎋</span> Cortinas</button>
             <div id="solar-time-group" style="display:flex; gap:2px; border-left:1px solid rgba(255,255,255,0.18); padding-left:4px;">
                 <button class="mode-btn solar-btn" data-time="morning" title="09:30 - Mañana Fresca (El Calafate)" style="padding:4px 6px;">🌅</button>
                 <button class="mode-btn solar-btn" data-time="noon" title="13:30 - Mediodía Patagónico" style="padding:4px 6px;">☀️</button>
@@ -879,6 +881,16 @@
         <label class="toggle-row">
             <span>Puertas 3D (Madera / Entrada / Placard)</span>
             <input type="checkbox" id="chk-doors" checked>
+            <div class="toggle-switch"></div>
+        </label>
+        <label class="toggle-row">
+            <span>Ventanas 3D (Corredizas / Ventiluz)</span>
+            <input type="checkbox" id="chk-windows" checked>
+            <div class="toggle-switch"></div>
+        </label>
+        <label class="toggle-row">
+            <span>Cortinas y Visillos</span>
+            <input type="checkbox" id="chk-curtains" checked>
             <div class="toggle-switch"></div>
         </label>
         <label class="toggle-row">
@@ -2199,6 +2211,14 @@
 
         const UNIT_BOX_GEO = new THREE.BoxGeometry(1, 1, 1);
 
+        // ============================================================================
+        // ELEMENTOS ARQUITECTÓNICOS INTERACTIVOS Y ANIMADOS: VENTANAS Y CORTINAS
+        // ============================================================================
+        const animWindows = [];
+        const windowClickCandidates = [];
+        const animCurtains = [];
+        const curtainClickCandidates = [];
+
         // Geometría de caja con bordes y esquinas redondeadas biseladas (evita el aspecto plano de cajas primitivas)
         function createRoundedBoxGeo(w, h, d, radius = 0.03, smoothness = 3) {
             const shape = new THREE.Shape();
@@ -2467,6 +2487,11 @@
         const topCapMat = wallCapCutMat; // Trazo arquitectónico oscuro de corte
         const winFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e242b, roughness: 0.35, metalness: 0.4 });
         const winGlassMat = new THREE.MeshPhysicalMaterial({ color: 0xcfe2ff, transparent: true, opacity: 0.35, roughness: 0.08, metalness: 0.15, transmission: 0.85, ior: 1.5 });
+        const chromePolishMat = new THREE.MeshStandardMaterial({
+            color: 0xf8f9fa,
+            metalness: 1.0,  // Cromo pulido 100% reflectivo
+            roughness: 0.06
+        });
         // Machimbre PBR del techo inclinado (Digital Twin exacto con ranuras en V y veta de pino)
         const woodRoofMat = new THREE.MeshStandardMaterial({
             color: 0x8d5524, // Pino barnizado cálido
@@ -3036,43 +3061,218 @@
                 }
             }
 
-            // Vidrio interior
-            const glass = new THREE.Mesh(UNIT_BOX_GEO, winGlassMat);
-            glass.scale.set(len - 0.08, winH - 0.08, 0.025);
-            glass.position.set(0, sillH + winH / 2, 0);
-            upperWinGroup.add(glass);
-            // Parantes verticales corredizos adaptados a la longitud del vano
-            const numPanels = len > 3.0 ? 4 : (len > 1.8 ? 2 : 1);
-            if (numPanels > 1) {
-                for (let p = 1; p < numPanels; p++) {
-                    const mulX = -len / 2 + p * (len / numPanels);
-                    const mullion = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
-                    mullion.scale.set(0.035, winH, 0.065);
-                    mullion.position.set(mulX, sillH + winH / 2, 0);
-                    mullion.castShadow = true; mullion.receiveShadow = true;
-                    upperWinGroup.add(mullion);
-                }
-            } else {
-                const mullion = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
-                mullion.scale.set(0.035, winH, 0.065);
-                mullion.position.set(0, sillH + winH / 2, 0);
-                mullion.castShadow = true; mullion.receiveShadow = true;
-                upperWinGroup.add(mullion);
-            }
-            // Marcos horizontales (superior/inferior) y jambas verticales (izquierda/derecha) de la ventana
+            // ------------------------------------------------------------------------
+            // MARCO PERIMETRAL EXTERIOR FIJO DE ALUMINIO NEGRO SATINADO
+            // ------------------------------------------------------------------------
+            const frameBarThick = 0.035;
+            const frameDepth = 0.075;
             const topBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
-            topBar.scale.set(len, 0.04, 0.065);
-            topBar.position.set(0, sillH + winH - 0.02, 0);
+            topBar.scale.set(len, frameBarThick, frameDepth);
+            topBar.position.set(0, sillH + winH - frameBarThick / 2, 0);
+            topBar.castShadow = true; topBar.receiveShadow = true;
+
             const botBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
-            botBar.scale.set(len, 0.04, 0.065);
-            botBar.position.set(0, sillH + 0.02, 0);
+            botBar.scale.set(len, frameBarThick, frameDepth);
+            botBar.position.set(0, sillH + frameBarThick / 2, 0);
+            botBar.castShadow = true; botBar.receiveShadow = true;
+
             const leftBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
-            leftBar.scale.set(0.04, winH, 0.065);
-            leftBar.position.set(-len / 2 + 0.02, sillH + winH / 2, 0);
+            leftBar.scale.set(frameBarThick, winH - frameBarThick * 2, frameDepth);
+            leftBar.position.set(-len / 2 + frameBarThick / 2, sillH + winH / 2, 0);
+            leftBar.castShadow = true; leftBar.receiveShadow = true;
+
             const rightBar = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
-            rightBar.scale.set(0.04, winH, 0.065);
-            rightBar.position.set(len / 2 - 0.02, sillH + winH / 2, 0);
+            rightBar.scale.set(frameBarThick, winH - frameBarThick * 2, frameDepth);
+            rightBar.position.set(len / 2 - frameBarThick / 2, sillH + winH / 2, 0);
+            rightBar.castShadow = true; rightBar.receiveShadow = true;
+
             upperWinGroup.add(topBar, botBar, leftBar, rightBar);
+
+            // Identificación unívoca del ambiente
+            let winName = "Ventana";
+            const midXCoord = (x1 + x2) / 2;
+            const midZCoord = (z1 + z2) / 2;
+            const isVentiluz = (len < 0.85);
+
+            if (isVentiluz) {
+                winName = "Baño Ventiluz (Oeste)";
+            } else if (Math.abs(z1) < 0.1 && midXCoord < 2.5) {
+                winName = "Estudio (Norte)";
+            } else if (Math.abs(z1) < 0.1 && midXCoord < 4.6) {
+                winName = "Living V1 (Norte)";
+            } else if (Math.abs(z1) < 0.1 && midXCoord >= 4.6) {
+                winName = "Living V2 (Norte)";
+            } else if (Math.abs(x1 - 6.30) < 0.1) {
+                winName = "Living V3 (Lateral Este)";
+            } else if (Math.abs(z1 - 8.00) < 0.1 && midXCoord < 2.5) {
+                winName = "Dormitorio (Sur)";
+            } else if (Math.abs(z1 - 8.00) < 0.1 && midXCoord >= 2.5) {
+                winName = "Cocina (Sur)";
+            }
+
+            // ------------------------------------------------------------------------
+            // HOJAS DE VENTANA ANIMADAS (CORREDIZAS O PROYECTANTE BANDEROLA)
+            // ------------------------------------------------------------------------
+            if (isVentiluz) {
+                // Ventiluz de Baño: Hoja proyectante / banderola basculante hacia el exterior
+                const sashW = len - frameBarThick * 2 - 0.01;
+                const sashH = winH - frameBarThick * 2 - 0.01;
+                const pivotY = sillH + winH - frameBarThick - 0.01;
+
+                const pivot = new THREE.Group();
+                pivot.position.set(0, pivotY, 0);
+
+                const sashGroup = new THREE.Group();
+                sashGroup.position.set(0, -sashH / 2, 0);
+
+                // Perfiles de aluminio de la hoja móvil
+                const pThick = 0.026;
+                const pDepth = 0.035;
+                const sTop = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                sTop.scale.set(sashW, pThick, pDepth);
+                sTop.position.set(0, sashH / 2 - pThick / 2, 0);
+                const sBot = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                sBot.scale.set(sashW, pThick, pDepth);
+                sBot.position.set(0, -sashH / 2 + pThick / 2, 0);
+                const sLeft = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                sLeft.scale.set(pThick, sashH - pThick * 2, pDepth);
+                sLeft.position.set(-sashW / 2 + pThick / 2, 0, 0);
+                const sRight = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                sRight.scale.set(pThick, sashH - pThick * 2, pDepth);
+                sRight.position.set(sashW / 2 - pThick / 2, 0, 0);
+
+                // Vidrio esmerilado de privacidad
+                const vGlass = new THREE.Mesh(UNIT_BOX_GEO, winGlassMat);
+                vGlass.scale.set(sashW - pThick * 2, sashH - pThick * 2, 0.015);
+                vGlass.position.set(0, 0, 0);
+                vGlass.castShadow = true; vGlass.receiveShadow = true;
+
+                // Picaporte / traba cromada inferior
+                const vHandle = new THREE.Mesh(createRoundedBoxGeo(0.08, 0.022, 0.035, 0.005, 2), chromePolishMat);
+                vHandle.position.set(0, -sashH / 2 + pThick, 0.024);
+
+                sashGroup.add(sTop, sBot, sLeft, sRight, vGlass, vHandle);
+                pivot.add(sashGroup);
+                upperWinGroup.add(pivot);
+
+                const animEntry = {
+                    name: winName,
+                    type: 'tilt',
+                    isOpen: false,
+                    currentVal: 0,
+                    targetVal: 0,
+                    openVal: -0.46, // ~26° de apertura basculante hacia afuera
+                    closedVal: 0,
+                    pivot: pivot,
+                    midX: midXCoord,
+                    midZ: midZCoord,
+                    toggle() {
+                        this.isOpen = !this.isOpen;
+                        this.targetVal = this.isOpen ? this.openVal : this.closedVal;
+                        wakeRenderer();
+                        return this.isOpen;
+                    }
+                };
+
+                [sTop, sBot, sLeft, sRight, vGlass, vHandle, topBar, botBar, leftBar, rightBar].forEach(m => {
+                    m.userData.animWindow = animEntry;
+                    windowClickCandidates.push(m);
+                });
+                animWindows.push(animEntry);
+
+            } else {
+                // Ventana corrediza de 2 hojas (Living, Estudio, Cuarto y Cocina)
+                const sashW = (len - frameBarThick * 2) / 2 + 0.022; // Solape central de 4.4 cm
+                const sashH = winH - frameBarThick * 2 - 0.015;
+                const pThick = 0.028;
+                const pDepth = 0.032;
+
+                // 1) HOJA IZQUIERDA EXTERIOR (FIJA / EXTERIOR en Z = -0.018 m)
+                const fixedX = -len / 4 + 0.005;
+                const fixedSash = new THREE.Group();
+                fixedSash.position.set(fixedX, sillH + winH / 2, -0.018);
+
+                const fTop = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                fTop.scale.set(sashW, pThick, pDepth);
+                fTop.position.set(0, sashH / 2 - pThick / 2, 0);
+                const fBot = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                fBot.scale.set(sashW, pThick, pDepth);
+                fBot.position.set(0, -sashH / 2 + pThick / 2, 0);
+                const fLeft = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                fLeft.scale.set(pThick, sashH - pThick * 2, pDepth);
+                fLeft.position.set(-sashW / 2 + pThick / 2, 0, 0);
+                const fRight = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                fRight.scale.set(pThick, sashH - pThick * 2, pDepth);
+                fRight.position.set(sashW / 2 - pThick / 2, 0, 0);
+
+                const fGlass = new THREE.Mesh(UNIT_BOX_GEO, winGlassMat);
+                fGlass.scale.set(sashW - pThick * 2, sashH - pThick * 2, 0.014);
+                fGlass.position.set(0, 0, 0);
+                fGlass.castShadow = true; fGlass.receiveShadow = true;
+
+                fixedSash.add(fTop, fBot, fLeft, fRight, fGlass);
+                upperWinGroup.add(fixedSash);
+
+                // 2) HOJA DERECHA INTERIOR (MÓVIL CORREDIZA en Z = +0.018 m)
+                const baseX = len / 4 - 0.005;
+                const slideGroup = new THREE.Group();
+                slideGroup.position.set(baseX, sillH + winH / 2, 0.018);
+
+                const sTop = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                sTop.scale.set(sashW, pThick, pDepth);
+                sTop.position.set(0, sashH / 2 - pThick / 2, 0);
+                const sBot = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                sBot.scale.set(sashW, pThick, pDepth);
+                sBot.position.set(0, -sashH / 2 + pThick / 2, 0);
+                const sLeft = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                sLeft.scale.set(pThick, sashH - pThick * 2, pDepth);
+                sLeft.position.set(-sashW / 2 + pThick / 2, 0, 0);
+                const sRight = new THREE.Mesh(UNIT_BOX_GEO, winFrameMat);
+                sRight.scale.set(pThick, sashH - pThick * 2, pDepth);
+                sRight.position.set(sashW / 2 - pThick / 2, 0, 0);
+
+                const sGlass = new THREE.Mesh(UNIT_BOX_GEO, winGlassMat);
+                sGlass.scale.set(sashW - pThick * 2, sashH - pThick * 2, 0.014);
+                sGlass.position.set(0, 0, 0);
+                sGlass.castShadow = true; sGlass.receiveShadow = true;
+
+                // Tirador / cerrojo embutido de aluminio en perfil interior
+                const latchMesh = new THREE.Mesh(createRoundedBoxGeo(0.016, 0.12, 0.018, 0.003, 2), chromePolishMat);
+                latchMesh.position.set(-sashW / 2 + pThick + 0.008, 0, 0.018);
+
+                slideGroup.add(sTop, sBot, sLeft, sRight, sGlass, latchMesh);
+                upperWinGroup.add(slideGroup);
+
+                // Carrera libre de apertura: corre hacia la izquierda despejando el vano
+                const openDist = len / 2 - frameBarThick - 0.05;
+
+                const animEntry = {
+                    name: winName,
+                    type: 'slide',
+                    isOpen: false,
+                    currentVal: 0,
+                    targetVal: 0,
+                    baseX: baseX,
+                    openVal: -openDist,
+                    closedVal: 0,
+                    sashGroup: slideGroup,
+                    midX: midXCoord,
+                    midZ: midZCoord,
+                    toggle() {
+                        this.isOpen = !this.isOpen;
+                        this.targetVal = this.isOpen ? this.openVal : this.closedVal;
+                        wakeRenderer();
+                        return this.isOpen;
+                    }
+                };
+
+                [sTop, sBot, sLeft, sRight, sGlass, latchMesh, fGlass, fTop, fBot, fLeft, fRight, topBar, botBar, leftBar, rightBar].forEach(m => {
+                    m.userData.animWindow = animEntry;
+                    windowClickCandidates.push(m);
+                });
+                animWindows.push(animEntry);
+            }
+
             holder.add(upperWinGroup);
 
             // Símbolo 2D en la tapa superior adaptado a la pendiente
@@ -3368,11 +3568,6 @@
             color: 0xf8fafc,
             roughness: 0.40,
             metalness: 0.0
-        });
-        const chromePolishMat = new THREE.MeshStandardMaterial({
-            color: 0xf8f9fa,
-            metalness: 1.0,  // Cromo pulido 100% reflectivo
-            roughness: 0.06
         });
         const mirrorAbsoluteMat = new THREE.MeshStandardMaterial({
             color: 0xf8fafc,
@@ -4803,40 +4998,141 @@
         }
 
         const sheerCurtainMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, transparent: true, opacity: 0.65, roughness: 0.90, metalness: 0.0 });
-        // Constructor de Cortinas con barral de madera y paños laterales atados
+        // Constructor de Cortinas PBR Interactivas Animadas (Recogibles con Brisa Patagónica)
         function addCurtainAssembly(x1, z1, x2, z2, offsetInwardX, offsetInwardZ, drapeColor = 0xc8beb4) {
             const dx = x2 - x1;
             const dz = z2 - z1;
-            const len = Math.hypot(dx, dz) + 0.16;
+            const len = Math.hypot(dx, dz) + 0.20;
             const angle = Math.atan2(dz, dx);
             const g = new THREE.Group();
-            g.position.set((x1 + x2) / 2 + offsetInwardX, 0, (z1 + z2) / 2 + offsetInwardZ);
+            const cMidX = (x1 + x2) / 2 + offsetInwardX;
+            const cMidZ = (z1 + z2) / 2 + offsetInwardZ;
+            g.position.set(cMidX, 0, cMidZ);
             g.rotation.y = -angle;
 
-            // Barral de madera tono cedro a Y = 2.12m
-            const rod = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0x7c2d12, 0.5));
-            rod.scale.set(len, 0.028, 0.028);
+            // Identificación unívoca del ambiente
+            let curtainTitle = "Cortina";
+            if (Math.abs(z1) < 0.1 && cMidX < 2.5) curtainTitle = "Cortina Estudio (Norte)";
+            else if (Math.abs(z1) < 0.1 && cMidX < 4.6) curtainTitle = "Cortina Living V1 (Norte)";
+            else if (Math.abs(z1) < 0.1 && cMidX >= 4.6) curtainTitle = "Cortina Living V2 (Norte)";
+            else if (Math.abs(x1 - 6.30) < 0.1) curtainTitle = "Cortina Living V3 (Lateral Este)";
+            else if (Math.abs(z1 - 8.00) < 0.1) curtainTitle = "Cortina Dormitorio (Sur)";
+
+            // 1. BARRAL DE MADERA MACIZA Y TERMINALES TORNEADOS A Y = 2.12 m
+            const rodMat = getStdMat(0x6c2e12, 0.45);
+            const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, len, 16), rodMat);
+            rod.rotation.z = Math.PI / 2;
             rod.position.set(0, 2.12, 0);
+            rod.castShadow = true;
             g.add(rod);
 
-            // Visillo blanco translúcido central
-            const sheer = new THREE.Mesh(UNIT_BOX_GEO, sheerCurtainMat);
-            sheer.scale.set(len - 0.12, 1.22, 0.015);
-            sheer.position.set(0, 1.48, 0);
-            g.add(sheer);
+            // Terminales esféricos torneados en los extremos
+            [-1, 1].forEach(side => {
+                const finial = new THREE.Mesh(new THREE.SphereGeometry(0.026, 12, 12), rodMat);
+                finial.position.set(side * (len / 2 + 0.015), 2.12, 0);
+                const bracket = new THREE.Mesh(UNIT_BOX_GEO, rodMat);
+                bracket.scale.set(0.024, 0.045, 0.06);
+                bracket.position.set(side * (len / 2 - 0.05), 2.12, -0.03);
+                g.add(finial, bracket);
+            });
 
-            // 2 Paños de cortina laterales con alzapaños
-            const panelMat = getStdMat(drapeColor, 0.75);
-            const leftPanel = new THREE.Mesh(UNIT_BOX_GEO, panelMat);
-            leftPanel.scale.set(0.26, 1.32, 0.035);
-            leftPanel.position.set(-len / 2 + 0.16, 1.44, 0.015);
-            const rightPanel = new THREE.Mesh(UNIT_BOX_GEO, panelMat);
-            rightPanel.scale.set(0.26, 1.32, 0.035);
-            rightPanel.position.set(len / 2 - 0.16, 1.44, 0.015);
-            g.add(leftPanel, rightPanel);
+            // Argollas de madera deslizantes
+            for (let rx = -len / 2 + 0.08; rx <= len / 2 - 0.08; rx += 0.14) {
+                const ring = new THREE.Mesh(new THREE.TorusGeometry(0.019, 0.0035, 8, 16), rodMat);
+                ring.position.set(rx, 2.12, 0);
+                g.add(ring);
+            }
 
+            // 2. VISILLOS BLANCOS TRANSLÚCIDOS (DIVIDIDOS EN 2 HOJAS PARA CORRERSE DEL CENTRO)
+            const sheerHalfW = (len - 0.08) / 2;
+            const sheerLeftGroup = new THREE.Group();
+            sheerLeftGroup.position.set(-sheerHalfW / 2, 1.48, 0.006);
+            const sheerLMesh = new THREE.Mesh(UNIT_BOX_GEO, sheerCurtainMat);
+            sheerLMesh.scale.set(sheerHalfW, 1.22, 0.012);
+            sheerLeftGroup.add(sheerLMesh);
+
+            const sheerRightGroup = new THREE.Group();
+            sheerRightGroup.position.set(sheerHalfW / 2, 1.48, 0.006);
+            const sheerRMesh = new THREE.Mesh(UNIT_BOX_GEO, sheerCurtainMat);
+            sheerRMesh.scale.set(sheerHalfW, 1.22, 0.012);
+            sheerRightGroup.add(sheerRMesh);
+
+            g.add(sheerLeftGroup, sheerRightGroup);
+
+            // 3. PAÑOS DE CORTINA LATERALES PESADOS (TELA CON CAÍDA Y ALZAPAÑOS)
+            const panelMat = getStdMat(drapeColor, 0.76);
+            const drapeW = 0.32;
+            const drapeH = 1.34;
+
+            // Paño izquierdo
+            const drapeLeftGroup = new THREE.Group();
+            drapeLeftGroup.position.set(-len / 2 + 0.17, 1.43, 0.022);
+            const dLeftMesh = new THREE.Mesh(createRoundedBoxGeo(drapeW, drapeH, 0.04, 0.012, 2), panelMat);
+            dLeftMesh.castShadow = true;
+            // Alzapaños izquierdo
+            const tieLeft = new THREE.Mesh(createRoundedBoxGeo(0.04, 0.05, 0.065, 0.008, 2), rodMat);
+            tieLeft.position.set(drapeW / 2 - 0.01, -0.06, 0);
+            drapeLeftGroup.add(dLeftMesh, tieLeft);
+
+            // Paño derecho
+            const drapeRightGroup = new THREE.Group();
+            drapeRightGroup.position.set(len / 2 - 0.17, 1.43, 0.022);
+            const dRightMesh = new THREE.Mesh(createRoundedBoxGeo(drapeW, drapeH, 0.04, 0.012, 2), panelMat);
+            dRightMesh.castShadow = true;
+            // Alzapaños derecho
+            const tieRight = new THREE.Mesh(createRoundedBoxGeo(0.04, 0.05, 0.065, 0.008, 2), rodMat);
+            tieRight.position.set(-drapeW / 2 + 0.01, -0.06, 0);
+            drapeRightGroup.add(dRightMesh, tieRight);
+
+            g.add(drapeLeftGroup, drapeRightGroup);
             decorVideoGroup.add(g);
             attachWallMount(g, (x1 + x2) / 2, (z1 + z2) / 2, Math.abs(dx) >= Math.abs(dz));
+
+            // Vincular con la ventana correspondiente para sincronización de brisa
+            const linkedWindow = animWindows.find(w => Math.hypot(w.midX - cMidX, w.midZ - cMidZ) < 0.75) || null;
+
+            // Función de interpolación de recogida de cortinas
+            function applyProgress(p) {
+                // p: 0.0 (Cerrada / corrida cubriendo el vano) -> 1.0 (Abierta / recogida a los laterales)
+                sheerLeftGroup.scale.x = (1 - p) * 1.0 + p * 0.16;
+                sheerLeftGroup.position.x = (1 - p) * (-sheerHalfW / 2) + p * (-len / 2 + 0.10);
+
+                sheerRightGroup.scale.x = (1 - p) * 1.0 + p * 0.16;
+                sheerRightGroup.position.x = (1 - p) * (sheerHalfW / 2) + p * (len / 2 - 0.10);
+
+                drapeLeftGroup.scale.x = (1 - p) * 1.0 + p * 0.62;
+                drapeLeftGroup.position.x = (1 - p) * (-len / 2 + 0.19) + p * (-len / 2 + 0.12);
+
+                drapeRightGroup.scale.x = (1 - p) * 1.0 + p * 0.62;
+                drapeRightGroup.position.x = (1 - p) * (len / 2 - 0.19) + p * (len / 2 - 0.12);
+            }
+
+            const curtainEntry = {
+                name: curtainTitle,
+                isOpen: false,
+                currentProgress: 0.0,
+                targetProgress: 0.0,
+                applyProgress: applyProgress,
+                phase: Math.random() * 6.28,
+                windAmp: 0.35,
+                linkedWindow: linkedWindow,
+                leftDrape: drapeLeftGroup,
+                rightDrape: drapeRightGroup,
+                leftSheer: sheerLeftGroup,
+                rightSheer: sheerRightGroup,
+                toggle() {
+                    this.isOpen = !this.isOpen;
+                    this.targetProgress = this.isOpen ? 1.0 : 0.0;
+                    wakeRenderer();
+                    return this.isOpen;
+                }
+            };
+
+            [dLeftMesh, dRightMesh, sheerLMesh, sheerRMesh, rod].forEach(m => {
+                m.userData.animCurtain = curtainEntry;
+                curtainClickCandidates.push(m);
+            });
+            animCurtains.push(curtainEntry);
         }
 
         
@@ -7667,6 +7963,16 @@
                 return;
             }
 
+            // Teclas de acceso rápido: 'V' para Ventanas y 'C' para Cortinas
+            if (e.key === 'v' || e.key === 'V') {
+                const btnW = document.getElementById('btn-toggle-windows');
+                if (btnW) btnW.click();
+            }
+            if (e.key === 'c' || e.key === 'C') {
+                const btnC = document.getElementById('btn-toggle-curtains');
+                if (btnC) btnC.click();
+            }
+
             if (selectedId || selectedDecorMesh) {
                 if (e.key === 'Delete' || e.key === 'Backspace') {
                     e.preventDefault();
@@ -7892,7 +8198,7 @@
             pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(pointer, activeCamera);
 
-            // 0. Raycast sobre puertas y hojas de placard animadas (click abre/cierra y muestra toast sin atrapar la selección)
+            // 0. Raycast sobre puertas y hojas de placard animadas
             if (activeCamera === perspCam) {
                 const doorHits = raycaster.intersectObjects(doorClickCandidates, false);
                 if (doorHits.length > 0) {
@@ -7900,6 +8206,32 @@
                     if (hitDoor) {
                         const nextState = hitDoor.toggle();
                         showToast(`🚪 ${hitDoor.name}: ${nextState ? 'Abierta' : 'Cerrada'}`);
+                        clearSelection();
+                        wakeRenderer();
+                        return;
+                    }
+                }
+
+                // 0B. Raycast sobre ventanas animadas (corredizas de aluminio y ventiluz basculante)
+                const winHits = raycaster.intersectObjects(windowClickCandidates, false);
+                if (winHits.length > 0) {
+                    const hitWin = winHits[0].object.userData.animWindow;
+                    if (hitWin) {
+                        const nextState = hitWin.toggle();
+                        showToast(`🪟 ${hitWin.name}: ${nextState ? 'Abierta (Entra brisa patagónica)' : 'Cerrada'}`);
+                        clearSelection();
+                        wakeRenderer();
+                        return;
+                    }
+                }
+
+                // 0C. Raycast sobre cortinas animadas (recogibles con caída y brisa)
+                const curtainHits = raycaster.intersectObjects(curtainClickCandidates, false);
+                if (curtainHits.length > 0) {
+                    const hitCurtain = curtainHits[0].object.userData.animCurtain;
+                    if (hitCurtain) {
+                        const nextState = hitCurtain.toggle();
+                        showToast(`🎋 ${hitCurtain.name}: ${nextState ? 'Recogida (Abierta)' : 'Corrida (Cerrada)'}`);
                         clearSelection();
                         wakeRenderer();
                         return;
@@ -8324,9 +8656,51 @@
                 }
             });
             document.getElementById('btn-toggle-doors').classList.toggle('active', nextState);
-            showSelectionBar(nextState ? 'Todas las puertas y placards abiertos' : 'Todas las puertas y placards cerrados');
+            showToast(nextState ? '🚪 Todas las puertas y placards abiertos' : '🚪 Todas las puertas y placards cerrados');
             wakeRenderer();
         });
+
+        document.getElementById('btn-toggle-windows').addEventListener('click', () => {
+            const anyClosed = animWindows.some(w => !w.isOpen);
+            const nextState = anyClosed;
+            animWindows.forEach(w => {
+                w.isOpen = nextState;
+                w.targetVal = w.isOpen ? w.openVal : w.closedVal;
+            });
+            const btn = document.getElementById('btn-toggle-windows');
+            if (btn) btn.classList.toggle('active', nextState);
+            showToast(nextState ? '🪟 Todas las ventanas abiertas (Entra brisa patagónica)' : '🪟 Todas las ventanas cerradas');
+            wakeRenderer();
+        });
+
+        document.getElementById('btn-toggle-curtains').addEventListener('click', () => {
+            const anyClosed = animCurtains.some(c => !c.isOpen);
+            const nextState = anyClosed;
+            animCurtains.forEach(c => {
+                c.isOpen = nextState;
+                c.targetProgress = c.isOpen ? 1.0 : 0.0;
+            });
+            const btn = document.getElementById('btn-toggle-curtains');
+            if (btn) btn.classList.toggle('active', nextState);
+            showToast(nextState ? '🎋 Todas las cortinas recogidas (Abiertas)' : '🎋 Todas las cortinas corridas (Cerradas)');
+            wakeRenderer();
+        });
+
+        // Checkboxes de capas en sidebar
+        const chkWin = document.getElementById('chk-windows');
+        if (chkWin) {
+            chkWin.addEventListener('change', (e) => {
+                windowClickCandidates.forEach(m => { m.visible = e.target.checked; });
+                wakeRenderer();
+            });
+        }
+        const chkCurt = document.getElementById('chk-curtains');
+        if (chkCurt) {
+            chkCurt.addEventListener('change', (e) => {
+                curtainClickCandidates.forEach(m => { m.visible = e.target.checked; });
+                wakeRenderer();
+            });
+        }
         document.getElementById('chk-furniture').addEventListener('change', (e) => {
             furnitureGroup.visible = e.target.checked;
             updateSelectionVisual();
@@ -8519,7 +8893,7 @@
             window.addEventListener(ev, wakeRenderer, { passive: true });
         });
 
-        // Cambiar cursor a pointer al pasar sobre puertas animadas
+        // Cambiar cursor a pointer al pasar sobre puertas, ventanas o cortinas animadas
         window.addEventListener('pointermove', (e) => {
             if (activeCamera !== perspCam || isDraggingFurniture || isRotatingFurniture) return;
             const rect = renderer.domElement.getBoundingClientRect();
@@ -8527,7 +8901,8 @@
             const py = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             const ray = new THREE.Raycaster();
             ray.setFromCamera(new THREE.Vector2(px, py), activeCamera);
-            const dHits = ray.intersectObjects(doorClickCandidates, false);
+            const allInteractives = [...doorClickCandidates, ...windowClickCandidates, ...curtainClickCandidates];
+            const dHits = ray.intersectObjects(allInteractives, false);
             renderer.domElement.style.cursor = dHits.length > 0 ? 'pointer' : '';
         }, { passive: true });
 
@@ -8549,6 +8924,78 @@
                     if (d.type === 'swing') d.pivot.rotation.y = d.currentVal;
                     else if (d.type === 'slide') d.group.position.x = d.currentVal;
                 }
+            }
+            return moving;
+        }
+
+        // Actualizador de interpolación suave de ventanas corredizas y ventiluz basculante
+        function updateAnimWindows() {
+            let moving = false;
+            for (let i = 0; i < animWindows.length; i++) {
+                const w = animWindows[i];
+                if (Math.abs(w.currentVal - w.targetVal) > 0.002) {
+                    w.currentVal += (w.targetVal - w.currentVal) * 0.16;
+                    moving = true;
+                    if (w.type === 'slide') {
+                        w.sashGroup.position.x = w.baseX + w.currentVal;
+                    } else if (w.type === 'tilt') {
+                        w.pivot.rotation.x = w.currentVal;
+                    }
+                } else if (w.currentVal !== w.targetVal) {
+                    w.currentVal = w.targetVal;
+                    if (w.type === 'slide') w.sashGroup.position.x = w.baseX + w.currentVal;
+                    else if (w.type === 'tilt') w.pivot.rotation.x = w.currentVal;
+                }
+            }
+            return moving;
+        }
+
+        // Actualizador de cortinas: apertura suave y ondulación orgánica por brisa patagónica
+        let curtainWindClock = 0;
+        function updateAnimCurtains() {
+            let moving = false;
+            curtainWindClock += 0.016;
+            for (let i = 0; i < animCurtains.length; i++) {
+                const c = animCurtains[i];
+                // 1. Interpolación de apertura / recogida
+                if (Math.abs(c.currentProgress - c.targetProgress) > 0.002) {
+                    c.currentProgress += (c.targetProgress - c.currentProgress) * 0.14;
+                    c.applyProgress(c.currentProgress);
+                    moving = true;
+                } else if (c.currentProgress !== c.targetProgress) {
+                    c.currentProgress = c.targetProgress;
+                    c.applyProgress(c.currentProgress);
+                }
+
+                // 2. Simulación de brisa patagónica continua
+                const isWinOpen = c.linkedWindow ? c.linkedWindow.isOpen : false;
+                const targetWind = isWinOpen ? 1.0 : 0.35;
+                c.windAmp += (targetWind - c.windAmp) * 0.06;
+
+                const t = curtainWindClock * 2.8 + c.phase;
+                const wave = Math.sin(t) * 0.038 * c.windAmp;
+                const sway = Math.cos(t * 1.5 + 0.9) * 0.022 * c.windAmp;
+
+                if (c.leftDrape) {
+                    c.leftDrape.rotation.x = wave * 0.8;
+                    c.leftDrape.rotation.z = sway * 0.35;
+                }
+                if (c.rightDrape) {
+                    c.rightDrape.rotation.x = wave * 0.75;
+                    c.rightDrape.rotation.z = -sway * 0.35;
+                }
+                if (c.leftSheer) {
+                    c.leftSheer.rotation.x = wave * 1.15;
+                    c.leftSheer.position.z = Math.sin(t * 1.9) * 0.014 * c.windAmp;
+                }
+                if (c.rightSheer) {
+                    c.rightSheer.rotation.x = wave * 1.15;
+                    c.rightSheer.position.z = Math.cos(t * 1.9) * 0.014 * c.windAmp;
+                }
+            }
+            const anyWinOpen = animWindows.some(w => w.isOpen);
+            if (anyWinOpen || moving) {
+                moving = true;
             }
             return moving;
         }
@@ -8616,7 +9063,9 @@
             if (dirtyFrames > 0) {
                 const wallsMoving = updateSimsWalls(false);
                 const doorsMoving = updateAnimDoors();
-                if (wallsMoving || doorsMoving) dirtyFrames = Math.max(dirtyFrames, 3);
+                const windowsMoving = updateAnimWindows();
+                const curtainsMoving = updateAnimCurtains();
+                if (wallsMoving || doorsMoving || windowsMoving || curtainsMoving) dirtyFrames = Math.max(dirtyFrames, 3);
                 dirtyFrames--;
                 updateLabels();
                 if (selectionBox) selectionBox.update();
