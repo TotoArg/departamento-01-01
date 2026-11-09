@@ -691,6 +691,12 @@
             <button class="mode-btn active" id="btn-toggle-video-decor" title="Mostrar/Ocultar Muebles, Electrodomésticos y Decoración Real"><span>🛋️</span> Muebles</button>
             <button class="mode-btn" id="btn-toggle-roof" title="Mostrar/Ocultar Techo de Madera y Vigas"><span>🏠</span> Techo</button>
             <button class="mode-btn" id="btn-toggle-doors" title="Abrir / Cerrar todas las puertas y placards del departamento"><span>🚪</span> Puertas</button>
+            <div id="solar-time-group" style="display:flex; gap:2px; border-left:1px solid rgba(255,255,255,0.18); padding-left:4px;">
+                <button class="mode-btn solar-btn" data-time="morning" title="09:30 - Mañana Fresca (El Calafate)" style="padding:4px 6px;">🌅</button>
+                <button class="mode-btn solar-btn" data-time="noon" title="13:30 - Mediodía Patagónico" style="padding:4px 6px;">☀️</button>
+                <button class="mode-btn solar-btn active" data-time="golden" title="18:45 - Atardecer Golden Hour 3200K (Sombras largas)" style="padding:4px 6px; background:#f59e0b; border-color:#fbbf24; color:#0f172a;">🌇</button>
+                <button class="mode-btn solar-btn" data-time="night" title="22:30 - Noche Domótica WiZ (2700K/4000K + Gaming RGB)" style="padding:4px 6px;">🌙</button>
+            </div>
             <div style="display:flex; gap:3px; margin-left:2px; border-left:1px solid rgba(255,255,255,0.15); padding-left:4px;">
                 <button class="icon-btn" id="btn-zoom-in" title="Acercar plano" style="padding:4px 6px; font-size:12px;">➕</button>
                 <button class="icon-btn" id="btn-zoom-out" title="Alejar plano" style="padding:4px 6px; font-size:12px;">➖</button>
@@ -701,6 +707,14 @@
 
     <!-- Right Sidebar (Visibility & Layers) -->
     <div id="sidebar-right" class="glass-panel">
+        <div class="panel-title" style="margin-bottom:4px;">☀️ Estudio Solar & Domótica WiZ</div>
+        <div style="font-size:10px; color:#94a3b8; margin-bottom:6px;">El Calafate, Santa Cruz (-50.33° Lat, -72.26° Lon)</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:10px;">
+            <button class="action-btn solar-btn-sb" data-time="morning" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#f8fafc;">🌅 Mañana</button>
+            <button class="action-btn solar-btn-sb" data-time="noon" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#f8fafc;">☀️ Mediodía</button>
+            <button class="action-btn solar-btn-sb active" data-time="golden" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fbbf24; font-weight:700;">🌇 Atardecer</button>
+            <button class="action-btn solar-btn-sb" data-time="night" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(56,189,248,0.15); border:1px solid #0284c7; color:#bae6fd;">🌙 Noche WiZ</button>
+        </div>
         <div class="panel-title">Paredes (Estilo Los Sims)</div>
         <label class="toggle-row" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 6px; padding: 5px 8px;">
             <span style="font-weight: 700; color: #38bdf8;">🏠 Corte Dinámico (Sims)</span>
@@ -1808,49 +1822,77 @@
         }
 
         // 1. Rebote natural cielo-suelo (HemisphereLight suave)
-        const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0xb88850, 0.58);
+        const hemiLight = new THREE.HemisphereLight(0xfed7aa, 0x92400e, 0.48);
         scene.add(hemiLight);
 
-        // 2. Luz Ambiental reducida al mínimo para evitar lavado plano
+        // 2. Luz Ambiental suave
         const ambLight = new THREE.AmbientLight(0xdbeafe, 0.16);
         scene.add(ambLight);
 
-        // 3. Sol Fotorrealista Atardecer Cálido en Ángulo Rasante con Sombras Suaves 4K (PCFSoftShadowMap)
-        const dirLight = new THREE.DirectionalLight(0xffecd2, 1.55);
-        dirLight.position.set(28.0, 38.0, 26.0); // Ángulo diagonal rasante para proyectar sombras largas arquitectónicas
+        // 3. Sol Físico El Calafate (-50.33° Lat) en Ángulo Rasante Norte con Sombras Suaves 4K
+        const dirLight = new THREE.DirectionalLight(0xff9d42, 1.95);
+        dirLight.position.set(-18.0, 6.8, -20.0); // Noroeste rasante entrando por ventanales Norte
         dirLight.target.position.set(3.15, 0.70, 3.80);
         scene.add(dirLight.target);
         dirLight.castShadow = true;
-        // Resolución 4K en desktop y 2K en móvil para máxima fidelidad y rendimiento
-        const shadowRes = isMobileOrLowEnd ? 1024 : 2048;
+
+        // Resolución 4K en desktop y 2K en móvil para máxima fidelidad
+        const shadowRes = isMobileOrLowEnd ? 2048 : 4096;
         dirLight.shadow.mapSize.width = shadowRes;
         dirLight.shadow.mapSize.height = shadowRes;
         dirLight.shadow.camera.near = 10.0;
         dirLight.shadow.camera.far = 120.0;
-        dirLight.shadow.camera.left = -10.0;
-        dirLight.shadow.camera.right = 10.0;
-        dirLight.shadow.camera.top = 10.0;
-        dirLight.shadow.camera.bottom = -10.0;
-        dirLight.shadow.bias = -0.00018;
-        dirLight.shadow.normalBias = 0.032;
-        dirLight.shadow.radius = 4.0; // Sombras arquitectónicas suaves de penumbra difusa
+        dirLight.shadow.camera.left = -11.0;
+        dirLight.shadow.camera.right = 11.0;
+        dirLight.shadow.camera.top = 11.0;
+        dirLight.shadow.camera.bottom = -11.0;
+        dirLight.shadow.bias = -0.00015;
+        dirLight.shadow.normalBias = 0.028;
+        dirLight.shadow.radius = 3.5;
         scene.add(dirLight);
 
         // 4. Luz de Relleno Suave Posterior
-        const fillLight = new THREE.DirectionalLight(0xffeedd, 0.25);
+        const fillLight = new THREE.DirectionalLight(0xffeedd, 0.20);
         fillLight.position.set(-15, 20, -15);
         scene.add(fillLight);
 
-        // 5. Tiras LED Cian Eléctrico Gamer (Detrás de monitores en Estudio y Smart TV en Living)
-        const cyanLedStudy = new THREE.PointLight(0x00f0ff, 2.4, 4.0, 1.8);
-        cyanLedStudy.position.set(2.45, 1.25, 1.15);
-        scene.add(cyanLedStudy);
+        // 5. Luces Domóticas WiZ de Techo (Downlights empotrados)
+        // WiZ Cálida 2700K (Living y Dormitorio)
+        const wizLivingLight = new THREE.PointLight(0xffd7a0, 0.4, 7.5, 1.8);
+        wizLivingLight.position.set(4.65, 2.70, 2.25);
+        scene.add(wizLivingLight);
 
-        const cyanLedLiving = new THREE.PointLight(0x00f0ff, 2.0, 3.6, 1.8);
+        const wizDiningLight = new THREE.PointLight(0xffd7a0, 0.4, 6.5, 1.8);
+        wizDiningLight.position.set(4.65, 2.70, 3.85);
+        scene.add(wizDiningLight);
+
+        const wizBedroomLight = new THREE.PointLight(0xffd7a0, 0.3, 6.8, 1.8);
+        wizBedroomLight.position.set(1.50, 2.50, 5.80);
+        scene.add(wizBedroomLight);
+
+        // WiZ Neutra Focal 4000K (Estudio y Baño)
+        const wizStudyLight = new THREE.PointLight(0xf4f8ff, 0.6, 6.5, 1.8);
+        wizStudyLight.position.set(2.00, 2.55, 1.15);
+        scene.add(wizStudyLight);
+
+        const wizBathLight = new THREE.PointLight(0xf4f8ff, 0.5, 5.5, 1.8);
+        wizBathLight.position.set(1.15, 2.45, 3.50);
+        scene.add(wizBathLight);
+
+        // 6. Contaminación Lumínica Gaming en Estudio (Noche)
+        const gamingBlueLight = new THREE.PointLight(0x0066ff, 1.8, 3.8, 1.8);
+        gamingBlueLight.position.set(2.65, 1.10, 0.85);
+        scene.add(gamingBlueLight);
+
+        const gamingMagentaLight = new THREE.PointLight(0xff0055, 1.5, 3.0, 1.8);
+        gamingMagentaLight.position.set(2.78, 0.45, 1.45);
+        scene.add(gamingMagentaLight);
+
+        // 7. Tiras LED complementarias y lámparas de noche
+        const cyanLedLiving = new THREE.PointLight(0x00f0ff, 1.8, 3.6, 1.8);
         cyanLedLiving.position.set(6.15, 1.45, 3.10);
         scene.add(cyanLedLiving);
 
-        // 6. Lámparas Cálidas de Noche en Dormitorio (Mesas de Luz)
         const bedsideLampLeft = new THREE.PointLight(0xffa834, 1.6, 3.4, 1.8);
         bedsideLampLeft.position.set(0.35, 0.95, 4.95);
         scene.add(bedsideLampLeft);
@@ -1859,10 +1901,158 @@
         bedsideLampRight.position.set(0.35, 0.95, 7.05);
         scene.add(bedsideLampRight);
 
-        // 7. Iluminación LED Cálida Bajo Muebles de Cocina
         const kitchenLed = new THREE.PointLight(0xfff4db, 1.4, 4.2, 1.8);
         kitchenLed.position.set(4.10, 1.75, 6.10);
         scene.add(kitchenLed);
+
+        // ============================================================================
+        // MOTOR DE ESTUDIO SOLAR Y DOMÓTICA WIZ (EL CALAFATE -50.33° LAT, -72.26° LON)
+        // ============================================================================
+        let currentSolarTime = 'golden';
+
+        const SOLAR_PRESETS = {
+            morning: {
+                name: 'Mañana Fresca (09:30)',
+                sunPos: [16.0, 18.0, -20.0],
+                sunColor: 0xfff0d8,
+                sunIntensity: 1.45,
+                hemiSky: 0xb9e1ff,
+                hemiGround: 0xc49c74,
+                hemiIntensity: 0.55,
+                ambIntensity: 0.18,
+                fillIntensity: 0.25,
+                bgColor: 0xf0f7ff,
+                wizLiving: 0.0,
+                wizDining: 0.0,
+                wizBedroom: 0.0,
+                wizStudy: 0.0,
+                wizBath: 0.0,
+                gamingBlue: 0.6,
+                gamingMagenta: 0.4,
+                isNight: false
+            },
+            noon: {
+                name: 'Mediodía Patagónico (13:30)',
+                sunPos: [3.15, 30.0, -22.0],
+                sunColor: 0xfffdf6,
+                sunIntensity: 1.70,
+                hemiSky: 0xdbeafe,
+                hemiGround: 0xb88850,
+                hemiIntensity: 0.60,
+                ambIntensity: 0.20,
+                fillIntensity: 0.30,
+                bgColor: 0xf8fafc,
+                wizLiving: 0.0,
+                wizDining: 0.0,
+                wizBedroom: 0.0,
+                wizStudy: 0.0,
+                wizBath: 0.0,
+                gamingBlue: 0.4,
+                gamingMagenta: 0.3,
+                isNight: false
+            },
+            golden: {
+                name: 'Atardecer Golden Hour 3200K (18:45)',
+                sunPos: [-18.0, 6.8, -20.0],
+                sunColor: 0xff9d42,
+                sunIntensity: 1.95,
+                hemiSky: 0xfed7aa,
+                hemiGround: 0x92400e,
+                hemiIntensity: 0.48,
+                ambIntensity: 0.15,
+                fillIntensity: 0.20,
+                bgColor: 0xfff7ed,
+                wizLiving: 0.4,
+                wizDining: 0.4,
+                wizBedroom: 0.3,
+                wizStudy: 0.6,
+                wizBath: 0.5,
+                gamingBlue: 1.8,
+                gamingMagenta: 1.5,
+                isNight: false
+            },
+            night: {
+                name: 'Noche Domótica WiZ (22:30)',
+                sunPos: [0.0, -10.0, 0.0],
+                sunColor: 0x1e293b,
+                sunIntensity: 0.04,
+                hemiSky: 0x0f172a,
+                hemiGround: 0x020617,
+                hemiIntensity: 0.08,
+                ambIntensity: 0.04,
+                fillIntensity: 0.0,
+                bgColor: 0x070b14,
+                wizLiving: 2.2,
+                wizDining: 2.0,
+                wizBedroom: 1.8,
+                wizStudy: 2.4,
+                wizBath: 2.0,
+                gamingBlue: 3.6,
+                gamingMagenta: 2.8,
+                isNight: true
+            }
+        };
+
+        function setSolarTime(presetKey, notify = true) {
+            const preset = SOLAR_PRESETS[presetKey] || SOLAR_PRESETS.golden;
+            currentSolarTime = presetKey;
+
+            dirLight.position.set(preset.sunPos[0], preset.sunPos[1], preset.sunPos[2]);
+            dirLight.color.setHex(preset.sunColor);
+            dirLight.intensity = preset.sunIntensity;
+            dirLight.castShadow = (preset.sunIntensity > 0.1);
+
+            hemiLight.color.setHex(preset.hemiSky);
+            hemiLight.groundColor.setHex(preset.hemiGround);
+            hemiLight.intensity = preset.hemiIntensity;
+            ambLight.intensity = preset.ambIntensity;
+            fillLight.intensity = preset.fillIntensity;
+
+            renderer.setClearColor(preset.bgColor, 1.0);
+            scene.background = null;
+
+            wizLivingLight.intensity = preset.wizLiving;
+            wizDiningLight.intensity = preset.wizDining;
+            wizBedroomLight.intensity = preset.wizBedroom;
+            wizStudyLight.intensity = preset.wizStudy;
+            wizBathLight.intensity = preset.wizBath;
+
+            gamingBlueLight.intensity = preset.gamingBlue;
+            gamingMagentaLight.intensity = preset.gamingMagenta;
+
+            document.querySelectorAll('.solar-btn, .solar-btn-sb').forEach(btn => {
+                if (btn.dataset.time === presetKey) {
+                    btn.classList.add('active');
+                    if (btn.classList.contains('solar-btn')) {
+                        btn.style.background = '#f59e0b';
+                        btn.style.borderColor = '#fbbf24';
+                        btn.style.color = '#0f172a';
+                    }
+                } else {
+                    btn.classList.remove('active');
+                    if (btn.classList.contains('solar-btn')) {
+                        btn.style.background = 'transparent';
+                        btn.style.borderColor = 'transparent';
+                        btn.style.color = '#f8fafc';
+                    }
+                }
+            });
+
+            wizFixturesList.forEach(wf => {
+                if (preset.isNight) {
+                    wf.lensMat.emissiveIntensity = 1.8;
+                } else if (presetKey === 'golden') {
+                    wf.lensMat.emissiveIntensity = 0.5;
+                } else {
+                    wf.lensMat.emissiveIntensity = 0.2;
+                }
+            });
+
+            if (notify) {
+                showToast(`☀️ ${preset.name}`);
+            }
+            wakeRenderer();
+        }
 
         const UNIT_BOX_GEO = new THREE.BoxGeometry(1, 1, 1);
         const stdMatCache = new Map();
@@ -2068,24 +2258,28 @@
 
         // Material PBR Albardillas de Corte Superior de Muros (Gris oscuro grafito #1e242b para contraste de maqueta cutaway)
         const wallCapCutMat = new THREE.MeshStandardMaterial({
-            color: 0x1e242b,
-            roughness: 0.50,
-            metalness: 0.15
+            color: 0x18181b, // Gris carbón mate puro para el tope del corte
+            roughness: 0.95,
+            metalness: 0.05
         });
 
         // Piso Cerámico Esmaltado 33×33 cm real (fotos/foto_01.jpg, foto_04.jpg y corridor_floor.jpg)
         const ceramicTile33MainTex = createRealisticCeramic33Texture(6.30, 6.30);
         const ceramicTile33SouthTex = createRealisticCeramic33Texture(4.85, 1.70);
         const pbrCeramicFloorMat = new THREE.MeshStandardMaterial({
-            color: 0xe2dcd3, // Baldosas cerámicas beige cálidas
+            color: 0xe2dcd3, // Baldosas cerámicas beige cálidas con juntas oscuras
             map: ceramicTile33MainTex,
-            roughness: 0.55,
+            bumpMap: ceramicTile33MainTex,
+            bumpScale: 0.003,
+            roughness: 0.80, // Rugosidad táctil cerámica exacta
             metalness: 0.05
         });
         const pbrCeramicSouthFloorMat = new THREE.MeshStandardMaterial({
             color: 0xe2dcd3,
             map: ceramicTile33SouthTex,
-            roughness: 0.55,
+            bumpMap: ceramicTile33SouthTex,
+            bumpScale: 0.003,
+            roughness: 0.80,
             metalness: 0.05
         });
         const floorMatMain = pbrCeramicFloorMat;
@@ -2140,6 +2334,37 @@
 
         apartmentGroup.add(floorGroup, exteriorWallsGroup, interiorWallsGroup, doors3DGroup, fixturesGroup, decorVideoGroup, roofGroup, furnitureGroup, lines2DGroup);
         scene.add(apartmentGroup);
+
+        // ============================================================================
+        // LUMINARIAS DOMÓTICAS WIZ MODELADAS EN TECHOS (Downlights LED Empotrados)
+        // ============================================================================
+        const wizFixturesList = [];
+        function addWizDownlightMesh(x, y, z, isWarm = true) {
+            const g = new THREE.Group();
+            g.position.set(x, y, z);
+            const rimMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.35, metalness: 0.8 });
+            const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.015, 16), rimMat);
+            rim.castShadow = true;
+            const lensMat = new THREE.MeshStandardMaterial({
+                color: isWarm ? 0xffdfa9 : 0xf8fafc,
+                emissive: isWarm ? 0xffdfa9 : 0xf8fafc,
+                emissiveIntensity: 0.35,
+                roughness: 0.2
+            });
+            const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.062, 0.062, 0.016, 16), lensMat);
+            lens.position.y = -0.002;
+            g.add(rim, lens);
+            fixturesGroup.add(g);
+            wizFixturesList.push({ g, lensMat, isWarm });
+            return g;
+        }
+
+        addWizDownlightMesh(4.65, 2.78, 2.25, true);  // Living (Cálida 2700K)
+        addWizDownlightMesh(4.65, 2.78, 3.85, true);  // Comedor (Cálida 2700K)
+        addWizDownlightMesh(1.50, 2.58, 5.80, true);  // Cuarto (Cálida 2700K)
+        addWizDownlightMesh(2.00, 2.58, 1.15, false); // Estudio (Neutra 4000K)
+        addWizDownlightMesh(1.15, 2.48, 3.50, false); // Baño (Neutra 4000K)
+        addWizDownlightMesh(3.90, 2.68, 6.20, true);  // Cocina (Cálida 2700K)
 
         let currentAssemblyGroup = null;
 
@@ -6617,6 +6842,15 @@
             }
         }
 
+        // Listeners de Estudio Solar & Domótica WiZ
+        document.querySelectorAll('.solar-btn, .solar-btn-sb').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const timeKey = btn.dataset.time;
+                if (timeKey) setSolarTime(timeKey, true);
+            });
+        });
+
         // Listeners de la barra de selección y controles de movimiento
         document.getElementById('btn-del-furniture').addEventListener('click', deleteCurrentSelected);
         document.getElementById('btn-quick-del').addEventListener('click', deleteCurrentSelected);
@@ -7433,12 +7667,12 @@
                 } else if (wallMode === 'zocalo') {
                     w.targetH = 0.25;
                 } else if (wallMode === 'down' || wallMode === 'cut') {
-                    w.targetH = 1.10;
+                    w.targetH = 2.00;
                 } else if (wallMode === 'nowalls') {
                     w.targetH = 0.02;
                 } else {
                     // Modo 'sims' (Corte Dinámico The Sims)
-                    w.targetH = shouldWallBeCutSims(w, cx, cz, tx, tz, vx, vz, distCam) ? 1.10 : fullH;
+                    w.targetH = shouldWallBeCutSims(w, cx, cz, tx, tz, vx, vz, distCam) ? 2.00 : fullH;
                 }
 
                 if (instant) {
