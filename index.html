@@ -6046,74 +6046,75 @@
                 });
 
                 // 1. Respaldo de madera maciza (Muro Oeste X=0.08) centrado en Z = 6.60 m (Cuarto 2.80m x 3.00m)
-                const headboard = new THREE.Mesh(createRoundedBoxGeo(0.07, 1.10, 1.64, 0.02, 2), bedWoodMat);
-                headboard.position.set(0.08, 0.65, 6.60);
+                // Dimensiones reducidas ligeramente a estándar confortable de 2 plazas (1.46m ancho respaldo, deja más paso)
+                const headboard = new THREE.Mesh(createRoundedBoxGeo(0.065, 1.05, 1.46, 0.02, 2), bedWoodMat);
+                headboard.position.set(0.08, 0.62, 6.60);
                 headboard.castShadow = true; headboard.receiveShadow = true;
                 // Moldura superior del respaldo (cap cornisa)
-                const headboardCap = new THREE.Mesh(createRoundedBoxGeo(0.10, 0.04, 1.68, 0.015, 2), bedWoodMat);
-                headboardCap.position.set(0.08, 1.21, 6.60);
+                const headboardCap = new THREE.Mesh(createRoundedBoxGeo(0.09, 0.035, 1.50, 0.015, 2), bedWoodMat);
+                headboardCap.position.set(0.08, 1.15, 6.60);
                 headboardCap.castShadow = true;
                 bedGroup.add(headboard, headboardCap);
 
-                // 2. Base sommier de madera con faldón perimetral
-                const bedBase = new THREE.Mesh(createRoundedBoxGeo(1.94, 0.22, 1.54, 0.02, 2), bedWoodMat);
-                bedBase.position.set(1.06, 0.18, 6.60);
+                // 2. Base sommier de madera con faldón perimetral (1.82m largo x 1.36m ancho)
+                const bedBase = new THREE.Mesh(createRoundedBoxGeo(1.82, 0.22, 1.36, 0.02, 2), bedWoodMat);
+                bedBase.position.set(1.00, 0.18, 6.60);
                 bedBase.castShadow = true; bedBase.receiveShadow = true;
                 bedGroup.add(bedBase);
 
                 // 4 Patas de madera torneadas en las esquinas
-                const legCoords = [[0.18, 5.90], [1.94, 5.90], [0.18, 7.30], [1.94, 7.30]];
+                const legCoords = [[0.18, 5.99], [1.82, 5.99], [0.18, 7.21], [1.82, 7.21]];
                 legCoords.forEach(([lx, lz]) => {
-                    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.026, 0.16, 14), bedWoodMat);
+                    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.024, 0.16, 14), bedWoodMat);
                     leg.position.set(lx, 0.08, lz);
                     leg.castShadow = true;
                     bedGroup.add(leg);
                 });
 
-                // 3. Colchón de 2 plazas de alta gama (núcleo + pillow-top viscoelástico con esquinas y bordes redondeados)
-                const mattressCore = new THREE.Mesh(createRoundedBoxGeo(1.90, 0.22, 1.48, 0.045, 3), mattressMat);
-                mattressCore.position.set(1.06, 0.39, 6.60);
+                // 3. Colchón de 2 plazas (1.78m x 1.32m con pillow-top viscoelástico)
+                const mattressCore = new THREE.Mesh(createRoundedBoxGeo(1.78, 0.22, 1.32, 0.045, 3), mattressMat);
+                mattressCore.position.set(1.00, 0.39, 6.60);
                 mattressCore.castShadow = true; mattressCore.receiveShadow = true;
-                const pillowTop = new THREE.Mesh(createRoundedBoxGeo(1.88, 0.08, 1.46, 0.035, 3), mattressMat);
-                pillowTop.position.set(1.06, 0.53, 6.60);
+                const pillowTop = new THREE.Mesh(createRoundedBoxGeo(1.76, 0.08, 1.30, 0.035, 3), mattressMat);
+                pillowTop.position.set(1.00, 0.53, 6.60);
                 pillowTop.castShadow = true; pillowTop.receiveShadow = true;
                 bedGroup.add(mattressCore, pillowTop);
 
-                // 4. Almohadas dobles (2 grandes de descanso propped a 18° + 2 almohadones de acento)
+                // 4. Almohadas dobles proporcionadas
                 [-1, 1].forEach(side => {
-                    const pz = 6.60 + side * 0.36;
+                    const pz = 6.60 + side * 0.31;
                     // Almohada principal blanca de algodón
                     const pillowGroup = new THREE.Group();
-                    pillowGroup.position.set(0.32, 0.62, pz);
+                    pillowGroup.position.set(0.30, 0.61, pz);
                     pillowGroup.rotation.z = -0.32; // Inclinación natural ~18° contra el respaldo
-                    const pillow = new THREE.Mesh(createRoundedBoxGeo(0.38, 0.15, 0.58, 0.05, 3), pillowMat);
+                    const pillow = new THREE.Mesh(createRoundedBoxGeo(0.36, 0.14, 0.50, 0.05, 3), pillowMat);
                     pillow.castShadow = true;
                     pillowGroup.add(pillow);
                     bedGroup.add(pillowGroup);
 
                     // Almohadón decorativo frontal azul
                     const accGroup = new THREE.Group();
-                    accGroup.position.set(0.50, 0.60, pz);
+                    accGroup.position.set(0.46, 0.59, pz);
                     accGroup.rotation.z = -0.22;
-                    const accPillow = new THREE.Mesh(createRoundedBoxGeo(0.28, 0.12, 0.44, 0.04, 3), accentPillowMat);
+                    const accPillow = new THREE.Mesh(createRoundedBoxGeo(0.26, 0.11, 0.38, 0.04, 3), accentPillowMat);
                     accPillow.castShadow = true;
                     accGroup.add(accPillow);
                     bedGroup.add(accGroup);
                 });
 
-                // 5. Edredón nórdico acolchado con volumen y caída lateral sobre los bordes (1.56m de ancho)
-                const duvet = new THREE.Mesh(createRoundedBoxGeo(1.36, 0.09, 1.54, 0.04, 3), duvetMat);
-                duvet.position.set(1.32, 0.58, 6.60);
+                // 5. Edredón nórdico acolchado ajustado a 1.38m de ancho
+                const duvet = new THREE.Mesh(createRoundedBoxGeo(1.28, 0.09, 1.38, 0.04, 3), duvetMat);
+                duvet.position.set(1.25, 0.58, 6.60);
                 duvet.castShadow = true; duvet.receiveShadow = true;
 
                 // Doblez de la sábana blanca superior al descubierto
-                const sheetFold = new THREE.Mesh(createRoundedBoxGeo(0.22, 0.065, 1.50, 0.025, 3), pillowMat);
-                sheetFold.position.set(0.58, 0.585, 6.60);
+                const sheetFold = new THREE.Mesh(createRoundedBoxGeo(0.20, 0.065, 1.34, 0.025, 3), pillowMat);
+                sheetFold.position.set(0.55, 0.585, 6.60);
                 sheetFold.castShadow = true;
 
-                // Pie de cama decorativo azul nórdico doblado prolijamente al pie
-                const runner = new THREE.Mesh(createRoundedBoxGeo(0.40, 0.045, 1.56, 0.02, 3), runnerMat);
-                runner.position.set(1.78, 0.60, 6.60);
+                // Pie de cama decorativo azul nórdico
+                const runner = new THREE.Mesh(createRoundedBoxGeo(0.36, 0.045, 1.40, 0.02, 3), runnerMat);
+                runner.position.set(1.66, 0.60, 6.60);
                 runner.castShadow = true;
 
                 bedGroup.add(duvet, sheetFold, runner);
@@ -6150,15 +6151,15 @@
                 setMountWall(null);
             });
 
-            // 3. 2 Mesas de luz de madera nogal oscuro a ambos lados de la cama (sobre Muro Oeste X=0.00):
-            // - Mesa de luz Norte (X=0.28, Z=5.55, pegada al Placard Cuarto) con humidificador blanco y parlante inteligente
+            // 3. 2 Mesas de luz de madera nogal estilizadas a ambos lados de la cama (sobre Muro Oeste X=0.00):
+            // - Mesa de luz Norte (reducida a 0.36m x 0.36m x 0.54m, centrada en Z=5.60) con humidificador
             createCompoundAssembly('Mesa de Luz Norte', () => {
-                addDecorBox(0.28, 0.31, 5.55, 0.42, 0.62, 0.44, 0x4a3222, 0.5);
-                addDecorCyl(0.28, 0.72, 5.55, 0.07, 0.07, 0.18, 0xffffff, 0.2);  // Humidificador blanco
+                addDecorBox(0.24, 0.27, 5.60, 0.36, 0.54, 0.36, 0x4a3222, 0.5);
+                addDecorCyl(0.24, 0.63, 5.60, 0.06, 0.06, 0.16, 0xffffff, 0.2);  // Humidificador blanco
             });
-            // - Mesa de luz Sur (X=0.28, Z=7.65, en esquina Suroeste) con reloj digital blanco y peluches
+            // - Mesa de luz Sur (reducida a 0.36m x 0.36m x 0.54m, centrada en Z=7.60)
             createCompoundAssembly('Mesa de Luz Sur', () => {
-                addDecorBox(0.28, 0.31, 7.65, 0.42, 0.62, 0.42, 0x4a3222, 0.5);
+                addDecorBox(0.24, 0.27, 7.60, 0.36, 0.54, 0.36, 0x4a3222, 0.5);
             });
             // 4. Panel calefactor eléctrico negro en muro Sur (X=2.48, Z=7.88) + Cesto de ropa sucia gris en muro Este
             createCompoundAssembly('Panel Calefactor Cuarto', () => {
@@ -8449,9 +8450,9 @@
             { id: 'vid_cucha_ne', name: 'Cucha Perro Esquina NE', room: 'Living', x: 5.55, z: 0.38, y: 0.05, w: 0.92, d: 0.62, h: 0.10, rot: 0, color: 0x94a3b8 },
             { id: 'vid_heladera', name: 'Heladera c/ Freezer + Bodega', room: 'Cocina', x: 4.85, z: 4.88, y: 0.84, w: 0.60, d: 0.62, h: 1.68, rot: 0, color: 0xe2e8f0 },
             { id: 'vid_lavarropas', name: 'Lavarropas + Estación Café (Bajo Ventana)', room: 'Cocina', x: 3.35, z: 6.67, y: 0.43, w: 0.60, d: 0.58, h: 0.86, rot: 0, color: 0xcbd5e1 },
-            { id: 'vid_cama_2p', name: 'Cama 2 Plazas + Respaldo Nogal', room: 'Cuarto', x: 1.08, z: 6.60, y: 0.24, w: 1.90, d: 1.45, h: 0.48, rot: 0, color: 0x475569 },
-            { id: 'vid_luz_n', name: 'Mesa de Luz Norte', room: 'Cuarto', x: 0.28, z: 5.55, y: 0.31, w: 0.42, d: 0.44, h: 0.62, rot: 0, color: 0x4a3222 },
-            { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.28, z: 7.65, y: 0.31, w: 0.42, d: 0.42, h: 0.62, rot: 0, color: 0x4a3222 },
+            { id: 'vid_cama_2p', name: 'Cama 2 Plazas + Respaldo Nogal', room: 'Cuarto', x: 1.00, z: 6.60, y: 0.24, w: 1.82, d: 1.36, h: 0.48, rot: 0, color: 0x475569 },
+            { id: 'vid_luz_n', name: 'Mesa de Luz Norte', room: 'Cuarto', x: 0.24, z: 5.60, y: 0.27, w: 0.36, d: 0.36, h: 0.54, rot: 0, color: 0x4a3222 },
+            { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.24, z: 7.60, y: 0.27, w: 0.36, d: 0.36, h: 0.54, rot: 0, color: 0x4a3222 },
             { id: 'vid_escr_l', name: 'Escritorio en L + PC Gamer', room: 'Estudio', x: 2.74, z: 1.02, y: 0.38, w: 0.52, d: 2.05, h: 0.76, rot: 0, color: 0x8f3818 },
             { id: 'vid_biblio', name: 'Biblioteca 5 Estantes', room: 'Estudio', x: 0.20, z: 1.10, y: 0.92, w: 0.32, d: 0.82, h: 1.84, rot: 0, color: 0x3b2314 },
             { id: 'vid_ajedrez', name: 'Mesa Ajedrez El Señor de los Anillos', room: 'Estudio', x: 0.35, z: 2.30, y: 0.37, w: 0.44, d: 0.44, h: 0.74, rot: 0, color: 0xd4a373 }
