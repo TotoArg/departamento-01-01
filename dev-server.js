@@ -1,11 +1,128 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { exec } = require('child_process');
+const { exec, execSync } = require('child_process');
 
 let PORT = parseInt(process.env.PORT || '8101', 10);
 const clients = [];
+
+// ============================================================================
+// CONFIGURACIÓN DE SINCRONIZACIÓN BIDIRECCIONAL CON GITHUB
+// ============================================================================
+const GITHUB_REPO = 'TotoArg/departamento-01-01';
+const GITHUB_FILE_PATH = 'layout.json';
+let cachedGhToken = process.env.GITHUB_TOKEN || '';
+
+function getGitHubToken() {
+    if (cachedGhToken) return cachedGhToken;
+    try {
+        cachedGhToken = execSync('gh auth token', { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }).trim();
+        return cachedGhToken;
+    } catch (e) {
+        return '';
+    }
+}
+
+// Descargar layout.json desde GitHub API si es más reciente
+async function fetchLayoutFromGitHub() {
+    const token = getGitHubToken();
+    return new Promise((resolve) => {
+        const options = {
+            hostname: 'api.github.com',
+            path: `/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}?ref=main`,
+            method: 'GET',
+            headers: {
+                'User-Agent': 'DepartamentoSync/1.0',
+                'Accept': 'application/vnd.github.v3+json',
+                ...(token ? { 'Authorization': `token ${token}` } : {})
+            }
+        };
+
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                if (res.statusCode === 200) {
+                    try {
+                        const parsed = JSON.parse(data);
+                        if (parsed.content) {
+                            const decoded = Buffer.from(parsed.content, 'base64').toString('utf8');
+                            const layoutObj = JSON.parse(decoded);
+                            resolve({ ok: true, sha: parsed.sha, layout: layoutObj });
+                            return;
+                        }
+                    } catch (e) {}
+                }
+                resolve({ ok: false, status: res.statusCode });
+            });
+        });
+        req.on('error', () => resolve({ ok: false }));
+        req.end();
+    });
+}
+
+// Subir layout.json a GitHub API (commit automático en rama main)
+let isPushingToGitHub = false;
+async function pushLayoutToGitHub(layoutObj, retry = 1) {
+    if (isPushingToGitHub) return;
+    const token = getGitHubToken();
+    if (!token) {
+        console.warn('[GitHub Sync] No se encontró token de GitHub (gh auth token), omitiendo push a GitHub');
+        return;
+    }
+
+    isPushingToGitHub = true;
+    try {
+        const ghInfo = await fetchLayoutFromGitHub();
+        const currentSha = ghInfo && ghInfo.ok ? ghInfo.sha : undefined;
+
+        const contentBase64 = Buffer.from(JSON.stringify(layoutObj, null, 2), 'utf8').toString('base64');
+        const payload = JSON.stringify({
+            message: `chore(layout): sincronizar muebles [${new Date(layoutObj.updatedAt || Date.now()).toLocaleTimeString()}]`,
+            content: contentBase64,
+            branch: 'main',
+            ...(currentSha ? { sha: currentSha } : {})
+        });
+
+        const res = await new Promise((resolve) => {
+            const req = https.request({
+                hostname: 'api.github.com',
+                path: `/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`,
+                method: 'PUT',
+                headers: {
+                    'User-Agent': 'DepartamentoSync/1.0',
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(payload)
+                }
+            }, (res) => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => resolve({ status: res.statusCode, body: data }));
+            });
+            req.on('error', (err) => resolve({ status: 500, error: err.message }));
+            req.write(payload);
+            req.end();
+        });
+
+        if (res.status === 200 || res.status === 201) {
+            console.log(`[GitHub Sync] ✓ Sincronizado con GitHub (commit en rama main exitoso)`);
+        } else if (res.status === 409 && retry > 0) {
+            console.log(`[GitHub Sync] Conflicto de SHA en GitHub, reintentando...`);
+            isPushingToGitHub = false;
+            return await pushLayoutToGitHub(layoutObj, retry - 1);
+        } else {
+            console.warn(`[GitHub Sync] Error subiendo a GitHub (HTTP ${res.status}):`, res.body || res.error);
+        }
+    } catch (e) {
+        console.warn('[GitHub Sync] Error al comunicar con GitHub:', e.message);
+    } finally {
+        isPushingToGitHub = false;
+    }
+}
 
 // Watch directory for hot live-reload
 let reloadTimeout = null;
@@ -87,26 +204,43 @@ const server = http.createServer((req, res) => {
 
     const cleanUrl = req.url.split('?')[0];
 
-    // Endpoint API para Sincronización Bidireccional (Online / Offline)
+    // Endpoint API para Sincronización Bidireccional (Online / Offline / GitHub)
     if (cleanUrl === '/api/layout') {
         const layoutFilePath = path.join(__dirname, 'layout.json');
         if (req.method === 'GET') {
-            try {
-                if (fs.existsSync(layoutFilePath)) {
-                    const data = fs.readFileSync(layoutFilePath, 'utf8');
+            (async () => {
+                let localLayout = null;
+                let localTs = 0;
+                try {
+                    if (fs.existsSync(layoutFilePath)) {
+                        localLayout = JSON.parse(fs.readFileSync(layoutFilePath, 'utf8'));
+                        localTs = localLayout.updatedAt || 0;
+                    }
+                } catch (e) {}
+
+                // Consultar GitHub por si hubo modificaciones hechas remotamente
+                try {
+                    const ghRes = await fetchLayoutFromGitHub();
+                    if (ghRes && ghRes.ok && ghRes.layout && ghRes.layout.updatedAt > localTs) {
+                        console.log(`[GitHub Sync] Cambios detectados en GitHub (${new Date(ghRes.layout.updatedAt).toLocaleTimeString()}). Actualizando copia local...`);
+                        fs.writeFileSync(layoutFilePath, JSON.stringify(ghRes.layout, null, 2), 'utf8');
+                        localLayout = ghRes.layout;
+                    }
+                } catch (err) {
+                    // Si GitHub falla o no hay internet, continuamos con la copia local sin bloquear
+                }
+
+                if (localLayout) {
                     res.writeHead(200, {
                         'Content-Type': 'application/json; charset=utf-8',
                         'Cache-Control': 'no-cache, no-store, must-revalidate'
                     });
-                    res.end(data);
+                    res.end(JSON.stringify(localLayout, null, 2));
                 } else {
                     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
                     res.end(JSON.stringify({ updatedAt: 0, decorOverrides: { deleted: [], transforms: {} }, furnitureList: [] }));
                 }
-            } catch (err) {
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: err.message }));
-            }
+            })();
             return;
         }
 
@@ -124,6 +258,9 @@ const server = http.createServer((req, res) => {
                     });
                     res.end(JSON.stringify({ ok: true, updatedAt: parsed.updatedAt }));
                     console.log(`[Layout Sync] Distribución sincronizada en disco (${new Date(parsed.updatedAt).toLocaleTimeString()})`);
+
+                    // Replicar asíncronamente a GitHub para que GitHub Pages y el repositorio remoto queden sincronizados
+                    pushLayoutToGitHub(parsed);
                 } catch (err) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ error: 'JSON inválido', details: err.message }));

@@ -8178,19 +8178,35 @@
 
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 2500);
+                const timeoutId = setTimeout(() => controller.abort(), 2800);
                 const res = await fetch('/api/layout', { cache: 'no-store', signal: controller.signal });
                 clearTimeout(timeoutId);
                 if (res.ok) {
                     remoteLayout = await res.json();
                 }
             } catch (e) {
+                // Fallback para GitHub Pages o entorno estático sin dev-server
                 try {
-                    const resStatic = await fetch('./layout.json', { cache: 'no-store' });
-                    if (resStatic.ok) {
-                        remoteLayout = await resStatic.json();
+                    // Intento 1: API de GitHub directa (para GitHub Pages siempre fresco)
+                    const ghRes = await fetch('https://api.github.com/repos/TotoArg/departamento-01-01/contents/layout.json?ref=main', {
+                        headers: { 'Accept': 'application/vnd.github.v3+json' },
+                        cache: 'no-store'
+                    });
+                    if (ghRes.ok) {
+                        const ghData = await ghRes.json();
+                        if (ghData.content) {
+                            const decoded = decodeURIComponent(escape(atob(ghData.content.replace(/\s/g, ''))));
+                            remoteLayout = JSON.parse(decoded);
+                        }
                     }
-                } catch (err) {}
+                } catch (errGh) {
+                    try {
+                        const resStatic = await fetch('./layout.json', { cache: 'no-store' });
+                        if (resStatic.ok) {
+                            remoteLayout = await resStatic.json();
+                        }
+                    } catch (errStatic) {}
+                }
             }
 
             if (remoteLayout && remoteLayout.updatedAt) {
