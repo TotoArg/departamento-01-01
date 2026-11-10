@@ -1,5 +1,5 @@
 {
-  "updatedAt": 1794335085007,
+  "updatedAt": 1794335087918,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -40,6 +40,12 @@
         "x": 4.46,
         "y": 0.37,
         "z": 1.25,
+        "rot": 0
+      },
+      "Camino de Mesa Rojo (Comedor)": {
+        "x": 4.47,
+        "y": 0.76,
+        "z": 1.2,
         "rot": 0
       }
     }
