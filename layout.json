@@ -1,5 +1,5 @@
 {
-  "updatedAt": 1794324294611,
+  "updatedAt": 1794324297165,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -21,6 +21,12 @@
         "x": 6.01,
         "y": 0.74,
         "z": 4.2,
+        "rot": 0
+      },
+      "Perchero y Zapatero Entrada": {
+        "x": 6,
+        "y": 0.98,
+        "z": 4.79,
         "rot": 0
       }
     }
