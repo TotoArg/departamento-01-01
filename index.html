@@ -931,7 +931,7 @@
     </div>
 
     <!-- Furniture Editor Panel -->
-    <div id="furniture-editor" class="glass-panel minimized">
+    <div id="furniture-editor" class="glass-panel minimized" style="display: none;">
         <div class="editor-header">
             <div class="editor-title">
                 <span>🛋️</span> Muebles (<span id="lbl-count">0</span>)
@@ -2807,10 +2807,10 @@
         floorSouthMesh.name = 'floorSouthMesh';
         floorGroup.add(floorSouthMesh);
 
-        // Piso cerámico blanco del Baño [0.00, 2.80] a [2.30, 4.20]
+        // Piso cerámico blanco del Baño [0.00, 3.30] a [2.30, 4.70] (centrado en Z = 4.00 m)
         const bathFloorGeo = new THREE.BoxGeometry(2.30, 0.062, 1.40);
         const bathFloorMesh = new THREE.Mesh(bathFloorGeo, bathFloorMat);
-        bathFloorMesh.position.set(1.15, -0.029, 3.50);
+        bathFloorMesh.position.set(1.15, -0.029, 4.00);
         bathFloorMesh.receiveShadow = true;
         bathFloorMesh.name = 'bathFloorMesh';
         floorGroup.add(bathFloorMesh);
@@ -3518,10 +3518,10 @@
         addSlopedWallSegment(4.50, 8.00, 4.85, 8.00, 4.56, 4.41, EXT_T, exteriorWallsGroup, true);
 
         // Muro Izquierdo (Oeste, X = 0.00): sube de [0.00, 0.00] a [0.00, 8.00] a cota exterior 3.20 m
-        // - Ventiluz Baño V7 sobre bañera (Z = 3.15 a 3.85)
-        addWallSegment(0.00, 0.00, 0.00, 3.15, EXT_T, exteriorWallsGroup, true, 3.20);
-        addWindowSegment(0.00, 3.15, 0.00, 3.85, 1.35, 0.65, 3.20);
-        addWallSegment(0.00, 3.85, 0.00, 8.00, EXT_T, exteriorWallsGroup, true, 3.20);
+        // - Ventiluz Baño V7 sobre bañera (Z = 3.65 a 4.35, centrado en bañera Z = 4.00 m)
+        addWallSegment(0.00, 0.00, 0.00, 3.65, EXT_T, exteriorWallsGroup, true, 3.20);
+        addWindowSegment(0.00, 3.65, 0.00, 4.35, 1.35, 0.65, 3.20);
+        addWallSegment(0.00, 4.35, 0.00, 8.00, EXT_T, exteriorWallsGroup, true, 3.20);
 
         // ============================================================================
         // 3B. EQUIPAMIENTO FIJO, CALEFACTORES Y TECHO DE MADERA EXTRAÍDOS DEL VIDEO
@@ -3622,15 +3622,15 @@
         createCompoundAssembly('Bañera y Ducha Cromada', () => {
             const bathGroup = new THREE.Group();
             
-            // Faldón exterior y estructura de bañera con bordes biselados
+            // Faldón exterior y estructura de bañera con bordes biselados (centrado en Z = 4.00 m)
             const faldon = new THREE.Mesh(createRoundedBoxGeo(0.68, 0.48, 1.28, 0.025, 3), porcelainMat);
-            faldon.position.set(0.40, 0.24, 3.50);
+            faldon.position.set(0.40, 0.24, 4.00);
             faldon.castShadow = true; faldon.receiveShadow = true;
             bathGroup.add(faldon);
 
             // Borde superior / reborde de apoyo de porcelana
             const rim = new THREE.Mesh(createRoundedBoxGeo(0.70, 0.05, 1.30, 0.02, 3), porcelainMat);
-            rim.position.set(0.40, 0.48, 3.50);
+            rim.position.set(0.40, 0.48, 4.00);
             bathGroup.add(rim);
 
             // Cavidad interior excavada realista (fondo de bañera más oscuro/recesado)
@@ -3639,29 +3639,29 @@
                 roughness: 0.08,
                 metalness: 0.05
             }));
-            cavity.position.set(0.40, 0.47, 3.50);
+            cavity.position.set(0.40, 0.47, 4.00);
             bathGroup.add(cavity);
 
             // Revestimiento de azulejos cerámicos con juntas en muros interiores de la ducha
             const tileBack = new THREE.Mesh(UNIT_BOX_GEO, tileBathWallMat);
             tileBack.scale.set(0.015, 1.60, 1.34);
-            tileBack.position.set(0.055, 1.28, 3.50);
+            tileBack.position.set(0.055, 1.28, 4.00);
             const tileNorth = new THREE.Mesh(UNIT_BOX_GEO, tileBathWallMat);
             tileNorth.scale.set(0.70, 1.60, 0.015);
-            tileNorth.position.set(0.40, 1.28, 2.825);
+            tileNorth.position.set(0.40, 1.28, 3.325);
             const tileSouth = new THREE.Mesh(UNIT_BOX_GEO, tileBathWallMat);
             tileSouth.scale.set(0.70, 1.60, 0.015);
-            tileSouth.position.set(0.40, 1.28, 4.175);
+            tileSouth.position.set(0.40, 1.28, 4.675);
             bathGroup.add(tileBack, tileNorth, tileSouth);
 
             // Desagüe click-clack y rebosadero ranurado cromados
             const drain = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.008, 18), chromePolishMat);
-            drain.position.set(0.38, 0.485, 3.05);
+            drain.position.set(0.38, 0.485, 3.55);
             bathGroup.add(drain);
 
-            // Cuadro de ducha monocomando cromado en muro Norte
+            // Cuadro de ducha monocomando cromado en muro Norte (Z = 3.30)
             const showerWall = new THREE.Group();
-            showerWall.position.set(0.40, 0, 2.84);
+            showerWall.position.set(0.40, 0, 3.34);
 
             // Monocomando de control circular con palanca y mezclador
             const valveBase = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.012, 18), chromePolishMat);
@@ -3700,12 +3700,12 @@
 
             // Mampara de vidrio templado de seguridad con perfil de acero inoxidable pulido
             const glassScreen = new THREE.Mesh(new THREE.BoxGeometry(0.012, 1.45, 0.72), glassShowerDoorMat);
-            glassScreen.position.set(0.74, 1.22, 3.22);
+            glassScreen.position.set(0.74, 1.22, 3.72);
             const glassProfile = new THREE.Mesh(new THREE.BoxGeometry(0.022, 1.45, 0.022), chromePolishMat);
-            glassProfile.position.set(0.74, 1.22, 2.85);
+            glassProfile.position.set(0.74, 1.22, 3.35);
             // Barral toallero integrado en la mampara
             const towelBar = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.36, 12), chromePolishMat);
-            towelBar.position.set(0.765, 1.05, 3.22);
+            towelBar.position.set(0.765, 1.05, 3.72);
             bathGroup.add(glassScreen, glassProfile, towelBar);
 
             (currentAssemblyGroup || decorVideoGroup).add(bathGroup);
@@ -3714,7 +3714,7 @@
         // B) VANITORY DE MADERA CON BACHA DE PORCELANA Y GRIFERÍA CROMADA
         createCompoundAssembly('Vanitory y Bacha de Baño', () => {
             const vanGroup = new THREE.Group();
-            vanGroup.position.set(1.42, 0, 2.98);
+            vanGroup.position.set(1.42, 0, 3.48);
 
             // Mueble vanitory suspendido en madera tratada antihumedad con cantos redondeados
             const vanBody = new THREE.Mesh(createRoundedBoxGeo(0.64, 0.52, 0.38, 0.02, 2), woodVanitoryMat);
@@ -3772,7 +3772,7 @@
         // C) BOTIQUÍN CON ESPEJO ABSOLUTO Y TIRA LED CÁLIDA
         createCompoundAssembly('Botiquín con Espejo y Luz LED', () => {
             const mirGroup = new THREE.Group();
-            mirGroup.position.set(1.42, 1.48, 2.82);
+            mirGroup.position.set(1.42, 1.48, 3.33);
 
             // Gabinete de botiquín trasero empotrado
             const cab = new THREE.Mesh(createRoundedBoxGeo(0.60, 0.72, 0.06, 0.01, 2), woodVanitoryMat);
@@ -3802,7 +3802,7 @@
         // D) SANITARIOS ORGÁNICOS EN LOZA BLANCA (INODORO Y BIDET EN MURO SUR Z=4.20)
         createCompoundAssembly('Inodoro y Mochila de Doble Descarga', () => {
             const toiGroup = new THREE.Group();
-            toiGroup.position.set(1.74, 0, 3.96);
+            toiGroup.position.set(1.74, 0, 4.46);
 
             // Pedestal orgánico ergonómico biselado
             const pedestal = new THREE.Mesh(createRoundedBoxGeo(0.36, 0.38, 0.50, 0.06, 3), porcelainMat);
@@ -3842,7 +3842,7 @@
 
         createCompoundAssembly('Bidet con Grifería Cromada Completa', () => {
             const bidGroup = new THREE.Group();
-            bidGroup.position.set(1.20, 0, 3.96);
+            bidGroup.position.set(1.20, 0, 4.46);
 
             // Bacha anatómica de loza blanca ergonómica biselada
             const bidetBody = new THREE.Mesh(createRoundedBoxGeo(0.36, 0.38, 0.50, 0.06, 3), porcelainMat);
@@ -3874,9 +3874,9 @@
 
         // E) ALACENA COLGANTE Y TOALLERO SOBRE SANITARIOS (MURO SUR Z=4.20)
         createCompoundAssembly('Alacena y Toallas de Baño', () => {
-            setMountWall(1.48, 4.20, true);
+            setMountWall(1.48, 4.70, true);
             const cupGroup = new THREE.Group();
-            cupGroup.position.set(1.48, 1.88, 4.08);
+            cupGroup.position.set(1.48, 1.88, 4.58);
 
             // Mueble blanco laqueado suspendido con 2 puertas y estante inferior
             const cupBody = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.30 }));
@@ -4075,49 +4075,47 @@
         // ============================================================================
         // 4. MUROS INTERNOS, PUERTAS (HACIA ADENTRO DE BAÑO Y HABITACIONES) Y VANOS ABIERTOS
         // ============================================================================
-        // Eje Vertical X = 2.30 (Cierre lateral de Bauleras y Baño):
-        // En X = 2.30 m, el tabique vertical remata a 3.56 m bajo la cubierta machimbrada
-        addWallSegment(2.30, 2.30, 2.30, 3.15, INT_T, interiorWallsGroup, false, 5.20);
-        // - PUERTA BAÑO: Entre Z = 3.15 y Z = 3.85 (abre HACIA ADENTRO del Baño hacia la izquierda X < 2.30)
-        addDashedLine(2.30, 3.15, 2.30, 3.85);
-        addDoorSymbol2D(2.30, 3.82, 2.08, 3.62, 2.04, 3.40, 2.30, 3.18);
-        // - Muro sólido abajo: de Z = 3.85 a Z = 4.70
-        addWallSegment(2.30, 3.85, 2.30, 4.70, INT_T, interiorWallsGroup, false, 5.20);
+        // Eje Vertical X = 2.30 (Cierre lateral de Placards, Bauleras y Baño):
+        // En X = 2.30 m, el tabique vertical remata a 5.20 m bajo la cumbrera
+        addWallSegment(2.30, 2.80, 2.30, 3.65, INT_T, interiorWallsGroup, false, 5.20);
+        // - PUERTA BAÑO: Entre Z = 3.65 y Z = 4.35 (centrada en Baño Z = 4.00 m, abre hacia adentro X < 2.30)
+        addDashedLine(2.30, 3.65, 2.30, 4.35);
+        addDoorSymbol2D(2.30, 4.32, 2.08, 4.12, 2.04, 3.90, 2.30, 3.68);
+        // - Muro sólido sur de Baño: de Z = 4.35 a Z = 5.20
+        addWallSegment(2.30, 4.35, 2.30, 5.20, INT_T, interiorWallsGroup, false, 5.20);
 
         // Eje Vertical Central continuo X = 3.00:
-        // - Muro sólido de Z = 0.00 a Z = 4.05 (remata a 5.20 m bajo la viga cumbrera)
-        addWallSegment(3.00, 0.00, 3.00, 4.05, INT_T, interiorWallsGroup, false, 5.20);
-        // - VANO ABIERTO (Paso Living-Pasillo): Sin muro entre Z = 4.05 y Z = 4.80 (0.75 m de paso libre al pasillo)
-        addDashedLine(3.00, 4.05, 3.00, 4.80);
+        // - Muro sólido de Z = 0.00 a Z = 4.45 (separa Estudio de Living y Pasillo de Living)
+        addWallSegment(3.00, 0.00, 3.00, 4.45, INT_T, interiorWallsGroup, false, 5.20);
+        // - VANO ABIERTO LIVING-PASILLO: De Z = 4.45 a Z = 5.20 (0.75 m de paso libre al pasillo distribuidor)
+        addDashedLine(3.00, 4.45, 3.00, 5.20);
         // - Muro sólido divisorio Cuarto-Cocina alineado de forma continua en el eje estructural central X = 3.00:
-        addWallSegment(3.00, 4.70, 3.00, 8.00, INT_T, interiorWallsGroup, false, 5.20);
+        addWallSegment(3.00, 5.20, 3.00, 8.00, INT_T, interiorWallsGroup, false, 5.20);
 
-        // Eje Vertical X = 4.85 (separa Cocina de Entrada corta): de Z = 4.80 a Z = 5.70 a cota 4.41 m
-        addWallSegment(4.85, 4.80, 4.85, 5.70, INT_T, interiorWallsGroup, false, 4.41);
+        // Eje Vertical X = 4.85 (separa Cocina de Entrada corta): de Z = 5.20 a Z = 5.70 a cota 4.41 m
+        addWallSegment(4.85, 5.20, 4.85, 5.70, INT_T, interiorWallsGroup, false, 4.41);
 
-        // Eje Horizontal Z = 2.30 (Frente Placard Estudio con 2 hojas enteras corredizas y Puerta Estudio):
-        addSlidingPlacard2D(0.00, 2.30, 2.30, -1);
-        // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (bisagra a la derecha en [3.00, 2.30], abre 90° hacia el Norte)
-        addDashedLine(2.30, 2.30, 3.00, 2.30);
-        addDoorSymbol2D(2.95, 2.30, 2.95, 1.62, 2.32, 1.62, 2.32, 2.30);
+        // Eje Horizontal Z = 2.80 (Frente Placard Estudio 2.80m x 3.00m simétrico al Cuarto):
+        addSlidingPlacard2D(0.00, 2.30, 2.80, -1);
+        // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (bisagra en X = 3.00, abre hacia el Norte)
+        addDashedLine(2.30, 2.80, 3.00, 2.80);
+        addDoorSymbol2D(2.95, 2.80, 2.95, 2.12, 2.32, 2.12, 2.32, 2.80);
 
-        // Eje Horizontal Z = 2.80 (Cierre de fondo de Baulera Estudio / Divide con Baño):
-        // Sube de X = 0.00 (3.20 m) a X = 2.30 (5.20 m) tocando la cara inferior del faldón catedral.
-        addSlopedWallSegment(0.00, 2.80, 2.30, 2.80, 3.20, 5.20, INT_T, interiorWallsGroup, false);
+        // Eje Horizontal Z = 3.30 (Fondo sólido Baulera/Placard Estudio y Muro Norte del Baño):
+        addSlopedWallSegment(0.00, 3.30, 2.30, 3.30, 3.20, 5.20, INT_T, interiorWallsGroup, false);
 
-        // Eje Horizontal Z = 4.20 (Cierre de fondo de Baulera Cuarto / Divide con Baño):
-        // Sube de X = 0.00 (3.20 m) a X = 2.30 (5.20 m) tocando la cara inferior del faldón catedral.
-        addSlopedWallSegment(0.00, 4.20, 2.30, 4.20, 3.20, 5.20, INT_T, interiorWallsGroup, false);
+        // Eje Horizontal Z = 4.70 (Fondo sólido Baulera/Placard Cuarto y Muro Sur del Baño):
+        addSlopedWallSegment(0.00, 4.70, 2.30, 4.70, 3.20, 5.20, INT_T, interiorWallsGroup, false);
 
-        // Eje Horizontal Z = 4.70 (Frente Placard Cuarto con 2 hojas enteras corredizas, Puerta Cuarto y Vano Cocina):
-        addSlidingPlacard2D(0.00, 2.30, 4.70, 1);
-        // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Cuarto)
-        addDashedLine(2.30, 4.70, 3.00, 4.70);
-        addDoorSymbol2D(2.95, 4.70, 2.75, 4.92, 2.55, 4.92, 2.42, 4.70);
+        // Eje Horizontal Z = 5.20 (Frente Placard Cuarto, Puerta Cuarto y Vano Cocina):
+        addSlidingPlacard2D(0.00, 2.30, 5.20, 1);
+        // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (bisagra en X = 3.00, abre hacia el Cuarto)
+        addDashedLine(2.30, 5.20, 3.00, 5.20);
+        addDoorSymbol2D(2.95, 5.20, 2.75, 5.42, 2.55, 5.42, 2.42, 5.20);
         // - VANO ABIERTO COCINA:
-        //   Paso libre continuo desde el eje central X = 3.00 a X = 3.75 (0.75 m); mocheta de X = 3.75 a X = 4.85 (cubre la heladera)
-        addDashedLine(3.00, 4.80, 3.75, 4.80);
-        addSlopedWallSegment(3.75, 4.80, 4.85, 4.80, 4.88, 4.41, INT_T, interiorWallsGroup, false);
+        //   Paso libre continuo desde el eje central X = 3.00 a X = 3.75 (0.75 m); mocheta de X = 3.75 a X = 4.85
+        addDashedLine(3.00, 5.20, 3.75, 5.20);
+        addSlopedWallSegment(3.75, 5.20, 4.85, 5.20, 4.88, 4.41, INT_T, interiorWallsGroup, false);
 
         // ============================================================================
         // 4B. PUERTAS 3D REALES EXTRAÍDAS DEL VIDEO (MARCOS DE CHAPA, HOJAS MADERA,
@@ -4472,6 +4470,18 @@
             capLosa.position.set(0, 2.20 + 0.008, 0);
             capLosa.userData.isCap = true;
             holder.add(capLosa);
+
+            // Fondo sólido de placard (panel melamínico de 0.08 a 2.20 m que ciega la vista desde el baño):
+            const backH = 2.12;
+            const backPanelGeo = new THREE.BoxGeometry(w, backH, 0.025);
+            const backPanelMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.55 });
+            const backPanel = new THREE.Mesh(backPanelGeo, backPanelMat);
+            backPanel.position.set(0, 0.08 + backH / 2, -facingSign * (interiorDepth - 0.0125));
+            backPanel.castShadow = true;
+            backPanel.receiveShadow = true;
+            holder.add(backPanel);
+
+
 
             // --- INTERIOR VISIBLE DEL PLACARD ---
             const chestW = (w - 0.10) / 2;
@@ -4833,12 +4843,12 @@
             decorVideoGroup.add(entranceMat);
 
             buildWoodenRoof();
-            // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 3.75, ancho 0.75 m)
+            // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 3.75, Z = 5.20, ancho 0.75 m)
             const wCocinaVano = 0.75;
             const lintelTopH = 5.04;
             const lintelH = lintelTopH - DOOR_H;
             const cocinaLintelHolder = new THREE.Group();
-            cocinaLintelHolder.position.set(3.00 + wCocinaVano / 2, 0, 4.80);
+            cocinaLintelHolder.position.set(3.00 + wCocinaVano / 2, 0, 5.20);
             const cocinaLintel = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
             cocinaLintel.scale.set(wCocinaVano, lintelH, INT_T);
             cocinaLintel.position.set(0, DOOR_H + lintelH / 2, 0);
@@ -4861,14 +4871,14 @@
                 currentH: lintelTopH,
                 targetH: lintelTopH,
                 linkedObjs: [],
-                ...getWallNormals(3.00, 4.80, 3.75, 4.80, false)
+                ...getWallNormals(3.00, 5.20, 3.75, 5.20, false)
             });
 
-            // Dintel sobre el Vano Abierto Living-Pasillo (X = 3.00, Z = 4.05 a 4.80, ancho 0.75 m)
+            // Dintel sobre el Vano Abierto Living-Pasillo (X = 3.00, Z = 4.45 a 5.20, ancho 0.75 m)
             const wPasilloVano = 0.75;
             const pasilloLintelH = 5.20 - 2.20;
             const pasilloLintelHolder = new THREE.Group();
-            pasilloLintelHolder.position.set(3.00, 0, 4.05 + wPasilloVano / 2);
+            pasilloLintelHolder.position.set(3.00, 0, 4.45 + wPasilloVano / 2);
             const pasilloLintel = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
             pasilloLintel.scale.set(INT_T, pasilloLintelH, wPasilloVano);
             pasilloLintel.position.set(0, 2.20 + pasilloLintelH / 2, 0);
@@ -4891,16 +4901,16 @@
                 currentH: 5.20,
                 targetH: 5.20,
                 linkedObjs: [],
-                ...getWallNormals(3.00, 4.05, 3.00, 4.80, false)
+                ...getWallNormals(3.00, 4.45, 3.00, 5.20, false)
             });
 
             // Instanciar puertas 3D interactivas con dintel a 5.20 m bajo la viga cumbrera:
             addMainEntranceDoor3D(5.34, 5.70, 6.18, 5.70);
-            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 90, 'Puerta Estudio', 5.20);
-            addInteriorWoodDoor3D(2.30, 3.15, 2.30, 3.85, false, 1, 75, 'Puerta Bano', 5.20);
-            addInteriorWoodDoor3D(2.30, 4.70, 3.00, 4.70, false, 1, 75, 'Puerta Cuarto', 5.20);
-            addSlidingPlacardFront3D(0.00, 2.30, 2.30, -1, 'Placard Estudio');
-            addSlidingPlacardFront3D(0.00, 2.30, 4.70, 1, 'Placard Cuarto');
+            addInteriorWoodDoor3D(2.30, 2.80, 3.00, 2.80, false, -1, 90, 'Puerta Estudio', 5.20);
+            addInteriorWoodDoor3D(2.30, 3.65, 2.30, 4.35, false, 1, 75, 'Puerta Bano', 5.20);
+            addInteriorWoodDoor3D(2.30, 5.20, 3.00, 5.20, false, 1, 75, 'Puerta Cuarto', 5.20);
+            addSlidingPlacardFront3D(0.00, 2.30, 2.80, -1, 'Placard Estudio');
+            addSlidingPlacardFront3D(0.00, 2.30, 5.20, 1, 'Placard Cuarto');
             resolveWallMounts();
             updateRoofCapsVisibility();
             updateSimsWalls(true);
@@ -6032,24 +6042,24 @@
                     metalness: 0.0
                 });
 
-                // 1. Respaldo de madera maciza (Muro Oeste X=0.08) dimensionado exactamente al ancho Queen (1.64m)
+                // 1. Respaldo de madera maciza (Muro Oeste X=0.08) centrado en Z = 6.60 m (Cuarto 2.80m x 3.00m)
                 const headboard = new THREE.Mesh(createRoundedBoxGeo(0.07, 1.10, 1.64, 0.02, 2), bedWoodMat);
-                headboard.position.set(0.08, 0.65, 6.20);
+                headboard.position.set(0.08, 0.65, 6.60);
                 headboard.castShadow = true; headboard.receiveShadow = true;
                 // Moldura superior del respaldo (cap cornisa)
                 const headboardCap = new THREE.Mesh(createRoundedBoxGeo(0.10, 0.04, 1.68, 0.015, 2), bedWoodMat);
-                headboardCap.position.set(0.08, 1.21, 6.20);
+                headboardCap.position.set(0.08, 1.21, 6.60);
                 headboardCap.castShadow = true;
                 bedGroup.add(headboard, headboardCap);
 
                 // 2. Base sommier de madera con faldón perimetral
                 const bedBase = new THREE.Mesh(createRoundedBoxGeo(1.94, 0.22, 1.54, 0.02, 2), bedWoodMat);
-                bedBase.position.set(1.06, 0.18, 6.20);
+                bedBase.position.set(1.06, 0.18, 6.60);
                 bedBase.castShadow = true; bedBase.receiveShadow = true;
                 bedGroup.add(bedBase);
 
                 // 4 Patas de madera torneadas en las esquinas
-                const legCoords = [[0.18, 5.50], [1.94, 5.50], [0.18, 6.90], [1.94, 6.90]];
+                const legCoords = [[0.18, 5.90], [1.94, 5.90], [0.18, 7.30], [1.94, 7.30]];
                 legCoords.forEach(([lx, lz]) => {
                     const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.026, 0.16, 14), bedWoodMat);
                     leg.position.set(lx, 0.08, lz);
@@ -6059,16 +6069,16 @@
 
                 // 3. Colchón de 2 plazas de alta gama (núcleo + pillow-top viscoelástico con esquinas y bordes redondeados)
                 const mattressCore = new THREE.Mesh(createRoundedBoxGeo(1.90, 0.22, 1.48, 0.045, 3), mattressMat);
-                mattressCore.position.set(1.06, 0.39, 6.20);
+                mattressCore.position.set(1.06, 0.39, 6.60);
                 mattressCore.castShadow = true; mattressCore.receiveShadow = true;
                 const pillowTop = new THREE.Mesh(createRoundedBoxGeo(1.88, 0.08, 1.46, 0.035, 3), mattressMat);
-                pillowTop.position.set(1.06, 0.53, 6.20);
+                pillowTop.position.set(1.06, 0.53, 6.60);
                 pillowTop.castShadow = true; pillowTop.receiveShadow = true;
                 bedGroup.add(mattressCore, pillowTop);
 
                 // 4. Almohadas dobles (2 grandes de descanso propped a 18° + 2 almohadones de acento)
                 [-1, 1].forEach(side => {
-                    const pz = 6.20 + side * 0.36;
+                    const pz = 6.60 + side * 0.36;
                     // Almohada principal blanca de algodón
                     const pillowGroup = new THREE.Group();
                     pillowGroup.position.set(0.32, 0.62, pz);
@@ -6090,17 +6100,17 @@
 
                 // 5. Edredón nórdico acolchado con volumen y caída lateral sobre los bordes (1.56m de ancho)
                 const duvet = new THREE.Mesh(createRoundedBoxGeo(1.36, 0.09, 1.54, 0.04, 3), duvetMat);
-                duvet.position.set(1.32, 0.58, 6.20);
+                duvet.position.set(1.32, 0.58, 6.60);
                 duvet.castShadow = true; duvet.receiveShadow = true;
 
                 // Doblez de la sábana blanca superior al descubierto
                 const sheetFold = new THREE.Mesh(createRoundedBoxGeo(0.22, 0.065, 1.50, 0.025, 3), pillowMat);
-                sheetFold.position.set(0.58, 0.585, 6.20);
+                sheetFold.position.set(0.58, 0.585, 6.60);
                 sheetFold.castShadow = true;
 
                 // Pie de cama decorativo azul nórdico doblado prolijamente al pie
                 const runner = new THREE.Mesh(createRoundedBoxGeo(0.40, 0.045, 1.56, 0.02, 3), runnerMat);
-                runner.position.set(1.78, 0.60, 6.20);
+                runner.position.set(1.78, 0.60, 6.60);
                 runner.castShadow = true;
 
                 bedGroup.add(duvet, sheetFold, runner);
@@ -6108,12 +6118,12 @@
             });
             
             createCompoundAssembly('Cuadro Glaciar Perito Moreno (Dormitorio)', () => {
-                setMountWall(0.00, 6.20, false);
+                setMountWall(0.00, 6.60, false);
                 const g = new THREE.Group();
                 g.userData.isWallArt = true;
                 g.userData.origY = 1.55;
                 g.userData.artHeight = 0.95;
-                g.position.set(0.04, 1.55, 6.20);
+                g.position.set(0.04, 1.55, 6.60);
 
                 const frameMat = new THREE.MeshStandardMaterial({ color: 0x111214, roughness: 0.35, metalness: 0.20 });
                 // Marco vertical negro elegante (0.68m x 0.95m)
@@ -6138,40 +6148,40 @@
             });
 
             // 3. 2 Mesas de luz de madera nogal oscuro a ambos lados de la cama (sobre Muro Oeste X=0.00):
-            // - Mesa de luz Norte (X=0.28, Z=5.15, pegada al Placard Inferior) con humidificador blanco y parlante inteligente
+            // - Mesa de luz Norte (X=0.28, Z=5.55, pegada al Placard Cuarto) con humidificador blanco y parlante inteligente
             createCompoundAssembly('Mesa de Luz Norte', () => {
-                addDecorBox(0.28, 0.31, 5.15, 0.42, 0.62, 0.44, 0x4a3222, 0.5);
-                addDecorCyl(0.28, 0.72, 5.20, 0.07, 0.07, 0.18, 0xffffff, 0.2);  // Humidificador blanco
+                addDecorBox(0.28, 0.31, 5.55, 0.42, 0.62, 0.44, 0x4a3222, 0.5);
+                addDecorCyl(0.28, 0.72, 5.55, 0.07, 0.07, 0.18, 0xffffff, 0.2);  // Humidificador blanco
             });
-            // - Mesa de luz Sur (X=0.28, Z=7.25, en esquina Suroeste) con reloj digital blanco y peluches
+            // - Mesa de luz Sur (X=0.28, Z=7.65, en esquina Suroeste) con reloj digital blanco y peluches
             createCompoundAssembly('Mesa de Luz Sur', () => {
-                addDecorBox(0.28, 0.31, 7.25, 0.42, 0.62, 0.42, 0x4a3222, 0.5);
+                addDecorBox(0.28, 0.31, 7.65, 0.42, 0.62, 0.42, 0x4a3222, 0.5);
             });
             // 4. Panel calefactor eléctrico negro en muro Sur (X=2.48, Z=7.88) + Cesto de ropa sucia gris en muro Este
             createCompoundAssembly('Panel Calefactor Cuarto', () => {
                 addDecorBox(2.48, 0.48, 7.88, 0.50, 0.50, 0.05, 0x0f172a, 0.2, 0, 'Panel Calefactor Vidrio Negro');
             });
             createCompoundAssembly('Cesto Ropa Sucia Cuarto', () => {
-                addDecorBox(2.72, 0.35, 6.80, 0.38, 0.70, 0.44, 0x475569, 0.8, 0, 'Cesto Ropa Sucia Gris');
+                addDecorBox(2.72, 0.35, 7.10, 0.38, 0.70, 0.44, 0x475569, 0.8, 0, 'Cesto Ropa Sucia Gris');
             });
 
-            // Equipaje, organizador y cajas guardados sobre la losa a Y = 2.20 m en la baulera abierta del cuarto:
+            // Equipaje, organizador y cajas guardados sobre la losa a Y = 2.20 m en la baulera del cuarto (Z = 4.70..5.20 m):
             createCompoundAssembly('Baulera Cuarto (Cajas y Valijas)', () => {
                 // - Sector Izquierdo:
-                addDecorBox(0.40, 2.20 + 0.12, 4.46, 0.26, 0.24, 0.28, 0x18181b, 0.6, 0, 'Caja Negra Encintada');
-                addDecorBox(0.60, 2.20 + 0.14, 4.50, 0.24, 0.28, 0.24, 0xe2e8f0, 0.5, 0, 'Caja Electrodoméstico Blanca');
-                addDecorBox(0.60, 2.20 + 0.28 + 0.045, 4.48, 0.20, 0.09, 0.20, 0x556b2f, 0.8, 0, 'Bolso Verde Baulera');
-                addDecorBox(0.62, 2.20 + 0.13, 4.30, 0.20, 0.26, 0.16, 0x1d4ed8, 0.5, 0, 'Caja Azul Fondo');
+                addDecorBox(0.40, 2.20 + 0.12, 4.96, 0.26, 0.24, 0.28, 0x18181b, 0.6, 0, 'Caja Negra Encintada');
+                addDecorBox(0.60, 2.20 + 0.14, 5.00, 0.24, 0.28, 0.24, 0xe2e8f0, 0.5, 0, 'Caja Electrodoméstico Blanca');
+                addDecorBox(0.60, 2.20 + 0.28 + 0.045, 4.98, 0.20, 0.09, 0.20, 0x556b2f, 0.8, 0, 'Bolso Verde Baulera');
+                addDecorBox(0.62, 2.20 + 0.13, 4.80, 0.20, 0.26, 0.16, 0x1d4ed8, 0.5, 0, 'Caja Azul Fondo');
                 // - Sector Central:
                 const cabW = 0.48, cabH = 0.52, cabD = 0.36;
-                addDecorBox(1.05, 2.20 + cabH / 2, 4.45, cabW, cabH, cabD, 0x64748b, 0.4, 0, 'Mueble Organizador Baulera');
-                addDecorBox(0.99, 2.20 + cabH / 2, 4.64, 0.07, 0.016, 0.02, 0x0f172a, 0.3, 0, 'Tirador Izquierdo Baulera');
-                addDecorBox(1.11, 2.20 + cabH / 2, 4.64, 0.07, 0.016, 0.02, 0x0f172a, 0.3, 0, 'Tirador Derecho Baulera');
-                addDecorBox(1.05, 2.20 + cabH + 0.09, 4.45, 0.56, 0.18, 0.36, 0xd4a373, 0.6, 0, 'Caja Monitor Samsung Curved');
+                addDecorBox(1.05, 2.20 + cabH / 2, 4.95, cabW, cabH, cabD, 0x64748b, 0.4, 0, 'Mueble Organizador Baulera');
+                addDecorBox(0.99, 2.20 + cabH / 2, 5.14, 0.07, 0.016, 0.02, 0x0f172a, 0.3, 0, 'Tirador Izquierdo Baulera');
+                addDecorBox(1.11, 2.20 + cabH / 2, 5.14, 0.07, 0.016, 0.02, 0x0f172a, 0.3, 0, 'Tirador Derecho Baulera');
+                addDecorBox(1.05, 2.20 + cabH + 0.09, 4.95, 0.56, 0.18, 0.36, 0xd4a373, 0.6, 0, 'Caja Monitor Samsung Curved');
                 // - Sector Derecho:
-                addDecorBox(1.68, 2.20 + 0.14, 4.52, 0.58, 0.28, 0.26, 0x334155, 0.35, 0, 'Valija Rígida Grafito');
-                addDecorBox(1.66, 2.20 + 0.285, 4.52, 0.12, 0.015, 0.04, 0x0f172a, 0.2, 0, 'Candado TSA Valija');
-                addDecorBox(1.68, 2.20 + 0.28, 4.32, 0.46, 0.56, 0.20, 0x18181b, 0.8, 0, 'Valija Tela Negra');
+                addDecorBox(1.68, 2.20 + 0.14, 5.02, 0.58, 0.28, 0.26, 0x334155, 0.35, 0, 'Valija Rígida Grafito');
+                addDecorBox(1.66, 2.20 + 0.285, 5.02, 0.12, 0.015, 0.04, 0x0f172a, 0.2, 0, 'Candado TSA Valija');
+                addDecorBox(1.68, 2.20 + 0.28, 4.82, 0.46, 0.56, 0.20, 0x18181b, 0.8, 0, 'Valija Tela Negra');
             });
             // 5. Cortina gris topo con barral de madera en la ventana Sur del Cuarto (V5: X=0.90..2.10, Z=8.00)
             addCurtainAssembly(0.90, 8.00, 2.10, 8.00, 0, -0.12, 0x78716c);
@@ -6205,61 +6215,85 @@
                 return topMesh;
             }
 
-            // 1. MURO NORTE (Y = 0.00 m):
-            // - Panel Calefactor Negro (X = 0.15 a 0.75 m, ancho 0.60 m) sobre muro ciego a la izquierda de la ventana:
+            // 1. MURO NORTE (Z = 0.00 m):
+            // - Panel Calefactor Vidrio Negro montado sobre superficie interior (Z = 0.125 m, visible y prominente):
             createCompoundAssembly('Panel Calefactor Estudio', () => {
-                addDecorBox(0.45, 0.48, 0.04, 0.60, 0.50, 0.03, 0x0f172a, 0.15, 0, 'Vidrio Templado Calefactor Estudio');
-                addDecorBox(0.70, 0.68, 0.056, 0.04, 0.02, 0.01, 0x38bdf8, 0.2, 0, 'Display Digital Calefactor Estudio');
+                const heatGroup = new THREE.Group();
+                heatGroup.position.set(0.75, 0.52, 0.125);
+
+                // Soporte metálico posterior fijado al muro Norte
+                const bracket = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0x1e293b, 0.4, 0.8));
+                bracket.scale.set(0.50, 0.36, 0.02);
+                bracket.position.set(0, 0, -0.015);
+                heatGroup.add(bracket);
+
+                // Panel frontal de vidrio templado negro piano brillante
+                const glassMat = new THREE.MeshStandardMaterial({
+                    color: 0x050508,
+                    roughness: 0.10,
+                    metalness: 0.85
+                });
+                const glassPanel = new THREE.Mesh(UNIT_BOX_GEO, glassMat);
+                glassPanel.scale.set(0.65, 0.52, 0.03);
+                glassPanel.position.set(0, 0, 0.01);
+                glassPanel.castShadow = true;
+                heatGroup.add(glassPanel);
+
+                // Display digital con retroiluminación cyan
+                const ledDisplay = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+                ledDisplay.scale.set(0.06, 0.03, 0.005);
+                ledDisplay.position.set(0.24, 0.18, 0.026);
+                heatGroup.add(ledDisplay);
+
+                (currentAssemblyGroup || decorVideoGroup).add(heatGroup);
             });
             // - Cortina de ventana Norte (V4: X = 1.65 a 2.95 m, barral a Z = 2.15 m):
             addCurtainAssembly(1.65, 0.00, 2.85, 0.00, 0, 0.12, 0x57534e);
 
-            // 2. ESCRITORIO GAMER EN "L" (Setup Detallado con FFVII Rebirth, Rebote LED, Mate y Termo)
+            // 2. ESCRITORIO GAMER EN "L" (Más flaco: tapa 0.52 m, L más larga: hasta Z = 2.05 m)
             createCompoundAssembly('Escritorio Gamer en "L"', () => {
 
                 const deskWoodMat = new THREE.MeshStandardMaterial({ color: 0xa65e18, roughness: 0.68, metalness: 0.04 });
                 const legWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c3a0e, roughness: 0.72, metalness: 0.04 });
 
-                // Tramo Largo Principal
+                // Tramo Largo Principal (contra pared Este X = 3.00, extendido de Z = 0.00 a Z = 2.05 m)
                 const mainTop = new THREE.Mesh(UNIT_BOX_GEO, deskWoodMat);
-                mainTop.scale.set(0.65, 0.035, 1.60);
-                mainTop.position.set(2.675, 0.745, 0.80);
+                mainTop.scale.set(0.52, 0.035, 2.05);
+                mainTop.position.set(2.74, 0.745, 1.025);
                 mainTop.castShadow = true; mainTop.receiveShadow = true;
                 const mainLeg = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
-                mainLeg.scale.set(0.63, 0.72, 0.035);
-                mainLeg.position.set(2.675, 0.36, 1.58);
+                mainLeg.scale.set(0.50, 0.72, 0.035);
+                mainLeg.position.set(2.74, 0.36, 2.03);
                 mainLeg.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(mainTop, mainLeg);
 
-                // Ala Corta en L
+                // Ala Corta en L (bajo ventana Norte Z = 0.00, de X = 1.35 a X = 2.48 m)
                 const wingTop = new THREE.Mesh(UNIT_BOX_GEO, deskWoodMat);
-                wingTop.scale.set(0.60, 0.035, 0.45);
-                wingTop.position.set(2.05, 0.745, 0.225);
+                wingTop.scale.set(1.13, 0.035, 0.50);
+                wingTop.position.set(1.915, 0.745, 0.25);
                 wingTop.castShadow = true; wingTop.receiveShadow = true;
                 const wingLeg = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
-                wingLeg.scale.set(0.035, 0.72, 0.43);
-                wingLeg.position.set(1.77, 0.36, 0.225);
+                wingLeg.scale.set(0.035, 0.72, 0.48);
+                wingLeg.position.set(1.36, 0.36, 0.25);
                 wingLeg.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(wingTop, wingLeg);
-            
-                    
             });
 
             // Gabinete PC Gamer Thermaltake con iluminación RGB (independiente)
             createCompoundAssembly('Gabinete PC Gamer Thermaltake', () => {
                 const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.30, metalness: 0.60 });
                 const pcCase = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
-                pcCase.scale.set(0.24, 0.46, 0.42);
-                pcCase.position.set(2.80, 0.24, 1.45);
+                pcCase.scale.set(0.22, 0.46, 0.42);
+                pcCase.position.set(2.82, 0.24, 1.75);
                 pcCase.castShadow = true;
                 const pcRgbMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 0.7 });
                 const pcWindow = new THREE.Mesh(UNIT_BOX_GEO, pcRgbMat);
                 pcWindow.scale.set(0.01, 0.42, 0.38);
-                pcWindow.position.set(2.675, 0.24, 1.45);
+                pcWindow.position.set(2.70, 0.24, 1.75);
                 (currentAssemblyGroup || decorVideoGroup).add(pcCase, pcWindow);
             });
 
-            // Monitor Gamer Curvo 27" 1500R (único monitor en el escritorio)
+            // Monitor Gamer Curvo 27" 1500R (frente a la silla en X=2.84, Z=1.05)
             createCompoundAssembly('Monitor Gamer Curvo 27"', () => {
                 const monitorBezelMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.15, metalness: 0.80 });
                 const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.25, metalness: 0.70 });
@@ -6274,8 +6308,7 @@
                 });
 
                 const monGroup = new THREE.Group();
-                // Centrado en el escritorio frente a la silla gamer (X=2.80, Z=0.85, Y=1.05)
-                monGroup.position.set(2.80, 1.05, 0.85);
+                monGroup.position.set(2.84, 1.05, 1.05);
 
                 const curveRadius = 1.40; // Radio 1400R/1500R curvo inmersivo
                 const monW = 0.61; // Ancho panel 27" (~61 cm)
@@ -6359,15 +6392,15 @@
             createCompoundAssembly('Teclado, Mouse Gamer y Deskmat', () => {
                 const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.30, metalness: 0.60 });
                 const deskMat = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.95 }));
-                deskMat.scale.set(0.44, 0.008, 0.84);
-                deskMat.position.set(2.62, 0.765, 0.80);
+                deskMat.scale.set(0.40, 0.008, 0.84);
+                deskMat.position.set(2.70, 0.765, 1.05);
                 const keyboard = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
-                keyboard.scale.set(0.16, 0.018, 0.38);
-                keyboard.position.set(2.62, 0.775, 0.76);
+                keyboard.scale.set(0.14, 0.018, 0.38);
+                keyboard.position.set(2.70, 0.775, 1.00);
                 keyboard.castShadow = true;
                 const mouse = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
-                mouse.scale.set(0.10, 0.025, 0.06);
-                mouse.position.set(2.62, 0.775, 0.98);
+                mouse.scale.set(0.09, 0.025, 0.06);
+                mouse.position.set(2.70, 0.775, 1.25);
                 mouse.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(deskMat, keyboard, mouse);
             });
@@ -6377,7 +6410,7 @@
                 const mateGourdMat = new THREE.MeshStandardMaterial({ color: 0x271a0c, roughness: 0.80, metalness: 0.0 });
                 const silverMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.15, metalness: 0.95 });
                 const mateGroup = new THREE.Group();
-                mateGroup.position.set(2.52, 0.77, 1.12);
+                mateGroup.position.set(2.62, 0.77, 1.48);
                 const mateBody = new THREE.Mesh(new THREE.SphereGeometry(0.038, 14, 12), mateGourdMat);
                 mateBody.scale.set(1.0, 1.25, 1.0);
                 mateBody.position.set(0, 0.035, 0);
@@ -6400,7 +6433,7 @@
                 const inoxMat = new THREE.MeshStandardMaterial({ color: 0xcfd8dc, roughness: 0.22, metalness: 0.90 });
                 const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.30, metalness: 0.60 });
                 const termoGroup = new THREE.Group();
-                termoGroup.position.set(2.46, 0.77, 1.24);
+                termoGroup.position.set(2.58, 0.77, 1.62);
                 const termoBody = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.26, 16), inoxMat);
                 termoBody.position.set(0, 0.13, 0);
                 termoBody.castShadow = true;
@@ -6797,7 +6830,7 @@
                 const wheelMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.40, metalness: 0.30 });
 
                 const cg = new THREE.Group();
-                cg.position.set(1.95, 0, 0.85);
+                cg.position.set(2.15, 0, 1.05);
 
                 // 1. Base en estrella de 5 puntas con 5 pares de ruedas
                 const starRadius = 0.28;
@@ -6884,29 +6917,29 @@
                 (currentAssemblyGroup || decorVideoGroup).add(cg);
             });
 
-            // 7. OBJETOS EN BAULERA ABIERTA DEL ESTUDIO (sobre losa plana en Z = 2.20 m): conjunto unificado
+            // 7. OBJETOS EN BAULERA DEL ESTUDIO (sobre losa plana en Z = 2.20 m, sector Z = 2.80..3.30 m)
             createCompoundAssembly('Baulera Estudio (Cajas y Valijas)', () => {
                 // - Sector Izquierdo (X=0.25..0.75):
-                addDecorBox(0.44, 2.20 + 0.08, 2.62, 0.34, 0.16, 0.26, 0x1e3a8a, 0.4, 0, 'Caja Sony Azul Baulera');
-                addDecorBox(0.44, 2.20 + 0.25, 2.62, 0.26, 0.18, 0.22, 0xf8fafc, 0.3, 0, 'Caja Mirage L120 Baulera');
-                addDecorBox(0.38, 2.20 + 0.10, 2.42, 0.28, 0.20, 0.18, 0x18181b, 0.7, 0, 'Morral Negro Baulera');
-                addDecorBox(0.38, 2.20 + 0.05, 2.32, 0.14, 0.10, 0.03, 0xf1f5f9, 0.3, 0, 'Libreta Baulera');
-                addDecorBox(0.41, 2.20 - 0.06, 2.29, 0.035, 0.18, 0.015, 0x18181b, 0.8, 0, 'Correa Colgante Baulera');
+                addDecorBox(0.44, 2.20 + 0.08, 3.12, 0.34, 0.16, 0.26, 0x1e3a8a, 0.4, 0, 'Caja Sony Azul Baulera');
+                addDecorBox(0.44, 2.20 + 0.25, 3.12, 0.26, 0.18, 0.22, 0xf8fafc, 0.3, 0, 'Caja Mirage L120 Baulera');
+                addDecorBox(0.38, 2.20 + 0.10, 2.92, 0.28, 0.20, 0.18, 0x18181b, 0.7, 0, 'Morral Negro Baulera');
+                addDecorBox(0.38, 2.20 + 0.05, 2.82, 0.14, 0.10, 0.03, 0xf1f5f9, 0.3, 0, 'Libreta Baulera');
+                addDecorBox(0.41, 2.20 - 0.06, 2.79, 0.035, 0.18, 0.015, 0x18181b, 0.8, 0, 'Correa Colgante Baulera');
 
                 // - Sector Central-Izquierdo (X=0.75..1.30):
-                addDecorBox(0.92, 2.20 + 0.12, 2.64, 0.42, 0.24, 0.22, 0x1e293b, 0.7, 0, 'Bolso Deportivo Azul Baulera');
-                addDecorBox(0.94, 2.20 + 0.13, 2.48, 0.46, 0.13, 0.13, 0xd9779f, 0.6, 0, 'Mat Yoga Lila Baulera');
-                addDecorBox(0.94, 2.20 + 0.05, 2.38, 0.52, 0.10, 0.12, 0x111827, 0.8, 0, 'Funda Tubular Negra Baulera');
+                addDecorBox(0.92, 2.20 + 0.12, 3.14, 0.42, 0.24, 0.22, 0x1e293b, 0.7, 0, 'Bolso Deportivo Azul Baulera');
+                addDecorBox(0.94, 2.20 + 0.13, 2.98, 0.46, 0.13, 0.13, 0xd9779f, 0.6, 0, 'Mat Yoga Lila Baulera');
+                addDecorBox(0.94, 2.20 + 0.05, 2.88, 0.52, 0.10, 0.12, 0x111827, 0.8, 0, 'Funda Tubular Negra Baulera');
 
                 // - Sector Central-Derecho (X=1.30..1.65):
-                addDecorBox(1.44, 2.20 + 0.07, 2.52, 0.34, 0.14, 0.28, 0x27272a, 0.5, 0, 'Caja Zapatos CAT Baulera');
-                addDecorBox(1.58, 2.20 + 0.07, 2.37, 0.05, 0.045, 0.01, 0xfacc15, 0.2, 0, 'Logo Amarillo CAT Baulera');
-                addDecorBox(1.42, 2.20 + 0.20, 2.52, 0.32, 0.13, 0.26, 0xb48a64, 0.6, 0, 'Caja Zapatos Lippi Baulera');
+                addDecorBox(1.44, 2.20 + 0.07, 3.02, 0.34, 0.14, 0.28, 0x27272a, 0.5, 0, 'Caja Zapatos CAT Baulera');
+                addDecorBox(1.58, 2.20 + 0.07, 2.87, 0.05, 0.045, 0.01, 0xfacc15, 0.2, 0, 'Logo Amarillo CAT Baulera');
+                addDecorBox(1.42, 2.20 + 0.20, 3.02, 0.32, 0.13, 0.26, 0xb48a64, 0.6, 0, 'Caja Zapatos Lippi Baulera');
 
                 // - Sector Derecho (X=1.65..2.10):
-                addDecorCyl(1.84, 2.20 + 0.09, 2.56, 0.26, 0.26, 0.18, 0x27272a, 0.9, 'Neumático Auxilio Baulera');
-                addDecorBox(1.80, 2.20 + 0.24, 2.54, 0.20, 0.12, 0.24, 0x1e293b, 0.3, 0, 'Casco Ciclismo Baulera');
-                addDecorBox(1.98, 2.20 + 0.09, 2.44, 0.26, 0.18, 0.26, 0xb5bda0, 0.7, 0, 'Manta Verde Salvia Baulera');
+                addDecorCyl(1.84, 2.20 + 0.09, 3.06, 0.26, 0.26, 0.18, 0x27272a, 0.9, 'Neumático Auxilio Baulera');
+                addDecorBox(1.80, 2.20 + 0.24, 3.04, 0.20, 0.12, 0.24, 0x1e293b, 0.3, 0, 'Casco Ciclismo Baulera');
+                addDecorBox(1.98, 2.20 + 0.09, 2.94, 0.26, 0.18, 0.26, 0xb5bda0, 0.7, 0, 'Manta Verde Salvia Baulera');
             });
         }
         // ============================================================================
@@ -6996,42 +7029,39 @@
         }
 
         // --- LÍNEAS 2D DE EQUIPAMIENTO EXACTO DEL ESTUDIO ---
-        // Calefactor negro en pared Norte [0.95..1.55, 0.00..0.04]
-        addLine2DSegment(0.20, 0.03, 0.70, 0.03, 0.035, 0x0f172a);
-        // Escritorio en L:
-        // - Tramo Largo Principal [2.35..3.00, 0.00..1.60]
-        addLine2DSegment(2.35, 0.00, 2.35, 1.60, 0.018, 0x8f3818);
-        addLine2DSegment(2.35, 1.60, 3.00, 1.60, 0.018, 0x8f3818);
-        // - Ala Corta [1.75..2.35, 0.00..0.45]
-        addLine2DSegment(1.75, 0.00, 1.75, 0.45, 0.018, 0x8f3818);
-        addLine2DSegment(1.75, 0.45, 2.35, 0.45, 0.018, 0x8f3818);
+        // Calefactor negro en pared Norte [0.45..1.05, 0.10..0.14]
+        addLine2DSegment(0.45, 0.12, 1.05, 0.12, 0.035, 0x0f172a);
+        // Escritorio en L (más flaco 0.52m, L más larga 2.05m):
+        // - Tramo Largo Principal [2.48..3.00, 0.00..2.05]
+        addLine2DSegment(2.48, 0.00, 2.48, 2.05, 0.018, 0x8f3818);
+        addLine2DSegment(2.48, 2.05, 3.00, 2.05, 0.018, 0x8f3818);
+        // - Ala Corta [1.35..2.48, 0.00..0.50]
+        addLine2DSegment(1.35, 0.00, 1.35, 0.50, 0.018, 0x8f3818);
+        addLine2DSegment(1.35, 0.50, 2.48, 0.50, 0.018, 0x8f3818);
         // 3 Estantes Flotantes Este [2.75..3.00, 0.10..1.55]
         addDashedLine(2.75, 0.10, 2.75, 1.55);
-        // Biblioteca Alta Oeste [0.00..0.30, 0.45..1.55]
-        addLine2DSegment(0.30, 0.45, 0.30, 1.55, 0.018, 0x18181b);
-        addLine2DSegment(0.00, 0.45, 0.30, 0.45, 0.018, 0x18181b);
-        addLine2DSegment(0.00, 1.55, 0.30, 1.55, 0.018, 0x18181b);
-        // Mesita Ajedrez [0.25, 0.25]
-        addLine2DSegment(0.12, 0.25, 0.38, 0.25, 0.016, 0xb47b48);
-        addLine2DSegment(0.25, 0.12, 0.25, 0.38, 0.016, 0xb47b48);
-        // Mesita Miniaturas [0.25, 2.00]
-        addLine2DSegment(0.12, 2.00, 0.38, 2.00, 0.016, 0xd4a373);
-        addLine2DSegment(0.25, 1.87, 0.25, 2.13, 0.016, 0xd4a373);
-        // Silla Gamer [1.95, 0.85]
-        addLine2DSegment(1.80, 0.85, 2.10, 0.85, 0.02, 0xdc2626);
+        // Biblioteca Alta Oeste [0.00..0.30, 0.60..1.70]
+        addLine2DSegment(0.30, 0.60, 0.30, 1.70, 0.018, 0x18181b);
+        addLine2DSegment(0.00, 0.60, 0.30, 0.60, 0.018, 0x18181b);
+        addLine2DSegment(0.00, 1.70, 0.30, 1.70, 0.018, 0x18181b);
+        // Mesita Ajedrez [0.35, 2.30]
+        addLine2DSegment(0.20, 2.30, 0.50, 2.30, 0.016, 0xb47b48);
+        addLine2DSegment(0.35, 2.15, 0.35, 2.45, 0.016, 0xb47b48);
+        // Silla Gamer [2.15, 1.05]
+        addLine2DSegment(2.00, 1.05, 2.30, 1.05, 0.02, 0xdc2626);
 
-        // Estudio: [0.00, 0.00] a [3.00, 2.30]
-        addPlanLabel(1.15, 1.35, "ESTUDIO");
-        // Baño: [0.00, 2.80] a [2.30, 4.20]
-        addPlanLabel(1.15, 3.50, "BAÑO");
-        // Pasillo Distribuidor: [2.30, 2.30] a [3.00, 4.80]
-        addPlanLabel(2.70, 3.50, "PASILLO", "arch-label vertical");
-        // Cuarto: [0.00, 4.70] a [3.00, 8.00]
-        addPlanLabel(1.50, 6.20, "CUARTO");
-        // Living: [3.00, 0.00] a [6.30, 4.80]
-        addPlanLabel(5.15, 2.40, "LIVING");
-        // Cocina: [3.00, 4.80] a [4.85, 8.00]
-        addPlanLabel(3.92, 6.20, "COCINA");
+        // Estudio: [0.00, 0.00] a [3.00, 2.80] (3.00 m x 2.80 m = 8.40 m², idéntico al Cuarto)
+        addPlanLabel(1.50, 1.40, "ESTUDIO");
+        // Baño: [0.00, 3.30] a [2.30, 4.70]
+        addPlanLabel(1.15, 4.00, "BAÑO");
+        // Pasillo Distribuidor: [2.30, 2.80] a [3.00, 5.20]
+        addPlanLabel(2.70, 4.00, "PASILLO", "arch-label vertical");
+        // Cuarto: [0.00, 5.20] a [3.00, 8.00] (3.00 m x 2.80 m = 8.40 m², idéntico al Estudio)
+        addPlanLabel(1.50, 6.60, "CUARTO");
+        // Living: [3.00, 0.00] a [6.30, 5.20]
+        addPlanLabel(5.15, 2.60, "LIVING");
+        // Cocina: [3.00, 5.20] a [4.85, 8.00]
+        addPlanLabel(3.92, 6.60, "COCINA");
         // Entrada: [4.85, 4.80] a [6.30, 6.30]
         addPlanLabel(5.57, 5.25, "ENTRADA", "arch-label sm");
         // Palier Edificio (Exterior): [4.85, 6.30] a [6.30, 8.00]
@@ -8416,12 +8446,12 @@
             { id: 'vid_cucha_ne', name: 'Cucha Perro Esquina NE', room: 'Living', x: 5.55, z: 0.38, y: 0.05, w: 0.92, d: 0.62, h: 0.10, rot: 0, color: 0x94a3b8 },
             { id: 'vid_heladera', name: 'Heladera c/ Freezer + Bodega', room: 'Cocina', x: 4.85, z: 4.88, y: 0.84, w: 0.60, d: 0.62, h: 1.68, rot: 0, color: 0xe2e8f0 },
             { id: 'vid_lavarropas', name: 'Lavarropas + Estación Café (Bajo Ventana)', room: 'Cocina', x: 3.35, z: 6.67, y: 0.43, w: 0.60, d: 0.58, h: 0.86, rot: 0, color: 0xcbd5e1 },
-            { id: 'vid_cama_2p', name: 'Cama 2 Plazas + Respaldo Nogal', room: 'Cuarto', x: 1.05, z: 5.80, y: 0.24, w: 1.90, d: 1.45, h: 0.48, rot: 0, color: 0x475569 },
-            { id: 'vid_luz_n', name: 'Mesa de Luz Norte', room: 'Cuarto', x: 0.28, z: 4.84, y: 0.31, w: 0.42, d: 0.44, h: 0.62, rot: 0, color: 0x4a3222 },
-            { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.28, z: 6.72, y: 0.31, w: 0.42, d: 0.42, h: 0.62, rot: 0, color: 0x4a3222 },
-            { id: 'vid_escr_l', name: 'Escritorio en L + PC Gamer', room: 'Estudio', x: 2.64, z: 0.96, y: 0.38, w: 0.64, d: 1.64, h: 0.76, rot: 0, color: 0x8f3818 },
-            { id: 'vid_biblio', name: 'Biblioteca 5 Estantes', room: 'Estudio', x: 0.20, z: 0.88, y: 0.92, w: 0.32, d: 0.82, h: 1.84, rot: 0, color: 0x3b2314 },
-            { id: 'vid_ajedrez', name: 'Mesa Ajedrez El Señor de los Anillos', room: 'Estudio', x: 0.35, z: 1.96, y: 0.37, w: 0.44, d: 0.44, h: 0.74, rot: 0, color: 0xd4a373 }
+            { id: 'vid_cama_2p', name: 'Cama 2 Plazas + Respaldo Nogal', room: 'Cuarto', x: 1.08, z: 6.60, y: 0.24, w: 1.90, d: 1.45, h: 0.48, rot: 0, color: 0x475569 },
+            { id: 'vid_luz_n', name: 'Mesa de Luz Norte', room: 'Cuarto', x: 0.28, z: 5.55, y: 0.31, w: 0.42, d: 0.44, h: 0.62, rot: 0, color: 0x4a3222 },
+            { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.28, z: 7.65, y: 0.31, w: 0.42, d: 0.42, h: 0.62, rot: 0, color: 0x4a3222 },
+            { id: 'vid_escr_l', name: 'Escritorio en L + PC Gamer', room: 'Estudio', x: 2.74, z: 1.02, y: 0.38, w: 0.52, d: 2.05, h: 0.76, rot: 0, color: 0x8f3818 },
+            { id: 'vid_biblio', name: 'Biblioteca 5 Estantes', room: 'Estudio', x: 0.20, z: 1.10, y: 0.92, w: 0.32, d: 0.82, h: 1.84, rot: 0, color: 0x3b2314 },
+            { id: 'vid_ajedrez', name: 'Mesa Ajedrez El Señor de los Anillos', room: 'Estudio', x: 0.35, z: 2.30, y: 0.37, w: 0.44, d: 0.44, h: 0.74, rot: 0, color: 0xd4a373 }
         ];
 
         document.getElementById('btn-load-video-furniture').addEventListener('click', () => {
@@ -8819,10 +8849,10 @@
             // Ángulo diagonal axonométrico natural (Foto Referencia: 25° de sesgo para ver profundidad 3D real de muros y ambientes)
             isom:   { pos: [-1.80, 11.80, 12.20], target: [3.15, 0.40, 4.00] },
             living: { pos: [4.80, 2.80, 4.40], target: [3.80, 0.70, 2.70] },
-            cocina: { pos: [4.10, 3.40, 4.10], target: [4.10, 0.60, 5.80] },
-            cuarto: { pos: [2.40, 2.80, 5.00], target: [1.10, 0.65, 6.20] },
-            bano:   { pos: [2.65, 3.50, 4.35], target: [1.15, 0.65, 3.40] },
-            estudio:{ pos: [2.70, 2.50, 2.10], target: [1.40, 0.70, 0.90] }
+            cocina: { pos: [4.10, 3.40, 4.30], target: [4.10, 0.60, 6.60] },
+            cuarto: { pos: [2.40, 2.80, 5.20], target: [1.10, 0.65, 6.60] },
+            bano:   { pos: [2.65, 3.50, 4.85], target: [1.15, 0.65, 4.00] },
+            estudio:{ pos: [2.70, 2.50, 2.60], target: [1.40, 0.70, 1.40] }
         };
 
         function switchTo2D() {
