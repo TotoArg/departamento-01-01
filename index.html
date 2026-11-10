@@ -3112,7 +3112,7 @@
 
             if (isVentiluz) {
                 winName = "Baño Ventiluz (Oeste)";
-            } else if (Math.abs(z1) < 0.1 && midXCoord < 2.5) {
+            } else if (Math.abs(z1) < 0.1 && midXCoord < 3.0) {
                 winName = "Estudio (Norte)";
             } else if (Math.abs(z1) < 0.1 && midXCoord < 4.6) {
                 winName = "Living V1 (Norte)";
@@ -3461,15 +3461,13 @@
         // 3. PERÍMETRO EXTERIOR CON LAS 7 VENTANAS REALES DEL VIDEO
         // ============================================================================
         // Muro Superior (Norte, Z = 0.00):
-        // 1) SECTOR ESTUDIO (X = 0.00 a 3.00 m, idéntica a ventana Cuarto, techo catedral cumbrera 5.20 m):
-        //    - Tramo izquierdo ciego: de X = 0.00 a 0.90 m (sube de 3.20 m a 3.98 m bajo faldón)
-        addSlopedWallSegment(0.00, 0.00, 0.90, 0.00, 3.20, 3.98, EXT_T, exteriorWallsGroup, true);
-        //    - Ventana Norte Estudio: de X = 0.90 a 2.10 m (ancho 1.20 m, idéntica a la ventana del Cuarto)
-        addWindowSegment(0.90, 0.00, 2.10, 0.00, 0.95, 1.10, 3.98, 5.03);
-        //    - Tramo derecho ciego en pendiente (X = 2.10 a 2.30 m, sube de 5.03 m a 5.20 m)
-        addSlopedWallSegment(2.10, 0.00, 2.30, 0.00, 5.03, 5.20, EXT_T, exteriorWallsGroup, true);
-        //    - Tramo derecho plano hasta el tabique divisorio central (X = 2.30 a 3.00 m, cumbrera 5.20 m)
-        addWallSegment(2.30, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 5.20);
+        // 1) SECTOR ESTUDIO (X = 0.00 a 3.00 m, ventana sobre escritorio gamer, techo catedral cumbrera 5.20 m):
+        //    - Tramo izquierdo ciego: de X = 0.00 a 1.65 m (sube de 3.20 m a 4.635 m bajo faldón, aloja calefactor)
+        addSlopedWallSegment(0.00, 0.00, 1.65, 0.00, 3.20, 4.635, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Estudio: de X = 1.65 a 2.85 m (ancho 1.20 m, idéntica a la ventana del Cuarto, sobre escritorio gamer)
+        addWindowSegment(1.65, 0.00, 2.85, 0.00, 0.95, 1.10, 4.635, 5.20);
+        //    - Tramo derecho ciego plano hasta el eje central (X = 2.85 a 3.00 m, cumbrera 5.20 m)
+        addWallSegment(2.85, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 5.20);
 
         // 2) SECTOR LIVING (X = 3.00 a 6.30 m, faldón este baja de 5.20 m a 3.80 m):
         //    - Muro inicial junto al eje central (X = 3.00 a 3.25 m, baja de 5.20 m a 5.09 m)
@@ -3508,15 +3506,16 @@
         addWallSegment(4.85, 5.70, 4.85, 8.00, EXT_T, exteriorWallsGroup, true, 4.41);
 
         // Muro Inferior (Sur, Z = 8.00): cierra de [0.00, 8.00] a [4.85, 8.00] (techo catedral a 5.20 m)
-        // - Sector Cuarto (X = 0.00 a 3.20 m, simétrico al Estudio):
+        // - Sector Cuarto (X = 0.00 a 3.00 m, cumbrera a 5.20 m):
         addSlopedWallSegment(0.00, 8.00, 0.90, 8.00, 3.20, 3.98, EXT_T, exteriorWallsGroup, true);
         addWindowSegment(0.90, 8.00, 2.10, 8.00, 0.95, 1.10, 3.98, 5.03);
         addSlopedWallSegment(2.10, 8.00, 2.30, 8.00, 5.03, 5.20, EXT_T, exteriorWallsGroup, true);
-        addWallSegment(2.30, 8.00, 3.20, 8.00, EXT_T, exteriorWallsGroup, true, 5.20);
+        addWallSegment(2.30, 8.00, 3.00, 8.00, EXT_T, exteriorWallsGroup, true, 5.20);
 
-        // - Sector Cocina (X = 3.20 a 4.85 m, bajo faldón Este):
-        addWindowSegment(3.25, 8.00, 4.55, 8.00, 1.05, 0.95, 5.09, 4.54);
-        addSlopedWallSegment(4.55, 8.00, 4.85, 8.00, 4.54, 4.41, EXT_T, exteriorWallsGroup, true);
+        // - Sector Cocina (X = 3.00 a 4.85 m, bajo faldón Este):
+        addWallSegment(3.00, 8.00, 3.20, 8.00, EXT_T, exteriorWallsGroup, true, 5.20);
+        addWindowSegment(3.20, 8.00, 4.50, 8.00, 1.05, 0.95, 5.11, 4.56);
+        addSlopedWallSegment(4.50, 8.00, 4.85, 8.00, 4.56, 4.41, EXT_T, exteriorWallsGroup, true);
 
         // Muro Izquierdo (Oeste, X = 0.00): sube de [0.00, 0.00] a [0.00, 8.00] a cota exterior 3.20 m
         // - Ventiluz Baño V7 sobre bañera (Z = 3.15 a 3.85)
@@ -4085,13 +4084,13 @@
         // - Muro sólido abajo: de Z = 3.85 a Z = 4.70
         addWallSegment(2.30, 3.85, 2.30, 4.70, INT_T, interiorWallsGroup, false, 5.20);
 
-        // Eje Vertical Central X = 3.00:
+        // Eje Vertical Central continuo X = 3.00:
         // - Muro sólido de Z = 0.00 a Z = 4.05 (remata a 5.20 m bajo la viga cumbrera)
         addWallSegment(3.00, 0.00, 3.00, 4.05, INT_T, interiorWallsGroup, false, 5.20);
         // - VANO ABIERTO (Paso Living-Pasillo): Sin muro entre Z = 4.05 y Z = 4.80 (0.75 m de paso libre al pasillo)
         addDashedLine(3.00, 4.05, 3.00, 4.80);
-        // - Muro sólido divisorio Cuarto-Cocina (trasladado a X = 3.20 para que la pared derecha de Cocina toque justo el lavarropas en X = 3.25):
-        addWallSegment(3.20, 4.80, 3.20, 8.00, INT_T, interiorWallsGroup, false, 5.20);
+        // - Muro sólido divisorio Cuarto-Cocina alineado de forma continua en el eje estructural central X = 3.00:
+        addWallSegment(3.00, 4.70, 3.00, 8.00, INT_T, interiorWallsGroup, false, 5.20);
 
         // Eje Vertical X = 4.85 (separa Cocina de Entrada corta): de Z = 4.80 a Z = 5.70 a cota 4.41 m
         addWallSegment(4.85, 4.80, 4.85, 5.70, INT_T, interiorWallsGroup, false, 4.41);
@@ -4104,23 +4103,21 @@
 
         // Eje Horizontal Z = 2.80 (Cierre de fondo de Baulera Estudio / Divide con Baño):
         // Sube de X = 0.00 (3.20 m) a X = 2.30 (5.20 m) tocando la cara inferior del faldón catedral.
-        addSlopedWallSegment(0.00, 2.80, 2.30, 3.20, 5.20, INT_T, interiorWallsGroup);
+        addSlopedWallSegment(0.00, 2.80, 2.30, 2.80, 3.20, 5.20, INT_T, interiorWallsGroup, false);
 
         // Eje Horizontal Z = 4.20 (Cierre de fondo de Baulera Cuarto / Divide con Baño):
         // Sube de X = 0.00 (3.20 m) a X = 2.30 (5.20 m) tocando la cara inferior del faldón catedral.
-        addSlopedWallSegment(0.00, 4.20, 2.30, 3.20, 5.20, INT_T, interiorWallsGroup);
+        addSlopedWallSegment(0.00, 4.20, 2.30, 4.20, 3.20, 5.20, INT_T, interiorWallsGroup, false);
 
         // Eje Horizontal Z = 4.70 (Frente Placard Cuarto con 2 hojas enteras corredizas, Puerta Cuarto y Vano Cocina):
         addSlidingPlacard2D(0.00, 2.30, 4.70, 1);
         // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (bisagra al Este en X=3.00, abre HACIA ADENTRO del Cuarto)
         addDashedLine(2.30, 4.70, 3.00, 4.70);
         addDoorSymbol2D(2.95, 4.70, 2.75, 4.92, 2.55, 4.92, 2.42, 4.70);
-        // Mocheta de unión entre marco puerta Cuarto (X=3.00) y tabique divisorio Cocina (X=3.20):
-        addWallSegment(3.00, 4.70, 3.20, 4.70, INT_T, interiorWallsGroup, false, 5.20);
         // - VANO ABIERTO COCINA:
-        //   Paso libre de X = 3.20 a X = 3.95 (0.75 m); mocheta de X = 3.95 a X = 4.85 (cubre la heladera)
-        addDashedLine(3.20, 4.80, 3.95, 4.80);
-        addSlopedWallSegment(3.95, 4.80, 4.85, 4.80, 4.80, 4.41, INT_T, interiorWallsGroup);
+        //   Paso libre continuo desde el eje central X = 3.00 a X = 3.75 (0.75 m); mocheta de X = 3.75 a X = 4.85 (cubre la heladera)
+        addDashedLine(3.00, 4.80, 3.75, 4.80);
+        addSlopedWallSegment(3.75, 4.80, 4.85, 4.80, 4.88, 4.41, INT_T, interiorWallsGroup, false);
 
         // ============================================================================
         // 4B. PUERTAS 3D REALES EXTRAÍDAS DEL VIDEO (MARCOS DE CHAPA, HOJAS MADERA,
@@ -4264,7 +4261,7 @@
             holder.rotation.y = -angle;
 
             // Dintel superior en muro exterior adaptado exactamente a la cota del muro a 2.98 m (cierra el hueco superior)
-            const wallHAtEntrance = 2.98;
+            const wallHAtEntrance = 4.03;
             const lintelH = wallHAtEntrance - DOOR_H; // 0.93 m
             const lintelMesh = new THREE.Mesh(new THREE.BoxGeometry(w, lintelH, EXT_T), extWallMat);
             lintelMesh.position.set(0, DOOR_H + lintelH / 2, 0);
@@ -4836,25 +4833,77 @@
             decorVideoGroup.add(entranceMat);
 
             buildWoodenRoof();
-            // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 3.85, ancho 0.85 m)
-            // Remata a 3.30 m bajo las vigas de madera para evitar perforaciones en la cubierta
+            // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 3.75, ancho 0.75 m)
             const wCocinaVano = 0.75;
-            const lintelTopH = 3.30;
+            const lintelTopH = 5.04;
             const lintelH = lintelTopH - DOOR_H;
+            const cocinaLintelHolder = new THREE.Group();
+            cocinaLintelHolder.position.set(3.00 + wCocinaVano / 2, 0, 4.80);
             const cocinaLintel = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
             cocinaLintel.scale.set(wCocinaVano, lintelH, INT_T);
-            cocinaLintel.position.set(3.20 + wCocinaVano / 2, DOOR_H + lintelH / 2, 4.80);
-            doors3DGroup.add(cocinaLintel);
-            attachWallMount(cocinaLintel, 4.35, 4.80, true);
-            // Instanciar puertas 3D interactivas con dintel a 3.56 m bajo la viga cumbrera:
+            cocinaLintel.position.set(0, DOOR_H + lintelH / 2, 0);
+            cocinaLintel.castShadow = true; cocinaLintel.receiveShadow = true;
+            cocinaLintelHolder.add(cocinaLintel);
+            const cocinaCap = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            cocinaCap.scale.set(wCocinaVano + 0.01, 0.02, INT_T + 0.01);
+            cocinaCap.position.set(0, lintelTopH + 0.01, 0);
+            cocinaCap.userData.isCap = true;
+            cocinaLintelHolder.add(cocinaCap);
+            doors3DGroup.add(cocinaLintelHolder);
+            simsWalls.push({
+                type: 'doorLintel',
+                holder: cocinaLintelHolder,
+                lintelMesh: cocinaLintel,
+                capMesh: cocinaCap,
+                wallTopH: lintelTopH,
+                isExterior: false,
+                maxH: lintelTopH,
+                currentH: lintelTopH,
+                targetH: lintelTopH,
+                linkedObjs: [],
+                ...getWallNormals(3.00, 4.80, 3.75, 4.80, false)
+            });
+
+            // Dintel sobre el Vano Abierto Living-Pasillo (X = 3.00, Z = 4.05 a 4.80, ancho 0.75 m)
+            const wPasilloVano = 0.75;
+            const pasilloLintelH = 5.20 - 2.20;
+            const pasilloLintelHolder = new THREE.Group();
+            pasilloLintelHolder.position.set(3.00, 0, 4.05 + wPasilloVano / 2);
+            const pasilloLintel = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
+            pasilloLintel.scale.set(INT_T, pasilloLintelH, wPasilloVano);
+            pasilloLintel.position.set(0, 2.20 + pasilloLintelH / 2, 0);
+            pasilloLintel.castShadow = true; pasilloLintel.receiveShadow = true;
+            pasilloLintelHolder.add(pasilloLintel);
+            const pasilloCap = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            pasilloCap.scale.set(INT_T + 0.01, 0.02, wPasilloVano + 0.01);
+            pasilloCap.position.set(0, 5.20 + 0.01, 0);
+            pasilloCap.userData.isCap = true;
+            pasilloLintelHolder.add(pasilloCap);
+            doors3DGroup.add(pasilloLintelHolder);
+            simsWalls.push({
+                type: 'doorLintel',
+                holder: pasilloLintelHolder,
+                lintelMesh: pasilloLintel,
+                capMesh: pasilloCap,
+                wallTopH: 5.20,
+                isExterior: false,
+                maxH: 5.20,
+                currentH: 5.20,
+                targetH: 5.20,
+                linkedObjs: [],
+                ...getWallNormals(3.00, 4.05, 3.00, 4.80, false)
+            });
+
+            // Instanciar puertas 3D interactivas con dintel a 5.20 m bajo la viga cumbrera:
             addMainEntranceDoor3D(5.34, 5.70, 6.18, 5.70);
-            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 90, 'Puerta Estudio', 3.56);
-            addInteriorWoodDoor3D(2.30, 3.15, 2.30, 3.85, false, 1, 75, 'Puerta Bano', 3.56);
-            addInteriorWoodDoor3D(2.30, 4.70, 3.00, 4.70, false, 1, 75, 'Puerta Cuarto', 3.56);
+            addInteriorWoodDoor3D(2.30, 2.30, 3.00, 2.30, false, -1, 90, 'Puerta Estudio', 5.20);
+            addInteriorWoodDoor3D(2.30, 3.15, 2.30, 3.85, false, 1, 75, 'Puerta Bano', 5.20);
+            addInteriorWoodDoor3D(2.30, 4.70, 3.00, 4.70, false, 1, 75, 'Puerta Cuarto', 5.20);
             addSlidingPlacardFront3D(0.00, 2.30, 2.30, -1, 'Placard Estudio');
             addSlidingPlacardFront3D(0.00, 2.30, 4.70, 1, 'Placard Cuarto');
             resolveWallMounts();
             updateRoofCapsVisibility();
+            updateSimsWalls(true);
         }
         setTimeout(ensure3DExtrasBuilt, 60);
         // ============================================================================
@@ -5925,24 +5974,24 @@
             setMountWall(null);
             // - Escurridor de platos negro sobre el retorno Sur de la mesada (mitad izquierda bajo la ventana: X=4.22, Z=7.68)
             addDecorBox(4.22, 0.93, 7.68, 0.38, 0.10, 0.36, 0x1e293b, 0.4, 0, 'Escurridor de Platos Negro');
-            // - Lavarropas automático blanco de carga frontal bajo la ventana Sur (X=3.25..3.85, Z=7.67, mirando al Norte) que toca justo la pared Oeste en X=3.25
-            addDecorBox(3.55, 0.42, 7.67, 0.60, 0.84, 0.58, 0xf8fafc, 0.3, 0, 'Lavarropas Automático');  // Cuerpo lavarropas
-            const drum = addDecorCyl(3.55, 0.44, 7.37, 0.18, 0.18, 0.04, 0x334155, 0.2, 'Puerta Lavarropas'); // Ojo de buey mirando al Norte
+            // - Lavarropas automático blanco de carga frontal bajo la ventana Sur (X=3.05..3.65, Z=7.67, mirando al Norte) apoyado contra la pared Oeste X=3.00
+            addDecorBox(3.35, 0.42, 7.67, 0.60, 0.84, 0.58, 0xf8fafc, 0.3, 0, 'Lavarropas Automático');  // Cuerpo lavarropas
+            const drum = addDecorCyl(3.35, 0.44, 7.37, 0.18, 0.18, 0.04, 0x334155, 0.2, 'Puerta Lavarropas'); // Ojo de buey mirando al Norte
             drum.rotation.x = Math.PI / 2;
-            addDecorBox(3.55, 0.86, 7.67, 0.60, 0.04, 0.60, 0xb47b48, 0.45, 0, 'Tapa Madera Lavarropas'); // Tapa de madera que apoya exacta contra la pared en X=3.25
+            addDecorBox(3.35, 0.86, 7.67, 0.60, 0.04, 0.60, 0xb47b48, 0.45, 0, 'Tapa Madera Lavarropas'); // Tapa de madera que apoya exacta contra pared X=3.00
             // - Estación de café sobre la tapa de madera del lavarropas (frente a la ventana): Cafetera expreso + Pava eléctrica negra
-            addDecorBox(3.65, 1.04, 7.68, 0.26, 0.32, 0.26, 0x334155, 0.3, 0, 'Cafetera Espresso');  // Cafetera expreso plateada/negra
-            addDecorCyl(3.38, 0.98, 7.68, 0.08, 0.09, 0.20, 0x0f172a, 0.3, 'Pava Eléctrica Negra');  // Pava eléctrica negra
-            // 4. Pared Oeste de la Cocina (X=3.20): 2 Cestos de basura en fila + bolso térmico + escoba azul con pala + portero eléctrico + aplique luz
-            addDecorBox(3.42, 0.26, 7.08, 0.30, 0.52, 0.30, 0xf8fafc, 0.4, 0, 'Cesto Basura Blanco');  // Cesto blanco (junto a pared X=3.20)
-            addDecorBox(3.42, 0.53, 7.08, 0.28, 0.03, 0.28, 0x1e293b, 0.4, 0, 'Tapa Cesto Blanco');  // Tapa vaivén negra del cesto blanco
-            addDecorBox(3.42, 0.28, 6.68, 0.30, 0.56, 0.32, 0x64748b, 0.5, 0, 'Cesto Basura Gris');  // Cesto gris con tapa
-            addDecorBox(3.42, 0.14, 6.32, 0.26, 0.26, 0.24, 0x1e1b4b, 0.7, 0, 'Bolso Térmico');  // Bolso térmico negro/rosa delante del cesto gris
-            addDecorCyl(3.27, 0.65, 6.68, 0.015, 0.015, 1.25, 0x1d4ed8, 0.4, 'Escoba Azul'); // Escoba cabo azul apoyada en pared Oeste
-            addDecorBox(3.28, 0.36, 6.68, 0.08, 0.22, 0.20, 0xf8fafc, 0.4, 0, 'Pala de Basura');  // Pala blanca colgada en la escoba
-            setMountWall(3.20, 6.00, false);
-            addDecorBox(3.26, 1.42, 5.50, 0.05, 0.22, 0.10, 0xfef3c7, 0.4, 0, 'Portero Eléctrico Intercom');  // Teléfono portero eléctrico beige
-            addDecorBox(3.26, 2.15, 5.75, 0.06, 0.16, 0.24, 0xffffff, 0.3, 0, 'Aplique de Pared Cocina');  // Aplique de pared medialuna blanco
+            addDecorBox(3.45, 1.04, 7.68, 0.26, 0.32, 0.26, 0x334155, 0.3, 0, 'Cafetera Espresso');  // Cafetera expreso plateada/negra
+            addDecorCyl(3.18, 0.98, 7.68, 0.08, 0.09, 0.20, 0x0f172a, 0.3, 'Pava Eléctrica Negra');  // Pava eléctrica negra
+            // 4. Pared Oeste de la Cocina (X=3.00): 2 Cestos de basura en fila + bolso térmico + escoba azul con pala + portero eléctrico + aplique luz
+            addDecorBox(3.22, 0.26, 7.08, 0.30, 0.52, 0.30, 0xf8fafc, 0.4, 0, 'Cesto Basura Blanco');  // Cesto blanco (junto a pared X=3.00)
+            addDecorBox(3.22, 0.53, 7.08, 0.28, 0.03, 0.28, 0x1e293b, 0.4, 0, 'Tapa Cesto Blanco');  // Tapa vaivén negra del cesto blanco
+            addDecorBox(3.22, 0.28, 6.68, 0.30, 0.56, 0.32, 0x64748b, 0.5, 0, 'Cesto Basura Gris');  // Cesto gris con tapa
+            addDecorBox(3.22, 0.14, 6.32, 0.26, 0.26, 0.24, 0x1e1b4b, 0.7, 0, 'Bolso Térmico');  // Bolso térmico negro/rosa delante del cesto gris
+            addDecorCyl(3.07, 0.65, 6.68, 0.015, 0.015, 1.25, 0x1d4ed8, 0.4, 'Escoba Azul'); // Escoba cabo azul apoyada en pared Oeste
+            addDecorBox(3.08, 0.36, 6.68, 0.08, 0.22, 0.20, 0xf8fafc, 0.4, 0, 'Pala de Basura');  // Pala blanca colgada en la escoba
+            setMountWall(3.00, 6.00, false);
+            addDecorBox(3.06, 1.42, 5.50, 0.05, 0.22, 0.10, 0xfef3c7, 0.4, 0, 'Portero Eléctrico Intercom');  // Teléfono portero eléctrico beige
+            addDecorBox(3.06, 2.15, 5.75, 0.06, 0.16, 0.24, 0xffffff, 0.3, 0, 'Aplique de Pared Cocina');  // Aplique de pared medialuna blanco
             setMountWall(null);
 
             // ------------------------------------------------------------------------
@@ -6163,7 +6212,7 @@
                 addDecorBox(0.70, 0.68, 0.056, 0.04, 0.02, 0.01, 0x38bdf8, 0.2, 0, 'Display Digital Calefactor Estudio');
             });
             // - Cortina de ventana Norte (V4: X = 1.65 a 2.95 m, barral a Z = 2.15 m):
-            addCurtainAssembly(0.90, 0.00, 2.10, 0.00, 0, 0.12, 0x57534e);
+            addCurtainAssembly(1.65, 0.00, 2.85, 0.00, 0, 0.12, 0x57534e);
 
             // 2. ESCRITORIO GAMER EN "L" (Setup Detallado con FFVII Rebirth, Rebote LED, Mate y Termo)
             createCompoundAssembly('Escritorio Gamer en "L"', () => {
@@ -8366,7 +8415,7 @@
             { id: 'vid_mesa_red', name: 'Mesa Comedor Redonda + 4 Sillas', room: 'Living', x: 4.55, z: 0.95, y: 0.38, w: 1.00, d: 1.00, h: 0.76, rot: 0, color: 0x882915 },
             { id: 'vid_cucha_ne', name: 'Cucha Perro Esquina NE', room: 'Living', x: 5.55, z: 0.38, y: 0.05, w: 0.92, d: 0.62, h: 0.10, rot: 0, color: 0x94a3b8 },
             { id: 'vid_heladera', name: 'Heladera c/ Freezer + Bodega', room: 'Cocina', x: 4.85, z: 4.88, y: 0.84, w: 0.60, d: 0.62, h: 1.68, rot: 0, color: 0xe2e8f0 },
-            { id: 'vid_lavarropas', name: 'Lavarropas + Estación Café (Bajo Ventana)', room: 'Cocina', x: 3.55, z: 6.67, y: 0.43, w: 0.60, d: 0.58, h: 0.86, rot: 0, color: 0xcbd5e1 },
+            { id: 'vid_lavarropas', name: 'Lavarropas + Estación Café (Bajo Ventana)', room: 'Cocina', x: 3.35, z: 6.67, y: 0.43, w: 0.60, d: 0.58, h: 0.86, rot: 0, color: 0xcbd5e1 },
             { id: 'vid_cama_2p', name: 'Cama 2 Plazas + Respaldo Nogal', room: 'Cuarto', x: 1.05, z: 5.80, y: 0.24, w: 1.90, d: 1.45, h: 0.48, rot: 0, color: 0x475569 },
             { id: 'vid_luz_n', name: 'Mesa de Luz Norte', room: 'Cuarto', x: 0.28, z: 4.84, y: 0.31, w: 0.42, d: 0.44, h: 0.62, rot: 0, color: 0x4a3222 },
             { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.28, z: 6.72, y: 0.31, w: 0.42, d: 0.42, h: 0.62, rot: 0, color: 0x4a3222 },
@@ -8599,6 +8648,7 @@
                 else if (mode === 'zocalo') setActiveTopBtn('btn-mode-zocalo');
                 else if (mode === 'nowalls') setActiveTopBtn('btn-mode-nowalls');
             }
+            updateSimsWalls(true);
             wakeRenderer();
         }
 
@@ -8836,6 +8886,7 @@
             
             setActiveTopBtn(mode === 'sims' ? 'btn-mode-sims' : (mode === 'down' || mode === 'cut' ? 'btn-mode-cut' : (mode === 'zocalo' ? 'btn-mode-zocalo' : (mode === 'nowalls' ? 'btn-mode-nowalls' : 'btn-mode-3d'))));
             document.querySelectorAll('.view-chip').forEach(el => el.classList.toggle('active', el.dataset.view === presetName));
+            updateSimsWalls(true);
             wakeRenderer();
         }
 
