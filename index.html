@@ -2965,7 +2965,7 @@
             const mz = (z1 + z2) / 2;
             let isHoriz = Math.abs(dx) >= Math.abs(dz);
             // Jambas cortas de la puerta de entrada en Z=6.30 se comportan como parte del muro horizontal Sur
-            if (isExterior && mz > 6.15 && mz < 6.45 && mx > 5.30 && mx < 6.20) {
+            if (isExterior && mz > 6.15 && mz < 6.45 && mx > 5.10 && mx < 6.05) {
                 isHoriz = true;
             }
             const nx = isHoriz ? 0 : 1;
@@ -3620,18 +3620,18 @@
         // - Muro sólido Este (Z = 1.45 a 6.30 m, aloja Calefactor en Z=1.85, Rack TV y Perchero Entrada)
         addWallSegment(6.30, 1.45, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 3.80);
 
-        // Retranqueo Palier (Puerta Principal en Z = 6.30): de [4.85, 6.30] a [6.30, 6.30] a 4.41 m
-        addWallSegment(4.85, 6.30, 5.34, 6.30, EXT_T, exteriorWallsGroup, true, 4.41);
-        addWallSegment(6.18, 6.30, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 3.80);
-        // Umbral y símbolo arquitectónico 2D de Puerta Principal (abre 90° hacia el Norte dentro de Entrada batiendo sobre pared Este)
+        // Retranqueo Palier (Puerta Principal en Z = 6.30 centrada en X = 5.575 m):
+        addWallSegment(4.85, 6.30, 5.15, 6.30, EXT_T, exteriorWallsGroup, true, 4.41);
+        addWallSegment(6.00, 6.30, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 3.80);
+        // Umbral y símbolo arquitectónico 2D de Puerta Principal (centrada, abre 90° hacia el Norte dentro de Entrada batiendo sobre pared Este)
         const entranceThreshold = new THREE.Mesh(
-            new THREE.BoxGeometry(0.84, 0.01, 0.06),
+            new THREE.BoxGeometry(0.85, 0.01, 0.06),
             new THREE.MeshBasicMaterial({ color: 0xcbd5e1 })
         );
-        entranceThreshold.position.set(5.76, 0.01, 6.30);
+        entranceThreshold.position.set(5.575, 0.01, 6.30);
         lines2DGroup.add(entranceThreshold);
-        addDashedLine(5.34, 6.30, 6.18, 6.30);
-        addDoorSymbol2D(6.14, 6.30, 6.14, 5.56, 5.40, 5.56, 5.40, 6.30);
+        addDashedLine(5.15, 6.30, 6.00, 6.30);
+        addDoorSymbol2D(5.96, 6.30, 5.96, 5.45, 5.19, 5.45, 5.19, 6.30);
 
         // Muro Derecho Cocina (Límite con Palier exterior): de [4.85, 6.30] a [4.85, 8.00] a 4.41 m
         addWallSegment(4.85, 6.30, 4.85, 8.00, EXT_T, exteriorWallsGroup, true, 4.41);
@@ -5036,7 +5036,7 @@
             });
 
             // Instanciar puertas 3D interactivas con dintel a 5.20 m bajo la viga cumbrera:
-            addMainEntranceDoor3D(5.34, 6.30, 6.18, 6.30);
+            addMainEntranceDoor3D(5.15, 6.30, 6.00, 6.30);
             addInteriorWoodDoor3D(2.30, 2.80, 3.00, 2.80, false, -1, 90, 'Puerta Estudio', 5.20);
             addInteriorWoodDoor3D(2.30, 3.65, 2.30, 4.35, false, 1, 75, 'Puerta Bano', 5.20);
             addInteriorWoodDoor3D(2.30, 5.20, 3.00, 5.20, false, 1, 75, 'Puerta Cuarto', 5.20);
@@ -5370,12 +5370,12 @@
             // A) ENTRADA Y LIVING-COMEDOR ([3.00, 0.00] a [6.30, 6.30])
             // ------------------------------------------------------------------------
             // 1. Entrada (X = 4.85..6.30, Z = 5.20..6.30):
-            // - Crucifijo de madera oscura sobre dintel de puerta principal + retablo dorado sobre muro + tablero eléctrico
-            setMountWall(5.75, 6.30, true);
+            // - Crucifijo de madera oscura centrado sobre dintel de puerta principal + retablo dorado sobre muro + tablero eléctrico
+            setMountWall(5.575, 6.30, true);
             // Crucifijo montado sobre el dintel interior de la puerta (Z = 6.23 pegado a la cara interna del muro en Z = 6.30)
-            addDecorBox(5.75, 2.30, 6.23, 0.14, 0.24, 0.02, 0x3b2314);
-            // Retablo dorado montado sobre el muro derecho junto a la puerta (X = 6.21, Z = 6.23)
-            addDecorBox(6.21, 1.48, 6.23, 0.08, 0.13, 0.02, 0xd4af37);
+            addDecorBox(5.575, 2.30, 6.23, 0.14, 0.24, 0.02, 0x3b2314);
+            // Retablo dorado montado sobre el muro derecho junto a la puerta (X = 6.15, Z = 6.23)
+            addDecorBox(6.15, 1.48, 6.23, 0.08, 0.13, 0.02, 0xd4af37);
             setMountWall(4.85, 5.70, false);
             // Tablero eléctrico sobre pared divisoria con Cocina (cara Entrada X = 4.85 + INT_T/2)
             addDecorBox(4.91, 1.45, 5.70, 0.02, 0.22, 0.26, 0x1e293b);
@@ -5385,17 +5385,17 @@
             // Dimensiones y distribución fiel de objetos:
             // ============================================================================
 
-            // 1. Muro Sur a la derecha de la puerta (lado Oeste, X = 4.85 a 5.34, Z = 6.30):
+            // 1. Muro Sur a la derecha de la puerta (lado Oeste, X = 4.85 a 5.15, Z = 6.30):
             // - Rejilla de ventilación blanca superior (cerca del techo, fotos #2 y #3)
-            setMountWall(5.25, 6.30, true);
-            addDecorBox(5.25, 2.48, 6.22, 0.16, 0.16, 0.015, 0xf8fafc, 0.6, 0, 'Rejilla de Ventilación');
+            setMountWall(5.00, 6.30, true);
+            addDecorBox(5.00, 2.48, 6.22, 0.16, 0.16, 0.015, 0xf8fafc, 0.6, 0, 'Rejilla de Ventilación');
             // - Cuadrito / placa religiosa dorada (santito) en muro derecho (foto #2)
-            addDecorBox(5.25, 1.45, 6.22, 0.09, 0.14, 0.022, 0xd4af37, 0.35, 0, 'Placa Religiosa Dorada');
-            addDecorBox(5.25, 1.45, 6.21, 0.065, 0.11, 0.024, 0x78350f, 0.7); // Lámina interior
+            addDecorBox(5.00, 1.45, 6.22, 0.09, 0.14, 0.022, 0xd4af37, 0.35, 0, 'Placa Religiosa Dorada');
+            addDecorBox(5.00, 1.45, 6.21, 0.065, 0.11, 0.024, 0x78350f, 0.7); // Lámina interior
             // - Tecla de luz blanca en el muro derecho (foto #2)
-            addDecorBox(5.25, 1.05, 6.22, 0.08, 0.12, 0.014, 0xf1f5f9, 0.4);
+            addDecorBox(5.00, 1.05, 6.22, 0.08, 0.12, 0.014, 0xf1f5f9, 0.4);
             // - Recipiente / macetita verde en el zócalo de la esquina derecha (foto #2)
-            addDecorCyl(5.25, 0.07, 6.22, 0.045, 0.045, 0.14, 0x4d7c0f, 0.5);
+            addDecorCyl(5.00, 0.07, 6.22, 0.045, 0.045, 0.14, 0x4d7c0f, 0.5);
 
             // 2. Muro Este de Entrada (X = 6.30, de Z = 5.20 a Z = 6.30):
             setMountWall(6.30, 6.18, false);
