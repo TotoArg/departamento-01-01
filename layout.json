@@ -1,5 +1,5 @@
 {
-  "updatedAt": 1794335079884,
+  "updatedAt": 1794335085007,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -37,7 +37,7 @@
         "rot": 0
       },
       "Mesa de Comedor Redonda": {
-        "x": 4.49,
+        "x": 4.46,
         "y": 0.37,
         "z": 1.25,
         "rot": 0
