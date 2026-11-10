@@ -5058,55 +5058,442 @@
         // ============================================================================
 
         // Creador de plantas de interior con maceta cerámica y esferas deformadas cruzadas
+        function createBotanicalLeafTexture(type = 'calathea') {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            if (type === 'sansevieria') {
+                const grad = ctx.createLinearGradient(0, 0, 512, 0);
+                grad.addColorStop(0, '#facc15');      // Borde amarillo dorado característico
+                grad.addColorStop(0.08, '#eab308');
+                grad.addColorStop(0.14, '#1b4332');   // Franja verde oscura
+                grad.addColorStop(0.50, '#2d6a4f');   // Centro verde jaspeado
+                grad.addColorStop(0.86, '#1b4332');
+                grad.addColorStop(0.92, '#eab308');
+                grad.addColorStop(1.0, '#facc15');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 512, 512);
+
+                ctx.fillStyle = 'rgba(116, 198, 157, 0.55)';
+                for (let y = 10; y < 512; y += 14 + (Math.sin(y * 0.05) * 6)) {
+                    ctx.beginPath();
+                    ctx.moveTo(70, y);
+                    for (let x = 70; x < 442; x += 30) {
+                        ctx.lineTo(x, y + Math.sin(x * 0.08 + y) * 5);
+                    }
+                    ctx.lineTo(442, y + 6);
+                    ctx.lineTo(70, y + 4);
+                    ctx.fill();
+                }
+            } else if (type === 'calathea') {
+                const grad = ctx.createLinearGradient(0, 0, 0, 512);
+                grad.addColorStop(0, '#134e4a');
+                grad.addColorStop(0.5, '#042f2e');
+                grad.addColorStop(1, '#022c22');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 512, 512);
+
+                ctx.strokeStyle = '#5eead4';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.moveTo(256, 0);
+                ctx.lineTo(256, 512);
+                ctx.stroke();
+
+                ctx.strokeStyle = '#2dd4bf';
+                ctx.lineWidth = 4;
+                for (let y = 30; y < 490; y += 22) {
+                    ctx.beginPath();
+                    ctx.moveTo(256, y);
+                    ctx.quadraticCurveTo(150, y - 18, 40, y + 25);
+                    ctx.moveTo(256, y);
+                    ctx.quadraticCurveTo(362, y - 18, 472, y + 25);
+                    ctx.stroke();
+                }
+            } else if (type === 'potus') {
+                const grad = ctx.createLinearGradient(0, 0, 0, 512);
+                grad.addColorStop(0, '#15803d');
+                grad.addColorStop(0.6, '#166534');
+                grad.addColorStop(1, '#14532d');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 512, 512);
+
+                ctx.fillStyle = 'rgba(254, 240, 138, 0.65)';
+                for (let m = 0; m < 35; m++) {
+                    const cx = 80 + Math.sin(m * 2.3) * 160 + 100;
+                    const cy = (m * 15) % 480;
+                    const r = 12 + Math.cos(m * 1.5) * 8;
+                    ctx.beginPath();
+                    ctx.ellipse(cx, cy, r * 1.5, r, Math.PI / 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.strokeStyle = 'rgba(217, 249, 157, 0.4)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(256, 0); ctx.lineTo(256, 512);
+                ctx.stroke();
+            } else {
+                ctx.fillStyle = '#1e3a1e';
+                ctx.fillRect(0, 0, 512, 512);
+                ctx.strokeStyle = '#4ade80';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(256, 0); ctx.lineTo(256, 512); ctx.stroke();
+            }
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.ClampToEdgeWrapping;
+            tex.wrapT = THREE.ClampToEdgeWrapping;
+            return tex;
+        }
+
+        const BOTANICAL_TEXTURES = {
+            sansevieria: createBotanicalLeafTexture('sansevieria'),
+            calathea: createBotanicalLeafTexture('calathea'),
+            potus: createBotanicalLeafTexture('potus'),
+            succulent: createBotanicalLeafTexture('succulent')
+        };
+
+        const SOIL_PBR_MAT = new THREE.MeshStandardMaterial({
+            color: 0x1c1917,
+            roughness: 0.94,
+            metalness: 0.02
+        });
+
+        // 1. GENERADOR DE SANSEVIERIA TRIFASCIATA (Lengua de suegra) REALISTA
+        function createRealisticSansevieria(potR = 0.14, potH = 0.24) {
+            const group = new THREE.Group();
+            group.name = 'Sansevieria_PBR';
+
+            const potMat = new THREE.MeshStandardMaterial({
+                color: 0xf8fafc,
+                roughness: 0.22,
+                metalness: 0.05
+            });
+            const potBody = new THREE.Mesh(new THREE.CylinderGeometry(potR, potR * 0.92, potH, 24), potMat);
+            potBody.position.y = potH / 2;
+            potBody.castShadow = true; potBody.receiveShadow = true;
+            group.add(potBody);
+
+            const rim = new THREE.Mesh(new THREE.TorusGeometry(potR + 0.004, 0.007, 10, 24), potMat);
+            rim.rotation.x = Math.PI / 2;
+            rim.position.y = potH;
+            group.add(rim);
+
+            const soil = new THREE.Mesh(new THREE.CylinderGeometry(potR - 0.008, potR - 0.012, 0.025, 24), SOIL_PBR_MAT);
+            soil.position.y = potH - 0.012;
+            group.add(soil);
+
+            const pebbleMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.45 });
+            const pGeo = new THREE.DodecahedronGeometry(0.008, 0);
+            for (let p = 0; p < 14; p++) {
+                const pMesh = new THREE.Mesh(pGeo, pebbleMat);
+                const pAng = (p / 14) * Math.PI * 2 + Math.random() * 0.3;
+                const pDist = (potR * 0.4) + Math.random() * (potR * 0.45);
+                pMesh.position.set(Math.cos(pAng) * pDist, potH + 0.003, Math.sin(pAng) * pDist);
+                pMesh.rotation.set(Math.random(), Math.random(), Math.random());
+                pMesh.scale.set(1 + Math.random(), 0.6, 1 + Math.random());
+                group.add(pMesh);
+            }
+
+            const leafMat = new THREE.MeshStandardMaterial({
+                map: BOTANICAL_TEXTURES.sansevieria,
+                color: 0xffffff,
+                roughness: 0.38,
+                metalness: 0.05,
+                side: THREE.DoubleSide
+            });
+
+            const leafCount = 13;
+            for (let i = 0; i < leafCount; i++) {
+                const bladeH = 0.38 + (i % 5) * 0.07 + (i === 0 ? 0.12 : 0);
+                const bladeW = 0.052 + (i % 3) * 0.012;
+                
+                const leafGeo = new THREE.PlaneGeometry(bladeW, bladeH, 6, 16);
+                const pos = leafGeo.attributes.position;
+                for (let v = 0; v < pos.count; v++) {
+                    const yVal = pos.getY(v);
+                    const prog = (yVal + bladeH / 2) / bladeH;
+                    const xVal = pos.getX(v);
+                    const taper = Math.sin((1 - prog) * Math.PI * 0.5);
+                    pos.setX(v, xVal * (0.3 + 0.7 * taper));
+                    const vCurve = (Math.abs(xVal) / (bladeW / 2)) * 0.006 * prog;
+                    const arch = Math.pow(prog, 1.8) * 0.035;
+                    pos.setZ(v, -arch + vCurve);
+                }
+                leafGeo.computeVertexNormals();
+
+                const blade = new THREE.Mesh(leafGeo, leafMat);
+                blade.castShadow = true; blade.receiveShadow = true;
+
+                const isCenter = i < 4;
+                const ringRadius = isCenter ? (potR * 0.22) : (potR * 0.58);
+                const angle = (i / leafCount) * Math.PI * 2 * 2.1 + (i * 0.4);
+                
+                blade.position.set(
+                    Math.cos(angle) * ringRadius,
+                    potH + bladeH / 2 - 0.02,
+                    Math.sin(angle) * ringRadius
+                );
+                
+                const tilt = isCenter ? 0.08 : (0.16 + (i % 4) * 0.04);
+                blade.rotation.set(
+                    Math.cos(angle) * -tilt,
+                    -angle + Math.PI / 2,
+                    Math.sin(angle) * tilt
+                );
+                group.add(blade);
+            }
+
+            return group;
+        }
+
+        // 2. GENERADOR DE CALATHEA / MARANTA (Hojas ovales anchas y pecíolos delgados)
+        function createRealisticCalathea(potR = 0.15, potH = 0.26) {
+            const group = new THREE.Group();
+            group.name = 'Calathea_PBR';
+
+            const potMat = new THREE.MeshStandardMaterial({
+                color: 0xc2714f,
+                roughness: 0.65,
+                metalness: 0.03
+            });
+            const pot = new THREE.Mesh(new THREE.CylinderGeometry(potR, potR * 0.72, potH, 24), potMat);
+            pot.position.y = potH / 2;
+            pot.castShadow = true; pot.receiveShadow = true;
+            group.add(pot);
+
+            const lip = new THREE.Mesh(new THREE.CylinderGeometry(potR + 0.008, potR + 0.004, 0.02, 24), potMat);
+            lip.position.y = potH;
+            group.add(lip);
+
+            const soil = new THREE.Mesh(new THREE.CylinderGeometry(potR - 0.006, potR - 0.012, 0.02, 24), SOIL_PBR_MAT);
+            soil.position.y = potH - 0.006;
+            group.add(soil);
+
+            const leafMat = new THREE.MeshStandardMaterial({
+                map: BOTANICAL_TEXTURES.calathea,
+                color: 0xffffff,
+                roughness: 0.35,
+                metalness: 0.02,
+                side: THREE.DoubleSide
+            });
+            const stemMat = new THREE.MeshStandardMaterial({
+                color: 0x1b4332,
+                roughness: 0.50,
+                metalness: 0.0
+            });
+
+            const leafTotal = 15;
+            for (let i = 0; i < leafTotal; i++) {
+                const angle = (i / leafTotal) * Math.PI * 2 + (i % 3) * 0.2;
+                const distRatio = 0.35 + (i / leafTotal) * 0.55;
+                const stemLen = 0.18 + (i % 4) * 0.06;
+                const leafW = 0.11 + (i % 3) * 0.025;
+                const leafL = 0.19 + (i % 3) * 0.035;
+
+                const stemCurve = new THREE.QuadraticBezierCurve3(
+                    new THREE.Vector3(0, potH, 0),
+                    new THREE.Vector3(Math.cos(angle) * (potR * 0.5), potH + stemLen * 0.7, Math.sin(angle) * (potR * 0.5)),
+                    new THREE.Vector3(Math.cos(angle) * (potR * 1.2 * distRatio), potH + stemLen, Math.sin(angle) * (potR * 1.2 * distRatio))
+                );
+                const stemGeo = new THREE.TubeGeometry(stemCurve, 8, 0.004, 6, false);
+                const stem = new THREE.Mesh(stemGeo, stemMat);
+                stem.castShadow = true;
+                group.add(stem);
+
+                const leafGeo = new THREE.PlaneGeometry(leafW, leafL, 8, 12);
+                const pos = leafGeo.attributes.position;
+                for (let v = 0; v < pos.count; v++) {
+                    const y = pos.getY(v);
+                    const x = pos.getX(v);
+                    const normY = (y + leafL / 2) / leafL;
+                    const taper = Math.sin(normY * Math.PI);
+                    pos.setX(v, x * taper);
+                    const dome = (1 - (x * x) / (leafW * leafW * 0.3)) * 0.015;
+                    pos.setZ(v, dome * Math.sin(normY * Math.PI) - Math.pow(normY, 2) * 0.02);
+                }
+                leafGeo.computeVertexNormals();
+
+                const leaf = new THREE.Mesh(leafGeo, leafMat);
+                leaf.castShadow = true; leaf.receiveShadow = true;
+
+                const endPoint = stemCurve.getPoint(1.0);
+                leaf.position.copy(endPoint);
+                leaf.rotation.set(0.35 + Math.random() * 0.2, -angle + Math.PI / 2, 0.2 * (Math.random() - 0.5));
+                group.add(leaf);
+            }
+
+            return group;
+        }
+
+        // 3. GENERADOR DE POTUS COLGANTE (Epipremnum aureum en cascada para estantes)
+        function createRealisticHangingPothos(potR = 0.08, potH = 0.12, cascadeLen = 0.42, name = 'Potus Colgante') {
+            const group = new THREE.Group();
+            group.name = name;
+
+            const potMat = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                roughness: 0.18,
+                metalness: 0.08
+            });
+            const pot = new THREE.Mesh(new THREE.CylinderGeometry(potR, potR * 0.75, potH, 20), potMat);
+            pot.position.y = potH / 2;
+            pot.castShadow = true; pot.receiveShadow = true;
+            group.add(pot);
+
+            const soil = new THREE.Mesh(new THREE.CylinderGeometry(potR - 0.005, potR - 0.008, 0.015, 20), SOIL_PBR_MAT);
+            soil.position.y = potH - 0.005;
+            group.add(soil);
+
+            const leafMat = new THREE.MeshStandardMaterial({
+                map: BOTANICAL_TEXTURES.potus,
+                color: 0xffffff,
+                roughness: 0.32,
+                metalness: 0.04,
+                side: THREE.DoubleSide
+            });
+            const vineMat = new THREE.MeshStandardMaterial({
+                color: 0x166534,
+                roughness: 0.60,
+                metalness: 0.0
+            });
+
+            for (let c = 0; c < 9; c++) {
+                const ang = (c / 9) * Math.PI * 2;
+                const topLeafGeo = new THREE.PlaneGeometry(0.048, 0.065, 4, 6);
+                const leaf = new THREE.Mesh(topLeafGeo, leafMat);
+                leaf.position.set(Math.cos(ang) * (potR * 0.5), potH + 0.012, Math.sin(ang) * (potR * 0.5));
+                leaf.rotation.set(-0.4, ang, 0.3);
+                leaf.castShadow = true;
+                group.add(leaf);
+            }
+
+            const vineBranches = [
+                { startAngle: 0.2, length: cascadeLen, sway: 0.05 },
+                { startAngle: -0.4, length: cascadeLen * 0.85, sway: -0.04 },
+                { startAngle: 0.8, length: cascadeLen * 0.65, sway: 0.03 },
+                { startAngle: -0.9, length: cascadeLen * 0.45, sway: -0.02 }
+            ];
+
+            vineBranches.forEach((vb) => {
+                const points = [];
+                const segments = 10;
+                for (let s = 0; s <= segments; s++) {
+                    const t = s / segments;
+                    const px = Math.cos(vb.startAngle) * (potR * 0.9) + Math.sin(t * Math.PI * 2) * vb.sway;
+                    const py = potH - t * vb.length;
+                    const pz = Math.sin(vb.startAngle) * (potR * 0.9) + t * 0.06;
+                    points.push(new THREE.Vector3(px, py, pz));
+                }
+                const curve = new THREE.CatmullRomCurve3(points);
+                const vineGeo = new THREE.TubeGeometry(curve, 14, 0.003, 5, false);
+                const vineMesh = new THREE.Mesh(vineGeo, vineMat);
+                group.add(vineMesh);
+
+                for (let h = 1; h <= segments; h++) {
+                    const t = h / segments;
+                    const pt = curve.getPoint(t);
+                    const leafSize = 0.042 * (1 - t * 0.35);
+                    const heartGeo = new THREE.PlaneGeometry(leafSize, leafSize * 1.35, 4, 6);
+                    
+                    const pos = heartGeo.attributes.position;
+                    for (let v = 0; v < pos.count; v++) {
+                        const y = pos.getY(v);
+                        const x = pos.getX(v);
+                        const ny = (y + (leafSize * 1.35) / 2) / (leafSize * 1.35);
+                        pos.setX(v, x * (Math.sin(ny * Math.PI) * 0.85 + 0.15));
+                        pos.setZ(v, -Math.abs(x) * 0.2);
+                    }
+                    heartGeo.computeVertexNormals();
+
+                    const leaf = new THREE.Mesh(heartGeo, leafMat);
+                    leaf.position.copy(pt);
+                    leaf.rotation.set(0.6 + Math.random() * 0.3, vb.startAngle + (h % 2 === 0 ? 0.6 : -0.6), Math.random() * 0.4);
+                    leaf.castShadow = true;
+                    group.add(leaf);
+                }
+            });
+
+            return group;
+        }
+
+        // 4. GENERADOR DE MACETITA DE SUCULENTAS / CENTRO DE MESA
+        function createRealisticSucculentCenterpiece(potR = 0.09, potH = 0.09, name = 'Centro de Mesa Succulent') {
+            const group = new THREE.Group();
+            group.name = name;
+
+            const potMat = new THREE.MeshStandardMaterial({
+                color: 0xf1f5f9,
+                roughness: 0.28,
+                metalness: 0.05
+            });
+            const pot = new THREE.Mesh(new THREE.CylinderGeometry(potR, potR * 0.70, potH, 20), potMat);
+            pot.position.y = potH / 2;
+            pot.castShadow = true; pot.receiveShadow = true;
+            group.add(pot);
+
+            const soil = new THREE.Mesh(new THREE.CylinderGeometry(potR - 0.005, potR - 0.008, 0.015, 20), SOIL_PBR_MAT);
+            soil.position.y = potH - 0.005;
+            group.add(soil);
+
+            const rosettaMat = new THREE.MeshStandardMaterial({
+                color: 0x6ee7b7,
+                roughness: 0.30,
+                metalness: 0.04
+            });
+            const rosettaGroup = new THREE.Group();
+            rosettaGroup.position.y = potH;
+
+            const layers = [
+                { count: 8, scale: 0.035, radius: 0.038, tilt: 0.55, yOff: 0.005 },
+                { count: 7, scale: 0.028, radius: 0.026, tilt: 0.40, yOff: 0.012 },
+                { count: 6, scale: 0.022, radius: 0.016, tilt: 0.25, yOff: 0.018 },
+                { count: 4, scale: 0.015, radius: 0.006, tilt: 0.12, yOff: 0.024 }
+            ];
+
+            const petalGeo = new THREE.SphereGeometry(1, 10, 8);
+            layers.forEach(layer => {
+                for (let i = 0; i < layer.count; i++) {
+                    const ang = (i / layer.count) * Math.PI * 2;
+                    const petal = new THREE.Mesh(petalGeo, rosettaMat);
+                    petal.scale.set(layer.scale * 0.7, layer.scale * 0.35, layer.scale * 1.3);
+                    petal.position.set(Math.cos(ang) * layer.radius, layer.yOff, Math.sin(ang) * layer.radius);
+                    petal.rotation.set(-layer.tilt, ang + Math.PI / 2, 0);
+                    petal.castShadow = true;
+                    rosettaGroup.add(petal);
+                }
+            });
+            group.add(rosettaGroup);
+
+            return group;
+        }
+
+        // Creador unificado de plantas de interior con delegación botánica precisa
         function addDecorPlantCeramic(x, y, z, potRTop, potRBot, potH, folScaleX, folScaleY, folScaleZ, folH, name = 'Planta de Interior') {
             const g = new THREE.Group();
             g.name = name;
             g.userData.name = name;
             g.position.set(x, y, z);
 
-            // Maceta cerámica cónica
-            const potMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.05 });
-            const potGeo = new THREE.CylinderGeometry(potRTop, potRBot, potH, 16);
-            const pot = new THREE.Mesh(potGeo, potMat);
-            pot.position.set(0, potH / 2, 0);
-            pot.castShadow = true; pot.receiveShadow = true;
-            g.add(pot);
+            let botanicalMesh = null;
+            const lowerName = name.toLowerCase();
 
-            // Tierra sustrato negro
-            const soilMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.95 });
-            const soil = new THREE.Mesh(new THREE.CylinderGeometry(potRTop - 0.015, potRTop - 0.015, 0.02, 16), soilMat);
-            soil.position.set(0, potH - 0.01, 0);
-            g.add(soil);
-
-            // Follaje: clúster de múltiples esferas deformadas cruzadas en abanico
-            const leafTones = [0x2d6a4f, 0x40916c, 0x52b788, 0x1b4332, 0x386641];
-            const sphereGeo = new THREE.SphereGeometry(1, 14, 12);
-            const count = 7;
-            for (let i = 0; i < count; i++) {
-                const angle = (i / count) * Math.PI * 2;
-                const tone = leafTones[i % leafTones.length];
-                const leafMat = new THREE.MeshStandardMaterial({ color: tone, roughness: 0.90, metalness: 0.0 });
-                const leaf = new THREE.Mesh(sphereGeo, leafMat);
-                
-                const lx = Math.cos(angle) * (folScaleX * 0.35);
-                const lz = Math.sin(angle) * (folScaleZ * 0.35);
-                const ly = potH + folH * 0.45 + (Math.sin(i * 1.7) * (folH * 0.15));
-
-                leaf.position.set(lx, ly, lz);
-                leaf.scale.set(folScaleX * (0.65 + Math.random() * 0.35), folScaleY * (0.8 + Math.random() * 0.4), folScaleZ * (0.65 + Math.random() * 0.35));
-                leaf.rotation.set(Math.random() * 0.3, angle, Math.random() * 0.3);
-                leaf.castShadow = true; leaf.receiveShadow = true;
-                g.add(leaf);
+            if (lowerName.includes('sansevieria')) {
+                botanicalMesh = createRealisticSansevieria(potRTop, potH);
+            } else if (lowerName.includes('calathea')) {
+                botanicalMesh = createRealisticCalathea(potRTop, potH);
+            } else if (lowerName.includes('potus') || lowerName.includes('colgante')) {
+                botanicalMesh = createRealisticHangingPothos(potRTop, potH, Math.max(folH * 0.85, 0.30), name);
+            } else if (lowerName.includes('comedor') || lowerName.includes('centro') || lowerName.includes('esquina')) {
+                botanicalMesh = createRealisticSucculentCenterpiece(potRTop, potH, name);
+            } else {
+                botanicalMesh = createRealisticCalathea(potRTop, potH);
             }
 
-            // Esfera central superior
-            const topLeafMat = new THREE.MeshStandardMaterial({ color: 0x40916c, roughness: 0.90, metalness: 0.0 });
-            const topLeaf = new THREE.Mesh(sphereGeo, topLeafMat);
-            topLeaf.position.set(0, potH + folH * 0.70, 0);
-            topLeaf.scale.set(folScaleX * 0.85, folScaleY * 0.85, folScaleZ * 0.85);
-            topLeaf.castShadow = true; topLeaf.receiveShadow = true;
-            g.add(topLeaf);
-
+            g.add(botanicalMesh);
             (currentAssemblyGroup || decorVideoGroup).add(g);
             return g;
         }
@@ -6856,29 +7243,10 @@
                 bibGroup.add(switchBox, switchLogo);
 
                 // --- ESTANTE 5 (Y = 1.56 m): PLANTA COLGANTE Y LIBROS ---
-                // Maceta blanca con planta colgante cayendo por el borde de madera
-                const plantPot = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.045, 0.11, 16), porcelainMat);
-                plantPot.position.set(0.02, 1.57 + 0.055, -bibL / 2 + 0.14);
-                plantPot.castShadow = true;
-                bibGroup.add(plantPot);
-
-                // Follaje colgante con hojas verdes cayendo en cascada por el estante
-                const vineLeafMat = new THREE.MeshStandardMaterial({
-                    color: 0x15803d,
-                    roughness: 0.65,
-                    metalness: 0.05,
-                    side: THREE.DoubleSide
-                });
-                const vineCount = 9;
-                for (let v = 0; v < vineCount; v++) {
-                    const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.028, 8, 6), vineLeafMat);
-                    leaf.scale.set(1.2, 0.35, 1.5);
-                    const dropY = 1.57 + 0.06 - v * 0.035;
-                    const dropZ = -bibL / 2 + 0.14 + (Math.sin(v * 1.2) * 0.04);
-                    leaf.position.set(0.12 + Math.cos(v) * 0.02, dropY, dropZ);
-                    leaf.rotation.set(0.4, 0.3, v * 0.2);
-                    bibGroup.add(leaf);
-                }
+                // Planta Potus colgante botánica hiperrealista cayendo en cascada por el estante de madera
+                const biblioPothos = createRealisticHangingPothos(0.055, 0.10, 0.36, 'Potus Biblioteca Estudio');
+                biblioPothos.position.set(0.02, 1.57, -bibL / 2 + 0.14);
+                bibGroup.add(biblioPothos);
 
                 // Libros en el resto del estante 5
                 let curZ5 = 0.0;
