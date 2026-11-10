@@ -1,9 +1,10 @@
 {
-  "updatedAt": 1794323761040,
+  "updatedAt": 1794323764189,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
-      "accentStudyWall"
+      "accentStudyWall",
+      "Espejo Panorámico Horizontal (Comedor)"
     ],
     "transforms": {
       "Comederos de Mascota": {
