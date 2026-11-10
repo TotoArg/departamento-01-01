@@ -1,4 +1,6 @@
-# Entorno virtual y temporales
+# Herramientas de diagnóstico temporales
+tools/
+
 .venv/
 __pycache__/
 *.pyc

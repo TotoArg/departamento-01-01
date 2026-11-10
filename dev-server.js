@@ -11,7 +11,7 @@ const clients = [];
 let reloadTimeout = null;
 try {
     fs.watch(__dirname, { recursive: true }, (eventType, filename) => {
-        if (!filename || filename.includes('node_modules') || filename.startsWith('.') || filename.endsWith('.tmp')) return;
+        if (!filename || filename.includes('node_modules') || filename.startsWith('.') || filename.endsWith('.tmp') || filename.includes('layout.json')) return;
         if (reloadTimeout) clearTimeout(reloadTimeout);
         reloadTimeout = setTimeout(() => {
             console.log(`[Auto-Reload] Cambio detectado en ${filename}, actualizando navegador...`);
@@ -59,6 +59,18 @@ const liveReloadScript = `
 
 const server = http.createServer((req, res) => {
     console.log(`[REQ] ${req.method} ${req.url} de ${req.socket.remoteAddress}`);
+
+    // Headers CORS para sincronización segura desde navegador local, celular o túnel
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
+
     if (req.url === '/__livereload') {
         res.writeHead(200, {
             'Content-Type': 'text/event-stream',
@@ -74,6 +86,53 @@ const server = http.createServer((req, res) => {
     }
 
     const cleanUrl = req.url.split('?')[0];
+
+    // Endpoint API para Sincronización Bidireccional (Online / Offline)
+    if (cleanUrl === '/api/layout') {
+        const layoutFilePath = path.join(__dirname, 'layout.json');
+        if (req.method === 'GET') {
+            try {
+                if (fs.existsSync(layoutFilePath)) {
+                    const data = fs.readFileSync(layoutFilePath, 'utf8');
+                    res.writeHead(200, {
+                        'Content-Type': 'application/json; charset=utf-8',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate'
+                    });
+                    res.end(data);
+                } else {
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify({ updatedAt: 0, decorOverrides: { deleted: [], transforms: {} }, furnitureList: [] }));
+                }
+            } catch (err) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: err.message }));
+            }
+            return;
+        }
+
+        if (req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk; });
+            req.on('end', () => {
+                try {
+                    const parsed = JSON.parse(body);
+                    if (!parsed.updatedAt) parsed.updatedAt = Date.now();
+                    fs.writeFileSync(layoutFilePath, JSON.stringify(parsed, null, 2), 'utf8');
+                    res.writeHead(200, {
+                        'Content-Type': 'application/json; charset=utf-8',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate'
+                    });
+                    res.end(JSON.stringify({ ok: true, updatedAt: parsed.updatedAt }));
+                    console.log(`[Layout Sync] Distribución sincronizada en disco (${new Date(parsed.updatedAt).toLocaleTimeString()})`);
+                } catch (err) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'JSON inválido', details: err.message }));
+                }
+            });
+            return;
+        }
+    }
+
     let filePath = path.join(__dirname, cleanUrl === '/' ? 'index.html' : cleanUrl);
 
     if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {

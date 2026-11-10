@@ -583,6 +583,81 @@
         }
         .sel-bar-actions::-webkit-scrollbar { display: none; }
 
+        /* Estilo Los Sims: Dimensionamiento y Sincronización */
+        .editor-title {
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+        }
+        .sync-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.14);
+            color: #f8fafc;
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        .sync-badge:hover {
+            transform: scale(1.03);
+            filter: brightness(1.15);
+        }
+        .sims-dim-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            width: 100%;
+        }
+        .sims-dim-lbl {
+            width: 80px;
+            flex-shrink: 0;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 10.5px;
+        }
+        .sims-step-btn {
+            background: #1e293b;
+            border: 1px solid #475569;
+            color: #f8fafc;
+            border-radius: 6px;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 3px 6px;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+            flex-shrink: 0;
+        }
+        .sims-step-btn:hover {
+            background: #334155;
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+        .sims-step-btn:active {
+            transform: scale(0.95);
+        }
+        .sims-slider {
+            flex: 1;
+            height: 5px;
+            accent-color: #d946ef;
+            cursor: pointer;
+        }
+        .sims-dim-val {
+            width: 82px;
+            text-align: right;
+            font-family: monospace;
+            color: #f0abfc;
+            font-weight: 700;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
         /* Mobile UI Optimization */
         @media (max-width: 900px) {
             #top-ui-wrapper {
@@ -675,7 +750,7 @@
             #furniture-editor.minimized {
                 padding: 4px 6px;
             }
-            .editor-title { font-size: 10.5px; }
+            .editor-title { font-size: 10.5px; white-space: nowrap !important; flex-shrink: 0 !important; }
 
             #selected-object-bar {
                 bottom: 48px;
@@ -816,9 +891,12 @@
             <button class="mode-btn" id="btn-toggle-edit-mode" style="background:rgba(245,158,11,0.20); border:1px solid #f59e0b; color:#fde68a;" title="Activar/Desactivar modo de edición de muebles">
                 <span id="btn-edit-mode-icon">🔒</span> <span id="btn-edit-mode-text">Editar muebles</span>
             </button>
-            <button class="mode-btn" id="btn-save-layout" style="background:rgba(16,185,129,0.24); border:1.5px solid #10b981; color:#6ee7b7; font-weight:700;" title="Guardar modificaciones de muebles permanentemente (Ctrl+S)">
+            <button class="mode-btn" id="btn-save-layout" style="background:rgba(16,185,129,0.24); border:1.5px solid #10b981; color:#6ee7b7; font-weight:700;" title="Guardar modificaciones de muebles permanentemente y sincronizar (Ctrl+S)">
                 <span>💾</span> <span id="btn-save-text">Guardar</span>
             </button>
+            <div id="sync-status-badge" class="sync-badge" title="Estado de sincronización en tiempo real (Nube y Local)">
+                <span style="color:#34d399;">🟢</span> <span class="badge-txt">Sincronizado</span>
+            </div>
             <button class="mode-btn" id="btn-backup-menu" style="background:rgba(56,189,248,0.18); border:1px solid #0284c7; color:#bae6fd;" title="Opciones de respaldo (Descargar/Cargar archivo)">
                 <span>📦</span> <span id="btn-backup-text">Respaldo</span>
             </button>
@@ -1050,11 +1128,61 @@
         </div>
         
         <div class="sel-bar-actions">
-            <button id="btn-toggle-move-pad" class="action-btn" style="background:rgba(56,189,248,0.22); border:1px solid #38bdf8; color:#38bdf8; padding:5px 10px; font-size:11px; border-radius:10px; font-weight:700; flex-shrink:0;" title="Abrir/Cerrar flechas de movimiento">🕹️ Mover</button>
-            <button id="btn-quick-rot" class="action-btn" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#f8fafc; padding:5px 10px; font-size:11px; border-radius:10px; font-weight:600; flex-shrink:0;" title="Girar 45°">🔄 Girar</button>
-            <button id="btn-quick-save" class="action-btn" style="background:rgba(16,185,129,0.22); border:1px solid #10b981; color:#34d399; padding:5px 10px; font-size:11px; border-radius:10px; font-weight:700; flex-shrink:0;" title="Guardar cambios permanentemente">💾 Guardar</button>
-            <button id="btn-quick-undo" class="action-btn" style="display:none; background:rgba(56,189,248,0.22); border:1px solid #38bdf8; color:#38bdf8; padding:5px 10px; font-size:11px; border-radius:10px; font-weight:700; flex-shrink:0;" title="Deshacer última acción">↩️ Deshacer</button>
-            <button id="btn-quick-del" class="action-btn btn-delete" style="padding:5px 10px; font-size:11px; margin:0; border-radius:10px; font-weight:600; flex-shrink:0;" title="Eliminar del plano">🗑️ Eliminar</button>
+            <button id="btn-toggle-move-pad" class="action-btn" style="background:rgba(56,189,248,0.22); border:1px solid #38bdf8; color:#38bdf8; padding:5px 9px; font-size:11px; border-radius:10px; font-weight:700; flex-shrink:0;" title="Abrir/Cerrar flechas de movimiento">🕹️ Mover</button>
+            <button id="btn-toggle-scale-sims" class="action-btn" style="background:rgba(217,70,239,0.22); border:1px solid #d946ef; color:#f0abfc; padding:5px 9px; font-size:11px; border-radius:10px; font-weight:700; flex-shrink:0;" title="Agrandar, achicar y dimensionar largo/ancho estilo Los Sims">📐 Medidas (Sims)</button>
+            <button id="btn-quick-rot" class="action-btn" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#f8fafc; padding:5px 9px; font-size:11px; border-radius:10px; font-weight:600; flex-shrink:0;" title="Girar 45°">🔄 Girar</button>
+            <button id="btn-quick-save" class="action-btn" style="background:rgba(16,185,129,0.22); border:1px solid #10b981; color:#34d399; padding:5px 9px; font-size:11px; border-radius:10px; font-weight:700; flex-shrink:0;" title="Guardar cambios permanentemente">💾 Guardar</button>
+            <button id="btn-quick-undo" class="action-btn" style="display:none; background:rgba(56,189,248,0.22); border:1px solid #38bdf8; color:#38bdf8; padding:5px 9px; font-size:11px; border-radius:10px; font-weight:700; flex-shrink:0;" title="Deshacer última acción">↩️ Deshacer</button>
+            <button id="btn-quick-del" class="action-btn btn-delete" style="padding:5px 9px; font-size:11px; margin:0; border-radius:10px; font-weight:600; flex-shrink:0;" title="Eliminar del plano">🗑️ Eliminar</button>
+        </div>
+
+        <!-- Panel Desplegable Estilo Los Sims: Agrandar, Achicar y Dimensionar Largo / Ancho / Alto -->
+        <div id="scale-sims-panel" style="display:none; width:100%; flex-direction:column; gap:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.12); margin-top:3px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:700; color:#38bdf8;">
+                <span>📐 Medidas Reales en Vivo:</span>
+                <span id="lbl-live-dims" style="font-family:monospace; color:#f8fafc; font-size:11px;">↔️ 1.36m × ↕️ 1.82m × ⬆️ 0.85m</span>
+            </div>
+
+            <!-- Control de Ancho (X) -->
+            <div class="sims-dim-row">
+                <span class="sims-dim-lbl">↔️ Ancho (X):</span>
+                <button class="sims-step-btn" data-sims-axis="x" data-sims-delta="-0.05">-5cm</button>
+                <input type="range" class="sims-slider" id="slider-scale-x" min="0.3" max="2.5" step="0.02" value="1.0">
+                <button class="sims-step-btn" data-sims-axis="x" data-sims-delta="0.05">+5cm</button>
+                <span class="sims-dim-val" id="lbl-scale-x">1.36 m</span>
+            </div>
+
+            <!-- Control de Largo / Profundidad (Z) -->
+            <div class="sims-dim-row">
+                <span class="sims-dim-lbl">↕️ Largo (Z):</span>
+                <button class="sims-step-btn" data-sims-axis="z" data-sims-delta="-0.05">-5cm</button>
+                <input type="range" class="sims-slider" id="slider-scale-z" min="0.3" max="2.5" step="0.02" value="1.0">
+                <button class="sims-step-btn" data-sims-axis="z" data-sims-delta="0.05">+5cm</button>
+                <span class="sims-dim-val" id="lbl-scale-z">1.82 m</span>
+            </div>
+
+            <!-- Control de Alto (Y) -->
+            <div class="sims-dim-row">
+                <span class="sims-dim-lbl">⬆️ Alto (Y):</span>
+                <button class="sims-step-btn" data-sims-axis="y" data-sims-delta="-0.05">-5cm</button>
+                <input type="range" class="sims-slider" id="slider-scale-y" min="0.3" max="2.5" step="0.02" value="1.0">
+                <button class="sims-step-btn" data-sims-axis="y" data-sims-delta="0.05">+5cm</button>
+                <span class="sims-dim-val" id="lbl-scale-y">0.85 m</span>
+            </div>
+
+            <!-- Escala Proporcional y Reset -->
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap; padding-top:2px;">
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="font-size:10.5px; color:#94a3b8; font-weight:600;">🔍 Tamaño:</span>
+                    <button class="sims-step-btn" data-sims-axis="all" data-sims-delta="-0.05" title="Achicar todo (-5%)">➖ -5%</button>
+                    <button class="sims-step-btn" data-sims-axis="all" data-sims-delta="0.05" title="Agrandar todo (+5%)">➕ +5%</button>
+                </div>
+                <button id="btn-reset-scale" class="action-btn" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#f8fafc; font-size:10.5px; padding:3px 7px; border-radius:8px;" title="Restablecer dimensiones originales al 100%">🔄 Reset 100%</button>
+            </div>
+
+            <div style="font-size:9.5px; color:#94a3b8; opacity:0.85; text-align:center; padding-top:1px;">
+                💡 Atajos Sims: [ / ] Tamaño general | Shift+[ / ] Largo | Alt+[ / ] Ancho | R Rotar
+            </div>
         </div>
 
         <!-- Panel D-Pad desplegable de Flechas para mover con precisión en pantalla -->
@@ -7010,6 +7138,9 @@
                         if (t.rot !== undefined) {
                             root.rotation.y = t.rot;
                         }
+                        if (t.sx !== undefined || t.sy !== undefined || t.sz !== undefined) {
+                            root.scale.set(t.sx || 1, t.sy || 1, t.sz || 1);
+                        }
                     }
                 });
             }
@@ -7457,6 +7588,7 @@
             const titleEl = document.getElementById('selected-obj-title');
             if (titleEl) titleEl.innerText = name || 'Objeto Seleccionado';
             updateSelectedObjBarPos();
+            updateScaleSimsPanelUI();
             bar.style.display = 'flex';
         }
 
@@ -7465,6 +7597,8 @@
             if (bar) bar.style.display = 'none';
             const dpad = document.getElementById('move-dpad-panel');
             if (dpad) dpad.style.display = 'none';
+            const simsPanel = document.getElementById('scale-sims-panel');
+            if (simsPanel) simsPanel.style.display = 'none';
         }
 
         function clearSelection() {
@@ -7500,21 +7634,18 @@
             wakeRenderer();
         }
 
-        function moveSelectedObject(dx, dy, dz) {
-            const obj = getSelectedObject();
+        function saveSelectedObjectTransform(obj = getSelectedObject()) {
             if (!obj) return;
-            const fromPos = { x: obj.position.x, y: obj.position.y, z: obj.position.z };
-            obj.position.x += dx;
-            obj.position.y += dy;
-            obj.position.z += dz;
-
-            // Sincronizar y guardar en localStorage (furnitureList o decorOverrides)
             if (selectedId) {
                 const item = furnitureList.find(f => f.id === selectedId);
                 if (item) {
                     item.x = Math.round(obj.position.x * 100) / 100;
                     item.y = Math.round(obj.position.y * 100) / 100;
                     item.z = Math.round(obj.position.z * 100) / 100;
+                    item.rot = Math.round(obj.rotation.y * 180 / Math.PI);
+                    item.sx = Math.round(obj.scale.x * 1000) / 1000;
+                    item.sy = Math.round(obj.scale.y * 1000) / 1000;
+                    item.sz = Math.round(obj.scale.z * 1000) / 1000;
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
                 }
             } else if (selectedDecorMesh) {
@@ -7524,11 +7655,138 @@
                         x: Math.round(selectedDecorMesh.position.x * 100) / 100,
                         y: Math.round(selectedDecorMesh.position.y * 100) / 100,
                         z: Math.round(selectedDecorMesh.position.z * 100) / 100,
-                        rot: Math.round(selectedDecorMesh.rotation.y * 1000) / 1000
+                        rot: Math.round(selectedDecorMesh.rotation.y * 1000) / 1000,
+                        sx: Math.round(selectedDecorMesh.scale.x * 1000) / 1000,
+                        sy: Math.round(selectedDecorMesh.scale.y * 1000) / 1000,
+                        sz: Math.round(selectedDecorMesh.scale.z * 1000) / 1000
                     };
                     saveDecorOverrides(false);
                 }
             }
+            if (typeof scheduleOnlineSync === 'function') scheduleOnlineSync();
+        }
+
+        function getObjectBaseDimensions(obj) {
+            if (!obj) return new THREE.Vector3(1, 1, 1);
+            if (obj.userData && obj.userData.baseDims) {
+                return obj.userData.baseDims;
+            }
+            const curScale = obj.scale.clone();
+            obj.scale.set(1, 1, 1);
+            const box = new THREE.Box3().setFromObject(obj);
+            const size = new THREE.Vector3();
+            box.getSize(size);
+            obj.scale.copy(curScale);
+
+            if (size.x < 0.05) size.x = 1.0;
+            if (size.y < 0.05) size.y = 1.0;
+            if (size.z < 0.05) size.z = 1.0;
+
+            obj.userData.baseDims = size;
+            return size;
+        }
+
+        function updateScaleSimsPanelUI() {
+            const obj = getSelectedObject();
+            if (!obj) return;
+            const base = getObjectBaseDimensions(obj);
+            const curW = base.x * obj.scale.x;
+            const curH = base.y * obj.scale.y;
+            const curD = base.z * obj.scale.z;
+
+            const lblDims = document.getElementById('lbl-live-dims');
+            if (lblDims) {
+                lblDims.innerHTML = `↔️ ${curW.toFixed(2)}m &nbsp; ↕️ ${curD.toFixed(2)}m &nbsp; ⬆️ ${curH.toFixed(2)}m`;
+            }
+
+            const lblScaleX = document.getElementById('lbl-scale-x');
+            if (lblScaleX) lblScaleX.innerText = `${curW.toFixed(2)}m (${Math.round(obj.scale.x * 100)}%)`;
+            const sliderX = document.getElementById('slider-scale-x');
+            if (sliderX) sliderX.value = obj.scale.x;
+
+            const lblScaleZ = document.getElementById('lbl-scale-z');
+            if (lblScaleZ) lblScaleZ.innerText = `${curD.toFixed(2)}m (${Math.round(obj.scale.z * 100)}%)`;
+            const sliderZ = document.getElementById('slider-scale-z');
+            if (sliderZ) sliderZ.value = obj.scale.z;
+
+            const lblScaleY = document.getElementById('lbl-scale-y');
+            if (lblScaleY) lblScaleY.innerText = `${curH.toFixed(2)}m (${Math.round(obj.scale.y * 100)}%)`;
+            const sliderY = document.getElementById('slider-scale-y');
+            if (sliderY) sliderY.value = obj.scale.y;
+        }
+
+        function scaleSelectedObject(axis, delta, isAbsolute = false) {
+            const obj = getSelectedObject();
+            if (!obj) return;
+            const prevScale = { sx: obj.scale.x, sy: obj.scale.y, sz: obj.scale.z };
+
+            if (axis === 'all') {
+                const factor = isAbsolute ? delta : (obj.scale.x + delta);
+                const clampedX = Math.max(0.2, Math.min(3.0, factor));
+                const ratio = clampedX / (obj.scale.x || 1);
+                obj.scale.x = clampedX;
+                obj.scale.y = Math.max(0.2, Math.min(3.0, obj.scale.y * ratio));
+                obj.scale.z = Math.max(0.2, Math.min(3.0, obj.scale.z * ratio));
+            } else if (axis === 'x') {
+                const val = isAbsolute ? delta : (obj.scale.x + delta);
+                obj.scale.x = Math.max(0.2, Math.min(3.0, val));
+            } else if (axis === 'y') {
+                const val = isAbsolute ? delta : (obj.scale.y + delta);
+                obj.scale.y = Math.max(0.2, Math.min(3.0, val));
+            } else if (axis === 'z') {
+                const val = isAbsolute ? delta : (obj.scale.z + delta);
+                obj.scale.z = Math.max(0.2, Math.min(3.0, val));
+            }
+
+            if (selectionBox) selectionBox.update();
+            updateScaleSimsPanelUI();
+            saveSelectedObjectTransform(obj);
+
+            if (!isAbsolute) {
+                const objName = selectedId ? (furnitureList.find(f => f.id === selectedId)?.name || 'Mueble') : (selectedDecorMesh?.userData?.name || selectedDecorMesh?.name || 'Objeto');
+                undoHistoryStack.push({
+                    type: 'scale',
+                    name: objName,
+                    target: selectedId ? { kind: 'furniture', id: selectedId } : { kind: 'decor', mesh: selectedDecorMesh, name: objName },
+                    from: prevScale,
+                    to: { sx: obj.scale.x, sy: obj.scale.y, sz: obj.scale.z }
+                });
+                updateUndoButtonUI();
+            }
+            wakeRenderer();
+        }
+
+        function resetSelectedObjectScale() {
+            const obj = getSelectedObject();
+            if (!obj) return;
+            const prevScale = { sx: obj.scale.x, sy: obj.scale.y, sz: obj.scale.z };
+            obj.scale.set(1, 1, 1);
+            if (selectionBox) selectionBox.update();
+            updateScaleSimsPanelUI();
+            saveSelectedObjectTransform(obj);
+
+            const objName = selectedId ? (furnitureList.find(f => f.id === selectedId)?.name || 'Mueble') : (selectedDecorMesh?.userData?.name || selectedDecorMesh?.name || 'Objeto');
+            undoHistoryStack.push({
+                type: 'scale',
+                name: objName,
+                target: selectedId ? { kind: 'furniture', id: selectedId } : { kind: 'decor', mesh: selectedDecorMesh, name: objName },
+                from: prevScale,
+                to: { sx: 1, sy: 1, sz: 1 }
+            });
+            updateUndoButtonUI();
+            showToast('🔄 Medidas restablecidas al 100%');
+            wakeRenderer();
+        }
+
+        function moveSelectedObject(dx, dy, dz) {
+            const obj = getSelectedObject();
+            if (!obj) return;
+            const fromPos = { x: obj.position.x, y: obj.position.y, z: obj.position.z };
+            obj.position.x += dx;
+            obj.position.y += dy;
+            obj.position.z += dz;
+
+            saveSelectedObjectTransform(obj);
 
             const objName = selectedId ? (furnitureList.find(f => f.id === selectedId)?.name || 'Mueble') : (selectedDecorMesh?.userData?.name || selectedDecorMesh?.name || 'Objeto');
             undoHistoryStack.push({
@@ -7552,24 +7810,7 @@
             const rad = dAngleDeg * Math.PI / 180;
             obj.rotation.y = (obj.rotation.y + rad) % (Math.PI * 2);
 
-            if (selectedId) {
-                const item = furnitureList.find(f => f.id === selectedId);
-                if (item) {
-                    item.rot = Math.round(obj.rotation.y * 180 / Math.PI);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
-                }
-            } else if (selectedDecorMesh) {
-                const name = selectedDecorMesh.userData?.name || selectedDecorMesh.name;
-                if (name) {
-                    decorOverrides.transforms[name] = {
-                        x: Math.round(selectedDecorMesh.position.x * 100) / 100,
-                        y: Math.round(selectedDecorMesh.position.y * 100) / 100,
-                        z: Math.round(selectedDecorMesh.position.z * 100) / 100,
-                        rot: Math.round(selectedDecorMesh.rotation.y * 1000) / 1000
-                    };
-                    saveDecorOverrides(false);
-                }
-            }
+            saveSelectedObjectTransform(obj);
 
             const objName = selectedId ? (furnitureList.find(f => f.id === selectedId)?.name || 'Mueble') : (selectedDecorMesh?.userData?.name || selectedDecorMesh?.name || 'Objeto');
             undoHistoryStack.push({
@@ -7708,6 +7949,37 @@
                 if (selectionBox) selectionBox.update();
                 showToast(`↩️ Rotación de "${action.name}" deshecha`);
                 wakeRenderer();
+            } else if (action.type === 'scale') {
+                if (action.target.kind === 'furniture') {
+                    const item = furnitureList.find(f => f.id === action.target.id);
+                    if (item) {
+                        item.sx = action.from.sx;
+                        item.sy = action.from.sy;
+                        item.sz = action.from.sz;
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
+                        selectedId = item.id;
+                        renderFurniture3D();
+                    }
+                } else if (action.target.kind === 'decor') {
+                    const mesh = action.target.mesh;
+                    if (mesh) {
+                        mesh.scale.set(action.from.sx, action.from.sy, action.from.sz);
+                        const name = action.target.name;
+                        if (name) {
+                            if (!decorOverrides.transforms[name]) decorOverrides.transforms[name] = {};
+                            decorOverrides.transforms[name].sx = action.from.sx;
+                            decorOverrides.transforms[name].sy = action.from.sy;
+                            decorOverrides.transforms[name].sz = action.from.sz;
+                            saveDecorOverrides(false);
+                        }
+                        selectDecorObject(mesh);
+                    }
+                }
+                if (selectionBox) selectionBox.update();
+                updateScaleSimsPanelUI();
+                if (typeof scheduleOnlineSync === 'function') scheduleOnlineSync();
+                showToast(`↩️ Medidas de "${action.name}" deshechas`);
+                wakeRenderer();
             } else if (action.type === 'furniture') {
                 const insertIdx = (action.index !== undefined && action.index >= 0) ? action.index : furnitureList.length;
                 furnitureList.splice(insertIdx, 0, action.item);
@@ -7779,8 +8051,161 @@
         const btnEditorUndo = document.getElementById('btn-editor-undo');
         if (btnEditorUndo) btnEditorUndo.addEventListener('click', undoLastAction);
 
+        // ============================================================================
+        // MOTOR DE SINCRONIZACIÓN BIDIRECCIONAL ONLINE / OFFLINE (PC, CELULAR Y NUBE)
+        // ============================================================================
+        let syncDebounceTimeout = null;
+        let lastSyncTimestamp = 0;
+
+        function updateSyncStatusBadge(status, text) {
+            const badge = document.getElementById('sync-status-badge');
+            if (!badge) return;
+            if (status === 'synced') {
+                badge.innerHTML = `<span style="color:#34d399;">🟢</span> <span class="badge-txt">${text || 'Sincronizado'}</span>`;
+                badge.style.borderColor = 'rgba(16,185,129,0.45)';
+                badge.style.background = 'rgba(16,185,129,0.15)';
+                badge.title = 'Plano sincronizado en la nube y guardado localmente (Offline)';
+            } else if (status === 'syncing') {
+                badge.innerHTML = `<span style="color:#38bdf8;">🔄</span> <span class="badge-txt">${text || 'Sincronizando...'}</span>`;
+                badge.style.borderColor = 'rgba(56,189,248,0.45)';
+                badge.style.background = 'rgba(56,189,248,0.15)';
+                badge.title = 'Guardando y sincronizando cambios...';
+            } else if (status === 'offline') {
+                badge.innerHTML = `<span style="color:#fbbf24;">💾</span> <span class="badge-txt">${text || 'Guardado local'}</span>`;
+                badge.style.borderColor = 'rgba(245,158,11,0.45)';
+                badge.style.background = 'rgba(245,158,11,0.15)';
+                badge.title = 'Guardado localmente en tu navegador (Modo 100% Offline)';
+            }
+        }
+
+        function getLocalFullLayout() {
+            let localUpdatedAt = 0;
+            try {
+                const storedTs = localStorage.getItem('depto_layout_updated_at');
+                if (storedTs) localUpdatedAt = parseInt(storedTs, 10) || 0;
+            } catch (e) {}
+
+            return {
+                updatedAt: localUpdatedAt || Date.now(),
+                decorOverrides: decorOverrides,
+                furnitureList: furnitureList
+            };
+        }
+
+        function saveLocalFullLayout(layout) {
+            if (!layout) return;
+            try {
+                if (layout.updatedAt) {
+                    localStorage.setItem('depto_layout_updated_at', layout.updatedAt.toString());
+                    lastSyncTimestamp = layout.updatedAt;
+                }
+                if (layout.decorOverrides) {
+                    decorOverrides = layout.decorOverrides;
+                    localStorage.setItem(DECOR_OVERRIDES_KEY, JSON.stringify(decorOverrides));
+                }
+                if (Array.isArray(layout.furnitureList)) {
+                    furnitureList = layout.furnitureList;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
+                }
+            } catch (e) {
+                console.warn('Error guardando en localStorage:', e);
+            }
+        }
+
+        async function pushLayoutToServer(layout = getLocalFullLayout(), notify = false) {
+            updateSyncStatusBadge('syncing', 'Sincronizando...');
+            try {
+                layout.updatedAt = Date.now();
+                localStorage.setItem('depto_layout_updated_at', layout.updatedAt.toString());
+                lastSyncTimestamp = layout.updatedAt;
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+                const res = await fetch('/api/layout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(layout),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (res.ok) {
+                    updateSyncStatusBadge('synced', 'Sincronizado');
+                    if (notify) showToast('☁️ Cambios sincronizados con la nube y guardados offline', false, 3200);
+                    return true;
+                } else {
+                    updateSyncStatusBadge('offline', 'Guardado local');
+                    if (notify) showToast('💾 Cambios guardados localmente (Offline)', false, 3200);
+                    return false;
+                }
+            } catch (err) {
+                updateSyncStatusBadge('offline', 'Guardado local');
+                if (notify) showToast('💾 Cambios guardados en tu dispositivo (Modo Offline)', false, 3200);
+                return false;
+            }
+        }
+
+        function scheduleOnlineSync(delay = 600) {
+            saveLocalFullLayout(getLocalFullLayout());
+            if (syncDebounceTimeout) clearTimeout(syncDebounceTimeout);
+            syncDebounceTimeout = setTimeout(() => {
+                pushLayoutToServer(getLocalFullLayout(), false);
+            }, delay);
+        }
+
+        async function initLayoutSync() {
+            updateSyncStatusBadge('syncing', 'Verificando...');
+            const localLayout = getLocalFullLayout();
+            let remoteLayout = null;
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 2500);
+                const res = await fetch('/api/layout', { cache: 'no-store', signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (res.ok) {
+                    remoteLayout = await res.json();
+                }
+            } catch (e) {
+                try {
+                    const resStatic = await fetch('./layout.json', { cache: 'no-store' });
+                    if (resStatic.ok) {
+                        remoteLayout = await resStatic.json();
+                    }
+                } catch (err) {}
+            }
+
+            if (remoteLayout && remoteLayout.updatedAt) {
+                const localTs = parseInt(localStorage.getItem('depto_layout_updated_at') || '0', 10);
+                if (remoteLayout.updatedAt > localTs) {
+                    console.log(`[Sync] Servidor tiene versión más reciente (${new Date(remoteLayout.updatedAt).toLocaleTimeString()}). Sincronizando...`);
+                    saveLocalFullLayout(remoteLayout);
+                    applyDecorOverrides();
+                    renderFurniture3D();
+                    wakeRenderer();
+                    updateSyncStatusBadge('synced', 'Sincronizado');
+                    showToast('☁️ Distribución sincronizada con éxito', false, 2500);
+                    return;
+                } else if (localTs > remoteLayout.updatedAt) {
+                    console.log(`[Sync] Cliente local tiene cambios más nuevos. Subiendo al servidor...`);
+                    await pushLayoutToServer(localLayout, false);
+                    return;
+                } else {
+                    updateSyncStatusBadge('synced', 'Sincronizado');
+                    return;
+                }
+            }
+
+            if (remoteLayout) {
+                updateSyncStatusBadge('synced', 'Sincronizado');
+            } else {
+                updateSyncStatusBadge('offline', 'Modo Offline');
+            }
+        }
+
         // Guardar cambios manualmente y restablecer plano
-        function saveCurrentModifications() {
+        async function saveCurrentModifications() {
             saveDecorOverrides(false);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
 
@@ -7809,7 +8234,7 @@
                 }, 2200);
             }
 
-            showToast('💾 Cambios guardados permanentemente (no se perderán al recargar)', false, 3500);
+            await pushLayoutToServer(getLocalFullLayout(), true);
         }
 
         // ============================================================================
@@ -8020,6 +8445,61 @@
             });
         }
 
+        const btnToggleScaleSims = document.getElementById('btn-toggle-scale-sims');
+        const scaleSimsPanel = document.getElementById('scale-sims-panel');
+        if (btnToggleScaleSims && scaleSimsPanel) {
+            btnToggleScaleSims.addEventListener('click', () => {
+                const isShown = scaleSimsPanel.style.display === 'flex';
+                scaleSimsPanel.style.display = isShown ? 'none' : 'flex';
+                if (!isShown) updateScaleSimsPanelUI();
+            });
+        }
+
+        document.querySelectorAll('.sims-step-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const axis = btn.dataset.simsAxis;
+                const delta = parseFloat(btn.dataset.simsDelta) || 0;
+                scaleSelectedObject(axis, delta, false);
+            });
+        });
+
+        const sliderScaleX = document.getElementById('slider-scale-x');
+        if (sliderScaleX) {
+            sliderScaleX.addEventListener('input', (e) => {
+                scaleSelectedObject('x', parseFloat(e.target.value), true);
+            });
+        }
+
+        const sliderScaleZ = document.getElementById('slider-scale-z');
+        if (sliderScaleZ) {
+            sliderScaleZ.addEventListener('input', (e) => {
+                scaleSelectedObject('z', parseFloat(e.target.value), true);
+            });
+        }
+
+        const sliderScaleY = document.getElementById('slider-scale-y');
+        if (sliderScaleY) {
+            sliderScaleY.addEventListener('input', (e) => {
+                scaleSelectedObject('y', parseFloat(e.target.value), true);
+            });
+        }
+
+        const btnResetScale = document.getElementById('btn-reset-scale');
+        if (btnResetScale) {
+            btnResetScale.addEventListener('click', (e) => {
+                e.stopPropagation();
+                resetSelectedObjectScale();
+            });
+        }
+
+        const syncBadge = document.getElementById('sync-status-badge');
+        if (syncBadge) {
+            syncBadge.addEventListener('click', () => {
+                pushLayoutToServer(getLocalFullLayout(), true);
+            });
+        }
+
         const btnQuickRot = document.getElementById('btn-quick-rot');
         if (btnQuickRot) btnQuickRot.addEventListener('click', () => rotateSelectedObject(45));
         const btnDpadCenter = document.getElementById('btn-dpad-rot-center');
@@ -8043,7 +8523,7 @@
             });
         });
 
-        // Atajos de teclado: Ctrl+Z / Cmd+Z para Deshacer, Escape para deseleccionar, Flechas para mover, R para girar, Supr para borrar
+        // Atajos de teclado: Ctrl+Z / Cmd+Z para Deshacer, Escape para deseleccionar, Flechas para mover, R para girar, Supr para borrar, [ ] para escalar estilo Los Sims
         window.addEventListener('keydown', (e) => {
             const tag = document.activeElement ? document.activeElement.tagName : '';
             if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
@@ -8077,6 +8557,18 @@
                 if (e.key === 'Delete' || e.key === 'Backspace') {
                     e.preventDefault();
                     deleteCurrentSelected();
+                } else if (e.key === '[' || e.key === ']') {
+                    e.preventDefault();
+                    const sign = e.key === ']' ? 0.05 : -0.05;
+                    if (e.shiftKey) {
+                        scaleSelectedObject('z', sign, false); // Largo
+                    } else if (e.altKey) {
+                        scaleSelectedObject('x', sign, false); // Ancho
+                    } else if (e.ctrlKey) {
+                        scaleSelectedObject('y', sign, false); // Alto
+                    } else {
+                        scaleSelectedObject('all', sign, false); // Proporcional Sims
+                    }
                 } else if (e.key === 'ArrowUp') {
                     e.preventDefault();
                     moveSelectedObject(0, 0, -0.10);
@@ -9303,10 +9795,13 @@
         // ============================================================================
         // 12. INICIALIZACIÓN CANÓNICA FOTORREALISTA PBR (DIORAMA DIGITAL TWIN)
         // ============================================================================
-        // Inicializar en 3D Maqueta Realista al cargar con edición activa
+        // Inicializar en 3D Maqueta Realista al cargar con edición protegida y sincronización de distribución
         setTimeout(() => {
             switchTo3D('isom', 'sims', true);
             setFurnitureEditMode(false, true);
+            if (typeof initLayoutSync === 'function') {
+                initLayoutSync();
+            }
             wakeRenderer();
         }, 120);
 
