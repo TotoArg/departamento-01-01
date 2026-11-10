@@ -1,16 +1,13 @@
 {
-  "updatedAt": 1794323739750,
+  "updatedAt": 1794323742189,
   "decorOverrides": {
     "deleted": [],
     "transforms": {
       "Comederos de Mascota": {
-        "x": 4.94,
+        "x": 4.38,
         "y": 0.04,
-        "z": 4.66,
-        "rot": 1.571,
-        "sx": 1,
-        "sy": 1,
-        "sz": 1
+        "z": 4.88,
+        "rot": 1.571
       }
     }
   },
