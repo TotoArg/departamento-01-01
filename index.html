@@ -658,14 +658,14 @@
             flex-shrink: 0;
         }
 
-        /* Mobile UI Optimization */
+        /* Mobile UI Optimization & Streamlining */
         @media (max-width: 900px) {
             #top-ui-wrapper {
-                top: 4px;
-                left: 4px;
-                right: 4px;
+                top: 6px;
+                left: 6px;
+                right: 6px;
                 flex-direction: column;
-                gap: 3px;
+                gap: 5px;
                 pointer-events: none;
             }
             #top-ui-wrapper > * {
@@ -676,49 +676,86 @@
                 max-width: none;
                 width: 100%;
                 padding: 4px 8px;
-                border-radius: 10px;
+                border-radius: 12px;
                 gap: 2px;
+                background: rgba(15, 23, 42, 0.78);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border: 1px solid rgba(255, 255, 255, 0.12);
             }
+            /* Ocultar título redundante en móviles para ganar un 25% más de área visible */
             #header-card h1 {
-                font-size: 11px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                display: none;
             }
-            .badge { font-size: 8.5px; padding: 2px 6px; }
-            .metrics-row {
-                display: none; /* Oculto en móvil por defecto para liberar el 100% de la pantalla */
+            .header-top {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
                 gap: 6px;
-                margin-top: 2px;
+            }
+            .badge {
+                font-size: 9px;
+                font-weight: 700;
+                padding: 3px 8px;
+                border-radius: 6px;
+                letter-spacing: 0.2px;
+            }
+            .header-actions {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+            .metrics-row {
+                display: none;
+                gap: 6px;
+                margin-top: 3px;
                 padding-top: 3px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
             }
             .metrics-row.show-mobile {
                 display: flex;
             }
             .metric-val { font-size: 10.5px; }
             .metric-lbl { font-size: 7px; }
-            .icon-btn { font-size: 8.5px; padding: 3px 6px; }
+            .icon-btn {
+                font-size: 9.5px;
+                padding: 4px 7px;
+                border-radius: 7px;
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.16);
+            }
 
-            /* Barra de modos y botones en una sola fila desplazable horizontalmente */
+            /* Barra superior de herramientas con scroll suave táctil */
             #top-toolbar {
                 width: 100%;
                 flex-wrap: nowrap !important;
                 overflow-x: auto !important;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
-                padding: 4px 6px;
-                border-radius: 10px;
+                padding: 5px 6px;
+                border-radius: 12px;
                 gap: 4px;
                 justify-content: flex-start;
+                background: rgba(15, 23, 42, 0.82);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border: 1px solid rgba(255, 255, 255, 0.14);
             }
             #top-toolbar::-webkit-scrollbar { display: none; }
             .mode-btn {
-                padding: 4px 8px;
-                font-size: 10px;
+                padding: 5px 9px;
+                font-size: 10.5px;
                 flex-shrink: 0;
                 justify-content: center;
-                gap: 3px;
+                gap: 4px;
                 white-space: nowrap;
+                border-radius: 8px;
+            }
+            .sync-badge {
+                padding: 4px 8px;
+                font-size: 9.5px;
+                flex-shrink: 0;
             }
             #solar-time-group {
                 flex-shrink: 0;
@@ -3422,31 +3459,19 @@
 
             holder.add(upperWinGroup);
 
-            // Símbolo 2D en la tapa superior adaptado a la pendiente
+            // Tapa superior del vano de ventana rematada en topCapMat idéntica a los muros (sin líneas celestes)
             const capGroup = new THREE.Group();
             capGroup.position.set(0, avgH + 0.012, 0);
             const capAngle = Math.atan2(h2 - h1, len);
             if (Math.abs(capAngle) > 0.005) {
                 capGroup.rotation.z = capAngle;
             }
-
             const capLen = Math.hypot(len, h2 - h1);
-            const capBg = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0xdbeafe));
-            capBg.scale.set(capLen, 0.025, EXT_T + 0.01);
-            capBg.position.set(0, 0, 0);
-            capGroup.add(capBg);
-
-            const lineMat = getBasicMat(0x0284c7);
-            const l1 = new THREE.Mesh(UNIT_BOX_GEO, lineMat);
-            l1.scale.set(capLen, 0.028, 0.018);
-            l1.position.set(0, 0.003, -0.022);
-            const l2 = new THREE.Mesh(UNIT_BOX_GEO, lineMat);
-            l2.scale.set(capLen, 0.028, 0.018);
-            l2.position.set(0, 0.003, 0.022);
-            const midCap = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
-            midCap.scale.set(0.025, 0.03, EXT_T + 0.015);
-            midCap.position.set(0, 0.004, 0);
-            capGroup.add(l1, l2, midCap);
+            const cleanCap = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            cleanCap.scale.set(capLen, 0.02, EXT_T + 0.01);
+            cleanCap.position.set(0, 0, 0);
+            cleanCap.userData.isCap = true;
+            capGroup.add(cleanCap);
             holder.add(capGroup);
 
             exteriorWallsGroup.add(holder);
@@ -9449,9 +9474,9 @@
                         w.capGroup.visible = !hideCaps;
                     }
                 } else {
+                    // Al cortar el muro en modo maqueta/Sims, el antepecho queda limpio al ras sin tapas flotantes ni artefactos
                     if (w.capGroup) {
-                        w.capGroup.position.y = curSill + 0.012;
-                        w.capGroup.visible = !hideCaps;
+                        w.capGroup.visible = false;
                     }
                 }
             }
