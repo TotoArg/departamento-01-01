@@ -1,12 +1,13 @@
 {
-  "updatedAt": 1794323787885,
+  "updatedAt": 1794324217118,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
       "accentStudyWall",
       "Espejo Panorámico Horizontal (Comedor)",
       "Elemento Decorativo 3",
-      "Elemento Decorativo 1"
+      "Elemento Decorativo 1",
+      "Cuadro Glaciar Perito Moreno (Dormitorio)"
     ],
     "transforms": {
       "Comederos de Mascota": {
