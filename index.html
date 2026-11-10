@@ -5111,12 +5111,13 @@
             return g;
         }
 
+        let decorAutoIdCounter = 1;
         function addDecorBox(x, y, z, w, h, d, color, rough = 0.45, rotY = 0, name = '') {
             const m = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(color, rough));
             m.scale.set(w, h, d);
             m.position.set(x, y, z);
             if (rotY) m.rotation.y = rotY;
-            m.userData.name = name || 'Elemento / Mueble';
+            m.userData.name = name || (currentAssemblyGroup ? currentAssemblyGroup.userData.name : `Elemento Decorativo ${decorAutoIdCounter++}`);
             m.userData.isDecor = true;
             (currentAssemblyGroup || decorVideoGroup).add(m);
             if (currentMountWallSpec) {
@@ -5132,7 +5133,7 @@
             const m = new THREE.Mesh(geo, getStdMat(color, rough));
             if (isUniform) m.scale.set(rTop, h, rTop);
             m.position.set(x, y, z);
-            m.userData.name = name || 'Elemento / Mueble';
+            m.userData.name = name || (currentAssemblyGroup ? currentAssemblyGroup.userData.name : `Cilindro Decorativo ${decorAutoIdCounter++}`);
             m.userData.isDecor = true;
             (currentAssemblyGroup || decorVideoGroup).add(m);
             if (currentMountWallSpec) {
@@ -7088,9 +7089,16 @@
             decorOverrides = { deleted: [], transforms: {} };
         }
 
-        function saveDecorOverrides(notify = false) {
+        // Función central y unificada de guardado y persistencia
+        function commitLayoutState(reason = '', notify = false, forceServerPush = false) {
             try {
+                const now = Date.now();
                 localStorage.setItem(DECOR_OVERRIDES_KEY, JSON.stringify(decorOverrides));
+                if (typeof STORAGE_KEY !== 'undefined' && typeof furnitureList !== 'undefined') {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
+                }
+                localStorage.setItem('depto_layout_updated_at', now.toString());
+
                 if (notify) {
                     showToast('💾 Modificaciones guardadas en tu dispositivo');
                 }
@@ -7101,9 +7109,21 @@
                         if (btnSave) btnSave.innerHTML = '<span>💾</span> Guardar';
                     }, 1800);
                 }
+
+                if (typeof scheduleOnlineSync === 'function') {
+                    if (forceServerPush && typeof pushLayoutToServer === 'function') {
+                        pushLayoutToServer(getLocalFullLayout(), notify);
+                    } else {
+                        scheduleOnlineSync(400);
+                    }
+                }
             } catch (e) {
-                console.warn('Error saving decor overrides:', e);
+                console.warn('[commitLayoutState] Error:', e);
             }
+        }
+
+        function saveDecorOverrides(notify = false) {
+            commitLayoutState('saveDecorOverrides', notify, false);
         }
 
         function applyDecorOverrides() {
@@ -7646,7 +7666,6 @@
                     item.sx = Math.round(obj.scale.x * 1000) / 1000;
                     item.sy = Math.round(obj.scale.y * 1000) / 1000;
                     item.sz = Math.round(obj.scale.z * 1000) / 1000;
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
                 }
             } else if (selectedDecorMesh) {
                 const name = selectedDecorMesh.userData?.name || selectedDecorMesh.name;
@@ -7660,10 +7679,9 @@
                         sy: Math.round(selectedDecorMesh.scale.y * 1000) / 1000,
                         sz: Math.round(selectedDecorMesh.scale.z * 1000) / 1000
                     };
-                    saveDecorOverrides(false);
                 }
             }
-            if (typeof scheduleOnlineSync === 'function') scheduleOnlineSync();
+            commitLayoutState('transformObject', false, false);
         }
 
         function getObjectBaseDimensions(obj) {
@@ -7863,7 +7881,8 @@
                 renderFurniture3D();
                 clearSelection();
                 updateUndoButtonUI();
-                showToast(`🗑️ "${name}" eliminado`, true);
+                commitLayoutState('deleteFurniture', false, false);
+                showToast(`🗑️ "${name}" eliminado (guardado)`, true);
             } else if (selectedDecorMesh) {
                 const obj = selectedDecorMesh;
                 const parent = obj.parent || decorVideoGroup;
@@ -7871,7 +7890,6 @@
                 if (name && !decorOverrides.deleted.includes(name)) {
                     decorOverrides.deleted.push(name);
                 }
-                saveDecorOverrides(false);
                 parent.remove(obj);
                 undoHistoryStack.push({
                     type: 'decor',
@@ -7881,6 +7899,7 @@
                 });
                 clearSelection();
                 updateUndoButtonUI();
+                commitLayoutState('deleteDecor', false, false);
                 showToast(`🗑️ "${name}" eliminado (guardado)`, true);
                 wakeRenderer();
             }
@@ -7901,7 +7920,6 @@
                         item.x = action.from.x;
                         item.y = action.from.y;
                         item.z = action.from.z;
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
                         selectedId = item.id;
                         renderFurniture3D();
                     }
@@ -7915,11 +7933,11 @@
                             decorOverrides.transforms[name].x = action.from.x;
                             decorOverrides.transforms[name].y = action.from.y;
                             decorOverrides.transforms[name].z = action.from.z;
-                            saveDecorOverrides(false);
                         }
                         selectDecorObject(mesh);
                     }
                 }
+                commitLayoutState('undoMove', false, false);
                 if (selectionBox) selectionBox.update();
                 updateSelectedObjBarPos();
                 showToast(`↩️ Movimiento de "${action.name}" deshecho`);
@@ -7929,7 +7947,6 @@
                     const item = furnitureList.find(f => f.id === action.target.id);
                     if (item) {
                         item.rot = Math.round(action.from * 180 / Math.PI);
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
                         selectedId = item.id;
                         renderFurniture3D();
                     }
@@ -7941,11 +7958,11 @@
                         if (name) {
                             if (!decorOverrides.transforms[name]) decorOverrides.transforms[name] = {};
                             decorOverrides.transforms[name].rot = action.from;
-                            saveDecorOverrides(false);
                         }
                         selectDecorObject(mesh);
                     }
                 }
+                commitLayoutState('undoRotate', false, false);
                 if (selectionBox) selectionBox.update();
                 showToast(`↩️ Rotación de "${action.name}" deshecha`);
                 wakeRenderer();
@@ -7956,7 +7973,6 @@
                         item.sx = action.from.sx;
                         item.sy = action.from.sy;
                         item.sz = action.from.sz;
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
                         selectedId = item.id;
                         renderFurniture3D();
                     }
@@ -7970,14 +7986,13 @@
                             decorOverrides.transforms[name].sx = action.from.sx;
                             decorOverrides.transforms[name].sy = action.from.sy;
                             decorOverrides.transforms[name].sz = action.from.sz;
-                            saveDecorOverrides(false);
                         }
                         selectDecorObject(mesh);
                     }
                 }
+                commitLayoutState('undoScale', false, false);
                 if (selectionBox) selectionBox.update();
                 updateScaleSimsPanelUI();
-                if (typeof scheduleOnlineSync === 'function') scheduleOnlineSync();
                 showToast(`↩️ Medidas de "${action.name}" deshechas`);
                 wakeRenderer();
             } else if (action.type === 'furniture') {
@@ -7986,14 +8001,15 @@
                 selectedId = action.item.id;
                 renderFurniture3D();
                 showSelectionBar(action.name || 'Mueble');
+                commitLayoutState('undoDeleteFurniture', false, false);
                 showToast(`↩️ "${action.name}" restaurado`);
                 wakeRenderer();
             } else if (action.type === 'decor') {
                 action.parent.add(action.obj);
                 if (action.name) {
                     decorOverrides.deleted = decorOverrides.deleted.filter(n => n !== action.name);
-                    saveDecorOverrides(false);
                 }
+                commitLayoutState('undoDeleteDecor', false, false);
                 applyShadowsRecursively(action.obj);
                 selectDecorObject(action.obj);
                 showToast(`↩️ "${action.name}" restaurado`);
@@ -8001,6 +8017,7 @@
             } else if (action.type === 'furniture_bulk') {
                 furnitureList = action.items;
                 renderFurniture3D();
+                commitLayoutState('undoFurnitureBulk', false, false);
                 showToast('↩️ Muebles restaurados');
                 wakeRenderer();
             }
@@ -8146,8 +8163,8 @@
             }
         }
 
-        function scheduleOnlineSync(delay = 600) {
-            saveLocalFullLayout(getLocalFullLayout());
+        function scheduleOnlineSync(delay = 400) {
+            commitLayoutState('scheduleSync', false, false);
             if (syncDebounceTimeout) clearTimeout(syncDebounceTimeout);
             syncDebounceTimeout = setTimeout(() => {
                 pushLayoutToServer(getLocalFullLayout(), false);
@@ -8206,8 +8223,7 @@
 
         // Guardar cambios manualmente y restablecer plano
         async function saveCurrentModifications() {
-            saveDecorOverrides(false);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
+            commitLayoutState('manualSave', false, false);
 
             const btnSave = document.getElementById('btn-save-layout');
             const saveText = document.getElementById('btn-save-text');
@@ -8759,7 +8775,7 @@
                     }
 
                     if (selectedId) {
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(furnitureList));
+                        commitLayoutState('dragFurniture', false, false);
                     } else if (selectedDecorMesh) {
                         const name = selectedDecorMesh.userData?.name || selectedDecorMesh.name;
                         if (name) {
@@ -8769,7 +8785,7 @@
                                 z: Math.round(selectedDecorMesh.position.z * 100) / 100,
                                 rot: Math.round(selectedDecorMesh.rotation.y * 1000) / 1000
                             };
-                            saveDecorOverrides(false);
+                            commitLayoutState('dragDecor', false, false);
                         }
                     }
                 }
