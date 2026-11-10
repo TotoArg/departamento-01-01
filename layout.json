@@ -1,5 +1,5 @@
 {
-  "updatedAt": 1794324286190,
+  "updatedAt": 1794324294611,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -16,6 +16,12 @@
         "y": 0.04,
         "z": 4.98,
         "rot": 1.571
+      },
+      "Sansevieria en Pie Nórdico": {
+        "x": 6.01,
+        "y": 0.74,
+        "z": 4.2,
+        "rot": 0
       }
     }
   },
