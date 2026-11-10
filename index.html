@@ -803,6 +803,9 @@
 
         <!-- Top Mode Switcher -->
         <div id="top-toolbar" class="glass-panel">
+            <button class="mode-btn" id="btn-toggle-cam-proj" onclick="toggleCameraProjection()" title="Alternar entre Perspectiva Teleobjetivo (24°) e Isométrica Pura (Ortho)">
+                <span id="cam-proj-icon">📐</span> <span id="cam-proj-label">Isométrica</span>
+            </button>
             <button class="mode-btn" id="btn-mode-2d" title="Plano 2D Técnico Ortogonal"><span>📐</span> 2D</button>
             <button class="mode-btn" id="btn-mode-3d" title="3D Normal con muros completos"><span>🏢</span> 3D Muros</button>
             <button class="mode-btn active" id="btn-mode-sims" title="3D Maqueta con corte dinámico estilo Los Sims"><span>✂️</span> 3D Sims</button>
@@ -8855,6 +8858,41 @@
             estudio:{ pos: [2.70, 2.50, 2.60], target: [1.40, 0.70, 1.40] }
         };
 
+        function toggleCameraProjection() {
+            if (activeCamera === orthoCam) {
+                switchTo3D('isom', 'sims', true);
+            }
+            isIsoOrthoMode = !isIsoOrthoMode;
+            const btnLabel = document.getElementById('cam-proj-label');
+            const btnIcon = document.getElementById('cam-proj-icon');
+            const btn = document.getElementById('btn-toggle-cam-proj');
+
+            if (isIsoOrthoMode) {
+                const aspect = window.innerWidth / window.innerHeight;
+                const viewSize = 10.5;
+                orthoIsoCam.left = -viewSize * aspect / 2;
+                orthoIsoCam.right = viewSize * aspect / 2;
+                orthoIsoCam.top = viewSize / 2;
+                orthoIsoCam.bottom = -viewSize / 2;
+                orthoIsoCam.updateProjectionMatrix();
+
+                activeCamera = orthoIsoCam;
+                controlsPersp.object = orthoIsoCam;
+                if (btnLabel) btnLabel.innerText = "Persp (24°)";
+                if (btnIcon) btnIcon.innerText = "📷";
+                if (btn) btn.classList.add('active');
+            } else {
+                activeCamera = perspCam;
+                controlsPersp.object = perspCam;
+                if (btnLabel) btnLabel.innerText = "Isométrica";
+                if (btnIcon) btnIcon.innerText = "📐";
+                if (btn) btn.classList.remove('active');
+            }
+            controlsPersp.target.set(3.15, 0.40, 4.00);
+            updateComposerCamera();
+            wakeRenderer();
+        }
+
         function switchTo2D() {
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
@@ -9126,7 +9164,11 @@
         // ============================================================================
         // MOTOR DE POST-PROCESAMIENTO PBR: EffectComposer + SSAO + Antialiasing (FXAA)
         // ============================================================================
-        // composer, ssaoPass, fxaaPass, renderPass declarados previamente
+        // ============================================================================
+        // CAPA 5: POST-PROCESAMIENTO CINEMATOGRÁFICO (EffectComposer + SSAO Alta Intensidad + SMAA)
+        // Genera sombras de contacto oscuras donde las paredes tocan el piso y en esquinas de muebles
+        // ============================================================================
+        var smaaPass = null;
 
         function initPostProcessing() {
             try {
@@ -9138,6 +9180,7 @@
 
                 const width = window.innerWidth;
                 const height = window.innerHeight;
+                const pr = Math.min(window.devicePixelRatio, 2.0);
 
                 composer = new THREE.EffectComposer(renderer);
 
@@ -9145,27 +9188,30 @@
                 renderPass = new THREE.RenderPass(scene, activeCamera);
                 composer.addPass(renderPass);
 
-                // 2. Pase SSAO (Screen Space Ambient Occlusion) para sombras de contacto profundas
+                // 2. Pase SSAO (Screen Space Ambient Occlusion) de alta intensidad
+                // kernelRadius en espacio de mundo (0.38m = 38cm): profundidad perfecta para sombras de contacto
                 ssaoPass = new THREE.SSAOPass(scene, activeCamera, width, height);
-                ssaoPass.kernelRadius = 14;
-                ssaoPass.kernelSize = 32;
-                ssaoPass.minDistance = 0.001;
-                ssaoPass.maxDistance = 0.12;
+                ssaoPass.kernelRadius = 0.38;
+                ssaoPass.kernelSize = 32; // 32 muestras para máxima suavidad sin ruido
+                ssaoPass.minDistance = 0.002;
+                ssaoPass.maxDistance = 0.45;
                 ssaoPass.output = THREE.SSAOPass.OUTPUT.Default;
                 composer.addPass(ssaoPass);
 
-                // 3. Pase Antialiasing (FXAA) para bordes nítidos y sin dentado
-                if (typeof THREE.FXAAShader !== 'undefined' && typeof THREE.ShaderPass !== 'undefined') {
+                // 3. Pase Antialiasing SMAA (Subpixel Morphological Antialiasing)
+                if (typeof THREE.SMAAPass !== 'undefined') {
+                    smaaPass = new THREE.SMAAPass(width * pr, height * pr);
+                    composer.addPass(smaaPass);
+                } else if (typeof THREE.FXAAShader !== 'undefined' && typeof THREE.ShaderPass !== 'undefined') {
                     fxaaPass = new THREE.ShaderPass(THREE.FXAAShader);
-                    const pr = renderer.getPixelRatio();
                     fxaaPass.material.uniforms['resolution'].value.x = 1 / (width * pr);
                     fxaaPass.material.uniforms['resolution'].value.y = 1 / (height * pr);
                     composer.addPass(fxaaPass);
                 }
 
-                console.log("EffectComposer con SSAO y FXAA inicializado exitosamente.");
+                console.log("EffectComposer con SSAO (Alta Intensidad) y SMAA inicializado exitosamente.");
             } catch (err) {
-                console.warn("Error al inicializar EffectComposer / SSAO:", err);
+                console.warn("Fallo al inicializar EffectComposer, usando renderizador estándar:", err);
                 composer = null;
             }
         }
@@ -9174,7 +9220,15 @@
         function updateComposerCamera() {
             if (typeof composer !== 'undefined' && composer) {
                 if (typeof renderPass !== 'undefined' && renderPass) renderPass.camera = activeCamera;
-                if (typeof ssaoPass !== 'undefined' && ssaoPass) ssaoPass.camera = activeCamera;
+                if (typeof ssaoPass !== 'undefined' && ssaoPass) {
+                    ssaoPass.camera = activeCamera;
+                    if (ssaoPass.ssaoMaterial && ssaoPass.ssaoMaterial.uniforms) {
+                        ssaoPass.ssaoMaterial.uniforms['cameraNear'].value = activeCamera.near;
+                        ssaoPass.ssaoMaterial.uniforms['cameraFar'].value = activeCamera.far;
+                        ssaoPass.ssaoMaterial.uniforms['cameraProjectionMatrix'].value.copy(activeCamera.projectionMatrix);
+                        ssaoPass.ssaoMaterial.uniforms['cameraInverseProjectionMatrix'].value.copy(activeCamera.projectionMatrixInverse);
+                    }
+                }
             }
         }
 
@@ -9193,7 +9247,7 @@
                 updateLabels();
                 if (selectionBox) selectionBox.update();
                 
-                if (composer && activeCamera === perspCam) {
+                if (composer && activeCamera !== orthoCam) {
                     try {
                         composer.render();
                     } catch (e) {
@@ -9205,6 +9259,7 @@
                 }
             }
         }
+        if (typeof enforcePhysicalShadows === 'function') enforcePhysicalShadows();
         animate();
 
         window.addEventListener('resize', () => {
@@ -9220,13 +9275,22 @@
             orthoCam.updateProjectionMatrix();
 
             renderer.setSize(window.innerWidth, window.innerHeight);
+            if (typeof orthoIsoCam !== 'undefined' && orthoIsoCam) {
+                const viewSize = 10.5;
+                orthoIsoCam.left = -viewSize * aspect / 2;
+                orthoIsoCam.right = viewSize * aspect / 2;
+                orthoIsoCam.top = viewSize / 2;
+                orthoIsoCam.bottom = -viewSize / 2;
+                orthoIsoCam.updateProjectionMatrix();
+            }
             if (composer) {
                 const w = window.innerWidth;
                 const h = window.innerHeight;
+                const pr = renderer.getPixelRatio();
                 composer.setSize(w, h);
                 if (ssaoPass) ssaoPass.setSize(w, h);
+                if (smaaPass) smaaPass.setSize(w * pr, h * pr);
                 if (fxaaPass) {
-                    const pr = renderer.getPixelRatio();
                     fxaaPass.material.uniforms['resolution'].value.x = 1 / (w * pr);
                     fxaaPass.material.uniforms['resolution'].value.y = 1 / (h * pr);
                 }
