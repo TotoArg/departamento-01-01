@@ -4611,9 +4611,13 @@
             plinth.position.set(0, 0.04, 0);
             holder.add(plinth);
 
-            // Piso de Baulera superior en Z = 2.20 m (deja el hueco superior 100% abierto hacia la habitación)
+            // =========================================================================
+            // ENVOLVENTE SÓLIDA OPACA DEL PLACARD (Techo, fondo, laterales y losa baulera)
+            // =========================================================================
             const interiorDepth = 0.50;
             const interiorZ = -facingSign * (interiorDepth / 2);
+
+            // 1. Losa divisoria / Piso de Baulera superior en Y = 2.20 m
             const slabMesh = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
             slabMesh.scale.set(w, 0.04, interiorDepth);
             slabMesh.position.set(0, 2.20 - 0.02, interiorZ);
@@ -4627,42 +4631,64 @@
             capLosa.userData.isCap = true;
             holder.add(capLosa);
 
-            // Fondo sólido de placard (panel melamínico de 0.08 a 2.20 m que ciega la vista desde el baño):
+            // 2. Techo / Tapa superior cerrada del cuerpo del placard a Y = 2.16 m (debajo de la losa de baulera):
+            // Sella 100% la parte superior del ropero para que nunca se vean los percheros ni estantes desde arriba
+            const closetRoofGeo = new THREE.BoxGeometry(w, 0.025, interiorDepth);
+            const closetRoofMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.50 });
+            const closetRoof = new THREE.Mesh(closetRoofGeo, closetRoofMat);
+            closetRoof.position.set(0, 0.08 + PLACARD_H - 0.0125, interiorZ);
+            closetRoof.castShadow = true;
+            closetRoof.receiveShadow = true;
+            holder.add(closetRoof);
+
+            // 3. Fondo sólido posterior del placard (panel melamínico blanco opaco de 0.08 a 2.20 m):
             const backH = 2.12;
-            const backPanelGeo = new THREE.BoxGeometry(w, backH, 0.025);
+            const backPanelGeo = new THREE.BoxGeometry(w, backH, 0.03);
             const backPanelMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.55 });
             const backPanel = new THREE.Mesh(backPanelGeo, backPanelMat);
-            backPanel.position.set(0, 0.08 + backH / 2, -facingSign * (interiorDepth - 0.0125));
+            backPanel.position.set(0, 0.08 + backH / 2, -facingSign * (interiorDepth - 0.015));
             backPanel.castShadow = true;
             backPanel.receiveShadow = true;
             holder.add(backPanel);
 
+            // 4. Laterales sólidos del placard (en X = -w/2 y X = w/2):
+            const sidePanelGeo = new THREE.BoxGeometry(0.025, backH, interiorDepth);
+            const sideLeft = new THREE.Mesh(sidePanelGeo, backPanelMat);
+            sideLeft.position.set(-w / 2 + 0.0125, 0.08 + backH / 2, interiorZ);
+            const sideRight = new THREE.Mesh(sidePanelGeo, backPanelMat);
+            sideRight.position.set(w / 2 - 0.0125, 0.08 + backH / 2, interiorZ);
+            holder.add(sideLeft, sideRight);
 
+            // =========================================================================
+            // GRUPO DE INTERIOR DEL PLACARD (Ropa, perchas, cajones, estantes)
+            // Se hace visible dinámicamente al abrir las hojas corredizas
+            // =========================================================================
+            const interiorGroup = new THREE.Group();
+            interiorGroup.visible = false; // Oculto por defecto mientras el placard esté cerrado
 
-            // --- INTERIOR VISIBLE DEL PLACARD ---
             const chestW = (w - 0.10) / 2;
             const centerDivider = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xffffff, 0.4));
             centerDivider.scale.set(0.02, PLACARD_H - 0.06, interiorDepth);
             centerDivider.position.set(0, 0.08 + (PLACARD_H - 0.06) / 2, interiorZ);
-            holder.add(centerDivider);
+            interiorGroup.add(centerDivider);
 
             // Sector izquierdo: cajonera + estantes
             const chestH = 0.88;
             const chestMesh = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xf8fafc, 0.3));
             chestMesh.scale.set(chestW, chestH, interiorDepth);
             chestMesh.position.set(-w / 4, 0.08 + chestH / 2, interiorZ);
-            holder.add(chestMesh);
+            interiorGroup.add(chestMesh);
             for (let c = 0; c < 4; c++) {
                 const groove = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x64748b));
                 groove.scale.set(chestW - 0.04, 0.015, 0.02);
                 groove.position.set(-w / 4, 0.08 + (c + 1) * (chestH / 4) - 0.01, interiorZ + facingSign * (interiorDepth / 2 + 0.01));
-                holder.add(groove);
+                interiorGroup.add(groove);
             }
             for (let s = 1; s <= 3; s++) {
                 const shelf = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xffffff, 0.4));
                 shelf.scale.set(chestW, 0.02, interiorDepth);
                 shelf.position.set(-w / 4, 0.08 + chestH + s * 0.28, interiorZ);
-                holder.add(shelf);
+                interiorGroup.add(shelf);
             }
             const bin1 = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0xf8fafc));
             bin1.scale.set(chestW * 0.44, 0.20, interiorDepth * 0.75);
@@ -4670,32 +4696,34 @@
             const bin2 = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x38bdf8));
             bin2.scale.set(chestW * 0.44, 0.20, interiorDepth * 0.75);
             bin2.position.set(-w / 4 + chestW * 0.24, 0.08 + chestH + 0.28 + 0.11, interiorZ);
-            holder.add(bin1, bin2);
+            interiorGroup.add(bin1, bin2);
 
             // Sector derecho: barrales y ropa colgada
             const barUpper = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, chestW, 16), chromeMat);
             barUpper.rotation.z = Math.PI / 2;
             barUpper.position.set(w / 4, 1.95, interiorZ);
-            holder.add(barUpper);
+            interiorGroup.add(barUpper);
 
             for (let h = -chestW * 0.38; h <= chestW * 0.38; h += 0.10) {
                 const coat = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x1e293b));
                 coat.scale.set(0.05, 0.58, 0.32);
                 coat.position.set(w / 4 + h, 1.62, interiorZ);
-                holder.add(coat);
+                interiorGroup.add(coat);
             }
 
             const barLower = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, chestW, 16), chromeMat);
             barLower.rotation.z = Math.PI / 2;
             barLower.position.set(w / 4, 1.10, interiorZ);
-            holder.add(barLower);
+            interiorGroup.add(barLower);
 
             for (let h = -chestW * 0.38; h <= chestW * 0.38; h += 0.09) {
                 const shirt = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x64748b));
                 shirt.scale.set(0.04, 0.52, 0.28);
                 shirt.position.set(w / 4 + h, 0.80, interiorZ);
-                holder.add(shirt);
+                interiorGroup.add(shirt);
             }
+
+            holder.add(interiorGroup);
 
             // =========================================================================
             // 2 HOJAS ENTERAS DE DESPLAZAMIENTO (Madera maciza lisa, sin divisiones artificiales)
@@ -4766,6 +4794,12 @@
             rightVanoClick.position.set(rightClosedX, 0.08 + leafH / 2 + 0.01, facingSign * 0.028);
             holder.add(rightVanoClick);
 
+            // Función sincronizadora de visibilidad interior según apertura de hojas
+            function syncInteriorVisibility() {
+                const anyOpen = leftAnim.isOpen || rightAnim.isOpen;
+                interiorGroup.visible = anyOpen;
+            }
+
             // Animadores independientes con exclusión mutua
             const leftAnim = {
                 name: `${placardName} (Hoja Izquierda)`,
@@ -4777,6 +4811,7 @@
                 closedVal: leftClosedX,
                 isOpen: false,
                 isPlacardSecondary: false,
+                interiorGroup: interiorGroup,
                 toggle: function() {
                     if (rightAnim.isOpen) {
                         rightAnim.isOpen = false;
@@ -4784,6 +4819,7 @@
                     }
                     this.isOpen = !this.isOpen;
                     this.targetVal = this.isOpen ? this.openVal : this.closedVal;
+                    syncInteriorVisibility();
                     wakeRenderer();
                     return this.isOpen;
                 }
@@ -4799,6 +4835,7 @@
                 closedVal: rightClosedX,
                 isOpen: false,
                 isPlacardSecondary: true,
+                interiorGroup: interiorGroup,
                 toggle: function() {
                     if (leftAnim.isOpen) {
                         leftAnim.isOpen = false;
@@ -4806,6 +4843,7 @@
                     }
                     this.isOpen = !this.isOpen;
                     this.targetVal = this.isOpen ? this.openVal : this.closedVal;
+                    syncInteriorVisibility();
                     wakeRenderer();
                     return this.isOpen;
                 }
@@ -4842,7 +4880,6 @@
             doors3DGroup.add(holder);
             // El frente del placard permanece siempre visible (no se oculta en corte Sims)
         }
-
         // Construcción diferida de puertas 3D y techo de madera (se ejecuta tras el primer render 2D para carga instantánea)
         let extras3DBuilt = false;
         function ensure3DExtrasBuilt() {
@@ -9696,6 +9733,9 @@
                 } else {
                     d.isOpen = nextState;
                     d.targetVal = d.isOpen ? d.openVal : d.closedVal;
+                }
+                if (d.interiorGroup) {
+                    d.interiorGroup.visible = d.isOpen;
                 }
             });
             document.getElementById('btn-toggle-doors').classList.toggle('active', nextState);
