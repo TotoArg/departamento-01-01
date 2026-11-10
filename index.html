@@ -3532,7 +3532,7 @@
         }
 
         // Símbolo arquitectónico 2D de frente de placard con dos hojas enteras de desplazamiento
-        function addSlidingPlacard2D(x1, x2, z, facingSign = -1) {
+        function addSlidingPlacard2D(x1, x2, z, facingSign = -1, invertX = false) {
             const w = x2 - x1; // 2.30 m
             const midX = (x1 + x2) / 2; // 1.15 m
             const overlap = 0.08; // 8 cm de solape central
@@ -3549,50 +3549,52 @@
             railMesh.position.set(midX, 0.012, z);
             lines2DGroup.add(railMesh);
 
-            // Hoja 1 (Izquierda, riel exterior hacia la habitación): de x1 a x1 + leafW
+            // Posición de rieles: invertX invierte qué hoja corre por delante (riel exterior) y cuál por detrás (riel interior)
+            const leftRailZ = invertX ? (z - facingSign * railOffset) : (z + facingSign * railOffset);
+            const rightRailZ = invertX ? (z + facingSign * railOffset) : (z - facingSign * railOffset);
+
+            // Hoja 1 (Izquierda): de x1 a x1 + leafW
             const leftCenterX = x1 + leafW / 2; // ~0.595 m
-            const leftZ = z + facingSign * railOffset; // Riel exterior (adelante)
             const leftLeaf2D = new THREE.Mesh(UNIT_BOX_GEO, woodMat2D);
             leftLeaf2D.scale.set(leafW, 0.018, leafT);
-            leftLeaf2D.position.set(leftCenterX, 0.020, leftZ);
+            leftLeaf2D.position.set(leftCenterX, 0.020, leftRailZ);
             lines2DGroup.add(leftLeaf2D);
 
             const leftEdge = new THREE.Mesh(UNIT_BOX_GEO, edgeMat2D);
             leftEdge.scale.set(leafW, 0.020, 0.005);
-            leftEdge.position.set(leftCenterX, 0.021, leftZ + facingSign * (leafT / 2));
+            leftEdge.position.set(leftCenterX, 0.021, leftRailZ + facingSign * (leafT / 2));
             lines2DGroup.add(leftEdge);
 
-            // Hoja 2 (Derecha, riel interior hacia el fondo): de x2 - leafW a x2
+            // Hoja 2 (Derecha): de x2 - leafW a x2
             const rightCenterX = x2 - leafW / 2; // ~1.705 m
-            const rightZ = z - facingSign * railOffset; // Riel interior (atrás)
             const rightLeaf2D = new THREE.Mesh(UNIT_BOX_GEO, woodMat2D);
             rightLeaf2D.scale.set(leafW, 0.018, leafT);
-            rightLeaf2D.position.set(rightCenterX, 0.020, rightZ);
+            rightLeaf2D.position.set(rightCenterX, 0.020, rightRailZ);
             lines2DGroup.add(rightLeaf2D);
 
             const rightEdge = new THREE.Mesh(UNIT_BOX_GEO, edgeMat2D);
             rightEdge.scale.set(leafW, 0.020, 0.005);
-            rightEdge.position.set(rightCenterX, 0.021, rightZ - facingSign * (leafT / 2));
+            rightEdge.position.set(rightCenterX, 0.021, rightRailZ - facingSign * (leafT / 2));
             lines2DGroup.add(rightEdge);
 
             // Tirador 2D embutido en el borde exterior de cada hoja
             const pullMat = getBasicMat(0x0f172a);
             const pull1 = new THREE.Mesh(UNIT_BOX_GEO, pullMat);
             pull1.scale.set(0.06, 0.022, 0.012);
-            pull1.position.set(x1 + 0.09, 0.023, leftZ);
+            pull1.position.set(x1 + 0.09, 0.023, leftRailZ);
             const pull2 = new THREE.Mesh(UNIT_BOX_GEO, pullMat);
             pull2.scale.set(0.06, 0.022, 0.012);
-            pull2.position.set(x2 - 0.09, 0.023, rightZ);
+            pull2.position.set(x2 - 0.09, 0.023, rightRailZ);
             lines2DGroup.add(pull1, pull2);
 
             // Indicador sutil de sentido de desplazamiento en 2D
             const arrowMat = getBasicMat(0xffffff);
             const arrow1 = new THREE.Mesh(UNIT_BOX_GEO, arrowMat);
             arrow1.scale.set(0.18, 0.004, 0.006);
-            arrow1.position.set(leftCenterX, 0.023, leftZ);
+            arrow1.position.set(leftCenterX, 0.023, leftRailZ);
             const arrow2 = new THREE.Mesh(UNIT_BOX_GEO, arrowMat);
             arrow2.scale.set(0.18, 0.004, 0.006);
-            arrow2.position.set(rightCenterX, 0.023, rightZ);
+            arrow2.position.set(rightCenterX, 0.023, rightRailZ);
             lines2DGroup.add(arrow1, arrow2);
         }
 
@@ -4252,7 +4254,7 @@
         addWallSegment(4.85, 5.20, 4.85, 6.30, INT_T, interiorWallsGroup, false, 4.41);
 
         // Eje Horizontal Z = 2.80 (Frente Placard Estudio 2.80m x 3.00m simétrico al Cuarto):
-        addSlidingPlacard2D(0.00, 2.30, 2.80, -1);
+        addSlidingPlacard2D(0.00, 2.30, 2.80, -1, true);
         // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (bisagra en X = 3.00, abre hacia el Norte)
         addDashedLine(2.30, 2.80, 3.00, 2.80);
         addDoorSymbol2D(2.95, 2.80, 2.95, 2.12, 2.32, 2.12, 2.32, 2.80);
@@ -4588,7 +4590,7 @@
         // 3) Constructor de Frentes de Placard (Fotos reales Cuarto y Estudio):
         //    Placard embutido de DOS HOJAS ENTERAS DE DESPLAZAMIENTO de madera natural/cedro barnizada
         //    con tiradores circulares oscuros embutidos, interior completo y baulera abierta superior
-        function addSlidingPlacardFront3D(x1, x2, zWall, facingSign = -1, placardName = "Placard") {
+        function addSlidingPlacardFront3D(x1, x2, zWall, facingSign = -1, placardName = "Placard", invertX = false) {
             const w = x2 - x1; // 2.30 m
             const holder = new THREE.Group();
             holder.position.set((x1 + x2) / 2, 0, zWall);
@@ -4661,7 +4663,7 @@
 
             // =========================================================================
             // GRUPO DE INTERIOR DEL PLACARD (Ropa, perchas, cajones, estantes)
-            // Se hace visible dinámicamente al abrir las hojas corredizas
+            // Se invierte simétricamente en X si invertX === true (Placard Estudio simétrico a Cuarto)
             // =========================================================================
             const interiorGroup = new THREE.Group();
             interiorGroup.visible = false; // Oculto por defecto mientras el placard esté cerrado
@@ -4672,54 +4674,60 @@
             centerDivider.position.set(0, 0.08 + (PLACARD_H - 0.06) / 2, interiorZ);
             interiorGroup.add(centerDivider);
 
-            // Sector izquierdo: cajonera + estantes
+            // Centro X para el sector de cajones/estantes y barrales:
+            // Por defecto (invertX = false): Cajonera a la izquierda (-w/4), Barrales a la derecha (+w/4)
+            // Invertido (invertX = true, Estudio): Cajonera a la derecha (+w/4), Barrales a la izquierda (-w/4)
+            const shelvesX = invertX ? (w / 4) : (-w / 4);
+            const hangerX = invertX ? (-w / 4) : (w / 4);
+
+            // Sector cajonera + estantes
             const chestH = 0.88;
             const chestMesh = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xf8fafc, 0.3));
             chestMesh.scale.set(chestW, chestH, interiorDepth);
-            chestMesh.position.set(-w / 4, 0.08 + chestH / 2, interiorZ);
+            chestMesh.position.set(shelvesX, 0.08 + chestH / 2, interiorZ);
             interiorGroup.add(chestMesh);
             for (let c = 0; c < 4; c++) {
                 const groove = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x64748b));
                 groove.scale.set(chestW - 0.04, 0.015, 0.02);
-                groove.position.set(-w / 4, 0.08 + (c + 1) * (chestH / 4) - 0.01, interiorZ + facingSign * (interiorDepth / 2 + 0.01));
+                groove.position.set(shelvesX, 0.08 + (c + 1) * (chestH / 4) - 0.01, interiorZ + facingSign * (interiorDepth / 2 + 0.01));
                 interiorGroup.add(groove);
             }
             for (let s = 1; s <= 3; s++) {
                 const shelf = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xffffff, 0.4));
                 shelf.scale.set(chestW, 0.02, interiorDepth);
-                shelf.position.set(-w / 4, 0.08 + chestH + s * 0.28, interiorZ);
+                shelf.position.set(shelvesX, 0.08 + chestH + s * 0.28, interiorZ);
                 interiorGroup.add(shelf);
             }
             const bin1 = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0xf8fafc));
             bin1.scale.set(chestW * 0.44, 0.20, interiorDepth * 0.75);
-            bin1.position.set(-w / 4 - chestW * 0.24, 0.08 + chestH + 0.28 + 0.11, interiorZ);
+            bin1.position.set(shelvesX - (invertX ? -1 : 1) * chestW * 0.24, 0.08 + chestH + 0.28 + 0.11, interiorZ);
             const bin2 = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x38bdf8));
             bin2.scale.set(chestW * 0.44, 0.20, interiorDepth * 0.75);
-            bin2.position.set(-w / 4 + chestW * 0.24, 0.08 + chestH + 0.28 + 0.11, interiorZ);
+            bin2.position.set(shelvesX + (invertX ? -1 : 1) * chestW * 0.24, 0.08 + chestH + 0.28 + 0.11, interiorZ);
             interiorGroup.add(bin1, bin2);
 
-            // Sector derecho: barrales y ropa colgada
+            // Sector barrales y ropa colgada
             const barUpper = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, chestW, 16), chromeMat);
             barUpper.rotation.z = Math.PI / 2;
-            barUpper.position.set(w / 4, 1.95, interiorZ);
+            barUpper.position.set(hangerX, 1.95, interiorZ);
             interiorGroup.add(barUpper);
 
             for (let h = -chestW * 0.38; h <= chestW * 0.38; h += 0.10) {
                 const coat = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x1e293b));
                 coat.scale.set(0.05, 0.58, 0.32);
-                coat.position.set(w / 4 + h, 1.62, interiorZ);
+                coat.position.set(hangerX + h, 1.62, interiorZ);
                 interiorGroup.add(coat);
             }
 
             const barLower = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, chestW, 16), chromeMat);
             barLower.rotation.z = Math.PI / 2;
-            barLower.position.set(w / 4, 1.10, interiorZ);
+            barLower.position.set(hangerX, 1.10, interiorZ);
             interiorGroup.add(barLower);
 
             for (let h = -chestW * 0.38; h <= chestW * 0.38; h += 0.09) {
                 const shirt = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x64748b));
                 shirt.scale.set(0.04, 0.52, 0.28);
-                shirt.position.set(w / 4 + h, 0.80, interiorZ);
+                shirt.position.set(hangerX + h, 0.80, interiorZ);
                 interiorGroup.add(shirt);
             }
 
@@ -4735,24 +4743,28 @@
             const railOffset = 0.018; // Distancia entre los dos rieles corredizos
 
             // Posiciones cerradas y abiertas:
-            // Hoja Izquierda: cerrada a la izquierda, se abre deslizándose a la derecha detrás de la hoja derecha
+            // Hoja Izquierda: cerrada a la izquierda, se abre deslizándose a la derecha detrás de la otra
             const leftClosedX = -w / 4 + (overlap / 4);
             const leftOpenX = w / 4 - (overlap / 4);
 
-            // Hoja Derecha: cerrada a la derecha, se abre deslizándose a la izquierda delante de la hoja izquierda
+            // Hoja Derecha: cerrada a la derecha, se abre deslizándose a la izquierda
             const rightClosedX = w / 4 - (overlap / 4);
             const rightOpenX = -w / 4 + (overlap / 4);
 
             // Desplazamiento frontal hacia la habitación para tiradores embutidos:
             const frontFaceOffset = facingSign * (leafT / 2 + 0.003);
 
-            // 1. HOJA IZQUIERDA ENTERA (Riel exterior hacia la habitación, en primer plano)
+            // Riel de cada hoja (si invertX = true, la hoja derecha va en el riel exterior en primer plano):
+            const leftRailZ = invertX ? -facingSign * railOffset : facingSign * railOffset;
+            const rightRailZ = invertX ? facingSign * railOffset : -facingSign * railOffset;
+
+            // 1. HOJA IZQUIERDA ENTERA
             const leftLeafGroup = new THREE.Group();
             leftLeafGroup.position.set(leftClosedX, 0, 0);
 
             const leftLeafMesh = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
             leftLeafMesh.scale.set(leafW, leafH, leafT);
-            leftLeafMesh.position.set(0, 0.08 + leafH / 2 + 0.01, facingSign * railOffset);
+            leftLeafMesh.position.set(0, 0.08 + leafH / 2 + 0.01, leftRailZ);
             leftLeafMesh.castShadow = true;
             leftLeafMesh.receiveShadow = true;
             leftLeafGroup.add(leftLeafMesh);
@@ -4760,18 +4772,18 @@
             // Tirador circular embutido en la hoja izquierda
             const pullLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.008, 24), doorFrameMat);
             pullLeft.rotation.x = Math.PI / 2;
-            pullLeft.position.set(-leafW / 2 + 0.09, 0.08 + 1.05, facingSign * railOffset + frontFaceOffset);
+            pullLeft.position.set(-leafW / 2 + 0.09, 0.08 + 1.05, leftRailZ + frontFaceOffset);
             leftLeafGroup.add(pullLeft);
 
             holder.add(leftLeafGroup);
 
-            // 2. HOJA DERECHA ENTERA (Riel interior hacia el fondo, en segundo plano)
+            // 2. HOJA DERECHA ENTERA
             const rightLeafGroup = new THREE.Group();
             rightLeafGroup.position.set(rightClosedX, 0, 0);
 
             const rightLeafMesh = new THREE.Mesh(UNIT_BOX_GEO, placardWoodMat);
             rightLeafMesh.scale.set(leafW, leafH, leafT);
-            rightLeafMesh.position.set(0, 0.08 + leafH / 2 + 0.01, -facingSign * railOffset);
+            rightLeafMesh.position.set(0, 0.08 + leafH / 2 + 0.01, rightRailZ);
             rightLeafMesh.castShadow = true;
             rightLeafMesh.receiveShadow = true;
             rightLeafGroup.add(rightLeafMesh);
@@ -4779,7 +4791,7 @@
             // Tirador circular embutido en la hoja derecha
             const pullRight = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.008, 24), doorFrameMat);
             pullRight.rotation.x = Math.PI / 2;
-            pullRight.position.set(leafW / 2 - 0.09, 0.08 + 1.05, -facingSign * railOffset + frontFaceOffset);
+            pullRight.position.set(leafW / 2 - 0.09, 0.08 + 1.05, rightRailZ + frontFaceOffset);
             rightLeafGroup.add(pullRight);
 
             holder.add(rightLeafGroup);
@@ -5102,7 +5114,7 @@
             addInteriorWoodDoor3D(2.30, 2.80, 3.00, 2.80, false, -1, 90, 'Puerta Estudio', 5.20);
             addInteriorWoodDoor3D(2.30, 3.65, 2.30, 4.35, false, 1, 75, 'Puerta Bano', 5.20);
             addInteriorWoodDoor3D(2.30, 5.20, 3.00, 5.20, false, 1, 75, 'Puerta Cuarto', 5.20);
-            addSlidingPlacardFront3D(0.00, 2.30, 2.80, -1, 'Placard Estudio');
+            addSlidingPlacardFront3D(0.00, 2.30, 2.80, -1, 'Placard Estudio', true);
             addSlidingPlacardFront3D(0.00, 2.30, 5.20, 1, 'Placard Cuarto');
             resolveWallMounts();
             updateRoofCapsVisibility();
