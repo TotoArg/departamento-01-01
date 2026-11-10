@@ -1,5 +1,5 @@
 {
-  "updatedAt": 1794335087918,
+  "updatedAt": 1794335091601,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -46,6 +46,12 @@
         "x": 4.47,
         "y": 0.76,
         "z": 1.2,
+        "rot": 0
+      },
+      "Centro de Mesa y Planta (Comedor)": {
+        "x": 4.47,
+        "y": 0.86,
+        "z": 1.21,
         "rot": 0
       }
     }
