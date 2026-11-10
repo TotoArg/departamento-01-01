@@ -2587,8 +2587,8 @@
         });
 
         // Piso Cerámico Esmaltado 33×33 cm real (fotos/foto_01.jpg, foto_04.jpg y corridor_floor.jpg)
-        const ceramicTile33MainTex = createRealisticCeramic33Texture(6.30, 5.70);
-        const ceramicTile33SouthTex = createRealisticCeramic33Texture(4.85, 2.30);
+        const ceramicTile33MainTex = createRealisticCeramic33Texture(6.30, 6.30);
+        const ceramicTile33SouthTex = createRealisticCeramic33Texture(4.85, 1.70);
         const pbrCeramicFloorMat = new THREE.MeshStandardMaterial({
             color: 0xe2dcd3, // Baldosas cerámicas beige cálidas con juntas oscuras
             map: ceramicTile33MainTex,
@@ -2922,18 +2922,18 @@
         // ============================================================================
         // 2. PISO CERÁMICO 33×33 cm EN "L" (6.30 m × 8.00 m) + BAÑO + PALIER EXTERIOR
         // ============================================================================
-        // Bloque superior (Estudio, Living y Entrada) [0.00, 0.00] a [6.30, 5.70]
-        const floorMainGeo = new THREE.BoxGeometry(6.30, 0.06, 5.70);
+        // Bloque superior (Estudio, Living y Entrada) [0.00, 0.00] a [6.30, 6.30]
+        const floorMainGeo = new THREE.BoxGeometry(6.30, 0.06, 6.30);
         const floorMainMesh = new THREE.Mesh(floorMainGeo, floorMatMain);
-        floorMainMesh.position.set(3.15, -0.03, 2.85);
+        floorMainMesh.position.set(3.15, -0.03, 3.15);
         floorMainMesh.receiveShadow = true;
         floorMainMesh.name = 'floorMainMesh';
         floorGroup.add(floorMainMesh);
 
-        // Bloque inferior (Cuarto + Cocina) [0.00, 5.70] a [4.85, 8.00] (2.30 m de profundidad)
-        const floorSouthGeo = new THREE.BoxGeometry(4.85, 0.06, 2.30);
+        // Bloque inferior (Cuarto + Cocina) [0.00, 6.30] a [4.85, 8.00] (1.70 m de profundidad)
+        const floorSouthGeo = new THREE.BoxGeometry(4.85, 0.06, 1.70);
         const floorSouthMesh = new THREE.Mesh(floorSouthGeo, floorMatSouth);
-        floorSouthMesh.position.set(2.425, -0.03, 6.85);
+        floorSouthMesh.position.set(2.425, -0.03, 7.15);
         floorSouthMesh.receiveShadow = true;
         floorSouthMesh.name = 'floorSouthMesh';
         floorGroup.add(floorSouthMesh);
@@ -2946,10 +2946,10 @@
         bathFloorMesh.name = 'bathFloorMesh';
         floorGroup.add(bathFloorMesh);
 
-        // Palier Edificio Exterior [4.85, 5.70] a [6.30, 8.00] (2.30 m de profundidad)
-        const palierGeo = new THREE.BoxGeometry(1.45, 0.05, 2.30);
+        // Palier Edificio Exterior [4.85, 6.30] a [6.30, 8.00] (1.70 m de profundidad)
+        const palierGeo = new THREE.BoxGeometry(1.45, 0.05, 1.70);
         const palierMesh = new THREE.Mesh(palierGeo, palierMat);
-        palierMesh.position.set(5.575, -0.03, 6.85);
+        palierMesh.position.set(5.575, -0.03, 7.15);
         palierMesh.name = 'palierMesh';
         floorGroup.add(palierMesh);
 
@@ -2964,8 +2964,8 @@
             const mx = (x1 + x2) / 2;
             const mz = (z1 + z2) / 2;
             let isHoriz = Math.abs(dx) >= Math.abs(dz);
-            // Jambas cortas de la puerta de entrada en Z=5.70 se comportan como parte del muro horizontal Sur
-            if (isExterior && mz > 5.55 && mz < 5.85 && mx > 5.30 && mx < 6.20) {
+            // Jambas cortas de la puerta de entrada en Z=6.30 se comportan como parte del muro horizontal Sur
+            if (isExterior && mz > 6.15 && mz < 6.45 && mx > 5.30 && mx < 6.20) {
                 isHoriz = true;
             }
             const nx = isHoriz ? 0 : 1;
@@ -3617,24 +3617,24 @@
         addWallSegment(6.30, 0.00, 6.30, 0.25, EXT_T, exteriorWallsGroup, true, 3.80);
         // - Ventana lateral Living V3 (Z = 0.25 a 1.45 m, ancho 1.20 m, 2 hojas corredizas)
         addWindowSegment(6.30, 0.25, 6.30, 1.45, 0.95, 1.10, 3.80);
-        // - Muro sólido Este (Z = 1.45 a 5.70 m, aloja Calefactor en Z=1.85, Rack TV y Perchero Entrada)
-        addWallSegment(6.30, 1.45, 6.30, 5.70, EXT_T, exteriorWallsGroup, true, 3.80);
+        // - Muro sólido Este (Z = 1.45 a 6.30 m, aloja Calefactor en Z=1.85, Rack TV y Perchero Entrada)
+        addWallSegment(6.30, 1.45, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 3.80);
 
-        // Retranqueo Palier (Puerta Principal en Z = 5.70): de [4.85, 5.70] a [6.30, 5.70] a 4.41 m
-        addWallSegment(4.85, 5.70, 5.34, 5.70, EXT_T, exteriorWallsGroup, true, 4.41);
-        addWallSegment(6.18, 5.70, 6.30, 5.70, EXT_T, exteriorWallsGroup, true, 3.80);
+        // Retranqueo Palier (Puerta Principal en Z = 6.30): de [4.85, 6.30] a [6.30, 6.30] a 4.41 m
+        addWallSegment(4.85, 6.30, 5.34, 6.30, EXT_T, exteriorWallsGroup, true, 4.41);
+        addWallSegment(6.18, 6.30, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 3.80);
         // Umbral y símbolo arquitectónico 2D de Puerta Principal (abre 90° hacia el Norte dentro de Entrada batiendo sobre pared Este)
         const entranceThreshold = new THREE.Mesh(
             new THREE.BoxGeometry(0.84, 0.01, 0.06),
             new THREE.MeshBasicMaterial({ color: 0xcbd5e1 })
         );
-        entranceThreshold.position.set(5.76, 0.01, 5.70);
+        entranceThreshold.position.set(5.76, 0.01, 6.30);
         lines2DGroup.add(entranceThreshold);
-        addDashedLine(5.34, 5.70, 6.18, 5.70);
-        addDoorSymbol2D(6.14, 5.70, 6.14, 4.96, 5.40, 4.96, 5.40, 5.70);
+        addDashedLine(5.34, 6.30, 6.18, 6.30);
+        addDoorSymbol2D(6.14, 6.30, 6.14, 5.56, 5.40, 5.56, 5.40, 6.30);
 
-        // Muro Derecho Cocina (Límite con Palier exterior): de [4.85, 5.70] a [4.85, 8.00] a 4.41 m
-        addWallSegment(4.85, 5.70, 4.85, 8.00, EXT_T, exteriorWallsGroup, true, 4.41);
+        // Muro Derecho Cocina (Límite con Palier exterior): de [4.85, 6.30] a [4.85, 8.00] a 4.41 m
+        addWallSegment(4.85, 6.30, 4.85, 8.00, EXT_T, exteriorWallsGroup, true, 4.41);
 
         // Muro Inferior (Sur, Z = 8.00): cierra de [0.00, 8.00] a [4.85, 8.00] (techo catedral a 5.20 m)
         // - Sector Cuarto (X = 0.00 a 3.00 m, cumbrera a 5.20 m):
@@ -3679,23 +3679,23 @@
         addBoxFixture(2.48, 0.66, 7.86, 0.48, 0.03, 0.16, 0xf97316);
 
         // 2) COCINA (según fotos reales): Sobre muro Este (X=4.85) van Heladera -> 1° tramo mesada + Calefón mural Orbis/Bosch -> Cocina 4H -> 2° tramo mesada con Bacha + esquina en "L" bajo ventana Sur (Y=8.00). Muro Oeste (X=3.00) queda libre con portero y cestos.
-        // - 1° tramo de bajo mesada y mesada de granito entre Heladera y Cocina (Z=5.52..5.92, X=4.52)
-        addBoxFixture(4.52, 0.42, 5.72, 0.56, 0.84, 0.40, 0xb48a64);
-        addBoxFixture(4.51, 0.86, 5.72, 0.60, 0.04, 0.40, 0xc8b2a6);
-        // - Calefón a gas mural blanco (Orbis/Bosch) colgado en pared Este sobre el 1° tramo de mesada (X=4.69, Y=1.44, Z=5.72) + caño amarillo
-        setMountWall(4.85, 5.72, false);
-        addBoxFixture(4.69, 1.44, 5.72, 0.22, 0.56, 0.36, 0xf8fafc, fixturesGroup, 0.25);
-        addBoxFixture(4.57, 1.28, 5.72, 0.02, 0.08, 0.12, 0x334155); // Visor/botonera calefón
-        addBoxFixture(4.73, 1.08, 5.58, 0.03, 0.22, 0.03, 0xeab308); // Caño de gas amarillo
+        // - 1° tramo de bajo mesada y mesada de granito entre Heladera y Cocina (Z=5.81..6.16, X=4.52)
+        addBoxFixture(4.52, 0.42, 5.98, 0.56, 0.84, 0.35, 0xb48a64);
+        addBoxFixture(4.51, 0.86, 5.98, 0.60, 0.04, 0.35, 0xc8b2a6);
+        // - Calefón a gas mural blanco (Orbis/Bosch) colgado en pared Este sobre el 1° tramo de mesada (X=4.69, Y=1.44, Z=5.98) + caño amarillo
+        setMountWall(4.85, 5.98, false);
+        addBoxFixture(4.69, 1.44, 5.98, 0.22, 0.56, 0.34, 0xf8fafc, fixturesGroup, 0.25);
+        addBoxFixture(4.57, 1.28, 5.98, 0.02, 0.08, 0.12, 0x334155); // Visor/botonera calefón
+        addBoxFixture(4.73, 1.08, 5.86, 0.03, 0.22, 0.03, 0xeab308); // Caño de gas amarillo
         setMountWall(null);
-        // - Cocina a gas blanca de 4 hornallas con horno visor negro sobre muro Este (X=4.51, Z=6.22, entre los dos tramos de mesada)
-        addBoxFixture(4.51, 0.43, 6.22, 0.58, 0.86, 0.54, 0xffffff, fixturesGroup, 0.25);
-        addBoxFixture(4.51, 0.87, 6.22, 0.52, 0.02, 0.48, 0x1e293b); // Rejilla 4 hornallas negra
-        addBoxFixture(4.21, 0.38, 6.22, 0.02, 0.44, 0.42, 0x0f172a); // Visor negro puerta del horno
-        // - 2° tramo de bajo mesada y mesada en "L" de granito gris/rosado (Muro Este Z=6.55..7.95 + retorno Sur X=3.70..4.50)
-        addBoxFixture(4.52, 0.42, 7.25, 0.56, 0.84, 1.40, 0xb48a64);
+        // - Cocina a gas blanca de 4 hornallas con horno visor negro sobre muro Este (X=4.51, Z=6.41, entre los dos tramos de mesada)
+        addBoxFixture(4.51, 0.43, 6.41, 0.58, 0.86, 0.50, 0xffffff, fixturesGroup, 0.25);
+        addBoxFixture(4.51, 0.87, 6.41, 0.52, 0.02, 0.46, 0x1e293b); // Rejilla 4 hornallas negra
+        addBoxFixture(4.21, 0.38, 6.41, 0.02, 0.44, 0.42, 0x0f172a); // Visor negro puerta del horno
+        // - 2° tramo de bajo mesada y mesada en "L" de granito gris/rosado (Muro Este Z=6.66..7.96 + retorno Sur X=3.70..4.50)
+        addBoxFixture(4.52, 0.42, 7.31, 0.56, 0.84, 1.30, 0xb48a64);
         addBoxFixture(4.05, 0.42, 7.68, 0.70, 0.84, 0.56, 0xb48a64);
-        addBoxFixture(4.51, 0.86, 7.25, 0.60, 0.04, 1.40, 0xc8b2a6);
+        addBoxFixture(4.51, 0.86, 7.31, 0.60, 0.04, 1.30, 0xc8b2a6);
         addBoxFixture(4.05, 0.86, 7.68, 0.68, 0.04, 0.58, 0xc8b2a6);
         // - Bacha doble esquinera de acero inoxidable + grifería monocomando + filtro purificador negro PSA (X=4.33, Z=7.55)
         addBoxFixture(4.47, 0.875, 7.46, 0.40, 0.02, 0.44, 0x94a3b8, fixturesGroup, 0.25);
@@ -4132,11 +4132,11 @@
             const beamOffsetR_X = -0.075 * Math.sin(angSlopeRight);
             const beamOffsetR_Y = -0.075 * Math.cos(angSlopeRight);
 
-            // 1. Cubierta machimbrada Living + Entrada (de Z = -0.15 a 5.75 m, X = 3.00 a 6.45 m)
+            // 1. Cubierta machimbrada Living + Entrada (de Z = -0.15 a 6.35 m, X = 3.00 a 6.45 m)
             const zLivStart = -eave; // -0.15 m
-            const zLivEnd = 5.75;
-            const depthLivingEnt = zLivEnd - zLivStart; // 5.90 m
-            const zLivCenter = (zLivStart + zLivEnd) / 2; // 2.80 m
+            const zLivEnd = 6.35;
+            const depthLivingEnt = zLivEnd - zLivStart; // 6.50 m
+            const zLivCenter = (zLivStart + zLivEnd) / 2; // 3.10 m
 
             const roofLivingEnt = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
             roofLivingEnt.scale.set(lenSlopeRight, 0.04, depthLivingEnt);
@@ -4144,15 +4144,15 @@
             roofLivingEnt.rotation.z = angSlopeRight;
             roofGroup.add(roofLivingEnt);
 
-            // 2. Cubierta machimbrada Cocina (de Z = 5.70 a 8.15 m, X = 3.00 a 4.95 m)
+            // 2. Cubierta machimbrada Cocina (de Z = 6.30 a 8.15 m, X = 3.00 a 4.95 m)
             const xCocinaEnd = 4.85 + 0.10; // 4.95 m
             const dxCocina = xCocinaEnd - xR1; // 1.95 m
             const dyCocina = dxCocina * slopeRight; // ~0.827 m
             const lenSlopeCocina = Math.hypot(dxCocina, dyCocina); // ~2.118 m
-            const zCocinaStart = 5.70;
+            const zCocinaStart = 6.30;
             const zCocinaEnd = 8.00 + eave; // 8.15 m
-            const depthCocinaSouth = zCocinaEnd - zCocinaStart; // 2.45 m
-            const zCocinaCenter = (zCocinaStart + zCocinaEnd) / 2; // 6.925 m
+            const depthCocinaSouth = zCocinaEnd - zCocinaStart; // 1.85 m
+            const zCocinaCenter = (zCocinaStart + zCocinaEnd) / 2; // 7.15 m
 
             const roofCocinaSouth = new THREE.Mesh(UNIT_BOX_GEO, woodRoofMat);
             roofCocinaSouth.scale.set(lenSlopeCocina, 0.04, depthCocinaSouth);
@@ -4223,8 +4223,8 @@
         // - Muro sólido divisorio Cuarto-Cocina alineado de forma continua en el eje estructural central X = 3.00:
         addWallSegment(3.00, 5.20, 3.00, 8.00, INT_T, interiorWallsGroup, false, 5.20);
 
-        // Eje Vertical X = 4.85 (separa Cocina de Entrada corta): de Z = 5.20 a Z = 5.70 a cota 4.41 m
-        addWallSegment(4.85, 5.20, 4.85, 5.70, INT_T, interiorWallsGroup, false, 4.41);
+        // Eje Vertical X = 4.85 (separa Cocina de Entrada): de Z = 5.20 a Z = 6.30 a cota 4.41 m
+        addWallSegment(4.85, 5.20, 4.85, 6.30, INT_T, interiorWallsGroup, false, 4.41);
 
         // Eje Horizontal Z = 2.80 (Frente Placard Estudio 2.80m x 3.00m simétrico al Cuarto):
         addSlidingPlacard2D(0.00, 2.30, 2.80, -1);
@@ -4945,8 +4945,8 @@
             addContactShadowPlane(1.35, 6.00, 2.25, 2.40, 0.58); // Cama matrimonial en Cuarto
             addContactShadowPlane(0.35, 4.95, 0.65, 0.65, 0.45); // Mesa de luz izquierda
             addContactShadowPlane(0.35, 7.05, 0.65, 0.65, 0.45); // Mesa de luz derecha
-            addContactShadowPlane(3.85, 6.50, 1.50, 2.60, 0.54); // Muebles bajo mesada y cocina
-            addContactShadowPlane(6.10, 5.40, 0.65, 1.25, 0.48); // Perchero y zapatero en Entrada
+            addContactShadowPlane(3.85, 6.60, 1.50, 2.50, 0.54); // Muebles bajo mesada y cocina
+            addContactShadowPlane(6.10, 5.50, 0.65, 1.25, 0.48); // Perchero y zapatero en Entrada
 
             // Activar sombras arrojadas y recibidas en toda la arquitectura y mobiliario
             apartmentGroup.traverse(child => {
@@ -5036,7 +5036,7 @@
             });
 
             // Instanciar puertas 3D interactivas con dintel a 5.20 m bajo la viga cumbrera:
-            addMainEntranceDoor3D(5.34, 5.70, 6.18, 5.70);
+            addMainEntranceDoor3D(5.34, 6.30, 6.18, 6.30);
             addInteriorWoodDoor3D(2.30, 2.80, 3.00, 2.80, false, -1, 90, 'Puerta Estudio', 5.20);
             addInteriorWoodDoor3D(2.30, 3.65, 2.30, 4.35, false, 1, 75, 'Puerta Bano', 5.20);
             addInteriorWoodDoor3D(2.30, 5.20, 3.00, 5.20, false, 1, 75, 'Puerta Cuarto', 5.20);
@@ -5367,76 +5367,76 @@
 
         function buildFurnishedVideoDecor() {
             // ------------------------------------------------------------------------
-            // A) ENTRADA Y LIVING-COMEDOR ([3.00, 0.00] a [6.30, 5.70])
+            // A) ENTRADA Y LIVING-COMEDOR ([3.00, 0.00] a [6.30, 6.30])
             // ------------------------------------------------------------------------
-            // 1. Entrada (X = 5.20..6.30, Z = 4.80..5.70):
+            // 1. Entrada (X = 4.85..6.30, Z = 5.20..6.30):
             // - Crucifijo de madera oscura sobre dintel de puerta principal + retablo dorado sobre muro + tablero eléctrico
-            setMountWall(5.75, 5.70, true);
-            // Crucifijo montado sobre el dintel interior de la puerta (Z = 5.63 pegado a la cara interna del muro en Z = 5.70)
-            addDecorBox(5.75, 2.30, 5.63, 0.14, 0.24, 0.02, 0x3b2314);
-            // Retablo dorado montado sobre el muro derecho junto a la puerta (X = 6.21, Z = 5.63)
-            addDecorBox(6.21, 1.48, 5.63, 0.08, 0.13, 0.02, 0xd4af37);
-            setMountWall(4.85, 5.22, false);
+            setMountWall(5.75, 6.30, true);
+            // Crucifijo montado sobre el dintel interior de la puerta (Z = 6.23 pegado a la cara interna del muro en Z = 6.30)
+            addDecorBox(5.75, 2.30, 6.23, 0.14, 0.24, 0.02, 0x3b2314);
+            // Retablo dorado montado sobre el muro derecho junto a la puerta (X = 6.21, Z = 6.23)
+            addDecorBox(6.21, 1.48, 6.23, 0.08, 0.13, 0.02, 0xd4af37);
+            setMountWall(4.85, 5.70, false);
             // Tablero eléctrico sobre pared divisoria con Cocina (cara Entrada X = 4.85 + INT_T/2)
-            addDecorBox(4.91, 1.45, 5.22, 0.02, 0.22, 0.26, 0x1e293b);
+            addDecorBox(4.91, 1.45, 5.70, 0.02, 0.22, 0.26, 0x1e293b);
             setMountWall(null);
             // ============================================================================
             // SECTOR ENTRADA Y PUERTA PRINCIPAL (FOTOS REALES #0 A #4):
             // Dimensiones y distribución fiel de objetos:
             // ============================================================================
 
-            // 1. Muro Sur a la derecha de la puerta (lado Oeste, X = 4.85 a 5.34, Z = 5.70):
+            // 1. Muro Sur a la derecha de la puerta (lado Oeste, X = 4.85 a 5.34, Z = 6.30):
             // - Rejilla de ventilación blanca superior (cerca del techo, fotos #2 y #3)
-            setMountWall(5.25, 5.70, true);
-            addDecorBox(5.25, 2.48, 5.62, 0.16, 0.16, 0.015, 0xf8fafc, 0.6, 0, 'Rejilla de Ventilación');
+            setMountWall(5.25, 6.30, true);
+            addDecorBox(5.25, 2.48, 6.22, 0.16, 0.16, 0.015, 0xf8fafc, 0.6, 0, 'Rejilla de Ventilación');
             // - Cuadrito / placa religiosa dorada (santito) en muro derecho (foto #2)
-            addDecorBox(5.25, 1.45, 5.62, 0.09, 0.14, 0.022, 0xd4af37, 0.35, 0, 'Placa Religiosa Dorada');
-            addDecorBox(5.25, 1.45, 5.61, 0.065, 0.11, 0.024, 0x78350f, 0.7); // Lámina interior
+            addDecorBox(5.25, 1.45, 6.22, 0.09, 0.14, 0.022, 0xd4af37, 0.35, 0, 'Placa Religiosa Dorada');
+            addDecorBox(5.25, 1.45, 6.21, 0.065, 0.11, 0.024, 0x78350f, 0.7); // Lámina interior
             // - Tecla de luz blanca en el muro derecho (foto #2)
-            addDecorBox(5.25, 1.05, 5.62, 0.08, 0.12, 0.014, 0xf1f5f9, 0.4);
+            addDecorBox(5.25, 1.05, 6.22, 0.08, 0.12, 0.014, 0xf1f5f9, 0.4);
             // - Recipiente / macetita verde en el zócalo de la esquina derecha (foto #2)
-            addDecorCyl(5.25, 0.07, 5.62, 0.045, 0.045, 0.14, 0x4d7c0f, 0.5);
+            addDecorCyl(5.25, 0.07, 6.22, 0.045, 0.045, 0.14, 0x4d7c0f, 0.5);
 
-            // 2. Muro Este de Entrada (X = 6.30, de Z = 4.80 a Z = 5.70):
-            setMountWall(6.30, 5.58, false);
+            // 2. Muro Este de Entrada (X = 6.30, de Z = 5.20 a Z = 6.30):
+            setMountWall(6.30, 6.18, false);
             // - Panel de alarma / portero visor con pantalla negra táctil y marco blanco (fotos #1 y #3)
-            addDecorBox(6.20, 1.38, 5.58, 0.018, 0.13, 0.18, 0xf8fafc, 0.4, 0, 'Panel Alarma / Pantalla');
-            addDecorBox(6.19, 1.38, 5.58, 0.019, 0.09, 0.13, 0x09090b, 0.15); // Pantalla negra
+            addDecorBox(6.20, 1.38, 6.18, 0.018, 0.13, 0.18, 0xf8fafc, 0.4, 0, 'Panel Alarma / Pantalla');
+            addDecorBox(6.19, 1.38, 6.18, 0.019, 0.09, 0.13, 0x09090b, 0.15); // Pantalla negra
             // - Tecla de luz blanca bajo el panel de alarma
-            addDecorBox(6.20, 1.05, 5.58, 0.014, 0.12, 0.08, 0xf1f5f9, 0.4);
+            addDecorBox(6.20, 1.05, 6.18, 0.014, 0.12, 0.08, 0xf1f5f9, 0.4);
             setMountWall(null);
 
             // - Bolsos / mochila sobre el piso cerca de la puerta (fotos #1 y #3): conjunto unificado seleccionable
             createCompoundAssembly('Mochila y Bolso Entrada', () => {
-                addDecorBox(6.10, 0.14, 5.48, 0.28, 0.28, 0.36, 0x0f766e, 0.85, 0.12, 'Bolso Estampado Entrada');
-                addDecorBox(6.08, 0.18, 5.36, 0.24, 0.32, 0.22, 0x1e293b, 0.9, -0.15, 'Mochila Negra Entrada');
+                addDecorBox(6.10, 0.14, 6.05, 0.28, 0.28, 0.36, 0x0f766e, 0.85, 0.12, 'Bolso Estampado Entrada');
+                addDecorBox(6.08, 0.18, 5.92, 0.24, 0.32, 0.22, 0x1e293b, 0.9, -0.15, 'Mochila Negra Entrada');
             });
 
             // - Perchero industrial de hierro negro + zapatero de 3 niveles + estante superior (fotos #0, #1, #3):
             createCompoundAssembly('Perchero y Zapatero Entrada', () => {
-                // Zapatero 3 niveles abajo con calzado (Z = 4.80 a 5.40, X = 6.10):
-                addDecorBox(6.10, 0.03, 5.10, 0.28, 0.02, 0.58, 0x0f172a, 0.45, 0, 'Estante Inferior Zapatero');
-                addDecorBox(6.10, 0.19, 5.10, 0.28, 0.02, 0.58, 0x0f172a, 0.45, 0, 'Estante Medio Zapatero');
-                addDecorBox(6.10, 0.35, 5.10, 0.28, 0.02, 0.58, 0x0f172a, 0.45, 0, 'Estante Superior Zapatero');
+                // Zapatero 3 niveles abajo con calzado (Z = 5.15 a 5.80, X = 6.10):
+                addDecorBox(6.10, 0.03, 5.48, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Inferior Zapatero');
+                addDecorBox(6.10, 0.19, 5.48, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Medio Zapatero');
+                addDecorBox(6.10, 0.35, 5.48, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Superior Zapatero');
                 // Patas y estructura lateral de hierro negro:
-                addDecorBox(6.10, 0.90, 4.82, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Norte Perchero');
-                addDecorBox(6.10, 0.90, 5.38, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Sur Perchero');
+                addDecorBox(6.10, 0.90, 5.16, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Norte Perchero');
+                addDecorBox(6.10, 0.90, 5.80, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Sur Perchero');
                 // Calzados ordenados dentro de los estantes del mueble zapatero:
-                addDecorBox(6.08, 0.09, 4.96, 0.22, 0.09, 0.24, 0x1e293b, 0.8, 0, 'Zapatillas Negras Estante 1');
-                addDecorBox(6.08, 0.09, 5.24, 0.22, 0.09, 0.24, 0x94a3b8, 0.8, 0, 'Zapatillas Grises Estante 1');
-                addDecorBox(6.08, 0.25, 4.96, 0.22, 0.09, 0.24, 0x475569, 0.8, 0, 'Zapatillas Cuero Estante 2');
-                addDecorBox(6.08, 0.25, 5.24, 0.22, 0.09, 0.24, 0xf1f5f9, 0.8, 0, 'Zapatillas Blancas Estante 2');
+                addDecorBox(6.08, 0.09, 5.32, 0.22, 0.09, 0.24, 0x1e293b, 0.8, 0, 'Zapatillas Negras Estante 1');
+                addDecorBox(6.08, 0.09, 5.62, 0.22, 0.09, 0.24, 0x94a3b8, 0.8, 0, 'Zapatillas Grises Estante 1');
+                addDecorBox(6.08, 0.25, 5.32, 0.22, 0.09, 0.24, 0x475569, 0.8, 0, 'Zapatillas Cuero Estante 2');
+                addDecorBox(6.08, 0.25, 5.62, 0.22, 0.09, 0.24, 0xf1f5f9, 0.8, 0, 'Zapatillas Blancas Estante 2');
 
                 // Camperas colgadas del perchero (sin setMountWall que altere alturas):
-                addDecorBox(6.10, 1.25, 5.02, 0.24, 0.82, 0.38, 0x1e293b, 0.85, 0, 'Campera Abrigada');
+                addDecorBox(6.10, 1.25, 5.35, 0.24, 0.82, 0.38, 0x1e293b, 0.85, 0, 'Campera Abrigada');
                 // Bolsa de tela con manija ("Ochenta y Cinco Accesorios", foto #1):
-                addDecorBox(6.11, 1.35, 5.22, 0.16, 0.32, 0.26, 0xfef08a, 0.9, 0.05, 'Bolsa Tela Accesorios');
+                addDecorBox(6.11, 1.35, 5.56, 0.16, 0.32, 0.26, 0xfef08a, 0.9, 0.05, 'Bolsa Tela Accesorios');
                 // Estante superior de madera natural (pino/paraíso):
-                addDecorBox(6.10, 1.78, 5.10, 0.26, 0.03, 0.60, 0x9a5b32, 0.6, 0, 'Estante Madera Perchero');
+                addDecorBox(6.10, 1.78, 5.48, 0.26, 0.03, 0.68, 0x9a5b32, 0.6, 0, 'Estante Madera Perchero');
                 // Adornos sobre el estante superior (fotos #0, #1, #3):
-                addDecorCyl(6.10, 1.88, 4.94, 0.035, 0.025, 0.16, 0xf1f5f9, 0.4, 'Florero Cerámico Perchero');
-                addDecorCyl(6.10, 1.88, 5.08, 0.025, 0.025, 0.15, 0x1c1917, 0.2, 'Botella Vidrio Perchero');
-                addDecorBox(6.10, 1.88, 5.22, 0.045, 0.16, 0.045, 0x78350f, 0.6, 0, 'Escultura Madera Perchero');
+                addDecorCyl(6.10, 1.88, 5.30, 0.035, 0.025, 0.16, 0xf1f5f9, 0.4, 'Florero Cerámico Perchero');
+                addDecorCyl(6.10, 1.88, 5.44, 0.025, 0.025, 0.15, 0x1c1917, 0.2, 'Botella Vidrio Perchero');
+                addDecorBox(6.10, 1.88, 5.58, 0.045, 0.16, 0.045, 0x78350f, 0.6, 0, 'Escultura Madera Perchero');
             });
 
             // - Maceta redonda blanca sobre pie nórdico de madera con Sansevieria (Lengua de suegra, fotos #0 y #3):
@@ -6075,39 +6075,39 @@
             addCurtainAssembly(6.30, 0.25, 6.30, 1.45, -0.12, 0, 0xd6ccc2);
 
             // ------------------------------------------------------------------------
-            // B) COCINA ([3.00, 4.80] a [5.20, 8.00]) - Relevamiento exacto de las fotos reales
+            // B) COCINA ([3.00, 5.20] a [4.85, 8.00]) - Relevamiento exacto de las fotos reales
             // ------------------------------------------------------------------------
-            // 1. Mueble envolvente de heladera en esquina Noreste (X=4.50, Z=5.11, protegido tras la mocheta de acceso):
+            // 1. Mueble envolvente de heladera en esquina Noreste (X=4.53, Z=5.53, protegido tras la mocheta de acceso):
             createCompoundAssembly('Heladera con Bodega y Alacena', () => {
                 // - Heladera blanca con freezer superior mirando al Oeste + imanes en la puerta
-                addDecorBox(4.50, 0.84, 5.11, 0.60, 1.68, 0.62, 0xf8fafc, 0.25, 0, 'Heladera con Freezer');
+                addDecorBox(4.53, 0.84, 5.53, 0.58, 1.68, 0.56, 0xf8fafc, 0.25, 0, 'Heladera con Freezer');
                 // - Bodega portabotellas de 8 nichos (4x2) + Alacena superior de 2 puertas en melamina roble claro hasta arriba
-                setMountWall(4.85, 5.11, false);
-                addDecorBox(4.50, 1.78, 5.11, 0.60, 0.16, 0.62, 0xd6ccc2, 0.5, 0, 'Bodega Portabotellas');  // Bodega portabotellas
-                addDecorBox(4.50, 2.12, 5.11, 0.60, 0.52, 0.62, 0xd6ccc2, 0.45, 0, 'Alacena sobre Heladera'); // Alacena alta sobre heladera
+                setMountWall(4.85, 5.53, false);
+                addDecorBox(4.53, 1.78, 5.53, 0.58, 0.16, 0.56, 0xd6ccc2, 0.5, 0, 'Bodega Portabotellas');  // Bodega portabotellas
+                addDecorBox(4.53, 2.12, 5.53, 0.58, 0.52, 0.56, 0xd6ccc2, 0.45, 0, 'Alacena sobre Heladera'); // Alacena alta sobre heladera
                 setMountWall(null);
             });
             // 2. Alacenas superiores sobre Muro Este (X=4.85):
-            // - Alacena sobre el calefón Orbis/Bosch (Z=5.72) + caño corrugado de aluminio arriba + plumero extensible violeta en el hueco
-            addDecorBox(4.61, 1.98, 5.72, 0.34, 0.48, 0.40, 0xd6ccc2, 0.45, 0, 'Alacena sobre Calefón');
-            addDecorCyl(4.67, 2.30, 5.78, 0.05, 0.05, 0.22, 0x94a3b8, 0.3, 'Conducto Ventilación Calefón');    // Conducto aluminio calefón
-            addDecorCyl(4.27, 1.65, 5.48, 0.012, 0.012, 1.45, 0xf8fafc, 0.4, 'Cabo Plumero Extensible');  // Cabo extensible blanco del plumero
-            addDecorCyl(4.27, 2.40, 5.48, 0.09, 0.05, 0.18, 0x7e22ce, 0.7, 'Plumero Violeta');    // Plumero violeta arriba de la heladera
-            // - Alacena larga de 3 puertas sobre cocina y bacha (Z=6.00..7.60) + estante especiero inferior abierto + 2 latas negras Bagley arriba + imán portacuchillos
-            setMountWall(4.85, 6.80, false);
-            addDecorBox(4.61, 1.84, 6.80, 0.34, 0.64, 1.60, 0xd6ccc2, 0.45, 0, 'Alacena Cocina 3 Puertas');
-            addDecorBox(4.61, 1.44, 6.80, 0.26, 0.14, 1.60, 0xb48a64, 0.5, 0, 'Estante Especiero Cocina');    // Estante especiero inferior con tazas y Moka roja
-            addDecorCyl(4.61, 2.24, 6.30, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4, 'Lata Redonda Alacena 1');    // Lata redonda negra 1 sobre alacena
-            addDecorCyl(4.61, 2.24, 7.30, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4, 'Lata Redonda Alacena 2');    // Lata redonda negra 2 sobre alacena
-            addDecorBox(4.76, 1.24, 6.80, 0.02, 0.16, 0.28, 0x334155, 0.3, 0, 'Imán Portacuchillos');    // Imán portacuchillos en pared azulejada
+            // - Alacena sobre el calefón Orbis/Bosch (Z=5.98) + caño corrugado de aluminio arriba + plumero extensible violeta en el hueco
+            addDecorBox(4.61, 1.98, 5.98, 0.34, 0.48, 0.35, 0xd6ccc2, 0.45, 0, 'Alacena sobre Calefón');
+            addDecorCyl(4.67, 2.30, 6.02, 0.05, 0.05, 0.22, 0x94a3b8, 0.3, 'Conducto Ventilación Calefón');    // Conducto aluminio calefón
+            addDecorCyl(4.27, 1.65, 5.76, 0.012, 0.012, 1.45, 0xf8fafc, 0.4, 'Cabo Plumero Extensible');  // Cabo extensible blanco del plumero
+            addDecorCyl(4.27, 2.40, 5.76, 0.09, 0.05, 0.18, 0x7e22ce, 0.7, 'Plumero Violeta');    // Plumero violeta arriba de la heladera
+            // - Alacena larga de 3 puertas sobre cocina y bacha (Z=6.30..7.60) + estante especiero inferior abierto + 2 latas negras Bagley arriba + imán portacuchillos
+            setMountWall(4.85, 6.95, false);
+            addDecorBox(4.61, 1.84, 6.95, 0.34, 0.64, 1.30, 0xd6ccc2, 0.45, 0, 'Alacena Cocina 3 Puertas');
+            addDecorBox(4.61, 1.44, 6.95, 0.26, 0.14, 1.30, 0xb48a64, 0.5, 0, 'Estante Especiero Cocina');    // Estante especiero inferior con tazas y Moka roja
+            addDecorCyl(4.61, 2.24, 6.55, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4, 'Lata Redonda Alacena 1');    // Lata redonda negra 1 sobre alacena
+            addDecorCyl(4.61, 2.24, 7.35, 0.09, 0.09, 0.16, 0x1e1b4b, 0.4, 'Lata Redonda Alacena 2');    // Lata redonda negra 2 sobre alacena
+            addDecorBox(4.76, 1.24, 6.95, 0.02, 0.16, 0.28, 0x334155, 0.3, 0, 'Imán Portacuchillos');    // Imán portacuchillos en pared azulejada
             // - Estante esquinero abierto de madera de 3 niveles en esquina Sureste (Z=7.82) con planta y cafetera Moka
             addDecorBox(4.61, 1.74, 7.82, 0.30, 0.62, 0.26, 0x9a5b32, 0.5, 0, 'Estante Esquinero Madera');
             addDecorPlantCeramic(4.61, 2.05, 7.82, 0.05, 0.04, 0.10, 0.12, 0.16, 0.12, 0.16, 'Planta Estante Esquina');    // Plantita en estante superior
             setMountWall(null);
-            // - Rollo de cocina y termo sobre el 1° tramo de mesada (Z=5.60..5.82) + contenedor celeste sobre mesada
-            addDecorCyl(4.33, 0.98, 5.60, 0.06, 0.06, 0.22, 0xffffff, 0.4, 'Rollo de Cocina');    // Rollo de papel de cocina
-            addDecorCyl(4.37, 0.98, 5.82, 0.045, 0.045, 0.24, 0x475569, 0.3, 'Termo Acero Inox');  // Termo acero
-            addDecorBox(4.39, 0.92, 6.84, 0.18, 0.09, 0.22, 0x0284c7, 0.3, 0, 'Tupper Celeste Mesada');    // Recipiente celeste sobre mesada
+            // - Rollo de cocina y termo sobre el 1° tramo de mesada (Z=5.85..6.10) + contenedor celeste sobre mesada
+            addDecorCyl(4.33, 0.98, 5.90, 0.06, 0.06, 0.22, 0xffffff, 0.4, 'Rollo de Cocina');    // Rollo de papel de cocina
+            addDecorCyl(4.37, 0.98, 6.06, 0.045, 0.045, 0.24, 0x475569, 0.3, 'Termo Acero Inox');  // Termo acero
+            addDecorBox(4.39, 0.92, 6.95, 0.18, 0.09, 0.22, 0x0284c7, 0.3, 0, 'Tupper Celeste Mesada');    // Recipiente celeste sobre mesada
             // 3. Sector bajo Ventana Sur (Y=8.00):
             // - Cortina roller blanca en ventana Sur (X=3.25..4.55, Z=7.94)
             setMountWall(3.90, 8.00, true);
@@ -7197,10 +7197,10 @@
         addPlanLabel(5.15, 2.60, "LIVING");
         // Cocina: [3.00, 5.20] a [4.85, 8.00]
         addPlanLabel(3.92, 6.60, "COCINA");
-        // Entrada: [4.85, 4.80] a [6.30, 6.30]
-        addPlanLabel(5.57, 5.25, "ENTRADA", "arch-label sm");
+        // Entrada: [4.85, 5.20] a [6.30, 6.30]
+        addPlanLabel(5.57, 5.75, "ENTRADA", "arch-label sm");
         // Palier Edificio (Exterior): [4.85, 6.30] a [6.30, 8.00]
-        addPlanLabel(5.57, 6.85, "PALIER\nEDIFICIO", "arch-label palier");
+        addPlanLabel(5.57, 7.15, "PALIER\nEDIFICIO", "arch-label palier");
 
         // Cotas Exteriores
         addPlanLabel(3.15, -0.30, "6.30 m", "arch-label dim");
