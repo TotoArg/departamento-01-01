@@ -1,12 +1,14 @@
 {
-  "updatedAt": 1794323748112,
+  "updatedAt": 1794323756141,
   "decorOverrides": {
-    "deleted": [],
+    "deleted": [
+      "accentLivingWall"
+    ],
     "transforms": {
       "Comederos de Mascota": {
-        "x": 4.38,
+        "x": 4.33,
         "y": 0.04,
-        "z": 4.88,
+        "z": 4.98,
         "rot": 1.571
       }
     }
