@@ -1,5 +1,5 @@
 {
-  "updatedAt": 1794332975145,
+  "updatedAt": 1794335077910,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -28,6 +28,12 @@
         "x": 6,
         "y": 0.98,
         "z": 4.79,
+        "rot": 0
+      },
+      "Sillas de Comedor (4)": {
+        "x": 4.49,
+        "y": 0.43,
+        "z": 1.18,
         "rot": 0
       }
     }
