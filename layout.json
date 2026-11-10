@@ -1,8 +1,9 @@
 {
-  "updatedAt": 1794323756141,
+  "updatedAt": 1794323761040,
   "decorOverrides": {
     "deleted": [
-      "accentLivingWall"
+      "accentLivingWall",
+      "accentStudyWall"
     ],
     "transforms": {
       "Comederos de Mascota": {
