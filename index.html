@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Plano Arquitectónico 2D y 3D (6.30m × 8.00m)</title>
+    <title>Plano Arquitectónico 2D y 3D (7.00m × 8.00m)</title>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <!-- Carga local offline con fallback a CDN -->
     <script src="libs/three.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'">
@@ -904,11 +904,11 @@
                     <button class="icon-btn" id="btn-toggle-layers">⚙️</button>
                 </div>
             </div>
-            <h1>Plano Arquitectónico Exacto (6.30m × 8.00m)</h1>
+            <h1>Plano Arquitectónico Exacto (7.00m × 8.00m)</h1>
             <div class="metrics-row">
                 <div class="metric"><span class="metric-val">54,16 m²</span><span class="metric-lbl">Escritura Oficial</span></div>
-                <div class="metric"><span class="metric-val">48,53 m²</span><span class="metric-lbl">Planta en L (6.30×8.00)</span></div>
-                <div class="metric"><span class="metric-val">6.30 m</span><span class="metric-lbl">Ancho (X)</span></div>
+                <div class="metric"><span class="metric-val">52,95 m²</span><span class="metric-lbl">Planta en L (7.00×8.00)</span></div>
+                <div class="metric"><span class="metric-val">7.00 m</span><span class="metric-lbl">Ancho (X)</span></div>
                 <div class="metric"><span class="metric-val">8.00 m</span><span class="metric-lbl">Alto (Y)</span></div>
             </div>
         </div>
@@ -946,6 +946,7 @@
             <button class="mode-btn" id="btn-toggle-doors" title="Abrir / Cerrar todas las puertas y placards del departamento"><span>🚪</span> Puertas</button>
             <button class="mode-btn" id="btn-toggle-windows" title="Abrir / Cerrar todas las ventanas corredizas y ventiluz del departamento (Entra brisa patagónica)"><span>🪟</span> Ventanas</button>
             <button class="mode-btn" id="btn-toggle-curtains" title="Abrir / Cerrar todas las cortinas recogibles del departamento"><span>🎋</span> Cortinas</button>
+            <button class="mode-btn" id="btn-toggle-dining-table" style="background:rgba(234,88,12,0.22); border:1px solid #f97316; color:#fdba74; font-weight:700;" title="Ampliar / Cerrar Mesa de Comedor Ovalada en 3 tandas (Ø 1.00m → 1.23m → 1.47m → 1.70m) [Tecla M]"><span>🍽️</span> <span id="lbl-dining-table-btn">Mesa 1.00m</span></button>
             <div id="solar-time-group" style="display:flex; gap:2px; border-left:1px solid rgba(255,255,255,0.18); padding-left:4px;">
                 <button class="mode-btn solar-btn" data-time="morning" title="09:30 - Mañana Fresca (El Calafate)" style="padding:4px 6px;">🌅</button>
                 <button class="mode-btn solar-btn" data-time="noon" title="13:30 - Mediodía Patagónico" style="padding:4px 6px;">☀️</button>
@@ -1374,9 +1375,9 @@
                 0.1,
                 100
             );
-            cam.position.set(3.15, 20, 4.00);
+            cam.position.set(3.50, 20, 4.00);
             cam.up.set(0, 0, -1); // Norte (Y=0) arriba en pantalla, Sur (Y=8.00) abajo
-            cam.lookAt(3.15, 0, 4.00);
+            cam.lookAt(3.50, 0, 4.00);
             return cam;
         }
         const orthoCam = createOrthoCam();
@@ -2386,6 +2387,7 @@
         const windowClickCandidates = [];
         const animCurtains = [];
         const curtainClickCandidates = [];
+        const diningTableClickCandidates = [];
 
         // Geometría de caja con bordes y esquinas redondeadas biseladas (evita el aspecto plano de cajas primitivas)
         function createRoundedBoxGeo(w, h, d, radius = 0.03, smoothness = 3) {
@@ -2624,7 +2626,7 @@
         });
 
         // Piso Cerámico Esmaltado 33×33 cm real (fotos/foto_01.jpg, foto_04.jpg y corridor_floor.jpg)
-        const ceramicTile33MainTex = createRealisticCeramic33Texture(6.30, 6.30);
+        const ceramicTile33MainTex = createRealisticCeramic33Texture(7.00, 6.30);
         const ceramicTile33SouthTex = createRealisticCeramic33Texture(4.85, 1.70);
         const pbrCeramicFloorMat = new THREE.MeshStandardMaterial({
             color: 0xe2dcd3, // Baldosas cerámicas beige cálidas con juntas oscuras
@@ -2775,7 +2777,7 @@
         }
 
         // Apliques de pared reales ubicados según relevamiento fotográfico y videos 360°
-        createRealWallSpotlight(6.22, 2.10, 1.65, Math.PI, 0.52, true, 'Living Sur (Zona Futón)');
+        createRealWallSpotlight(6.92, 2.10, 1.65, Math.PI, 0.52, true, 'Living Sur (Zona Futón)');
         createRealWallSpotlight(6.22, 2.10, 3.10, Math.PI, 0.52, true, 'Living Norte (Zona TV)');
         createRealWallSpotlight(3.08, 2.10, 2.30, 0, 0.52, true, 'Living Pasillo (Tabique Central)');
         createRealWallSpotlight(4.60, 2.10, 0.08, -Math.PI / 2, 0.58, true, 'Comedor (Muro Norte sobre Mesa)');
@@ -2959,10 +2961,10 @@
         // ============================================================================
         // 2. PISO CERÁMICO 33×33 cm EN "L" (6.30 m × 8.00 m) + BAÑO + PALIER EXTERIOR
         // ============================================================================
-        // Bloque superior (Estudio, Living y Entrada) [0.00, 0.00] a [6.30, 6.30]
-        const floorMainGeo = new THREE.BoxGeometry(6.30, 0.06, 6.30);
+        // Bloque superior (Estudio, Living y Entrada) [0.00, 0.00] a [7.00, 6.30] (Living extendido a 7.00m)
+        const floorMainGeo = new THREE.BoxGeometry(7.00, 0.06, 6.30);
         const floorMainMesh = new THREE.Mesh(floorMainGeo, floorMatMain);
-        floorMainMesh.position.set(3.15, -0.03, 3.15);
+        floorMainMesh.position.set(3.50, -0.03, 3.15);
         floorMainMesh.receiveShadow = true;
         floorMainMesh.name = 'floorMainMesh';
         floorGroup.add(floorMainMesh);
@@ -2983,10 +2985,10 @@
         bathFloorMesh.name = 'bathFloorMesh';
         floorGroup.add(bathFloorMesh);
 
-        // Palier Edificio Exterior [4.85, 6.30] a [6.30, 8.00] (1.70 m de profundidad)
-        const palierGeo = new THREE.BoxGeometry(1.45, 0.05, 1.70);
+        // Palier Edificio Exterior [4.85, 6.30] a [7.00, 8.00] (1.70 m de profundidad)
+        const palierGeo = new THREE.BoxGeometry(2.15, 0.05, 1.70);
         const palierMesh = new THREE.Mesh(palierGeo, palierMat);
-        palierMesh.position.set(5.575, -0.03, 7.15);
+        palierMesh.position.set(5.925, -0.03, 7.15);
         palierMesh.name = 'palierMesh';
         floorGroup.add(palierMesh);
 
@@ -3002,7 +3004,7 @@
             const mz = (z1 + z2) / 2;
             let isHoriz = Math.abs(dx) >= Math.abs(dz);
             // Jambas cortas de la puerta de entrada en Z=6.30 se comportan como parte del muro horizontal Sur
-            if (isExterior && mz > 6.15 && mz < 6.45 && mx > 5.10 && mx < 6.05) {
+            if (isExterior && mz > 6.15 && mz < 6.45 && mx > 5.45 && mx < 6.40) {
                 isHoriz = true;
             }
             const nx = isHoriz ? 0 : 1;
@@ -3282,11 +3284,11 @@
                 winName = "Baño Ventiluz (Oeste)";
             } else if (Math.abs(z1) < 0.1 && midXCoord < 3.0) {
                 winName = "Estudio (Norte)";
-            } else if (Math.abs(z1) < 0.1 && midXCoord < 4.6) {
+            } else if (Math.abs(z1) < 0.1 && midXCoord < 5.0) {
                 winName = "Living V1 (Norte)";
-            } else if (Math.abs(z1) < 0.1 && midXCoord >= 4.6) {
+            } else if (Math.abs(z1) < 0.1 && midXCoord >= 5.0) {
                 winName = "Living V2 (Norte)";
-            } else if (Math.abs(x1 - 6.30) < 0.1) {
+            } else if (Math.abs(x1 - 7.00) < 0.1 || Math.abs(x1 - 6.30) < 0.1) {
                 winName = "Living V3 (Lateral Este)";
             } else if (Math.abs(z1 - 8.00) < 0.1 && midXCoord < 2.5) {
                 winName = "Dormitorio (Sur)";
@@ -3627,38 +3629,38 @@
         //    - Tramo derecho ciego plano hasta el eje central (X = 2.85 a 3.00 m, cumbrera 5.20 m)
         addWallSegment(2.85, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 5.20);
 
-        // 2) SECTOR LIVING (X = 3.00 a 6.30 m, faldón este baja de 5.20 m a 3.80 m):
-        //    - Muro inicial junto al eje central (X = 3.00 a 3.25 m, baja de 5.20 m a 5.09 m)
-        addSlopedWallSegment(3.00, 0.00, 3.25, 0.00, 5.20, 5.09, EXT_T, exteriorWallsGroup, true);
-        //    - Ventana Norte Living V1 (X = 3.25 a 4.35 m, baja de 5.09 m a 4.63 m, ancho 1.10 m)
-        addWindowSegment(3.25, 0.00, 4.35, 0.00, 0.95, 1.10, 5.09, 4.63);
-        //    - Muro intermedio entre ventanales (X = 4.35 a 4.95 m, baja de 4.63 m a 4.37 m, pilar central 60 cm)
-        addSlopedWallSegment(4.35, 0.00, 4.95, 0.00, 4.63, 4.37, EXT_T, exteriorWallsGroup, true);
-        //    - Ventana Norte Living V2 (X = 4.95 a 6.05 m, baja de 4.37 m a 3.91 m, ancho 1.10 m)
-        addWindowSegment(4.95, 0.00, 6.05, 0.00, 0.95, 1.10, 4.37, 3.91);
-        //    - Muro esquinero Este (X = 6.05 a 6.30 m, baja de 3.91 m a 3.80 m, columna esquina 25 cm)
-        addSlopedWallSegment(6.05, 0.00, 6.30, 0.00, 3.91, 3.80, EXT_T, exteriorWallsGroup, true);
+        // 2) SECTOR LIVING (X = 3.00 a 7.00 m, faldón este baja de 5.20 m a 3.80 m):
+        //    - Muro inicial junto al eje central (X = 3.00 a 3.35 m, baja de 5.20 m a 5.08 m)
+        addSlopedWallSegment(3.00, 0.00, 3.35, 0.00, 5.20, 5.08, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Living V1 (X = 3.35 a 4.65 m, baja de 5.08 m a 4.62 m, ancho 1.30 m)
+        addWindowSegment(3.35, 0.00, 4.65, 0.00, 0.95, 1.10, 5.08, 4.62);
+        //    - Muro intermedio entre ventanales (X = 4.65 a 5.35 m, baja de 4.62 m a 4.38 m, pilar central 70 cm)
+        addSlopedWallSegment(4.65, 0.00, 5.35, 0.00, 4.62, 4.38, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Living V2 (X = 5.35 a 6.65 m, baja de 4.38 m a 3.92 m, ancho 1.30 m)
+        addWindowSegment(5.35, 0.00, 6.65, 0.00, 0.95, 1.10, 4.38, 3.92);
+        //    - Muro esquinero Este (X = 6.65 a 7.00 m, baja de 3.92 m a 3.80 m, columna esquina 35 cm)
+        addSlopedWallSegment(6.65, 0.00, 7.00, 0.00, 3.92, 3.80, EXT_T, exteriorWallsGroup, true);
 
-        // Muro Derecho (Este, X = 6.30): remata en 3.80 m bajo la solera del techo catedral
+        // Muro Derecho (Este, X = 7.00): remata en 3.80 m bajo la solera del techo catedral
         // - Columna esquinera Norte (Z = 0.00 a 0.25 m)
-        addWallSegment(6.30, 0.00, 6.30, 0.25, EXT_T, exteriorWallsGroup, true, 3.80);
+        addWallSegment(7.00, 0.00, 7.00, 0.25, EXT_T, exteriorWallsGroup, true, 3.80);
         // - Ventana lateral Living V3 (Z = 0.25 a 1.45 m, ancho 1.20 m, 2 hojas corredizas)
-        addWindowSegment(6.30, 0.25, 6.30, 1.45, 0.95, 1.10, 3.80);
+        addWindowSegment(7.00, 0.25, 7.00, 1.45, 0.95, 1.10, 3.80);
         // - Muro sólido Este (Z = 1.45 a 6.30 m, aloja Calefactor en Z=1.85, Rack TV y Perchero Entrada)
-        addWallSegment(6.30, 1.45, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 3.80);
+        addWallSegment(7.00, 1.45, 7.00, 6.30, EXT_T, exteriorWallsGroup, true, 3.80);
 
-        // Retranqueo Palier (Puerta Principal en Z = 6.30 centrada en X = 5.575 m):
-        addWallSegment(4.85, 6.30, 5.15, 6.30, EXT_T, exteriorWallsGroup, true, 4.41);
-        addWallSegment(6.00, 6.30, 6.30, 6.30, EXT_T, exteriorWallsGroup, true, 3.80);
-        // Umbral y símbolo arquitectónico 2D de Puerta Principal (centrada, abre 90° hacia el Norte dentro de Entrada batiendo sobre pared Este)
+        // Retranqueo Palier (Puerta Principal en Z = 6.30 centrada en X = 5.925 m):
+        addWallSegment(4.85, 6.30, 5.50, 6.30, EXT_T, exteriorWallsGroup, true, 4.41);
+        addWallSegment(6.35, 6.30, 7.00, 6.30, EXT_T, exteriorWallsGroup, true, 3.80);
+        // Umbral y símbolo arquitectónico 2D de Puerta Principal (centrada en X = 5.925 m, abre 90° hacia el Norte dentro de Entrada)
         const entranceThreshold = new THREE.Mesh(
             new THREE.BoxGeometry(0.85, 0.01, 0.06),
             new THREE.MeshBasicMaterial({ color: 0xcbd5e1 })
         );
-        entranceThreshold.position.set(5.575, 0.01, 6.30);
+        entranceThreshold.position.set(5.925, 0.01, 6.30);
         lines2DGroup.add(entranceThreshold);
-        addDashedLine(5.15, 6.30, 6.00, 6.30);
-        addDoorSymbol2D(5.96, 6.30, 5.96, 5.45, 5.19, 5.45, 5.19, 6.30);
+        addDashedLine(5.50, 6.30, 6.35, 6.30);
+        addDoorSymbol2D(6.31, 6.30, 6.31, 5.45, 5.54, 5.45, 5.54, 6.30);
 
         // Muro Derecho Cocina (Límite con Palier exterior): de [4.85, 6.30] a [4.85, 8.00] a 4.41 m
         addWallSegment(4.85, 6.30, 4.85, 8.00, EXT_T, exteriorWallsGroup, true, 4.41);
@@ -4141,25 +4143,25 @@
             roofGroup.add(ridgeSpine);
 
             // =========================================================================
-            // 2) BLOQUE DERECHO ELEVADO (LIVING, ENTRADA Y COCINA: X = 3.00 a 6.45 m)
+            // 2) BLOQUE DERECHO ELEVADO (LIVING, ENTRADA Y COCINA: X = 3.00 a 7.15 m)
             //    - Techo continuo desde la cumbrera central X = 3.00 m (Y = 5.20 m)
-            //      hasta el alero Este X = 6.45 m (Y = 3.736 m)
+            //      hasta el alero Este X = 7.15 m (Y = 3.747 m)
             // =========================================================================
             const xR1 = 3.00;
-            const xR2 = 6.30 + eave; // 6.45 m
-            const dxRight = xR2 - xR1; // 3.45 m
-            const slopeRight = (5.20 - 3.80) / 3.30; // 0.424242 (pendiente este de gran altura)
+            const xR2 = 7.00 + eave; // 7.15 m
+            const dxRight = xR2 - xR1; // 4.15 m
+            const slopeRight = (5.20 - 3.80) / 4.00; // 0.35
             const yR1 = 5.20;
-            const yR2 = 5.20 - dxRight * slopeRight; // ~3.736 m
-            const dyRight = yR1 - yR2; // ~1.464 m
-            const lenSlopeRight = Math.hypot(dxRight, dyRight); // ~3.748 m
-            const angSlopeRight = -Math.atan2(dyRight, dxRight); // ~ -23.0°
+            const yR2 = 5.20 - dxRight * slopeRight; // ~3.7475 m
+            const dyRight = yR1 - yR2; // ~1.4525 m
+            const lenSlopeRight = Math.hypot(dxRight, dyRight); // ~4.397 m
+            const angSlopeRight = -Math.atan2(dyRight, dxRight); // ~ -19.29°
 
             // Desplazamiento normal exacto bajo el entablonado derecho
             const beamOffsetR_X = -0.075 * Math.sin(angSlopeRight);
             const beamOffsetR_Y = -0.075 * Math.cos(angSlopeRight);
 
-            // 1. Cubierta machimbrada Living + Entrada (de Z = -0.15 a 6.35 m, X = 3.00 a 6.45 m)
+            // 1. Cubierta machimbrada Living + Entrada (de Z = -0.15 a 6.35 m, X = 3.00 a 7.15 m)
             const zLivStart = -eave; // -0.15 m
             const zLivEnd = 6.35;
             const depthLivingEnt = zLivEnd - zLivStart; // 6.50 m
@@ -4196,8 +4198,8 @@
                 roofGroup.add(beamL);
             }
 
-            // Tirantes de madera en Entrada (Z = 4.95 a 5.60 m, X = 4.85 a 6.30 m)
-            const dxEnt = 1.45;
+            // Tirantes de madera en Entrada (Z = 4.95 a 5.60 m, X = 4.85 a 7.00 m)
+            const dxEnt = 2.15;
             const dyEnt = dxEnt * slopeRight;
             const lenSlopeEnt = Math.hypot(dxEnt, dyEnt);
             for (let zBeam = 4.95; zBeam <= 5.60; zBeam += 0.55) {
@@ -4217,10 +4219,10 @@
                 roofGroup.add(beamC);
             }
 
-            // Viga solera de remate sobre muro Este (X = 6.30 m)
+            // Viga solera de remate sobre muro Este (X = 7.00 m)
             const eaveBeamEast = new THREE.Mesh(UNIT_BOX_GEO, woodBeamMat);
             eaveBeamEast.scale.set(0.14, 0.16, depthLivingEnt);
-            eaveBeamEast.position.set(6.30, 3.73, zLivCenter);
+            eaveBeamEast.position.set(7.00, 3.73, zLivCenter);
             roofGroup.add(eaveBeamEast);
 
             // Viga solera de remate sobre muro Oeste (X = 0.00 m)
@@ -5110,7 +5112,7 @@
             });
 
             // Instanciar puertas 3D interactivas con dintel a 5.20 m bajo la viga cumbrera:
-            addMainEntranceDoor3D(5.15, 6.30, 6.00, 6.30);
+            addMainEntranceDoor3D(5.50, 6.30, 6.35, 6.30);
             addInteriorWoodDoor3D(2.30, 2.80, 3.00, 2.80, false, -1, 90, 'Puerta Estudio', 5.20);
             addInteriorWoodDoor3D(2.30, 3.65, 2.30, 4.35, false, 1, 75, 'Puerta Bano', 5.20);
             addInteriorWoodDoor3D(2.30, 5.20, 3.00, 5.20, false, 1, 75, 'Puerta Cuarto', 5.20);
@@ -5681,9 +5683,9 @@
             // Identificación unívoca del ambiente
             let curtainTitle = "Cortina";
             if (Math.abs(z1) < 0.1 && cMidX < 2.5) curtainTitle = "Cortina Estudio (Norte)";
-            else if (Math.abs(z1) < 0.1 && cMidX < 4.6) curtainTitle = "Cortina Living V1 (Norte)";
-            else if (Math.abs(z1) < 0.1 && cMidX >= 4.6) curtainTitle = "Cortina Living V2 (Norte)";
-            else if (Math.abs(x1 - 6.30) < 0.1) curtainTitle = "Cortina Living V3 (Lateral Este)";
+            else if (Math.abs(z1) < 0.1 && cMidX < 5.0) curtainTitle = "Cortina Living V1 (Norte)";
+            else if (Math.abs(z1) < 0.1 && cMidX >= 5.0) curtainTitle = "Cortina Living V2 (Norte)";
+            else if (Math.abs(x1 - 7.00) < 0.1 || Math.abs(x1 - 6.30) < 0.1) curtainTitle = "Cortina Living V3 (Lateral Este)";
             else if (Math.abs(z1 - 8.00) < 0.1) curtainTitle = "Cortina Dormitorio (Sur)";
 
             // 1. BARRAL DE MADERA MACIZA Y TERMINALES TORNEADOS A Y = 2.12 m
@@ -5833,11 +5835,11 @@
             // ------------------------------------------------------------------------
             // 1. Entrada (X = 4.85..6.30, Z = 5.20..6.30):
             // - Crucifijo de madera oscura centrado sobre dintel de puerta principal + retablo dorado sobre muro + tablero eléctrico
-            setMountWall(5.575, 6.30, true);
+            setMountWall(5.925, 6.30, true);
             // Crucifijo montado sobre el dintel interior de la puerta (Z = 6.23 pegado a la cara interna del muro en Z = 6.30)
-            addDecorBox(5.575, 2.30, 6.23, 0.14, 0.24, 0.02, 0x3b2314);
+            addDecorBox(5.925, 2.30, 6.23, 0.14, 0.24, 0.02, 0x3b2314);
             // Retablo dorado montado sobre el muro derecho junto a la puerta (X = 6.15, Z = 6.23)
-            addDecorBox(6.15, 1.48, 6.23, 0.08, 0.13, 0.02, 0xd4af37);
+            addDecorBox(6.85, 1.48, 6.23, 0.08, 0.13, 0.02, 0xd4af37);
             setMountWall(4.85, 5.70, false);
             // Tablero eléctrico sobre pared divisoria con Cocina (cara Entrada X = 4.85 + INT_T/2)
             addDecorBox(4.91, 1.45, 5.70, 0.02, 0.22, 0.26, 0x1e293b);
@@ -5860,51 +5862,51 @@
             addDecorCyl(5.00, 0.07, 6.22, 0.045, 0.045, 0.14, 0x4d7c0f, 0.5);
 
             // 2. Muro Este de Entrada (X = 6.30, de Z = 5.20 a Z = 6.30):
-            setMountWall(6.30, 6.18, false);
+            setMountWall(7.00, 6.18, false);
             // - Panel de alarma / portero visor con pantalla negra táctil y marco blanco (fotos #1 y #3)
-            addDecorBox(6.20, 1.38, 6.18, 0.018, 0.13, 0.18, 0xf8fafc, 0.4, 0, 'Panel Alarma / Pantalla');
-            addDecorBox(6.19, 1.38, 6.18, 0.019, 0.09, 0.13, 0x09090b, 0.15); // Pantalla negra
+            addDecorBox(6.90, 1.38, 6.18, 0.018, 0.13, 0.18, 0xf8fafc, 0.4, 0, 'Panel Alarma / Pantalla');
+            addDecorBox(6.89, 1.38, 6.18, 0.019, 0.09, 0.13, 0x09090b, 0.15); // Pantalla negra
             // - Tecla de luz blanca bajo el panel de alarma
-            addDecorBox(6.20, 1.05, 6.18, 0.014, 0.12, 0.08, 0xf1f5f9, 0.4);
+            addDecorBox(6.90, 1.05, 6.18, 0.014, 0.12, 0.08, 0xf1f5f9, 0.4);
             setMountWall(null);
 
             // - Bolsos / mochila sobre el piso cerca de la puerta (fotos #1 y #3): conjunto unificado seleccionable
             createCompoundAssembly('Mochila y Bolso Entrada', () => {
-                addDecorBox(6.10, 0.14, 6.05, 0.28, 0.28, 0.36, 0x0f766e, 0.85, 0.12, 'Bolso Estampado Entrada');
-                addDecorBox(6.08, 0.18, 5.92, 0.24, 0.32, 0.22, 0x1e293b, 0.9, -0.15, 'Mochila Negra Entrada');
+                addDecorBox(6.80, 0.14, 6.05, 0.28, 0.28, 0.36, 0x0f766e, 0.85, 0.12, 'Bolso Estampado Entrada');
+                addDecorBox(6.78, 0.18, 5.92, 0.24, 0.32, 0.22, 0x1e293b, 0.9, -0.15, 'Mochila Negra Entrada');
             });
 
             // - Perchero industrial de hierro negro + zapatero de 3 niveles + estante superior (fotos #0, #1, #3):
             createCompoundAssembly('Perchero y Zapatero Entrada', () => {
                 // Zapatero 3 niveles abajo con calzado (Z = 5.15 a 5.80, X = 6.10):
-                addDecorBox(6.10, 0.03, 5.48, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Inferior Zapatero');
-                addDecorBox(6.10, 0.19, 5.48, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Medio Zapatero');
-                addDecorBox(6.10, 0.35, 5.48, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Superior Zapatero');
+                addDecorBox(6.80, 0.03, 5.48, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Inferior Zapatero');
+                addDecorBox(6.80, 0.19, 5.48, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Medio Zapatero');
+                addDecorBox(6.80, 0.35, 5.48, 0.28, 0.02, 0.65, 0x0f172a, 0.45, 0, 'Estante Superior Zapatero');
                 // Patas y estructura lateral de hierro negro:
-                addDecorBox(6.10, 0.90, 5.16, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Norte Perchero');
-                addDecorBox(6.10, 0.90, 5.80, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Sur Perchero');
+                addDecorBox(6.80, 0.90, 5.16, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Norte Perchero');
+                addDecorBox(6.80, 0.90, 5.80, 0.025, 1.80, 0.025, 0x0f172a, 0.45, 0, 'Columna Sur Perchero');
                 // Calzados ordenados dentro de los estantes del mueble zapatero:
-                addDecorBox(6.08, 0.09, 5.32, 0.22, 0.09, 0.24, 0x1e293b, 0.8, 0, 'Zapatillas Negras Estante 1');
-                addDecorBox(6.08, 0.09, 5.62, 0.22, 0.09, 0.24, 0x94a3b8, 0.8, 0, 'Zapatillas Grises Estante 1');
-                addDecorBox(6.08, 0.25, 5.32, 0.22, 0.09, 0.24, 0x475569, 0.8, 0, 'Zapatillas Cuero Estante 2');
-                addDecorBox(6.08, 0.25, 5.62, 0.22, 0.09, 0.24, 0xf1f5f9, 0.8, 0, 'Zapatillas Blancas Estante 2');
+                addDecorBox(6.78, 0.09, 5.32, 0.22, 0.09, 0.24, 0x1e293b, 0.8, 0, 'Zapatillas Negras Estante 1');
+                addDecorBox(6.78, 0.09, 5.62, 0.22, 0.09, 0.24, 0x94a3b8, 0.8, 0, 'Zapatillas Grises Estante 1');
+                addDecorBox(6.78, 0.25, 5.32, 0.22, 0.09, 0.24, 0x475569, 0.8, 0, 'Zapatillas Cuero Estante 2');
+                addDecorBox(6.78, 0.25, 5.62, 0.22, 0.09, 0.24, 0xf1f5f9, 0.8, 0, 'Zapatillas Blancas Estante 2');
 
                 // Camperas colgadas del perchero (sin setMountWall que altere alturas):
-                addDecorBox(6.10, 1.25, 5.35, 0.24, 0.82, 0.38, 0x1e293b, 0.85, 0, 'Campera Abrigada');
+                addDecorBox(6.80, 1.25, 5.35, 0.24, 0.82, 0.38, 0x1e293b, 0.85, 0, 'Campera Abrigada');
                 // Bolsa de tela con manija ("Ochenta y Cinco Accesorios", foto #1):
-                addDecorBox(6.11, 1.35, 5.56, 0.16, 0.32, 0.26, 0xfef08a, 0.9, 0.05, 'Bolsa Tela Accesorios');
+                addDecorBox(6.81, 1.35, 5.56, 0.16, 0.32, 0.26, 0xfef08a, 0.9, 0.05, 'Bolsa Tela Accesorios');
                 // Estante superior de madera natural (pino/paraíso):
-                addDecorBox(6.10, 1.78, 5.48, 0.26, 0.03, 0.68, 0x9a5b32, 0.6, 0, 'Estante Madera Perchero');
+                addDecorBox(6.80, 1.78, 5.48, 0.26, 0.03, 0.68, 0x9a5b32, 0.6, 0, 'Estante Madera Perchero');
                 // Adornos sobre el estante superior (fotos #0, #1, #3):
-                addDecorCyl(6.10, 1.88, 5.30, 0.035, 0.025, 0.16, 0xf1f5f9, 0.4, 'Florero Cerámico Perchero');
-                addDecorCyl(6.10, 1.88, 5.44, 0.025, 0.025, 0.15, 0x1c1917, 0.2, 'Botella Vidrio Perchero');
-                addDecorBox(6.10, 1.88, 5.58, 0.045, 0.16, 0.045, 0x78350f, 0.6, 0, 'Escultura Madera Perchero');
+                addDecorCyl(6.80, 1.88, 5.30, 0.035, 0.025, 0.16, 0xf1f5f9, 0.4, 'Florero Cerámico Perchero');
+                addDecorCyl(6.80, 1.88, 5.44, 0.025, 0.025, 0.15, 0x1c1917, 0.2, 'Botella Vidrio Perchero');
+                addDecorBox(6.80, 1.88, 5.58, 0.045, 0.16, 0.045, 0x78350f, 0.6, 0, 'Escultura Madera Perchero');
             });
 
             // - Maceta redonda blanca sobre pie nórdico de madera con Sansevieria (Lengua de suegra, fotos #0 y #3):
             createCompoundAssembly('Sansevieria en Pie Nórdico', () => {
-                addDecorBox(6.05, 0.14, 4.45, 0.24, 0.28, 0.24, 0xc2844f, 0.6, 0, 'Pie Nórdico Maceta'); // Patas madera
-                addDecorPlantCeramic(6.05, 0.28, 4.45, 0.13, 0.10, 0.22, 0.28, 0.55, 0.28, 0.52, 'Sansevieria en Pie Nórdico');
+                addDecorBox(6.75, 0.14, 4.45, 0.24, 0.28, 0.24, 0xc2844f, 0.6, 0, 'Pie Nórdico Maceta'); // Patas madera
+                addDecorPlantCeramic(6.75, 0.28, 4.45, 0.13, 0.10, 0.22, 0.28, 0.55, 0.28, 0.52, 'Sansevieria en Pie Nórdico');
             });
 
             // 3. Comederos / bebederos del perro junto al zócalo de la pared de cocina (fotos #0, #3 y #4):
@@ -5925,48 +5927,48 @@
                 // Cuerpo principal del rack de madera
                 const rackBody = new THREE.Mesh(UNIT_BOX_GEO, woodMat);
                 rackBody.scale.set(rackD, rackH, rackW);
-                rackBody.position.set(6.02, rackH / 2, rackZ);
+                rackBody.position.set(6.72, rackH / 2, rackZ);
                 rackBody.castShadow = true; rackBody.receiveShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(rackBody);
 
                 // Tapa superior de madera maciza biselada
                 const rackTop = new THREE.Mesh(UNIT_BOX_GEO, woodTopMat);
                 rackTop.scale.set(rackD + 0.03, 0.03, rackW + 0.04);
-                rackTop.position.set(6.01, rackH + 0.015, rackZ);
+                rackTop.position.set(6.71, rackH + 0.015, rackZ);
                 rackTop.castShadow = true; rackTop.receiveShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(rackTop);
 
                 // Puertas de madera con marcos y tiradores metálicos
                 const pL = new THREE.Mesh(UNIT_BOX_GEO, woodTopMat);
                 pL.scale.set(0.02, rackH - 0.08, 0.42);
-                pL.position.set(5.79, rackH / 2, rackZ - 0.54);
+                pL.position.set(6.49, rackH / 2, rackZ - 0.54);
                 pL.castShadow = true;
                 const tL = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
                 tL.scale.set(0.02, 0.16, 0.02);
-                tL.position.set(5.77, rackH / 2, rackZ - 0.38);
+                tL.position.set(6.47, rackH / 2, rackZ - 0.38);
                 tL.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(pL, tL);
 
                 const pR = new THREE.Mesh(UNIT_BOX_GEO, woodTopMat);
                 pR.scale.set(0.02, 0.42, 0.42);
-                pR.position.set(5.79, rackH / 2, rackZ + 0.54);
+                pR.position.set(6.49, rackH / 2, rackZ + 0.54);
                 pR.castShadow = true;
                 const tR = new THREE.Mesh(UNIT_BOX_GEO, darkMetalMat);
                 tR.scale.set(0.02, 0.16, 0.02);
-                tR.position.set(5.77, rackH / 2, rackZ + 0.38);
+                tR.position.set(6.47, rackH / 2, rackZ + 0.38);
                 tR.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(pR, tR);
 
                 // Nicho central: Estante divisorio
                 const midShelf = new THREE.Mesh(UNIT_BOX_GEO, woodTopMat);
                 midShelf.scale.set(0.36, 0.015, 0.66);
-                midShelf.position.set(5.90, 0.58, rackZ);
+                midShelf.position.set(6.60, 0.58, rackZ);
                 midShelf.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(midShelf);
 
                 // --- CONSOLA 1: PLAYSTATION 5 DETALLADA ---
                 const ps5Group = new THREE.Group();
-                ps5Group.position.set(5.88, 0.62, rackZ - 0.16);
+                ps5Group.position.set(6.58, 0.62, rackZ - 0.16);
                 // Aleta superior curva blanca (roughness: 0.25)
                 const ps5WhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.10 });
                 const ps5CoreMat = new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.15, metalness: 0.60 });
@@ -5996,7 +5998,7 @@
 
                 // --- CONSOLA 2: NINTENDO SWITCH 2 DETALLADA ---
                 const switchGroup = new THREE.Group();
-                switchGroup.position.set(5.86, 0.62, rackZ + 0.16);
+                switchGroup.position.set(6.58, 0.62, rackZ + 0.16);
                 const swScreenMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.10, metalness: 0.40 });
                 const swBlueMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.35, metalness: 0.10 });
                 const swRedMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.35, metalness: 0.10 });
@@ -6020,13 +6022,13 @@
                 // Subwoofer inferior / sintoamplificador
                 const subWoofer = new THREE.Mesh(UNIT_BOX_GEO, plasticMat);
                 subWoofer.scale.set(0.32, 0.34, 0.32);
-                subWoofer.position.set(5.88, 0.32, rackZ - 0.16);
+                subWoofer.position.set(6.58, 0.32, rackZ - 0.16);
                 subWoofer.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(subWoofer);
 
                 // --- SMART TV 55" ULTRA DETALLADA CON STAR WARS: ZERO COMPANY Y LED TRASERO ---
                 const tvGroup = new THREE.Group();
-                tvGroup.position.set(6.16, 1.38, rackZ);
+                tvGroup.position.set(6.86, 1.38, rackZ);
                 // Marco ultra delgado negro brillante (roughness: 0.10)
                 const tvFrameMat = new THREE.MeshStandardMaterial({ color: 0x080808, roughness: 0.10, metalness: 0.80 });
                 const tvFrame = new THREE.Mesh(UNIT_BOX_GEO, tvFrameMat);
@@ -6064,28 +6066,28 @@
                 (currentAssemblyGroup || decorVideoGroup).add(tvGroup);
 
                 // 2 Torres de sonido LG Home Theater sobre el rack
-                addLGSoundTower(5.98, rackH + 0.03, rackZ - 0.66, 0);
-                addLGSoundTower(5.98, rackH + 0.03, rackZ + 0.66, 0);
+                addLGSoundTower(6.68, rackH + 0.03, rackZ - 0.66, 0);
+                addLGSoundTower(6.68, rackH + 0.03, rackZ + 0.66, 0);
 
                 // Camino de tela rústica sobre el rack (roughness: 1.0)
                 const runnerMat = new THREE.MeshStandardMaterial({ color: 0xc2410c, roughness: 1.0, metalness: 0.0 });
                 const runner = new THREE.Mesh(UNIT_BOX_GEO, runnerMat);
                 runner.scale.set(0.24, 0.005, 0.76);
-                runner.position.set(5.92, rackH + 0.035, rackZ);
+                runner.position.set(6.62, rackH + 0.035, rackZ);
                 (currentAssemblyGroup || decorVideoGroup).add(runner);
 
                 // Aplique de pared blanco cálido encendido a la derecha del TV
                 const wallLightMat = new THREE.MeshStandardMaterial({ color: 0xffedd5, emissive: 0xffedd5, emissiveIntensity: 0.6, roughness: 0.2 });
                 const wallLight = new THREE.Mesh(UNIT_BOX_GEO, wallLightMat);
                 wallLight.scale.set(0.08, 0.12, 0.12);
-                wallLight.position.set(6.25, 1.88, rackZ + 0.62);
+                wallLight.position.set(6.95, 1.88, rackZ + 0.62);
                 (currentAssemblyGroup || decorVideoGroup).add(wallLight);
             });
 
             // - Calefactor a gas metálico gris a la izquierda del rack con caño vertical de escape (en Z=1.85, fotos #1 y #7)
             createCompoundAssembly('Calefactor a Gas con Conducto', () => {
-                addDecorBox(6.05, 0.36, 1.85, 0.28, 0.68, 0.40, 0x475569, 0.35); // Calefactor
-                addDecorCyl(6.12, 2.25, 1.85, 0.045, 0.045, 3.10, 0x94a3b8, 0.3); // Caño de ventilación al techo catedral
+                addDecorBox(6.75, 0.36, 1.85, 0.28, 0.68, 0.40, 0x475569, 0.35); // Calefactor
+                addDecorCyl(6.82, 2.25, 1.85, 0.045, 0.045, 3.10, 0x94a3b8, 0.3); // Caño de ventilación al techo catedral
             });
 
             // 3. Sector Sillón Seccional / Futón 3 Cuerpos con Cojines Individuales (roughness: 1.0)
@@ -6364,65 +6366,173 @@
                 addDecorBox(tableX - 0.08, tableH + 0.008, tableZ + 0.42, 0.08, 0.012, 0.10, 0x334155, 0.6); // Billetera
             });
 
-            // 4. Sector Comedor: Mesa con Patas Metálicas Oscuras (separada de centros de mesa y sillas)
+            // 4. Sector Comedor: Mesa Redonda Extensible en 3 Tandas de Forma Ovalada (Ø 1.00 m -> 1.23 m -> 1.47 m -> 1.70 m)
+            const tableDiningX = 5.00;
+            const tableDiningZ = 1.15;
             createCompoundAssembly('Mesa de Comedor Redonda', () => {
-                const tableDiningZ = 0.95;
                 const tableMetalMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.30, metalness: 0.85 });
-                const tableWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.70, metalness: 0.05 });
+                const tableWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.65, metalness: 0.05 });
+                const tableLeafMat = new THREE.MeshStandardMaterial({ color: 0x8a3416, roughness: 0.62, metalness: 0.05 });
+                const railMetalMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.35, metalness: 0.80 });
 
-                // Tapa de madera maciza veteada
-                const topGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.04, 32);
-                const topMesh = new THREE.Mesh(topGeo, tableWoodMat);
-                topMesh.position.set(4.55, 0.74, tableDiningZ);
-                topMesh.castShadow = true; topMesh.receiveShadow = true;
-                (currentAssemblyGroup || decorVideoGroup).add(topMesh);
+                const tableRoot = new THREE.Group();
+                tableRoot.position.set(tableDiningX, 0, tableDiningZ);
 
-                // 4 Patas esbeltas de metal oscuro inclinadas hacia afuera (metalness: 0.85)
-                const legGeo = new THREE.CylinderGeometry(0.016, 0.012, 0.74, 12);
-                for (let a = 0; a < 4; a++) {
-                    const ang = a * (Math.PI / 2) + Math.PI / 4;
+                const radius = 0.50; // Ø 1.00 m cerrada
+                const topThick = 0.038;
+                const topY = 0.74;
+                const legGeo = new THREE.CylinderGeometry(0.016, 0.012, 0.73, 12);
+
+                // Mitad Izquierda (-X): Semicírculo Oeste + faldón + 2 patas solidarias
+                const westHalfGroup = new THREE.Group();
+                const westTopGeo = new THREE.CylinderGeometry(radius, radius, topThick, 32, 1, false, Math.PI, Math.PI);
+                const westTopMesh = new THREE.Mesh(westTopGeo, tableWoodMat);
+                westTopMesh.position.set(0, topY, 0);
+                westTopMesh.castShadow = true; westTopMesh.receiveShadow = true;
+                westHalfGroup.add(westTopMesh);
+
+                // Patas Oeste (Noroeste y Suroeste) que se deslizan junto con la mitad izquierda
+                [3 * Math.PI / 4, 5 * Math.PI / 4].forEach(ang => {
                     const leg = new THREE.Mesh(legGeo, tableMetalMat);
-                    leg.position.set(4.55 + Math.cos(ang) * 0.34, 0.36, tableDiningZ + Math.sin(ang) * 0.34);
+                    leg.position.set(Math.cos(ang) * 0.32, 0.365, Math.sin(ang) * 0.32);
                     leg.rotation.z = Math.cos(ang) * 0.08;
                     leg.rotation.x = Math.sin(ang) * 0.08;
                     leg.castShadow = true; leg.receiveShadow = true;
-                    (currentAssemblyGroup || decorVideoGroup).add(leg);
+                    westHalfGroup.add(leg);
+                });
+                tableRoot.add(westHalfGroup);
+
+                // Mitad Derecha (+X): Semicírculo Este + faldón + 2 patas solidarias
+                const eastHalfGroup = new THREE.Group();
+                const eastTopGeo = new THREE.CylinderGeometry(radius, radius, topThick, 32, 1, false, 0, Math.PI);
+                const eastTopMesh = new THREE.Mesh(eastTopGeo, tableWoodMat);
+                eastTopMesh.position.set(0, topY, 0);
+                eastTopMesh.castShadow = true; eastTopMesh.receiveShadow = true;
+                eastHalfGroup.add(eastTopMesh);
+
+                // Patas Este (Noreste y Sureste) que se deslizan junto con la mitad derecha
+                [Math.PI / 4, 7 * Math.PI / 4].forEach(ang => {
+                    const leg = new THREE.Mesh(legGeo, tableMetalMat);
+                    leg.position.set(Math.cos(ang) * 0.32, 0.365, Math.sin(ang) * 0.32);
+                    leg.rotation.z = Math.cos(ang) * 0.08;
+                    leg.rotation.x = Math.sin(ang) * 0.08;
+                    leg.castShadow = true; leg.receiveShadow = true;
+                    eastHalfGroup.add(leg);
+                });
+                tableRoot.add(eastHalfGroup);
+
+                // Guías telescópicas metálicas inferiores de extensión
+                const guideRail1 = new THREE.Mesh(UNIT_BOX_GEO, railMetalMat);
+                guideRail1.scale.set(0.60, 0.022, 0.035);
+                guideRail1.position.set(0, topY - 0.032, -0.22);
+                const guideRail2 = new THREE.Mesh(UNIT_BOX_GEO, railMetalMat);
+                guideRail2.scale.set(0.60, 0.022, 0.035);
+                guideRail2.position.set(0, topY - 0.032, 0.22);
+                tableRoot.add(guideRail1, guideRail2);
+
+                // 3 Tablas / Tandas centrales de ampliación (0.2333 m cada una -> hasta +0.70 m = 1.70 m total)
+                const leafWidth = 0.70 / 3; // ~0.2333 m
+                const leafDepth = radius * 2; // 1.00 m
+                const leaves = [];
+                for (let i = 0; i < 3; i++) {
+                    const leafGroup = new THREE.Group();
+                    leafGroup.position.set(0, topY, 0);
+                    const leafMesh = new THREE.Mesh(UNIT_BOX_GEO, i % 2 === 0 ? tableLeafMat : tableWoodMat);
+                    leafMesh.scale.set(leafWidth - 0.003, topThick, leafDepth);
+                    leafMesh.castShadow = true; leafMesh.receiveShadow = true;
+                    // Faldón lateral bajo cada tabla de extensión
+                    const apronN = new THREE.Mesh(UNIT_BOX_GEO, tableMetalMat);
+                    apronN.scale.set(leafWidth - 0.004, 0.026, 0.018);
+                    apronN.position.set(0, -0.028, -leafDepth / 2 + 0.04);
+                    const apronS = new THREE.Mesh(UNIT_BOX_GEO, tableMetalMat);
+                    apronS.scale.set(leafWidth - 0.004, 0.026, 0.018);
+                    apronS.position.set(0, -0.028, leafDepth / 2 - 0.04);
+                    leafGroup.add(leafMesh, apronN, apronS);
+                    leafGroup.scale.set(0.001, 1, 1);
+                    leafGroup.visible = false;
+                    tableRoot.add(leafGroup);
+                    leaves.push({ group: leafGroup, mesh: leafMesh });
                 }
+
+                (currentAssemblyGroup || decorVideoGroup).add(tableRoot);
+
+                // Registrar piezas interactivas para clic directo sobre la mesa
+                const interactiveTableMeshes = [westTopMesh, eastTopMesh, guideRail1, guideRail2, ...leaves.map(l => l.mesh)];
+                window.diningTableAnimState = {
+                    stage: 0, // 0: 1.00m, 1: 1.23m, 2: 1.47m, 3: 1.70m
+                    stageExts: [0.00, 0.70 / 3, (0.70 * 2) / 3, 0.70],
+                    stageLabels: [
+                        'Cerrada Redonda (Ø 1.00 m)',
+                        'Tanda 1 Ovalada (1.23 m × 1.00 m)',
+                        'Tanda 2 Ovalada (1.47 m × 1.00 m)',
+                        'Tanda 3 Ovalada Máxima (1.70 m × 1.00 m)'
+                    ],
+                    currentExt: 0.00,
+                    targetExt: 0.00,
+                    westHalfGroup,
+                    eastHalfGroup,
+                    guideRail1,
+                    guideRail2,
+                    leaves,
+                    westChair: null,
+                    eastChair: null,
+                    runnerMesh: null,
+                    cycleStage() {
+                        this.stage = (this.stage + 1) % 4;
+                        this.targetExt = this.stageExts[this.stage];
+                        const totalLen = (1.00 + this.targetExt).toFixed(2);
+                        const btnLbl = document.getElementById('lbl-dining-table-btn');
+                        if (btnLbl) {
+                            btnLbl.innerText = this.stage === 0 ? 'Mesa 1.00m' : `Mesa ${totalLen}m (${this.stage}/3)`;
+                        }
+                        const btnEl = document.getElementById('btn-toggle-dining-table');
+                        if (btnEl) btnEl.classList.toggle('active', this.stage > 0);
+                        showToast(`🍽️ Mesa Comedor: ${this.stageLabels[this.stage]}`);
+                        wakeRenderer();
+                        return this.stage;
+                    }
+                };
+                interactiveTableMeshes.forEach(m => {
+                    m.userData.isDiningTableInteractive = true;
+                    diningTableClickCandidates.push(m);
+                });
             });
 
             // Elementos individuales sobre la mesa de comedor (editables, movibles y borrables):
             createCompoundAssembly('Camino de Mesa Rojo (Comedor)', () => {
-                const tableDiningZ = 0.95;
                 const runnerMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 1.0, metalness: 0.0 });
                 const runner = new THREE.Mesh(UNIT_BOX_GEO, runnerMat);
-                runner.scale.set(0.70, 0.006, 0.22);
-                runner.position.set(4.55, 0.763, tableDiningZ);
+                runner.scale.set(0.68, 0.006, 0.22);
+                runner.position.set(tableDiningX, 0.762, tableDiningZ);
                 (currentAssemblyGroup || decorVideoGroup).add(runner);
+                if (window.diningTableAnimState) {
+                    window.diningTableAnimState.runnerMesh = runner;
+                }
             });
 
             createCompoundAssembly('Centro de Mesa y Planta (Comedor)', () => {
-                const tableDiningZ = 0.95;
-                addDecorPlantCeramic(4.55, 0.765, tableDiningZ, 0.09, 0.07, 0.14, 0.15, 0.18, 0.15, 0.22, 'Centro de Mesa Comedor');
+                addDecorPlantCeramic(tableDiningX, 0.765, tableDiningZ, 0.09, 0.07, 0.14, 0.15, 0.18, 0.15, 0.22, 'Centro de Mesa Comedor');
             });
 
-            // 4 Sillas ergonómicas de comedor con respaldo curvo
+            // 4 Sillas ergonómicas de comedor con respaldo curvo (acompañan la apertura ovalada de la mesa)
             createCompoundAssembly('Sillas de Comedor (4)', () => {
-                const tableDiningZ = 0.95;
                 const tableMetalMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.30, metalness: 0.85 });
                 const tableWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.70, metalness: 0.05 });
                 const chairCushionMat = new THREE.MeshStandardMaterial({ color: 0x84cc16, roughness: 1.0, metalness: 0.0 });
 
+                const chairRadius = 0.52;
                 const chairCoords = [
-                    { x: 4.55, z: tableDiningZ + 0.55, rot: 0 },
-                    { x: 4.55, z: tableDiningZ - 0.55, rot: Math.PI },
-                    { x: 4.55 - 0.55, z: tableDiningZ, rot: -Math.PI / 2 },
-                    { x: 4.55 + 0.55, z: tableDiningZ, rot: Math.PI / 2 }
+                    { x: tableDiningX, z: tableDiningZ + chairRadius, rot: 0, role: 'south' },
+                    { x: tableDiningX, z: tableDiningZ - chairRadius, rot: Math.PI, role: 'north' },
+                    { x: tableDiningX - chairRadius, z: tableDiningZ, rot: -Math.PI / 2, role: 'west' },
+                    { x: tableDiningX + chairRadius, z: tableDiningZ, rot: Math.PI / 2, role: 'east' }
                 ];
 
                 chairCoords.forEach(c => {
                     const cg = new THREE.Group();
                     cg.position.set(c.x, 0, c.z);
                     cg.rotation.y = c.rot;
+                    cg.userData.baseX = c.x;
 
                     // 4 Patas metálicas de la silla
                     const chairLegGeo = new THREE.CylinderGeometry(0.010, 0.008, 0.44, 8);
@@ -6458,18 +6568,31 @@
                     }
                     cg.add(backGroup);
 
+                    if (window.diningTableAnimState) {
+                        if (c.role === 'west') window.diningTableAnimState.westChair = cg;
+                        if (c.role === 'east') window.diningTableAnimState.eastChair = cg;
+                    }
+
                     (currentAssemblyGroup || decorVideoGroup).add(cg);
                 });
             });
+            if (window.diningTableAnimState) {
+                if (window.diningTableAnimState.westChair) {
+                    window.diningTableAnimState.westChair.userData.baseX = window.diningTableAnimState.westChair.position.x;
+                }
+                if (window.diningTableAnimState.eastChair) {
+                    window.diningTableAnimState.eastChair.userData.baseX = window.diningTableAnimState.eastChair.position.x;
+                }
+            }
 
             // - Espejo Panorámico Horizontal (Comedor, Muro Norte Y=0.00, ref. Francisco Alles)
             createCompoundAssembly('Espejo Panorámico Horizontal (Comedor)', () => {
-                setMountWall(4.55, 0.00, true);
+                setMountWall(5.00, 0.00, true);
                 const g = new THREE.Group();
                 g.userData.isWallArt = true;
                 g.userData.origY = 1.45;
                 g.userData.artHeight = 0.55;
-                g.position.set(4.55, 1.45, 0.04);
+                g.position.set(5.00, 1.45, 0.04);
 
                 // Marco de aluminio satinado anodizado
                 const frameMat = new THREE.MeshStandardMaterial({ color: 0xcfd2d4, roughness: 0.35, metalness: 0.65 });
@@ -6491,12 +6614,12 @@
 
             // - Cuadros Chicos en Grilla 2x2 (Living/Comedor, Muro Este X=6.30, ref. Francisco Alles)
             createCompoundAssembly('Cuadros Chicos en Grilla (4)', () => {
-                setMountWall(6.30, 1.85, false);
+                setMountWall(7.00, 1.85, false);
                 const g = new THREE.Group();
                 g.userData.isWallArt = true;
                 g.userData.origY = 1.45;
                 g.userData.artHeight = 0.55;
-                g.position.set(6.27, 1.45, 1.85);
+                g.position.set(6.97, 1.45, 1.85);
 
                 const oakMat = new THREE.MeshStandardMaterial({ color: 0xb98a55, roughness: 0.60, metalness: 0.05 });
                 const photoMat = new THREE.MeshStandardMaterial({ map: montanasArtTex, roughness: 0.70 });
@@ -6523,18 +6646,18 @@
             });
             // - 2 Cuchas / colchonetas grises para los perros bajo las ventanas Norte + bebedero celeste (fotos #4, #5 y #7): unidades gestionables
             createCompoundAssembly('Cucha de Mascota Esquina NE', () => {
-                addDecorBox(5.55, 0.05, 0.36, 0.85, 0.10, 0.54, 0x94a3b8, 0.85, 0, 'Cucha Mascota Esquina NE');
+                addDecorBox(6.25, 0.05, 0.36, 0.85, 0.10, 0.54, 0x94a3b8, 0.85, 0, 'Cucha Mascota Esquina NE');
             });
             createCompoundAssembly('Cucha de Mascota Esquina NO', () => {
-                addDecorBox(3.52, 0.05, 0.36, 0.80, 0.10, 0.52, 0x94a3b8, 0.85, 0, 'Cucha Mascota Esquina NO');
+                addDecorBox(3.62, 0.05, 0.36, 0.80, 0.10, 0.52, 0x94a3b8, 0.85, 0, 'Cucha Mascota Esquina NO');
             });
             createCompoundAssembly('Bebedero de Mascota con Dispenser', () => {
-                addDecorCyl(5.96, 0.08, 0.78, 0.13, 0.15, 0.14, 0x38bdf8, 0.4, 'Bebedero Celeste con Dispenser');
+                addDecorCyl(6.66, 0.08, 0.78, 0.13, 0.15, 0.14, 0x38bdf8, 0.4, 'Bebedero Celeste con Dispenser');
             });
             // - Cortinas beige con barral de madera en las 3 ventanas del Living (V1, V2 y V3)
-            addCurtainAssembly(3.25, 0.00, 4.35, 0.00, 0, 0.12, 0xd6ccc2);
-            addCurtainAssembly(4.95, 0.00, 6.05, 0.00, 0, 0.12, 0xd6ccc2);
-            addCurtainAssembly(6.30, 0.25, 6.30, 1.45, -0.12, 0, 0xd6ccc2);
+            addCurtainAssembly(3.35, 0.00, 4.65, 0.00, 0, 0.12, 0xd6ccc2);
+            addCurtainAssembly(5.35, 0.00, 6.65, 0.00, 0, 0.12, 0xd6ccc2);
+            addCurtainAssembly(7.00, 0.25, 7.00, 1.45, -0.12, 0, 0xd6ccc2);
 
             // ------------------------------------------------------------------------
             // B) COCINA ([3.00, 5.20] a [4.85, 8.00]) - Relevamiento exacto de las fotos reales
@@ -7520,7 +7643,7 @@
         // ============================================================================
         // SISTEMA DE PERSISTENCIA DE MODIFICACIONES (MUEBLES MOVIDOS Y ELIMINADOS)
         // ============================================================================
-        const DECOR_OVERRIDES_KEY = 'depto_decor_overrides_v1';
+        const DECOR_OVERRIDES_KEY = 'depto_decor_overrides_v2';
         let decorOverrides = { deleted: [], transforms: {} };
         try {
             const savedDecor = localStorage.getItem(DECOR_OVERRIDES_KEY);
@@ -7656,16 +7779,16 @@
         // Cuarto: [0.00, 5.20] a [3.00, 8.00] (3.00 m x 2.80 m = 8.40 m², idéntico al Estudio)
         addPlanLabel(1.50, 6.60, "CUARTO");
         // Living: [3.00, 0.00] a [6.30, 5.20]
-        addPlanLabel(5.15, 2.60, "LIVING");
+        addPlanLabel(5.50, 2.60, "LIVING");
         // Cocina: [3.00, 5.20] a [4.85, 8.00]
         addPlanLabel(3.92, 6.60, "COCINA");
         // Entrada: [4.85, 5.20] a [6.30, 6.30]
-        addPlanLabel(5.57, 5.75, "ENTRADA", "arch-label sm");
+        addPlanLabel(5.92, 5.75, "ENTRADA", "arch-label sm");
         // Palier Edificio (Exterior): [4.85, 6.30] a [6.30, 8.00]
-        addPlanLabel(5.57, 7.15, "PALIER\nEDIFICIO", "arch-label palier");
+        addPlanLabel(5.92, 7.15, "PALIER\nEDIFICIO", "arch-label palier");
 
         // Cotas Exteriores
-        addPlanLabel(3.15, -0.30, "6.30 m", "arch-label dim");
+        addPlanLabel(3.50, -0.30, "7.00 m", "arch-label dim");
         addPlanLabel(-0.32, 4.00, "8.00 m", "arch-label dim-v");
 
         const _projVec = new THREE.Vector3();
@@ -9026,6 +9149,9 @@
                 const btnC = document.getElementById('btn-toggle-curtains');
                 if (btnC) btnC.click();
             }
+            if (e.key === 'm' || e.key === 'M') {
+                if (window.diningTableAnimState) window.diningTableAnimState.cycleStage();
+            }
 
             if (selectedId || selectedDecorMesh) {
                 if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -9302,6 +9428,17 @@
                         wakeRenderer();
                         return;
                     }
+                }
+            }
+
+            // 0D. Raycast sobre la Mesa de Comedor Extensible (permite abrir/cerrar sus 3 tandas ovaladas con un clic/toque en 3D o 2D cuando no está en modo edición)
+            if (!isFurnitureEditMode && diningTableClickCandidates.length > 0 && window.diningTableAnimState) {
+                const tableHits = raycaster.intersectObjects(diningTableClickCandidates, false);
+                if (tableHits.length > 0) {
+                    window.diningTableAnimState.cycleStage();
+                    clearSelection();
+                    wakeRenderer();
+                    return;
                 }
             }
 
@@ -9781,6 +9918,15 @@
             wakeRenderer();
         });
 
+        const btnToggleDiningTable = document.getElementById('btn-toggle-dining-table');
+        if (btnToggleDiningTable) {
+            btnToggleDiningTable.addEventListener('click', () => {
+                if (window.diningTableAnimState) {
+                    window.diningTableAnimState.cycleStage();
+                }
+            });
+        }
+
         // Checkboxes de capas en sidebar
         const chkWin = document.getElementById('chk-windows');
         if (chkWin) {
@@ -9813,15 +9959,15 @@
         });
 
         function setActiveTopBtn(id) {
-            document.querySelectorAll('.mode-btn:not(#btn-toggle-roof):not(#btn-toggle-video-decor):not(#btn-toggle-labels):not(#btn-toggle-doors)').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.mode-btn:not(#btn-toggle-roof):not(#btn-toggle-video-decor):not(#btn-toggle-labels):not(#btn-toggle-doors):not(#btn-toggle-dining-table)').forEach(b => b.classList.remove('active'));
             const el = document.getElementById(id);
             if (el) el.classList.add('active');
         }
 
         const viewPresets = {
             // Ángulo diagonal axonométrico natural (Foto Referencia: 25° de sesgo para ver profundidad 3D real de muros y ambientes)
-            isom:   { pos: [-1.80, 11.80, 12.20], target: [3.15, 0.40, 4.00] },
-            living: { pos: [4.80, 2.80, 4.40], target: [3.80, 0.70, 2.70] },
+            isom:   { pos: [-1.60, 12.20, 12.50], target: [3.50, 0.40, 4.00] },
+            living: { pos: [5.60, 2.90, 4.50], target: [4.80, 0.70, 2.50] },
             cocina: { pos: [4.10, 3.40, 4.30], target: [4.10, 0.60, 6.60] },
             cuarto: { pos: [2.40, 2.80, 5.20], target: [1.10, 0.65, 6.60] },
             bano:   { pos: [2.65, 3.50, 4.85], target: [1.15, 0.65, 4.00] },
@@ -9858,7 +10004,7 @@
                 if (btnIcon) btnIcon.innerText = "📐";
                 if (btn) btn.classList.remove('active');
             }
-            controlsPersp.target.set(3.15, 0.40, 4.00);
+            controlsPersp.target.set(3.50, 0.40, 4.00);
             updateComposerCamera();
             wakeRenderer();
         }
@@ -10059,6 +10205,66 @@
             return moving;
         }
 
+        // Actualizador de animación suave para la Mesa de Comedor Extensible en 3 Tandas Ovaladas (1.00m -> 1.23m -> 1.47m -> 1.70m)
+        function updateAnimDiningTable() {
+            const st = window.diningTableAnimState;
+            if (!st) return false;
+            let moving = false;
+            if (Math.abs(st.currentExt - st.targetExt) > 0.0015) {
+                st.currentExt += (st.targetExt - st.currentExt) * 0.15;
+                moving = true;
+            } else if (st.currentExt !== st.targetExt) {
+                st.currentExt = st.targetExt;
+                moving = true;
+            } else {
+                return false;
+            }
+
+            const ext = st.currentExt;
+            const halfExt = ext / 2;
+            if (st.westHalfGroup) st.westHalfGroup.position.x = -halfExt;
+            if (st.eastHalfGroup) st.eastHalfGroup.position.x = halfExt;
+
+            if (st.guideRail1) st.guideRail1.scale.x = 0.60 + ext * 0.95;
+            if (st.guideRail2) st.guideRail2.scale.x = 0.60 + ext * 0.95;
+
+            // Despliegue progresivo de las 3 tablas centrales (cada tanda suma 0.2333 m)
+            const leafW = 0.70 / 3;
+            const activeCount = Math.ceil((ext - 0.005) / leafW);
+            for (let i = 0; i < st.leaves.length; i++) {
+                const lf = st.leaves[i].group;
+                const startExt = i * leafW;
+                const localProgress = Math.max(0, Math.min(1, (ext - startExt) / leafW));
+                if (localProgress > 0.01) {
+                    lf.visible = true;
+                    lf.scale.x = Math.max(0.001, localProgress);
+                    // Centrar simétricamente las tablas activas en el hueco abierto [-halfExt, +halfExt]
+                    const totalSpan = ext;
+                    const prevWidth = i * leafW;
+                    const curPieceW = leafW * localProgress;
+                    lf.position.x = -halfExt + prevWidth + curPieceW / 2;
+                } else {
+                    lf.visible = false;
+                    lf.scale.x = 0.001;
+                }
+            }
+
+            // Desplazar suavemente las sillas Oeste y Este acompañando las cabeceras ovaladas
+            if (st.westChair && st.westChair.userData.baseX !== undefined) {
+                st.westChair.position.x = st.westChair.userData.baseX - halfExt;
+            }
+            if (st.eastChair && st.eastChair.userData.baseX !== undefined) {
+                st.eastChair.position.x = st.eastChair.userData.baseX + halfExt;
+            }
+
+            // Acompañar con el camino de mesa rojo
+            if (st.runnerMesh) {
+                st.runnerMesh.scale.x = 0.68 + ext * 0.85;
+            }
+
+            return moving;
+        }
+
         // Actualizador de interpolación suave de ventanas corredizas y ventiluz basculante
         function updateAnimWindows() {
             let moving = false;
@@ -10212,7 +10418,8 @@
                 const doorsMoving = updateAnimDoors();
                 const windowsMoving = updateAnimWindows();
                 const curtainsMoving = updateAnimCurtains();
-                if (wallsMoving || doorsMoving || windowsMoving || curtainsMoving) dirtyFrames = Math.max(dirtyFrames, 3);
+                const tableMoving = updateAnimDiningTable();
+                if (wallsMoving || doorsMoving || windowsMoving || curtainsMoving || tableMoving) dirtyFrames = Math.max(dirtyFrames, 3);
                 dirtyFrames--;
                 updateLabels();
                 if (selectionBox) selectionBox.update();
