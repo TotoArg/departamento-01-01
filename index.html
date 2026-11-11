@@ -1832,246 +1832,6 @@
             return tex;
         }
         const ff7ScreenTex = createFFVIIScreenTexture();
-        // ============================================================================
-        // TEXTURAS PROCEDURALES DE CUADROS Y ARTE EN PAREDES (REFERENCIA FRANCISCO ALLES)
-        // ============================================================================
-        function createMontanasArtTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 320;
-            const ctx = canvas.getContext('2d');
-
-            // Paspartú blanco roto
-            ctx.fillStyle = '#f6f5f2';
-            ctx.fillRect(0, 0, 512, 320);
-
-            const m = 24;
-            const fw = 512 - m * 2;
-            const fh = 320 - m * 2;
-
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(m, m, fw, fh);
-            ctx.clip();
-
-            // Cielo degradé suave
-            const cielo = ctx.createLinearGradient(0, m, 0, m + fh * 0.6);
-            cielo.addColorStop(0, '#9a9a98');
-            cielo.addColorStop(1, '#e4e4e1');
-            ctx.fillStyle = cielo;
-            ctx.fillRect(m, m, fw, fh);
-
-            const aguaY = m + fh * 0.68;
-
-            // Cordones montañosos en 4 capas de profundidad
-            const capas = [
-                { color: '#c9c9c6', base: 0.30, amp: 0.10, k: 2 },
-                { color: '#a9a9a6', base: 0.40, amp: 0.09, k: 3 },
-                { color: '#7d7d7b', base: 0.50, amp: 0.08, k: 4 },
-                { color: '#4b4b4a', base: 0.60, amp: 0.06, k: 5 }
-            ];
-
-            const perfiles = [];
-            capas.forEach((c, idx) => {
-                const pts = [];
-                for (let i = 0; i <= 28; i++) {
-                    const t = i / 28;
-                    const pico = Math.sin(t * Math.PI * (2 + c.k)) * 0.5 + Math.sin(t * Math.PI * (5 + 2 * c.k) + idx) * 0.3;
-                    pts.push([m + t * fw, m + fh * (c.base - c.amp * pico)]);
-                }
-                perfiles.push({ color: c.color, pts });
-
-                ctx.fillStyle = c.color;
-                ctx.beginPath();
-                ctx.moveTo(m, aguaY);
-                for (const [x, y] of pts) ctx.lineTo(x, Math.min(y, aguaY));
-                ctx.lineTo(m + fw, aguaY);
-                ctx.fill();
-            });
-
-            // Nieve en picos intermedios
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
-            for (const [x, y] of perfiles[1].pts) {
-                if (y < m + fh * 0.36) {
-                    ctx.beginPath();
-                    ctx.moveTo(x - 8, y + 9);
-                    ctx.lineTo(x, y);
-                    ctx.lineTo(x + 8, y + 9);
-                    ctx.fill();
-                }
-            }
-
-            // Lago con reflejo atenuado
-            ctx.fillStyle = '#bdbdba';
-            ctx.fillRect(m, aguaY, fw, fh - (aguaY - m));
-
-            ctx.globalAlpha = 0.40;
-            perfiles.slice(2).forEach(p => {
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.moveTo(m, aguaY);
-                for (const [x, y] of p.pts) {
-                    ctx.lineTo(x, aguaY + (aguaY - Math.min(y, aguaY)) * 0.55);
-                }
-                ctx.lineTo(m + fw, aguaY);
-                ctx.fill();
-            });
-            ctx.globalAlpha = 1.0;
-
-            // Ondas de agua sutiles
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.40)';
-            for (let i = 0; i < 18; i++) {
-                const rx = m + (i * 27) % fw;
-                const ry = aguaY + 6 + (i * 7) % (fh * 0.25);
-                ctx.fillRect(rx, ry, 15 + (i * 3) % 25, 1.2);
-            }
-
-            ctx.restore();
-
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.colorSpace = THREE.SRGBColorSpace;
-            return tex;
-        }
-        const montanasArtTex = createMontanasArtTexture();
-
-        function createGlaciarArtTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 360;
-            canvas.height = 504;
-            const ctx = canvas.getContext('2d');
-
-            // Cielo degradé patagónico
-            const cielo = ctx.createLinearGradient(0, 0, 0, 504 * 0.38);
-            cielo.addColorStop(0, '#5b8fc7');
-            cielo.addColorStop(1, '#d7e6f2');
-            ctx.fillStyle = cielo;
-            ctx.fillRect(0, 0, 360, 504);
-
-            // Cerros de fondo
-            ctx.fillStyle = '#6f7f93';
-            ctx.beginPath();
-            ctx.moveTo(0, 504 * 0.36);
-            const mPts = [[0.12, 0.25], [0.28, 0.31], [0.45, 0.17], [0.60, 0.27], [0.78, 0.20], [1.0, 0.30]];
-            for (const [px, py] of mPts) ctx.lineTo(360 * px, 504 * py);
-            ctx.lineTo(360, 504 * 0.45);
-            ctx.lineTo(0, 504 * 0.45);
-            ctx.fill();
-
-            // Nieve en las cumbres
-            ctx.fillStyle = '#eef3f8';
-            for (const [px, py] of [[0.45, 0.17], [0.78, 0.20], [0.12, 0.25]]) {
-                ctx.beginPath();
-                ctx.moveTo(360 * (px - 0.08), 504 * (py + 0.06));
-                ctx.lineTo(360 * px, 504 * py);
-                ctx.lineTo(360 * (px + 0.08), 504 * (py + 0.06));
-                ctx.fill();
-            }
-
-            // Lengua superior del Glaciar Perito Moreno
-            const hielo = ctx.createLinearGradient(0, 504 * 0.38, 0, 504 * 0.56);
-            hielo.addColorStop(0, '#f4f8fb');
-            hielo.addColorStop(1, '#cfe3ef');
-            ctx.fillStyle = hielo;
-            ctx.beginPath();
-            ctx.moveTo(0, 504 * 0.42);
-            ctx.lineTo(360, 504 * 0.40);
-            ctx.lineTo(360, 504 * 0.56);
-            ctx.lineTo(0, 504 * 0.58);
-            ctx.fill();
-
-            // Pared frontal del glaciar con seracs y grietas
-            ctx.fillStyle = '#e9f3f8';
-            ctx.beginPath();
-            ctx.moveTo(0, 504 * 0.56);
-            for (let x = 0; x <= 360; x += 25) {
-                ctx.lineTo(x, 504 * (0.53 + Math.sin(x * 0.08) * 0.025));
-            }
-            ctx.lineTo(360, 504 * 0.67);
-            ctx.lineTo(0, 504 * 0.68);
-            ctx.fill();
-
-            // Grietas azul profundo
-            for (let i = 0; i < 30; i++) {
-                const gx = 10 + (i * 12) % 340;
-                ctx.strokeStyle = i % 2 === 0 ? '#7fb6d6' : '#38bdf8';
-                ctx.lineWidth = 1.5 + (i % 3);
-                ctx.beginPath();
-                ctx.moveTo(gx, 504 * 0.56);
-                ctx.lineTo(gx + (i % 5 - 2) * 3, 504 * 0.67);
-                ctx.stroke();
-            }
-
-            // Lago turquesa lechoso
-            const lago = ctx.createLinearGradient(0, 504 * 0.67, 0, 504);
-            lago.addColorStop(0, '#5fa9b8');
-            lago.addColorStop(1, '#2f6f86');
-            ctx.fillStyle = lago;
-            ctx.fillRect(0, 504 * 0.67, 360, 504 * 0.33);
-
-            // Témpanos flotando en el agua
-            ctx.fillStyle = '#e6f2f7';
-            for (let i = 0; i < 12; i++) {
-                const tx = 20 + (i * 31) % 320;
-                const ty = 504 * 0.72 + (i * 19) % (504 * 0.22);
-                ctx.fillRect(tx, ty, 8 + (i % 4) * 4, 3 + (i % 3) * 2);
-            }
-
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.colorSpace = THREE.SRGBColorSpace;
-            return tex;
-        }
-        const glaciarArtTex = createGlaciarArtTexture();
-
-        function createDiplomasArtTexture(title = 'CERTIFICADO ACADÉMICO') {
-            const canvas = document.createElement('canvas');
-            canvas.width = 256;
-            canvas.height = 180;
-            const ctx = canvas.getContext('2d');
-
-            // Papel pergamino
-            ctx.fillStyle = '#f8f6f0';
-            ctx.fillRect(0, 0, 256, 180);
-
-            // Borde ornamental dorado / gris
-            ctx.strokeStyle = '#c5a059';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(8, 8, 240, 164);
-            ctx.strokeStyle = '#27272a';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(12, 12, 232, 156);
-
-            // Encabezado
-            ctx.textAlign = 'center';
-            ctx.fillStyle = '#18181b';
-            ctx.font = 'bold 9px serif';
-            ctx.fillText(title, 128, 38);
-
-            // Líneas de texto caligráfico simuladas
-            ctx.strokeStyle = '#71717a';
-            ctx.lineWidth = 1;
-            for (let y = 56; y <= 118; y += 12) {
-                const wLine = 120 + ((y * 7) % 60);
-                ctx.beginPath();
-                ctx.moveTo(128 - wLine / 2, y);
-                ctx.lineTo(128 + wLine / 2, y);
-                ctx.stroke();
-            }
-
-            // Sello notarial rojo lacre
-            ctx.fillStyle = '#b91c1c';
-            ctx.beginPath();
-            ctx.arc(195, 142, 12, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#facc15';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.colorSpace = THREE.SRGBColorSpace;
-            return tex;
-        }
-        const diplomaTex = createDiplomasArtTexture();
-
 
         // ============================================================================
         // SISTEMA DE ILUMINACIÓN CINEMATOGRÁFICA Y REBOTE GLOBAL (PBR ARCHVIZ)
@@ -6258,35 +6018,7 @@
                 (currentAssemblyGroup || decorVideoGroup).add(futonGroup);
             });
             
-            createCompoundAssembly('Cuadro Panorámico de Montañas (Living)', () => {
-                setMountWall(3.00, 3.10, false);
-                const g = new THREE.Group();
-                g.userData.isWallArt = true;
-                g.userData.origY = 1.48;
-                g.userData.artHeight = 0.65;
-                g.position.set(3.03, 1.48, 3.10);
 
-                const frameMat = new THREE.MeshStandardMaterial({ color: 0x111214, roughness: 0.35, metalness: 0.20 });
-                // Marco exterior negro fino (1.25m x 0.65m)
-                const frame = new THREE.Mesh(UNIT_BOX_GEO, frameMat);
-                frame.scale.set(0.025, 0.65, 1.25);
-                frame.castShadow = true; frame.receiveShadow = true;
-
-                // Lámina con paspartú y cordones montañosos
-                const canvasMat = new THREE.MeshStandardMaterial({
-                    map: montanasArtTex,
-                    roughness: 0.70,
-                    metalness: 0.02
-                });
-                const canvas = new THREE.Mesh(UNIT_BOX_GEO, canvasMat);
-                canvas.scale.set(0.005, 0.61, 1.21);
-                canvas.position.set(0.012, 0, 0); // Cara visible hacia el living (+X)
-                canvas.castShadow = true;
-
-                g.add(frame, canvas);
-                (currentAssemblyGroup || decorVideoGroup).add(g);
-                setMountWall(null);
-            });
 
             // - 2 Torres de sonido traseras LG apoyadas DIRECTAMENTE EN EL PISO (fotos #0, #1 y #2):
             // Torre trasera sur (apoyada en el piso junto al apoyabrazos sur del futón, en el vano hacia el pasillo):
@@ -6585,65 +6317,7 @@
                 }
             }
 
-            // - Espejo Panorámico Horizontal (Comedor, Muro Norte Y=0.00, ref. Francisco Alles)
-            createCompoundAssembly('Espejo Panorámico Horizontal (Comedor)', () => {
-                setMountWall(5.00, 0.00, true);
-                const g = new THREE.Group();
-                g.userData.isWallArt = true;
-                g.userData.origY = 1.45;
-                g.userData.artHeight = 0.55;
-                g.position.set(5.00, 1.45, 0.04);
 
-                // Marco de aluminio satinado anodizado
-                const frameMat = new THREE.MeshStandardMaterial({ color: 0xcfd2d4, roughness: 0.35, metalness: 0.65 });
-                const frame = new THREE.Mesh(UNIT_BOX_GEO, frameMat);
-                frame.scale.set(1.40, 0.55, 0.025);
-                frame.castShadow = true; frame.receiveShadow = true;
-
-                // Superficie espejada de alta reflexión
-                const mirrorMat = new THREE.MeshStandardMaterial({ color: 0xd3dbdf, roughness: 0.06, metalness: 0.85 });
-                const mirror = new THREE.Mesh(UNIT_BOX_GEO, mirrorMat);
-                mirror.scale.set(1.34, 0.49, 0.005);
-                mirror.position.set(0, 0, 0.012);
-                mirror.castShadow = true;
-
-                g.add(frame, mirror);
-                (currentAssemblyGroup || decorVideoGroup).add(g);
-                setMountWall(null);
-            });
-
-            // - Cuadros Chicos en Grilla 2x2 (Living/Comedor, Muro Este X=6.30, ref. Francisco Alles)
-            createCompoundAssembly('Cuadros Chicos en Grilla (4)', () => {
-                setMountWall(7.00, 1.85, false);
-                const g = new THREE.Group();
-                g.userData.isWallArt = true;
-                g.userData.origY = 1.45;
-                g.userData.artHeight = 0.55;
-                g.position.set(6.97, 1.45, 1.85);
-
-                const oakMat = new THREE.MeshStandardMaterial({ color: 0xb98a55, roughness: 0.60, metalness: 0.05 });
-                const photoMat = new THREE.MeshStandardMaterial({ map: montanasArtTex, roughness: 0.70 });
-
-                // Grilla de 2 x 2 cuadritos con marco de roble
-                const qw = 0.24, qh = 0.24;
-                [-1, 1].forEach((row, rIdx) => {
-                    [-1, 1].forEach((col, cIdx) => {
-                        const qg = new THREE.Group();
-                        qg.position.set(0, row * 0.15, col * 0.15);
-                        const frame = new THREE.Mesh(UNIT_BOX_GEO, oakMat);
-                        frame.scale.set(0.02, qh, qw);
-                        frame.castShadow = true;
-                        const canvas = new THREE.Mesh(UNIT_BOX_GEO, photoMat);
-                        canvas.scale.set(0.004, qh - 0.04, qw - 0.04);
-                        canvas.position.set(-0.01, 0, 0);
-                        qg.add(frame, canvas);
-                        g.add(qg);
-                    });
-                });
-
-                (currentAssemblyGroup || decorVideoGroup).add(g);
-                setMountWall(null);
-            });
             // - 2 Cuchas / colchonetas grises para los perros bajo las ventanas Norte + bebedero celeste (fotos #4, #5 y #7): unidades gestionables
             createCompoundAssembly('Cucha de Mascota Esquina NE', () => {
                 addDecorBox(6.25, 0.05, 0.36, 0.85, 0.10, 0.54, 0x94a3b8, 0.85, 0, 'Cucha Mascota Esquina NE');
@@ -6834,35 +6508,7 @@
                 (currentAssemblyGroup || decorVideoGroup).add(bedGroup);
             });
             
-            createCompoundAssembly('Cuadro Glaciar Perito Moreno (Dormitorio)', () => {
-                setMountWall(0.00, 6.60, false);
-                const g = new THREE.Group();
-                g.userData.isWallArt = true;
-                g.userData.origY = 1.55;
-                g.userData.artHeight = 0.95;
-                g.position.set(0.04, 1.55, 6.60);
 
-                const frameMat = new THREE.MeshStandardMaterial({ color: 0x111214, roughness: 0.35, metalness: 0.20 });
-                // Marco vertical negro elegante (0.68m x 0.95m)
-                const frame = new THREE.Mesh(UNIT_BOX_GEO, frameMat);
-                frame.scale.set(0.025, 0.95, 0.68);
-                frame.castShadow = true; frame.receiveShadow = true;
-
-                // Lámina vertical Glaciar Perito Moreno con lago turquesa
-                const canvasMat = new THREE.MeshStandardMaterial({
-                    map: glaciarArtTex,
-                    roughness: 0.70,
-                    metalness: 0.02
-                });
-                const canvas = new THREE.Mesh(UNIT_BOX_GEO, canvasMat);
-                canvas.scale.set(0.005, 0.91, 0.64);
-                canvas.position.set(0.012, 0, 0); // Cara visible hacia el dormitorio (+X)
-                canvas.castShadow = true;
-
-                g.add(frame, canvas);
-                (currentAssemblyGroup || decorVideoGroup).add(g);
-                setMountWall(null);
-            });
 
             // 3. 2 Mesas de luz de madera nogal estilizadas a ambos lados de la cama (sobre Muro Oeste X=0.00):
             // - Mesa de luz Norte (reducida a 0.36m x 0.36m x 0.54m, centrada en Z=5.60) con humidificador
@@ -7165,49 +6811,7 @@
                 (currentAssemblyGroup || decorVideoGroup).add(termoGroup);
             });
 
-            // - Diplomas de Estudio en Muro (5 Cuadros: 3 arriba y 2 abajo, ref. Francisco Alles)
-            createCompoundAssembly('Diplomas de Estudio (5 Cuadros)', () => {
-                setMountWall(3.00, 0.85, false);
-                const g = new THREE.Group();
-                g.userData.isWallArt = true;
-                g.userData.origY = 1.62;
-                g.userData.artHeight = 0.85;
-                g.position.set(2.97, 1.62, 0.85);
 
-                const frameMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.40, metalness: 0.30 });
-                const diplomaMat = new THREE.MeshStandardMaterial({ map: diplomaTex, roughness: 0.80 });
-
-                // Fila Superior: 3 diplomas
-                const topW = 0.36, topH = 0.26;
-                [-1, 0, 1].forEach((col, idx) => {
-                    const dz = col * 0.44;
-                    const frame = new THREE.Mesh(UNIT_BOX_GEO, frameMat);
-                    frame.scale.set(0.02, topH, topW);
-                    frame.position.set(0, 0.18, dz);
-                    frame.castShadow = true;
-                    const sheet = new THREE.Mesh(UNIT_BOX_GEO, diplomaMat);
-                    sheet.scale.set(0.004, topH - 0.03, topW - 0.03);
-                    sheet.position.set(-0.01, 0.18, dz);
-                    g.add(frame, sheet);
-                });
-
-                // Fila Inferior: 2 diplomas centrados
-                const botW = 0.42, botH = 0.28;
-                [-0.5, 0.5].forEach(col => {
-                    const dz = col * 0.50;
-                    const frame = new THREE.Mesh(UNIT_BOX_GEO, frameMat);
-                    frame.scale.set(0.02, botH, botW);
-                    frame.position.set(0, -0.18, dz);
-                    frame.castShadow = true;
-                    const sheet = new THREE.Mesh(UNIT_BOX_GEO, diplomaMat);
-                    sheet.scale.set(0.004, botH - 0.03, botW - 0.03);
-                    sheet.position.set(-0.01, -0.18, dz);
-                    g.add(frame, sheet);
-                });
-
-                (currentAssemblyGroup || decorVideoGroup).add(g);
-                setMountWall(null);
-            });
 
             // 3. 3 ESTANTES FLOTANTES (Muro Este X = 3.00 m sobre escritorio): conjunto unificado gestionable
             createCompoundAssembly('Estantes Flotantes Estudio (Libros y Figuras)', () => {
@@ -9668,27 +9272,8 @@
             }
             // En The Sims el equipamiento y muebles de pared (como Smart TV, consolas, alacenas, cuadros y estantes)
             // se mantienen SIEMPRE visibles para que los ambientes sigan completamente amoblados al cortar o bajar paredes
-            // Adaptación de objetos de pared (cuadros, diplomas, espejos) al cortar muros (ref. Francisco Alles)
             for (let j = 0; j < w.linkedObjs.length; j++) {
-                const lObj = w.linkedObjs[j];
-                if (lObj.userData && lObj.userData.isWallArt) {
-                    if (h < 0.40) {
-                        // En corte muy bajo / zócalo o sin muros, ocultar cuadros para no dejarlos flotando en el aire
-                        lObj.visible = false;
-                    } else if (h < 1.35) {
-                        // En muros bajos cortados (1.10m): bajar el cuadro justo bajo la línea de corte para que apoye elegante
-                        lObj.visible = true;
-                        const artH = lObj.userData.artHeight || 0.50;
-                        const targetY = Math.min(lObj.userData.origY || 1.45, h - 0.04 - artH / 2);
-                        lObj.position.y = Math.max(0.40, targetY);
-                    } else {
-                        // Muros completos: restaurar altura y visibilidad original
-                        lObj.visible = true;
-                        if (lObj.userData.origY) lObj.position.y = lObj.userData.origY;
-                    }
-                } else {
-                    lObj.visible = true;
-                }
+                w.linkedObjs[j].visible = true;
             }
         }
 

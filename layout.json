@@ -1,15 +1,12 @@
 {
-  "updatedAt": 1794335091601,
+  "updatedAt": 1794416000000,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
       "accentStudyWall",
-      "Espejo Panorámico Horizontal (Comedor)",
       "Elemento Decorativo 3",
       "Elemento Decorativo 1",
-      "Cuadro Glaciar Perito Moreno (Dormitorio)",
-      "Mochila y Bolso Entrada",
-      "Cuadro Panorámico de Montañas (Living)"
+      "Mochila y Bolso Entrada"
     ],
     "transforms": {
       "Comederos de Mascota": {
@@ -31,27 +28,27 @@
         "rot": 0
       },
       "Sillas de Comedor (4)": {
-        "x": 4.49,
+        "x": 5.0,
         "y": 0.43,
-        "z": 1.18,
+        "z": 1.15,
         "rot": 0
       },
       "Mesa de Comedor Redonda": {
-        "x": 4.46,
+        "x": 5.0,
         "y": 0.37,
-        "z": 1.25,
+        "z": 1.15,
         "rot": 0
       },
       "Camino de Mesa Rojo (Comedor)": {
-        "x": 4.47,
+        "x": 5.0,
         "y": 0.76,
-        "z": 1.2,
+        "z": 1.15,
         "rot": 0
       },
       "Centro de Mesa y Planta (Comedor)": {
-        "x": 4.47,
+        "x": 5.0,
         "y": 0.86,
-        "z": 1.21,
+        "z": 1.15,
         "rot": 0
       }
     }
