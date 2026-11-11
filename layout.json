@@ -1,5 +1,5 @@
 {
-  "updatedAt": 1794416000000,
+  "updatedAt": 1794427786163,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -28,27 +28,33 @@
         "rot": 0
       },
       "Sillas de Comedor (4)": {
-        "x": 5.0,
+        "x": 5,
         "y": 0.43,
         "z": 1.15,
         "rot": 0
       },
       "Mesa de Comedor Redonda": {
-        "x": 5.0,
+        "x": 5,
         "y": 0.37,
         "z": 1.15,
         "rot": 0
       },
       "Camino de Mesa Rojo (Comedor)": {
-        "x": 5.0,
+        "x": 5,
         "y": 0.76,
         "z": 1.15,
         "rot": 0
       },
       "Centro de Mesa y Planta (Comedor)": {
-        "x": 5.0,
+        "x": 5,
         "y": 0.86,
         "z": 1.15,
+        "rot": 0
+      },
+      "Bañera y Ducha Cromada": {
+        "x": 0.4,
+        "y": 1.12,
+        "z": 4,
         "rot": 0
       }
     }
