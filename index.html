@@ -883,6 +883,166 @@
             line-height: 1.35;
         }
 
+        /* ============================================================================
+           HUD DE RECORRIDO 3D WALKTHROUGH (1° PERSONA + TOUR CINEMATOGRÁFICO)
+           ============================================================================ */
+        #walkthrough-hud {
+            display: none;
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 80;
+        }
+        #walkthrough-hud.active {
+            display: block;
+        }
+        #wt-top-banner {
+            position: absolute;
+            top: 76px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.90);
+            border: 1.5px solid #38bdf8;
+            border-radius: 999px;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+            max-width: 94vw;
+            white-space: nowrap;
+        }
+        #wt-room-badge {
+            font-size: 12px;
+            font-weight: 800;
+            color: #38bdf8;
+            letter-spacing: 0.4px;
+        }
+        .wt-ctrl-btn {
+            background: rgba(56, 189, 248, 0.20);
+            border: 1px solid #38bdf8;
+            color: #f8fafc;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.18s ease;
+        }
+        .wt-ctrl-btn:hover {
+            background: #38bdf8;
+            color: #0f172a;
+        }
+        .wt-ctrl-btn.exit {
+            background: rgba(239, 68, 68, 0.24);
+            border-color: #ef4444;
+            color: #fecaca;
+        }
+        .wt-ctrl-btn.exit:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+        #wt-crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            transform: translate(-50%, -50%);
+            border: 1.5px solid rgba(255, 255, 255, 0.75);
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+            pointer-events: none;
+        }
+        #wt-CrosshairDot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 2px;
+            background: #38bdf8;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        /* Joystick Virtual Táctil Izquierdo */
+        #wt-joystick-zone {
+            position: absolute;
+            bottom: 48px;
+            left: 22px;
+            width: 112px;
+            height: 112px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.62);
+            border: 2px solid rgba(56, 189, 248, 0.55);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+            pointer-events: auto;
+            touch-action: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(6px);
+        }
+        #wt-joystick-knob {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 32% 32%, #7dd3fc, #0284c7);
+            border: 2px solid #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            transform: translate(0px, 0px);
+            pointer-events: none;
+        }
+        #wt-help-pill {
+            position: absolute;
+            bottom: 52px;
+            right: 18px;
+            background: rgba(15, 23, 42, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 14px;
+            font-size: 10.5px;
+            line-height: 1.35;
+            pointer-events: none;
+            backdrop-filter: blur(8px);
+            max-width: 210px;
+        }
+        @media (max-width: 800px) {
+            #wt-top-banner {
+                top: 66px;
+                padding: 4px 10px;
+                gap: 6px;
+            }
+            #wt-room-badge {
+                font-size: 10.5px;
+            }
+            .wt-ctrl-btn {
+                padding: 3px 8px;
+                font-size: 10px;
+            }
+            #wt-joystick-zone {
+                bottom: 38px;
+                left: 14px;
+                width: 96px;
+                height: 96px;
+            }
+            #wt-joystick-knob {
+                width: 38px;
+                height: 38px;
+            }
+            #wt-help-pill {
+                bottom: 40px;
+                right: 12px;
+                font-size: 9.5px;
+                padding: 5px 9px;
+                max-width: 165px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -890,6 +1050,24 @@
 
     <div id="webgl-container"></div>
     <div id="labels-container"></div>
+
+    <!-- HUD Interactivo para Recorrido 3D Walkthrough (1° Persona y Tour Guiado) -->
+    <div id="walkthrough-hud">
+        <div id="wt-top-banner">
+            <span id="wt-room-badge">🚶 LIVING - COMEDOR</span>
+            <button class="wt-ctrl-btn" id="btn-wt-toggle-tour" title="Iniciar / Pausar vuelo automático por todos los ambientes">🎬 <span id="lbl-wt-tour">Auto-Tour</span></button>
+            <button class="wt-ctrl-btn exit" id="btn-wt-exit" title="Volver a vista Maqueta 3D (Esc)">✕ Salir</button>
+        </div>
+        <div id="wt-crosshair"><div id="wt-CrosshairDot"></div></div>
+        <div id="wt-joystick-zone" title="Arrastrá para caminar en cualquier dirección">
+            <div id="wt-joystick-knob"></div>
+        </div>
+        <div id="wt-help-pill">
+            🕹️ <b>Joystick / WASD</b>: Caminar<br>
+            👆 <b>Arrastrar vista</b>: Mirar 360°<br>
+            🎯 <b>Tocar piso / puertas</b>: Ir / Abrir
+        </div>
+    </div>
 
     <!-- Top UI Container (Evita cualquier superposición en móviles) -->
     <div id="top-ui-wrapper">
@@ -921,6 +1099,8 @@
             <button class="mode-btn" id="btn-mode-2d" title="Plano 2D Técnico Ortogonal"><span>📐</span> 2D</button>
             <button class="mode-btn" id="btn-mode-3d" title="3D Normal con muros completos"><span>🏢</span> 3D Muros</button>
             <button class="mode-btn active" id="btn-mode-sims" title="3D Maqueta con corte dinámico estilo Los Sims"><span>✂️</span> 3D Sims</button>
+            <button class="mode-btn" id="btn-mode-walk" style="background:rgba(14,165,233,0.22); border:1px solid #38bdf8; color:#bae6fd; font-weight:700;" title="Caminar por adentro en 1° Persona (Joystick / WASD / Toque en el piso)"><span>🚶</span> Caminar 3D</button>
+            <button class="mode-btn" id="btn-mode-tour" style="background:rgba(168,85,247,0.24); border:1px solid #c084fc; color:#e9d5ff; font-weight:700;" title="Recorrido 3D Guiado Automático (Estilo Reel / Walkthrough)"><span>🎬</span> Tour 3D</button>
 
             <button class="mode-btn" id="btn-global-undo" style="display:none; background:rgba(239,68,68,0.22); border:1px solid #ef4444; color:#fca5a5;" title="Deshacer último cambio (Ctrl+Z)">
                 <span>↩️</span> <span id="btn-undo-text">Deshacer</span>
@@ -1247,6 +1427,8 @@
     <div id="bottom-bar" class="glass-panel">
         <div class="view-chip" data-view="top2d">📐 Plano 2D Exacto</div>
         <div class="view-chip active" data-view="isom">🏢 Maqueta 3D General</div>
+        <div class="view-chip" data-view="walk">🚶 Recorrido 1° Persona</div>
+        <div class="view-chip" data-view="tour">🎬 Auto-Tour 3D</div>
         <div class="view-chip" data-view="living">🛋️ Living y Entrada</div>
         <div class="view-chip" data-view="cocina">🍳 Cocina</div>
         <div class="view-chip" data-view="cuarto">🛏️ Cuarto</div>
@@ -9046,6 +9228,26 @@
                 }
             }
 
+            // 0E. En modo Recorrido 1° Persona (Walkthrough): tocar un punto del piso te lleva caminando suavemente hasta allí (estilo Matterport)
+            if (walkthroughState.active) {
+                const floorHits = raycaster.intersectObjects([floorMainMesh, floorSouthMesh, bathFloorMesh, palierMesh], false);
+                if (floorHits.length > 0) {
+                    const pt = floorHits[0].point;
+                    const clamped = clampWalkthroughPosition(pt.x, pt.z);
+                    walkthroughState.walkTarget = new THREE.Vector3(clamped.x, walkthroughState.eyeH, clamped.z);
+                    walkthroughState.isAutoTour = false;
+                    const lbl = document.getElementById('lbl-wt-tour');
+                    if (lbl) lbl.innerText = 'Auto-Tour';
+                    setActiveTopBtn('btn-mode-walk');
+                    if (walkthroughState.targetMarker) {
+                        walkthroughState.targetMarker.position.set(clamped.x, 0.015, clamped.z);
+                        walkthroughState.targetMarker.visible = true;
+                    }
+                    wakeRenderer();
+                }
+                return;
+            }
+
             // PROTECCIÓN CONTRA ERRORES: Si el modo "Editar muebles" NO está activo, ignorar selección de muebles
             if (!isFurnitureEditMode) {
                 // Comprobar si tocó un mueble para mostrar aviso amigable
@@ -9595,6 +9797,9 @@
         }
 
         function switchTo2D() {
+            if (typeof walkthroughState !== 'undefined' && walkthroughState.active) {
+                stopWalkthrough(null);
+            }
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
             const studioGround = floorGroup.getObjectByName('studioGround');
@@ -9620,6 +9825,9 @@
         }
 
         function switchTo3D(presetName = 'isom', mode = wallMode, moveCam = true) {
+            if (typeof walkthroughState !== 'undefined' && walkthroughState.active) {
+                stopWalkthrough(null);
+            }
             ensure3DExtrasBuilt();
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
@@ -9729,7 +9937,10 @@
                 const v = chip.dataset.view;
                 if (v === 'top2d') {
                     switchTo2D();
-                
+                } else if (v === 'walk') {
+                    startWalkthrough(false);
+                } else if (v === 'tour') {
+                    startWalkthrough(true);
                 } else {
                     switchTo3D(v, wallMode, true);
                 }
@@ -9993,18 +10204,511 @@
             }
         }
 
+        // ============================================================================
+        // MOTOR 3D WALKTHROUGH: 1° PERSONA INTERACTIVO + AUTO-TOUR CINEMATOGRÁFICO
+        // ============================================================================
+        const walkthroughState = {
+            active: false,
+            isAutoTour: false,
+            eyeH: 1.62,
+            pos: new THREE.Vector3(5.85, 1.62, 5.75),
+            yaw: 0.35,   // radianes (0 mira hacia -Z Norte)
+            pitch: -0.04,
+            moveFwd: 0,
+            moveRight: 0,
+            joyX: 0,
+            joyY: 0,
+            keys: { w: false, a: false, s: false, d: false, up: false, down: false, left: false, right: false },
+            isLooking: false,
+            lookPointerId: null,
+            lastLookX: 0,
+            lastLookY: 0,
+            walkTarget: null, // Vector3 cuando el usuario toca un punto del piso (estilo Matterport)
+            bobTime: 0,
+            tourTime: 0,
+            tourDuration: 38.0, // segundos para la vuelta completa
+            savedFov: 32,
+            savedRoof: false,
+            savedWallMode: 'sims',
+            targetMarker: null
+        };
+
+        // Crear anillo indicador en el piso para navegación click-to-walk estilo Matterport
+        (function createWalkTargetMarker() {
+            const ringGeo = new THREE.RingGeometry(0.11, 0.16, 28);
+            ringGeo.rotateX(-Math.PI / 2);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+            const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+            ringMesh.position.set(5.0, 0.015, 3.0);
+            ringMesh.visible = false;
+            scene.add(ringMesh);
+            walkthroughState.targetMarker = ringMesh;
+        })();
+
+        // Ruta del Auto-Tour Cinematográfico (Estilo Reel de Instagram)
+        // Recorre: Palier -> Entrada -> Living -> Comedor (abre mesa) -> Cocina -> Pasillo -> Estudio -> Baño -> Cuarto -> Living
+        const TOUR_WAYPOINTS = [
+            { pos: [5.92, 1.62, 6.85], look: [5.92, 1.55, 5.20], label: '🚪 PALIER DE ACCESO' },
+            { pos: [5.85, 1.62, 5.55], look: [5.00, 1.55, 3.10], label: '🔑 ENTRADA PRINCIPAL' },
+            { pos: [5.35, 1.62, 3.85], look: [6.80, 1.40, 3.10], label: '🛋️ LIVING & SMART TV' },
+            { pos: [4.85, 1.62, 2.55], look: [5.00, 1.15, 1.15], label: '🍽️ COMEDOR (MESA EXTENSIBLE 1.70m)' },
+            { pos: [5.85, 1.62, 1.45], look: [3.45, 1.35, 3.10], label: '🪟 VENTANALES NORTE Y LIVING' },
+            { pos: [4.35, 1.62, 4.45], look: [3.85, 1.35, 6.80], label: '🍳 ENTRANDO A LA COCINA' },
+            { pos: [4.15, 1.62, 6.35], look: [3.40, 1.25, 7.50], label: '🍳 COCINA EQUIPADA' },
+            { pos: [3.55, 1.62, 4.82], look: [2.65, 1.50, 4.00], label: '🚶 PASILLO DISTRIBUIDOR' },
+            { pos: [2.65, 1.62, 3.20], look: [1.50, 1.40, 1.20], label: '💻 ENTRANDO AL ESTUDIO' },
+            { pos: [1.75, 1.62, 1.85], look: [2.75, 1.25, 1.05], label: '💻 ESTUDIO & SETUP GAMER' },
+            { pos: [1.75, 1.62, 1.65], look: [0.25, 1.30, 1.15], label: '📚 BIBLIOTECA Y RINCÓN LECTURA' },
+            { pos: [2.65, 1.62, 4.00], look: [1.10, 1.35, 4.00], label: '🚿 BAÑO COMPLETO' },
+            { pos: [2.65, 1.62, 5.50], look: [1.20, 1.25, 6.60], label: '🛏️ ENTRANDO AL DORMITORIO' },
+            { pos: [1.95, 1.62, 6.55], look: [0.80, 1.15, 6.60], label: '🛏️ DORMITORIO PRINCIPAL' },
+            { pos: [4.80, 1.62, 3.60], look: [5.20, 1.50, 1.20], label: '🏠 VISTA INTEGRAL LIVING' }
+        ];
+
+        function getRoomNameAt(x, z) {
+            if (z > 6.30 && x >= 4.85) return '🚪 PALIER EXTERIOR';
+            if (x >= 4.85 && z >= 5.05 && z <= 6.30) return '🔑 ENTRADA';
+            if (x >= 3.00 && z < 5.20) {
+                return z < 2.15 ? '🍽️ COMEDOR' : '🛋️ LIVING';
+            }
+            if (x >= 3.00 && x <= 4.85 && z >= 5.20) return '🍳 COCINA';
+            if (x >= 2.30 && x < 3.00 && z >= 2.80 && z <= 5.20) return '🚶 PASILLO DISTRIBUIDOR';
+            if (x < 3.00 && z < 2.85) return '💻 ESTUDIO';
+            if (x < 2.35 && z >= 3.30 && z <= 4.70) return '🚿 BAÑO';
+            if (x < 3.00 && z > 5.15) return '🛏️ CUARTO';
+            return '🏠 INTERIOR DEPARTAMENTO';
+        }
+
+        // Abrir automáticamente puertas cercanas al usuario durante el recorrido 3D
+        function autoOpenNearbyDoors(px, pz) {
+            const doorTriggerPoints = [
+                { match: 'Entrada', x: 5.92, z: 6.30, dist: 1.55 },
+                { match: 'Estudio', x: 2.65, z: 2.80, dist: 1.35 },
+                { match: 'Bano',    x: 2.30, z: 4.00, dist: 1.25 },
+                { match: 'Cuarto',  x: 2.65, z: 5.20, dist: 1.35 }
+            ];
+            doorTriggerPoints.forEach(dp => {
+                const d = Math.hypot(px - dp.x, pz - dp.z);
+                if (d < dp.dist) {
+                    const doorObj = animDoors.find(ad => ad.name && ad.name.includes(dp.match) && !ad.name.includes('Placard'));
+                    if (doorObj && !doorObj.isOpen) {
+                        doorObj.isOpen = true;
+                        doorObj.targetVal = doorObj.openVal;
+                        wakeRenderer();
+                    }
+                }
+            });
+        }
+
+        // Restricción suave de límites del departamento para no atravesar paredes exteriores
+        function clampWalkthroughPosition(nx, nz) {
+            let x = Math.max(0.28, Math.min(6.72, nx));
+            let z = Math.max(0.28, Math.min(7.72, nz));
+            return { x, z };
+        }
+
+        function updateWalkthroughCameraLook() {
+            const st = walkthroughState;
+            const lookDist = 2.0;
+            const lx = st.pos.x - Math.sin(st.yaw) * Math.cos(st.pitch) * lookDist;
+            const ly = st.pos.y + Math.sin(st.pitch) * lookDist;
+            const lz = st.pos.z - Math.cos(st.yaw) * Math.cos(st.pitch) * lookDist;
+            perspCam.position.copy(st.pos);
+            controlsPersp.target.set(lx, ly, lz);
+            perspCam.lookAt(lx, ly, lz);
+        }
+
+        function startWalkthrough(autoTour = false) {
+            ensure3DExtrasBuilt();
+            if (isFurnitureEditMode) setFurnitureEditMode(false, true);
+            clearSelection();
+
+            if (!walkthroughState.active) {
+                walkthroughState.savedFov = perspCam.fov;
+                walkthroughState.savedRoof = !!(roofGroup && roofGroup.visible);
+                walkthroughState.savedWallMode = wallMode;
+            }
+
+            walkthroughState.active = true;
+            walkthroughState.isAutoTour = !!autoTour;
+            walkthroughState.walkTarget = null;
+            if (walkthroughState.targetMarker) walkthroughState.targetMarker.visible = false;
+
+            // Configurar cámara gran angular humana (62° FOV) y muros + techo completos para inmersión interior
+            activeCamera = perspCam;
+            perspCam.fov = 62;
+            perspCam.near = 0.06;
+            perspCam.updateProjectionMatrix();
+            controlsOrtho.enabled = false;
+            controlsPersp.enabled = false;
+
+            applyWallsVisibility(true, true);
+            roofGroup.visible = true;
+            document.getElementById('chk-roof').checked = true;
+            document.getElementById('btn-toggle-roof').classList.add('active');
+            setWallMode('up');
+            updateRoofCapsVisibility();
+            updateLabels(true);
+
+            // Ubicación inicial: En la entrada mirando hacia el Living-Comedor
+            if (!autoTour) {
+                walkthroughState.pos.set(5.80, walkthroughState.eyeH, 5.45);
+                walkthroughState.yaw = 0.32;
+                walkthroughState.pitch = -0.03;
+                updateWalkthroughCameraLook();
+            } else {
+                walkthroughState.tourTime = 0;
+            }
+
+            const hud = document.getElementById('walkthrough-hud');
+            if (hud) hud.classList.add('active');
+            const lblTour = document.getElementById('lbl-wt-tour');
+            if (lblTour) lblTour.innerText = walkthroughState.isAutoTour ? 'Pausar Tour' : 'Auto-Tour';
+
+            setActiveTopBtn(autoTour ? 'btn-mode-tour' : 'btn-mode-walk');
+            document.querySelectorAll('.view-chip').forEach(el => {
+                el.classList.toggle('active', el.dataset.view === (autoTour ? 'tour' : 'walk'));
+            });
+
+            updateComposerCamera();
+            showToast(autoTour ? '🎬 Tour 3D Automático iniciado (Tocá la pantalla o Joystick para tomar el control)' : '🚶 Modo Caminar 1° Persona activo (Usá el Joystick, WASD o tocá el piso)');
+            wakeRenderer();
+        }
+
+        function stopWalkthrough(switchPreset = 'isom', mode = 'sims') {
+            if (!walkthroughState.active) return;
+            walkthroughState.active = false;
+            walkthroughState.isAutoTour = false;
+            walkthroughState.walkTarget = null;
+            if (walkthroughState.targetMarker) walkthroughState.targetMarker.visible = false;
+
+            perspCam.fov = walkthroughState.savedFov || 32;
+            perspCam.near = 0.1;
+            perspCam.updateProjectionMatrix();
+
+            // Restaurar techo al estado previo
+            roofGroup.visible = false;
+            document.getElementById('chk-roof').checked = false;
+            document.getElementById('btn-toggle-roof').classList.remove('active');
+            updateRoofCapsVisibility();
+
+            const hud = document.getElementById('walkthrough-hud');
+            if (hud) hud.classList.remove('active');
+
+            controlsPersp.enabled = true;
+            if (switchPreset) {
+                switchTo3D(switchPreset, mode, true);
+            }
+            updateComposerCamera();
+            wakeRenderer();
+        }
+
+        function updateWalkthroughFrame() {
+            if (!walkthroughState.active) return false;
+            const st = walkthroughState;
+            const dt = 0.016;
+
+            // 1. Modo Auto-Tour Cinematográfico (Interpolación suave Catmull-Rom / Coseno por los ambientes)
+            if (st.isAutoTour) {
+                st.tourTime += dt;
+                const totalSegs = TOUR_WAYPOINTS.length;
+                const progress = ((st.tourTime / st.tourDuration) % 1.0) * totalSegs;
+                const idx0 = Math.floor(progress) % totalSegs;
+                const idx1 = (idx0 + 1) % totalSegs;
+                const localT = progress - Math.floor(progress);
+                // Suavizado hermite (smoothstep)
+                const smoothT = localT * localT * (3 - 2 * localT);
+
+                const w0 = TOUR_WAYPOINTS[idx0];
+                const w1 = TOUR_WAYPOINTS[idx1];
+
+                const px = w0.pos[0] + (w1.pos[0] - w0.pos[0]) * smoothT;
+                const py = w0.pos[1] + (w1.pos[1] - w0.pos[1]) * smoothT + Math.sin(st.tourTime * 5.5) * 0.012;
+                const pz = w0.pos[2] + (w1.pos[2] - w0.pos[2]) * smoothT;
+
+                const lx = w0.look[0] + (w1.look[0] - w0.look[0]) * smoothT;
+                const ly = w0.look[1] + (w1.look[1] - w0.look[1]) * smoothT;
+                const lz = w0.look[2] + (w1.look[2] - w0.look[2]) * smoothT;
+
+                st.pos.set(px, py, pz);
+                perspCam.position.copy(st.pos);
+                controlsPersp.target.set(lx, ly, lz);
+                perspCam.lookAt(lx, ly, lz);
+
+                // Sincronizar yaw/pitch por si el usuario toma el control manual en cualquier momento
+                const dx = lx - px;
+                const dy = ly - py;
+                const dz = lz - pz;
+                st.yaw = Math.atan2(-dx, -dz);
+                st.pitch = Math.atan2(dy, Math.hypot(dx, dz));
+
+                autoOpenNearbyDoors(px, pz);
+
+                // Al pasar por el Comedor (idx0 === 3), desplegar la mesa ovalada a 1.70m automáticamente
+                if (idx0 === 3 && window.diningTableAnimState && window.diningTableAnimState.stage === 0) {
+                    window.diningTableAnimState.stage = 2;
+                    window.diningTableAnimState.cycleStage();
+                }
+
+                const badge = document.getElementById('wt-room-badge');
+                if (badge) badge.innerText = w0.label;
+                return true;
+            }
+
+            // 2. Modo Caminar en 1° Persona (WASD / Flechas / Joystick / Click-to-Walk)
+            let fwd = (st.keys.w || st.keys.up ? 1 : 0) - (st.keys.s || st.keys.down ? 1 : 0) - st.joyY;
+            let right = (st.keys.d || st.keys.right ? 1 : 0) - (st.keys.a || st.keys.left ? 1 : 0) + st.joyX;
+
+            let moving = false;
+            const speed = 2.15; // m/s velocidad de caminata humana natural
+
+            if (Math.hypot(fwd, right) > 0.05) {
+                // Si el usuario usa el joystick o teclado, cancelar destino automático de click en piso
+                st.walkTarget = null;
+                if (st.targetMarker) st.targetMarker.visible = false;
+
+                const mag = Math.min(1.0, Math.hypot(fwd, right));
+                const nf = fwd / (Math.hypot(fwd, right) || 1);
+                const nr = right / (Math.hypot(fwd, right) || 1);
+
+                const sinY = Math.sin(st.yaw);
+                const cosY = Math.cos(st.yaw);
+
+                const vx = (-sinY * nf + cosY * nr) * speed * mag * dt;
+                const vz = (-cosY * nf - sinY * nr) * speed * mag * dt;
+
+                const clamped = clampWalkthroughPosition(st.pos.x + vx, st.pos.z + vz);
+                st.pos.x = clamped.x;
+                st.pos.z = clamped.z;
+                st.bobTime += dt * 7.5 * mag;
+                st.pos.y = st.eyeH + Math.sin(st.bobTime) * 0.016;
+                moving = true;
+            } else if (st.walkTarget) {
+                // Desplazamiento suave hacia el punto del piso tocado (estilo Matterport)
+                const dx = st.walkTarget.x - st.pos.x;
+                const dz = st.walkTarget.z - st.pos.z;
+                const dist = Math.hypot(dx, dz);
+                if (dist > 0.08) {
+                    const step = Math.min(dist, speed * 1.15 * dt);
+                    const clamped = clampWalkthroughPosition(st.pos.x + (dx / dist) * step, st.pos.z + (dz / dist) * step);
+                    st.pos.x = clamped.x;
+                    st.pos.z = clamped.z;
+                    st.bobTime += dt * 8.0;
+                    st.pos.y = st.eyeH + Math.sin(st.bobTime) * 0.014;
+                    moving = true;
+                } else {
+                    st.walkTarget = null;
+                    if (st.targetMarker) st.targetMarker.visible = false;
+                    st.pos.y = st.eyeH;
+                }
+            } else {
+                st.pos.y += (st.eyeH - st.pos.y) * 0.2;
+            }
+
+            autoOpenNearbyDoors(st.pos.x, st.pos.z);
+            updateWalkthroughCameraLook();
+
+            const badge = document.getElementById('wt-room-badge');
+            if (badge) badge.innerText = getRoomNameAt(st.pos.x, st.pos.z);
+
+            return moving || st.isLooking;
+        }
+
+        // Eventos de botones del Walkthrough y Joystick Virtual
+        (function setupWalkthroughControls() {
+            const btnWalk = document.getElementById('btn-mode-walk');
+            if (btnWalk) {
+                btnWalk.addEventListener('click', () => {
+                    if (walkthroughState.active && !walkthroughState.isAutoTour) {
+                        stopWalkthrough('isom', 'sims');
+                    } else {
+                        startWalkthrough(false);
+                    }
+                });
+            }
+
+            const btnTour = document.getElementById('btn-mode-tour');
+            if (btnTour) {
+                btnTour.addEventListener('click', () => {
+                    if (walkthroughState.active && walkthroughState.isAutoTour) {
+                        stopWalkthrough('isom', 'sims');
+                    } else {
+                        startWalkthrough(true);
+                    }
+                });
+            }
+
+            const btnWtToggleTour = document.getElementById('btn-wt-toggle-tour');
+            if (btnWtToggleTour) {
+                btnWtToggleTour.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    walkthroughState.isAutoTour = !walkthroughState.isAutoTour;
+                    const lbl = document.getElementById('lbl-wt-tour');
+                    if (lbl) lbl.innerText = walkthroughState.isAutoTour ? 'Pausar Tour' : 'Auto-Tour';
+                    setActiveTopBtn(walkthroughState.isAutoTour ? 'btn-mode-tour' : 'btn-mode-walk');
+                    wakeRenderer();
+                });
+            }
+
+            const btnWtExit = document.getElementById('btn-wt-exit');
+            if (btnWtExit) {
+                btnWtExit.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    stopWalkthrough('isom', 'sims');
+                });
+            }
+
+            // Joystick Virtual Táctil
+            const joyZone = document.getElementById('wt-joystick-zone');
+            const joyKnob = document.getElementById('wt-joystick-knob');
+            let joyPointerId = null;
+            const maxRadius = 34;
+
+            function updateJoystick(clientX, clientY) {
+                const rect = joyZone.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                let dx = clientX - cx;
+                let dy = clientY - cy;
+                const dist = Math.hypot(dx, dy);
+                if (dist > maxRadius) {
+                    dx = (dx / dist) * maxRadius;
+                    dy = (dy / dist) * maxRadius;
+                }
+                if (joyKnob) joyKnob.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`;
+                walkthroughState.joyX = dx / maxRadius;
+                walkthroughState.joyY = dy / maxRadius;
+                if (walkthroughState.isAutoTour) {
+                    walkthroughState.isAutoTour = false;
+                    const lbl = document.getElementById('lbl-wt-tour');
+                    if (lbl) lbl.innerText = 'Auto-Tour';
+                    setActiveTopBtn('btn-mode-walk');
+                }
+                wakeRenderer();
+            }
+
+            function resetJoystick() {
+                joyPointerId = null;
+                walkthroughState.joyX = 0;
+                walkthroughState.joyY = 0;
+                if (joyKnob) joyKnob.style.transform = 'translate(0px, 0px)';
+                wakeRenderer();
+            }
+
+            if (joyZone) {
+                joyZone.addEventListener('pointerdown', (e) => {
+                    e.stopPropagation();
+                    joyPointerId = e.pointerId;
+                    joyZone.setPointerCapture(e.pointerId);
+                    updateJoystick(e.clientX, e.clientY);
+                });
+                joyZone.addEventListener('pointermove', (e) => {
+                    if (e.pointerId !== joyPointerId) return;
+                    e.stopPropagation();
+                    updateJoystick(e.clientX, e.clientY);
+                });
+                joyZone.addEventListener('pointerup', (e) => {
+                    if (e.pointerId !== joyPointerId) return;
+                    resetJoystick();
+                });
+                joyZone.addEventListener('pointercancel', resetJoystick);
+            }
+
+            // Mirar 360° arrastrando la pantalla o el mouse en modo Walkthrough
+            renderer.domElement.addEventListener('pointerdown', (e) => {
+                if (!walkthroughState.active) return;
+                walkthroughState.isLooking = true;
+                walkthroughState.lookPointerId = e.pointerId;
+                walkthroughState.lastLookX = e.clientX;
+                walkthroughState.lastLookY = e.clientY;
+            });
+
+            window.addEventListener('pointermove', (e) => {
+                if (!walkthroughState.active || !walkthroughState.isLooking || e.pointerId !== walkthroughState.lookPointerId) return;
+                const dx = e.clientX - walkthroughState.lastLookX;
+                const dy = e.clientY - walkthroughState.lastLookY;
+                walkthroughState.lastLookX = e.clientX;
+                walkthroughState.lastLookY = e.clientY;
+
+                if (Math.hypot(dx, dy) > 2 && walkthroughState.isAutoTour) {
+                    walkthroughState.isAutoTour = false;
+                    const lbl = document.getElementById('lbl-wt-tour');
+                    if (lbl) lbl.innerText = 'Auto-Tour';
+                    setActiveTopBtn('btn-mode-walk');
+                }
+
+                const sensitivity = 0.0042;
+                walkthroughState.yaw -= dx * sensitivity;
+                walkthroughState.pitch = Math.max(-1.15, Math.min(1.05, walkthroughState.pitch - dy * sensitivity));
+                updateWalkthroughCameraLook();
+                wakeRenderer();
+            });
+
+            window.addEventListener('pointerup', (e) => {
+                if (!walkthroughState.active) return;
+                if (e.pointerId === walkthroughState.lookPointerId) {
+                    walkthroughState.isLooking = false;
+                    walkthroughState.lookPointerId = null;
+                }
+            });
+
+            // Teclado WASD / Flechas para caminar en 1° Persona y Escape para salir
+            window.addEventListener('keydown', (e) => {
+                if (!walkthroughState.active) return;
+                const tag = document.activeElement ? document.activeElement.tagName : '';
+                if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
+
+                const k = e.key.toLowerCase();
+                if (k === 'escape') {
+                    stopWalkthrough('isom', 'sims');
+                    return;
+                }
+                let pressed = false;
+                if (k === 'w') { walkthroughState.keys.w = true; pressed = true; }
+                if (k === 's') { walkthroughState.keys.s = true; pressed = true; }
+                if (k === 'a') { walkthroughState.keys.a = true; pressed = true; }
+                if (k === 'd') { walkthroughState.keys.d = true; pressed = true; }
+                if (e.key === 'ArrowUp') { walkthroughState.keys.up = true; pressed = true; e.preventDefault(); }
+                if (e.key === 'ArrowDown') { walkthroughState.keys.down = true; pressed = true; e.preventDefault(); }
+                if (e.key === 'ArrowLeft') { walkthroughState.keys.left = true; pressed = true; e.preventDefault(); }
+                if (e.key === 'ArrowRight') { walkthroughState.keys.right = true; pressed = true; e.preventDefault(); }
+
+                if (pressed && walkthroughState.isAutoTour) {
+                    walkthroughState.isAutoTour = false;
+                    const lbl = document.getElementById('lbl-wt-tour');
+                    if (lbl) lbl.innerText = 'Auto-Tour';
+                    setActiveTopBtn('btn-mode-walk');
+                }
+                if (pressed) wakeRenderer();
+            });
+
+            window.addEventListener('keyup', (e) => {
+                if (!walkthroughState.active) return;
+                const k = e.key.toLowerCase();
+                if (k === 'w') walkthroughState.keys.w = false;
+                if (k === 's') walkthroughState.keys.s = false;
+                if (k === 'a') walkthroughState.keys.a = false;
+                if (k === 'd') walkthroughState.keys.d = false;
+                if (e.key === 'ArrowUp') walkthroughState.keys.up = false;
+                if (e.key === 'ArrowDown') walkthroughState.keys.down = false;
+                if (e.key === 'ArrowLeft') walkthroughState.keys.left = false;
+                if (e.key === 'ArrowRight') walkthroughState.keys.right = false;
+            });
+        })();
+
         function animate() {
             requestAnimationFrame(animate);
             const movedPersp = controlsPersp.enabled && controlsPersp.update();
             const movedOrtho = controlsOrtho.enabled && controlsOrtho.update();
-            if (movedPersp || movedOrtho) dirtyFrames = Math.max(dirtyFrames, 5);
+            const movedWalk = walkthroughState.active && updateWalkthroughFrame();
+            if (movedPersp || movedOrtho || movedWalk) dirtyFrames = Math.max(dirtyFrames, 5);
             if (dirtyFrames > 0) {
                 const wallsMoving = updateSimsWalls(false);
                 const doorsMoving = updateAnimDoors();
                 const windowsMoving = updateAnimWindows();
                 const curtainsMoving = updateAnimCurtains();
                 const tableMoving = updateAnimDiningTable();
-                if (wallsMoving || doorsMoving || windowsMoving || curtainsMoving || tableMoving) dirtyFrames = Math.max(dirtyFrames, 3);
+                if (wallsMoving || doorsMoving || windowsMoving || curtainsMoving || tableMoving || movedWalk) dirtyFrames = Math.max(dirtyFrames, 3);
                 dirtyFrames--;
                 updateLabels();
                 if (selectionBox) selectionBox.update();
