@@ -3645,9 +3645,7 @@
         addBoxFixture(6.14, 0.62, 1.85, 0.19, 0.04, 0.46, 0xf97316); // Tapa/indicador térmico
         // (El conducto vertical galvanizado bajo la pendiente del techo se modela con altura exacta en decorVideoGroup)
 
-        // Calefactor Cuarto Ampliado (Muro Sur Y=8.00, X=2.48, a la derecha de la ventana)
-        addBoxFixture(2.48, 0.34, 7.86, 0.46, 0.62, 0.14, 0x9ca3af);
-        addBoxFixture(2.48, 0.66, 7.86, 0.48, 0.03, 0.16, 0xf97316);
+        // (Los calefactores Orbis de vidrio templado negro del Cuarto y del Estudio son idénticos y se modelan en simetría en X=0.48 sobre Muros Sur y Norte)
 
         // 2) COCINA (según fotos reales): Sobre muro Este (X=4.85) van Heladera -> 1° tramo mesada + Calefón mural Orbis/Bosch -> Cocina 4H -> 2° tramo mesada con Bacha + esquina en "L" bajo ventana Sur (Y=8.00). Muro Oeste (X=3.00) queda libre con portero y cestos.
         // - 1° tramo de bajo mesada y mesada de granito entre Heladera y Cocina (Z=5.81..6.16, X=4.52)
@@ -4197,8 +4195,10 @@
         // Eje Vertical X = 4.85 (separa Cocina de Entrada): de Z = 5.20 a Z = 6.30 a cota 4.41 m
         addWallSegment(4.85, 5.20, 4.85, 6.30, INT_T, interiorWallsGroup, false, 4.41);
 
-        // Eje Horizontal Z = 2.80 (Frente Placard Estudio 2.80m x 3.00m simétrico al Cuarto):
-        addSlidingPlacard2D(0.00, 2.30, 2.80, -1, true);
+        // Eje Horizontal Z = 2.80 (Frente Placard Estudio con mochetas / paredcitas laterales idénticas al Cuarto):
+        addLine2DSegment(0.00, 2.80, 0.18, 2.80, INT_T, 0x3b2314);
+        addSlidingPlacard2D(0.18, 1.92, 2.80, -1, true);
+        addLine2DSegment(1.92, 2.80, 2.30, 2.80, INT_T, 0x3b2314);
         // - PUERTA ESTUDIO: De X = 2.30 a X = 3.00 (bisagra en X = 3.00, abre hacia el Norte)
         addDashedLine(2.30, 2.80, 3.00, 2.80);
         addDoorSymbol2D(2.95, 2.80, 2.95, 2.12, 2.32, 2.12, 2.32, 2.80);
@@ -4209,8 +4209,10 @@
         // Eje Horizontal Z = 4.70 (Fondo sólido Baulera/Placard Cuarto y Muro Sur del Baño):
         addSlopedWallSegment(0.00, 4.70, 2.30, 4.70, 3.20, 5.20, INT_T, interiorWallsGroup, false);
 
-        // Eje Horizontal Z = 5.20 (Frente Placard Cuarto, Puerta Cuarto y Vano Cocina):
-        addSlidingPlacard2D(0.00, 2.30, 5.20, 1);
+        // Eje Horizontal Z = 5.20 (Frente Placard Cuarto con mochetas / paredcitas laterales, Puerta Cuarto y Vano Cocina):
+        addLine2DSegment(0.00, 5.20, 0.18, 5.20, INT_T, 0x3b2314);
+        addSlidingPlacard2D(0.18, 1.92, 5.20, 1, false);
+        addLine2DSegment(1.92, 5.20, 2.30, 5.20, INT_T, 0x3b2314);
         // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (bisagra en X = 3.00, abre hacia el Cuarto)
         addDashedLine(2.30, 5.20, 3.00, 5.20);
         addDoorSymbol2D(2.95, 5.20, 2.75, 5.42, 2.55, 5.42, 2.42, 5.20);
@@ -4532,29 +4534,77 @@
         }
 
         // 3) Constructor de Frentes de Placard (Fotos reales Cuarto y Estudio):
-        //    Placard embutido de DOS HOJAS ENTERAS DE DESPLAZAMIENTO de madera natural/cedro barnizada
-        //    con tiradores circulares oscuros embutidos, interior completo y baulera abierta superior
+        //    Placard embutido con MOCHETAS / PAREDCITAS DE MAMPOSTERÍA EN LOS COSTADOS (18 cm lado Oeste y 38 cm lado Puerta con tecla de luz),
+        //    dintel frontal de baulera y DOS HOJAS ENTERAS DE DESPLAZAMIENTO de madera natural/cedro barnizada
         function addSlidingPlacardFront3D(x1, x2, zWall, facingSign = -1, placardName = "Placard", invertX = false) {
-            const w = x2 - x1; // 2.30 m
+            const totalSpanW = 2.30; // Ancho total del nicho entre X = 0.00 y X = 2.30 m
+            const leftWallW = 0.18;  // Paredcita lateral izquierda (X = 0.00 a 0.18 m, ~18 cm)
+            const rightWallW = 0.38; // Paredcita lateral derecha junto al marco de puerta (X = 1.92 a 2.30 m, ~38 cm con llave de luz)
+            const w = x2 - x1;       // Vano neto de las puertas corredizas de madera (1.74 m: de X = 0.18 a 1.92 m)
             const holder = new THREE.Group();
             holder.position.set((x1 + x2) / 2, 0, zWall);
 
-            // Marco perimetral del vano de placard (chapa doblada grafito oscuro) hasta 2.20 m:
-            const PLACARD_H = 2.12;
-            const frameT = 0.06;
-            const topTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.04, frameT), doorFrameMat);
-            topTrack.position.set(0, 0.08 + PLACARD_H - 0.02, 0);
-            const botTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.04, frameT), doorFrameMat);
-            botTrack.position.set(0, 0.08 + 0.02, 0);
-            const leftBorder = new THREE.Mesh(new THREE.BoxGeometry(0.04, PLACARD_H, frameT), doorFrameMat);
-            leftBorder.position.set(-w / 2 + 0.02, 0.08 + PLACARD_H / 2, 0);
-            const rightBorder = new THREE.Mesh(new THREE.BoxGeometry(0.04, PLACARD_H, frameT), doorFrameMat);
-            rightBorder.position.set(w / 2 - 0.02, 0.08 + PLACARD_H / 2, 0);
+            // Marco perimetral del vano de placard (chapa doblada grafito oscuro) de 0.08 a 2.08 m:
+            const PLACARD_H = 2.00;
+            const LINTEL_TOP_Y = 2.22; // Borde superior de la fajita de pared bajo la baulera abierta
+            const frameT = INT_T + 0.02;
+
+            // --- PAREDCITAS LATERALES DE MAMPOSTERÍA BLANCA EN LOS COSTADOS DEL PLACARD (Fotos reales) ---
+            // 1. Paredcita lateral Oeste (X = 0.00 a 0.18 m, sube hasta el nivel de la baulera 2.22 m)
+            const leftMasonry = new THREE.Mesh(new THREE.BoxGeometry(leftWallW, LINTEL_TOP_Y, INT_T), intWallMat);
+            leftMasonry.position.set(-w / 2 - leftWallW / 2, LINTEL_TOP_Y / 2, 0);
+            leftMasonry.castShadow = true;
+            leftMasonry.receiveShadow = true;
+            holder.add(leftMasonry);
+
+            const leftMasonryCap = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            leftMasonryCap.scale.set(leftWallW + 0.01, 0.018, INT_T + 0.01);
+            leftMasonryCap.position.set(-w / 2 - leftWallW / 2, LINTEL_TOP_Y + 0.009, 0);
+            leftMasonryCap.userData.isCap = true;
+            holder.add(leftMasonryCap);
+
+            // 2. Paredcita / Mocheta lateral Este (X = 1.92 a 2.30 m, 38 cm de ancho junto a la puerta, con llave de luz)
+            const rightMasonry = new THREE.Mesh(new THREE.BoxGeometry(rightWallW, LINTEL_TOP_Y, INT_T), intWallMat);
+            rightMasonry.position.set(w / 2 + rightWallW / 2, LINTEL_TOP_Y / 2, 0);
+            rightMasonry.castShadow = true;
+            rightMasonry.receiveShadow = true;
+            holder.add(rightMasonry);
+
+            const rightMasonryCap = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            rightMasonryCap.scale.set(rightWallW + 0.01, 0.018, INT_T + 0.01);
+            rightMasonryCap.position.set(w / 2 + rightWallW / 2, LINTEL_TOP_Y + 0.009, 0);
+            rightMasonryCap.userData.isCap = true;
+            holder.add(rightMasonryCap);
+
+            // 3. Faja / Dintel frontal de mampostería blanca sobre las hojas del placard (de Y = 2.08 a 2.22 m)
+            const headerH = LINTEL_TOP_Y - (0.08 + PLACARD_H);
+            const headerMasonry = new THREE.Mesh(new THREE.BoxGeometry(w, headerH, INT_T), intWallMat);
+            headerMasonry.position.set(0, 0.08 + PLACARD_H + headerH / 2, 0);
+            headerMasonry.castShadow = true;
+            headerMasonry.receiveShadow = true;
+            holder.add(headerMasonry);
+
+            // 4. Tecla / Llave de luz blanca en la paredcita derecha (tal cual se ve en la foto real a Y = 1.15 m)
+            const switchPlate = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.12, 0.014), getStdMat(0xf8fafc, 0.3));
+            switchPlate.position.set(w / 2 + rightWallW * 0.52, 1.15, facingSign * (INT_T / 2 + 0.007));
+            const switchButton = new THREE.Mesh(new THREE.BoxGeometry(0.036, 0.024, 0.018), getStdMat(0xe2e8f0, 0.4));
+            switchButton.position.set(w / 2 + rightWallW * 0.52, 1.15, facingSign * (INT_T / 2 + 0.010));
+            holder.add(switchPlate, switchButton);
+
+            // Marco de chapa doblada grafito oscuro del vano de las puertas corredizas
+            const topTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.035, frameT), doorFrameMat);
+            topTrack.position.set(0, 0.08 + PLACARD_H - 0.0175, 0);
+            const botTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 0.035, frameT), doorFrameMat);
+            botTrack.position.set(0, 0.08 + 0.0175, 0);
+            const leftBorder = new THREE.Mesh(new THREE.BoxGeometry(0.035, PLACARD_H, frameT), doorFrameMat);
+            leftBorder.position.set(-w / 2 + 0.0175, 0.08 + PLACARD_H / 2, 0);
+            const rightBorder = new THREE.Mesh(new THREE.BoxGeometry(0.035, PLACARD_H, frameT), doorFrameMat);
+            rightBorder.position.set(w / 2 - 0.0175, 0.08 + PLACARD_H / 2, 0);
             holder.add(topTrack, botTrack, leftBorder, rightBorder);
 
-            // Zócalo inferior blanco de obra
-            const plinth = new THREE.Mesh(new THREE.BoxGeometry(w, 0.08, INT_T), intWallMat);
-            plinth.position.set(0, 0.04, 0);
+            // Zócalo inferior blanco y cerámico de obra a lo largo de los 2.30 m
+            const plinth = new THREE.Mesh(new THREE.BoxGeometry(totalSpanW, 0.08, INT_T), intWallMat);
+            plinth.position.set((rightWallW - leftWallW) / 2, 0.04, 0);
             holder.add(plinth);
 
             // =========================================================================
@@ -4563,17 +4613,18 @@
             const interiorDepth = 0.50;
             const interiorZ = -facingSign * (interiorDepth / 2);
 
-            // 1. Losa divisoria / Piso de Baulera superior en Y = 2.20 m
+            // 1. Losa divisoria / Piso de Baulera superior en Y = 2.20 m (abarca todo el ancho de 2.30 m)
+            const slabCenterOffset = (rightWallW - leftWallW) / 2;
             const slabMesh = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
-            slabMesh.scale.set(w, 0.04, interiorDepth);
-            slabMesh.position.set(0, 2.20 - 0.02, interiorZ);
+            slabMesh.scale.set(totalSpanW, 0.04, interiorDepth);
+            slabMesh.position.set(slabCenterOffset, 2.20 - 0.02, interiorZ);
             slabMesh.castShadow = true;
             slabMesh.receiveShadow = true;
             holder.add(slabMesh);
 
             const capLosa = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
             capLosa.scale.set(w + 0.01, 0.016, 0.05);
-            capLosa.position.set(0, 2.20 + 0.008, 0);
+            capLosa.position.set(0, LINTEL_TOP_Y + 0.008, 0);
             capLosa.userData.isCap = true;
             holder.add(capLosa);
 
@@ -4960,9 +5011,9 @@
             addContactShadowPlane(4.65, 3.10, 0.90, 1.20, 0.45); // Mesa ratona
             addContactShadowPlane(4.65, 1.20, 1.45, 1.90, 0.48); // Mesa de comedor y sillas
             addContactShadowPlane(1.65, 0.85, 1.25, 2.30, 0.52); // Escritorio gamer en Estudio
-            addContactShadowPlane(1.35, 6.00, 2.25, 2.40, 0.58); // Cama matrimonial en Cuarto
-            addContactShadowPlane(0.35, 4.95, 0.65, 0.65, 0.45); // Mesa de luz izquierda
-            addContactShadowPlane(0.35, 7.05, 0.65, 0.65, 0.45); // Mesa de luz derecha
+            addContactShadowPlane(1.05, 6.65, 2.05, 1.60, 0.58); // Cama matrimonial en Cuarto
+            addContactShadowPlane(0.28, 5.73, 0.50, 0.52, 0.45); // Mesa de luz Norte
+            addContactShadowPlane(0.28, 7.57, 0.50, 0.52, 0.45); // Mesa de luz Sur
             addContactShadowPlane(3.85, 6.60, 1.50, 2.50, 0.54); // Muebles bajo mesada y cocina
             addContactShadowPlane(6.10, 5.50, 0.65, 1.25, 0.48); // Perchero y zapatero en Entrada
 
@@ -5058,8 +5109,8 @@
             addInteriorWoodDoor3D(2.30, 2.80, 3.00, 2.80, false, -1, 90, 'Puerta Estudio', 5.20);
             addInteriorWoodDoor3D(2.30, 3.65, 2.30, 4.35, false, 1, 75, 'Puerta Bano', 5.20);
             addInteriorWoodDoor3D(2.30, 5.20, 3.00, 5.20, false, 1, 75, 'Puerta Cuarto', 5.20);
-            addSlidingPlacardFront3D(0.00, 2.30, 2.80, -1, 'Placard Estudio', true);
-            addSlidingPlacardFront3D(0.00, 2.30, 5.20, 1, 'Placard Cuarto');
+            addSlidingPlacardFront3D(0.18, 1.92, 2.80, -1, 'Placard Estudio', true);
+            addSlidingPlacardFront3D(0.18, 1.92, 5.20, 1, 'Placard Cuarto', false);
             resolveWallMounts();
             updateRoofCapsVisibility();
             updateSimsWalls(true);
@@ -6577,15 +6628,76 @@
             setMountWall(null);
 
             // ------------------------------------------------------------------------
-            // C) CUARTO AMPLIADO ([0.00, 4.70] a [3.00, 8.00]) - CAMA Y MESAS DE LUZ SOBRE MURO OESTE (X=0.00, fotos #17 a #22)
+            // C) CUARTO ([0.00, 5.20] a [3.00, 8.00]) - RESPALDO EXTENDIDO NOGAL, CAMA Y MESAS DE LUZ EMPOTRADAS (Fotos reales)
             // ------------------------------------------------------------------------
-            // 1. Cama de 2 plazas con Base de Madera, Colchón Biselado, 2 Almohadas Inclinadas y Acolchado Mate
+            // Función constructora del Calefactor a Gas Orbis de Frente de Vidrio Templado Negro (idéntico en Cuarto y Estudio):
+            // En las fotos reales está en el tramo de pared entre la esquina Oeste y la ventana (X = 0.48 m), con:
+            // - Frente cuadrado de vidrio negro templado (0.50 m x 0.52 m) con 4 botones cromados en las esquinas
+            // - Etiqueta blanca de Eficiencia Energética "A" arriba a la derecha
+            // - Salida superior marrón claro y cañito de cobre al piso con llave de paso cromada a la derecha
+            function buildOrbisBlackGlassHeater(xPos, zWallSurface, facingDirZ) {
+                const hg = new THREE.Group();
+                hg.position.set(xPos, 0.52, zWallSurface);
+
+                // 1. Gabinete posterior crema/metálico y base inferior
+                const backBox = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0xd6d3d1, 0.5));
+                backBox.scale.set(0.42, 0.48, 0.07);
+                backBox.position.set(0, -0.01, -facingDirZ * 0.02);
+                hg.add(backBox);
+
+                // Sombrerete / rejilla superior marrón claro (visible arriba del vidrio en la foto)
+                const topVent = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.04, 16), getStdMat(0xb47b48, 0.5));
+                topVent.position.set(-0.08, 0.27, -facingDirZ * 0.005);
+                hg.add(topVent);
+
+                // 2. Frente de vidrio templado negro espejo (esquinas redondeadas y 4 fijaciones cromadas)
+                const glassMat = new THREE.MeshStandardMaterial({
+                    color: 0x05070b,
+                    roughness: 0.08,
+                    metalness: 0.88
+                });
+                const glassFront = new THREE.Mesh(createRoundedBoxGeo(0.50, 0.52, 0.022, 0.025, 2), glassMat);
+                glassFront.position.set(0, 0, facingDirZ * 0.025);
+                glassFront.castShadow = true;
+                hg.add(glassFront);
+
+                // 4 embellecedores circulares cromados en las 4 esquinas del vidrio
+                const studGeo = new THREE.CylinderGeometry(0.010, 0.010, 0.006, 14);
+                studGeo.rotateX(Math.PI / 2);
+                [[-0.21, 0.22], [0.21, 0.22], [-0.21, -0.22], [0.21, -0.22]].forEach(([sx, sy]) => {
+                    const stud = new THREE.Mesh(studGeo, chromeMat);
+                    stud.position.set(sx, sy, facingDirZ * 0.037);
+                    hg.add(stud);
+                });
+
+                // 3. Etiqueta blanca de Eficiencia Energética ENARGAS (arriba a la derecha del panel negro)
+                const sticker = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0xf8fafc));
+                sticker.scale.set(0.095, 0.14, 0.004);
+                sticker.position.set(0.17, 0.10, facingDirZ * 0.038);
+                hg.add(sticker);
+                const stickerBars = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x16a34a));
+                stickerBars.scale.set(0.045, 0.04, 0.005);
+                stickerBars.position.set(0.15, 0.11, facingDirZ * 0.039);
+                hg.add(stickerBars);
+
+                // 4. Cañito de cobre inferior + llave de paso de gas cromada en la pared
+                const pipeV = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.22, 8), getStdMat(0xb45309, 0.35, 0.7));
+                pipeV.position.set(0.14, -0.35, facingDirZ * 0.01);
+                const gasValve = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.045, 10), chromeMat);
+                gasValve.rotation.x = Math.PI / 2;
+                gasValve.position.set(0.28, -0.34, facingDirZ * 0.02);
+                hg.add(pipeV, gasValve);
+
+                return hg;
+            }
+
+            // 1. Cama de 2 plazas con Respaldo Extendido continuo (cubre cama + ambas mesas de luz, dejando ~32 cm libres al placard y ~22 cm a la ventana)
             createCompoundAssembly('Cama Matrimonial 2 Plazas', () => {
                 const bedGroup = new THREE.Group();
 
                 const bedWoodMat = new THREE.MeshStandardMaterial({
-                    color: 0x482d1d,
-                    roughness: 0.58,
+                    color: 0x422a1b, // Madera nogal oscuro veteado horizontal (fotos reales)
+                    roughness: 0.56,
                     metalness: 0.04
                 });
                 const mattressMat = new THREE.MeshStandardMaterial({
@@ -6594,45 +6706,47 @@
                     metalness: 0.0
                 });
                 const pillowMat = new THREE.MeshStandardMaterial({
-                    color: 0xfdfdfd,
-                    roughness: 0.95,
+                    color: 0xcbd5e1,
+                    roughness: 0.92,
                     metalness: 0.0
                 });
                 const accentPillowMat = new THREE.MeshStandardMaterial({
-                    color: 0x26394e,
+                    color: 0x475569,
                     roughness: 0.90,
                     metalness: 0.0
                 });
                 const duvetMat = new THREE.MeshStandardMaterial({
-                    color: 0x364352, // Edredón nórdico gris pizarra con caída lateral
-                    roughness: 0.98,
+                    color: 0x4b5563, // Acolchado a franjas tonos grises (fotos reales)
+                    roughness: 0.95,
                     metalness: 0.0
                 });
-                const runnerMat = new THREE.MeshStandardMaterial({
-                    color: 0x1d4ed8, // Pie de cama azul cobalto
+                const stripeLightMat = new THREE.MeshStandardMaterial({
+                    color: 0xd1d5db, // Franjas claras del acolchado
                     roughness: 0.95,
                     metalness: 0.0
                 });
 
-                // 1. Respaldo de madera maciza (Muro Oeste X=0.08) centrado en Z = 6.60 m (Cuarto 2.80m x 3.00m)
-                // Dimensiones reducidas ligeramente a estándar confortable de 2 plazas (1.46m ancho respaldo, deja más paso)
-                const headboard = new THREE.Mesh(createRoundedBoxGeo(0.065, 1.05, 1.46, 0.02, 2), bedWoodMat);
-                headboard.position.set(0.08, 0.62, 6.60);
-                headboard.castShadow = true; headboard.receiveShadow = true;
-                // Moldura superior del respaldo (cap cornisa)
-                const headboardCap = new THREE.Mesh(createRoundedBoxGeo(0.09, 0.035, 1.50, 0.015, 2), bedWoodMat);
-                headboardCap.position.set(0.08, 1.15, 6.60);
-                headboardCap.castShadow = true;
-                bedGroup.add(headboard, headboardCap);
+                // Centro del conjunto Cama + Respaldo + Mesas de Luz: Z = 6.65 m
+                // - Placard en Z = 5.20 m -> Queda un pasillo libre de 32 cm (Z = 5.20 a 5.52 m) para abrir el placard y dejar las sandalias (foto #4)
+                // - Respaldo continuo: de Z = 5.52 a Z = 7.78 m (ancho total 2.26 m: 0.42 m mesa Norte + 1.42 m cama + 0.42 m mesa Sur)
+                // - Muro Sur en Z = 8.00 m -> Queda el espacio exacto de 22 cm (Z = 7.78 a 8.00 m) para la caída de la cortina (foto #3)
+                const bedCenterZ = 6.65;
+                const headboardW = 2.26;
 
-                // 2. Base sommier de madera con faldón perimetral (1.82m largo x 1.36m ancho)
-                const bedBase = new THREE.Mesh(createRoundedBoxGeo(1.82, 0.22, 1.36, 0.02, 2), bedWoodMat);
-                bedBase.position.set(1.00, 0.18, 6.60);
+                // 1. Respaldo mural continuo de madera nogal (de Z = 5.52 a 7.78 m, altura superior 1.12 m)
+                const headboard = new THREE.Mesh(createRoundedBoxGeo(0.045, 1.04, headboardW, 0.01, 2), bedWoodMat);
+                headboard.position.set(0.085, 0.58, bedCenterZ);
+                headboard.castShadow = true; headboard.receiveShadow = true;
+                bedGroup.add(headboard);
+
+                // 2. Base sommier de madera (1.88m largo x 1.40m ancho, centrada en Z = 6.65 m -> va de Z = 5.95 a 7.35 m)
+                const bedBase = new THREE.Mesh(createRoundedBoxGeo(1.86, 0.22, 1.40, 0.02, 2), bedWoodMat);
+                bedBase.position.set(1.02, 0.18, bedCenterZ);
                 bedBase.castShadow = true; bedBase.receiveShadow = true;
                 bedGroup.add(bedBase);
 
-                // 4 Patas de madera torneadas en las esquinas
-                const legCoords = [[0.18, 5.99], [1.82, 5.99], [0.18, 7.21], [1.82, 7.21]];
+                // 4 Patas de madera en las esquinas
+                const legCoords = [[0.18, bedCenterZ - 0.63], [1.86, bedCenterZ - 0.63], [0.18, bedCenterZ + 0.63], [1.86, bedCenterZ + 0.63]];
                 legCoords.forEach(([lx, lz]) => {
                     const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.024, 0.16, 14), bedWoodMat);
                     leg.position.set(lx, 0.08, lz);
@@ -6640,71 +6754,90 @@
                     bedGroup.add(leg);
                 });
 
-                // 3. Colchón de 2 plazas (1.78m x 1.32m con pillow-top viscoelástico)
-                const mattressCore = new THREE.Mesh(createRoundedBoxGeo(1.78, 0.22, 1.32, 0.045, 3), mattressMat);
-                mattressCore.position.set(1.00, 0.39, 6.60);
+                // 3. Colchón de 2 plazas (1.84m x 1.38m)
+                const mattressCore = new THREE.Mesh(createRoundedBoxGeo(1.84, 0.22, 1.38, 0.04, 3), mattressMat);
+                mattressCore.position.set(1.02, 0.39, bedCenterZ);
                 mattressCore.castShadow = true; mattressCore.receiveShadow = true;
-                const pillowTop = new THREE.Mesh(createRoundedBoxGeo(1.76, 0.08, 1.30, 0.035, 3), mattressMat);
-                pillowTop.position.set(1.00, 0.53, 6.60);
+                const pillowTop = new THREE.Mesh(createRoundedBoxGeo(1.82, 0.07, 1.36, 0.03, 3), mattressMat);
+                pillowTop.position.set(1.02, 0.525, bedCenterZ);
                 pillowTop.castShadow = true; pillowTop.receiveShadow = true;
                 bedGroup.add(mattressCore, pillowTop);
 
-                // 4. Almohadas dobles proporcionadas
+                // 4. Almohadas con fundas rayadas grises (fotos #3 y #4)
                 [-1, 1].forEach(side => {
-                    const pz = 6.60 + side * 0.31;
-                    // Almohada principal blanca de algodón
+                    const pz = bedCenterZ + side * 0.33;
                     const pillowGroup = new THREE.Group();
-                    pillowGroup.position.set(0.30, 0.61, pz);
-                    pillowGroup.rotation.z = -0.32; // Inclinación natural ~18° contra el respaldo
-                    const pillow = new THREE.Mesh(createRoundedBoxGeo(0.36, 0.14, 0.50, 0.05, 3), pillowMat);
+                    pillowGroup.position.set(0.31, 0.60, pz);
+                    pillowGroup.rotation.z = -0.28;
+                    const pillow = new THREE.Mesh(createRoundedBoxGeo(0.36, 0.13, 0.54, 0.045, 3), pillowMat);
                     pillow.castShadow = true;
                     pillowGroup.add(pillow);
                     bedGroup.add(pillowGroup);
 
-                    // Almohadón decorativo frontal azul
                     const accGroup = new THREE.Group();
-                    accGroup.position.set(0.46, 0.59, pz);
-                    accGroup.rotation.z = -0.22;
-                    const accPillow = new THREE.Mesh(createRoundedBoxGeo(0.26, 0.11, 0.38, 0.04, 3), accentPillowMat);
+                    accGroup.position.set(0.48, 0.58, pz);
+                    accGroup.rotation.z = -0.18;
+                    const accPillow = new THREE.Mesh(createRoundedBoxGeo(0.26, 0.10, 0.42, 0.035, 3), accentPillowMat);
                     accPillow.castShadow = true;
                     accGroup.add(accPillow);
                     bedGroup.add(accGroup);
                 });
 
-                // 5. Edredón nórdico acolchado ajustado a 1.38m de ancho
-                const duvet = new THREE.Mesh(createRoundedBoxGeo(1.28, 0.09, 1.38, 0.04, 3), duvetMat);
-                duvet.position.set(1.25, 0.58, 6.60);
+                // 5. Acolchado en tonos grises con franjas claras transversales (tal como en las fotos reales)
+                const duvet = new THREE.Mesh(createRoundedBoxGeo(1.36, 0.085, 1.42, 0.04, 3), duvetMat);
+                duvet.position.set(1.26, 0.575, bedCenterZ);
                 duvet.castShadow = true; duvet.receiveShadow = true;
 
-                // Doblez de la sábana blanca superior al descubierto
-                const sheetFold = new THREE.Mesh(createRoundedBoxGeo(0.20, 0.065, 1.34, 0.025, 3), pillowMat);
-                sheetFold.position.set(0.55, 0.585, 6.60);
-                sheetFold.castShadow = true;
+                const stripe1 = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.092, 1.43, 0.02, 2), stripeLightMat);
+                stripe1.position.set(0.88, 0.578, bedCenterZ);
+                const stripe2 = new THREE.Mesh(createRoundedBoxGeo(0.26, 0.092, 1.43, 0.02, 2), stripeLightMat);
+                stripe2.position.set(1.42, 0.578, bedCenterZ);
 
-                // Pie de cama decorativo azul nórdico
-                const runner = new THREE.Mesh(createRoundedBoxGeo(0.36, 0.045, 1.40, 0.02, 3), runnerMat);
-                runner.position.set(1.66, 0.60, 6.60);
-                runner.castShadow = true;
-
-                bedGroup.add(duvet, sheetFold, runner);
+                bedGroup.add(duvet, stripe1, stripe2);
                 (currentAssemblyGroup || decorVideoGroup).add(bedGroup);
             });
-            
 
+            // 3. 2 Mesas de luz de madera nogal con nicho abierto superior y 2 cajones (integradas delante del respaldo continuo, al ras de sus bordes):
+            function buildNightstandWithShelfAndDrawers(zCenter, withHumidifier = false) {
+                const nsW = 0.42; // Ancho en Z (42 cm)
+                const nsD = 0.36; // Profundidad en X (36 cm)
+                const nsH = 0.58; // Altura (58 cm)
+                const xCenter = 0.10 + nsD / 2; // 0.28 m (apoyada delante del respaldo continuo)
 
-            // 3. 2 Mesas de luz de madera nogal estilizadas a ambos lados de la cama (sobre Muro Oeste X=0.00):
-            // - Mesa de luz Norte (reducida a 0.36m x 0.36m x 0.54m, centrada en Z=5.60) con humidificador
+                // Cuerpo exterior de madera nogal oscuro
+                addDecorBox(xCenter, nsH / 2, zCenter, nsD, nsH, nsW, 0x3f2719, 0.55);
+                // Nicho abierto superior (hueco oscuro + libros/objetos guardados como en las fotos #3 y #4)
+                addDecorBox(xCenter + 0.02, 0.46, zCenter, nsD - 0.03, 0.13, nsW - 0.04, 0x18100b, 0.8);
+                addDecorBox(xCenter + 0.03, 0.42, zCenter - 0.07, 0.22, 0.028, 0.14, 0xf8fafc, 0.4); // Libro/cuaderno blanco en el nicho
+                addDecorBox(xCenter + 0.03, 0.42, zCenter + 0.08, 0.20, 0.025, 0.12, 0xcbd5e1, 0.4);
+                // Frentes de los 2 cajones inferiores con ranura de apertura
+                addDecorBox(xCenter + nsD / 2 + 0.004, 0.29, zCenter, 0.015, 0.16, nsW - 0.02, 0x362013, 0.5);
+                addDecorBox(xCenter + nsD / 2 + 0.004, 0.11, zCenter, 0.015, 0.16, nsW - 0.02, 0x362013, 0.5);
+
+                if (withHumidifier) {
+                    // Mesa de luz lado placard (Norte, foto #4): humidificador blanco + envase crema + sandalias al costado
+                    addDecorCyl(xCenter, nsH + 0.09, zCenter + 0.08, 0.055, 0.055, 0.18, 0xf8fafc, 0.2);
+                    addDecorCyl(xCenter - 0.04, nsH + 0.055, zCenter - 0.09, 0.024, 0.024, 0.11, 0xffffff, 0.3);
+                } else {
+                    // Mesa de luz lado ventana (Sur, foto #3): dispenser blanco + reloj digital blanco
+                    addDecorCyl(xCenter - 0.04, nsH + 0.06, zCenter - 0.08, 0.025, 0.028, 0.12, 0xf8fafc, 0.25);
+                    addDecorBox(xCenter + 0.02, nsH + 0.025, zCenter - 0.02, 0.04, 0.05, 0.08, 0xf8fafc, 0.3);
+                }
+            }
+
+            // - Mesa de luz Norte (lado placard: de Z = 5.52 a 5.94 m, centrada en Z = 5.73 m, dejando 32 cm libres al placard)
             createCompoundAssembly('Mesa de Luz Norte', () => {
-                addDecorBox(0.24, 0.27, 5.60, 0.36, 0.54, 0.36, 0x4a3222, 0.5);
-                addDecorCyl(0.24, 0.63, 5.60, 0.06, 0.06, 0.16, 0xffffff, 0.2);  // Humidificador blanco
+                buildNightstandWithShelfAndDrawers(5.73, true);
             });
-            // - Mesa de luz Sur (reducida a 0.36m x 0.36m x 0.54m, centrada en Z=7.60)
+            // - Mesa de luz Sur (lado ventana: de Z = 7.36 a 7.78 m, centrada en Z = 7.57 m, dejando 22 cm libres a la pared Sur)
             createCompoundAssembly('Mesa de Luz Sur', () => {
-                addDecorBox(0.24, 0.27, 7.60, 0.36, 0.54, 0.36, 0x4a3222, 0.5);
+                buildNightstandWithShelfAndDrawers(7.57, false);
             });
-            // 4. Panel calefactor eléctrico negro en muro Sur (X=2.48, Z=7.88) + Cesto de ropa sucia gris en muro Este
+
+            // 4. Calefactor Orbis de vidrio templado negro en Muro Sur del Cuarto (X = 0.48 m, Z = 7.89 m, entre esquina Oeste y ventana, foto #2)
             createCompoundAssembly('Panel Calefactor Cuarto', () => {
-                addDecorBox(2.48, 0.48, 7.88, 0.50, 0.50, 0.05, 0x0f172a, 0.2, 0, 'Panel Calefactor Vidrio Negro');
+                const heaterCuarto = buildOrbisBlackGlassHeater(0.48, 7.89, -1);
+                (currentAssemblyGroup || decorVideoGroup).add(heaterCuarto);
             });
             createCompoundAssembly('Cesto Ropa Sucia Cuarto', () => {
                 addDecorBox(2.72, 0.35, 7.10, 0.38, 0.70, 0.44, 0x475569, 0.8, 0, 'Cesto Ropa Sucia Gris');
@@ -6761,36 +6894,10 @@
             }
 
             // 1. MURO NORTE (Z = 0.00 m):
-            // - Panel Calefactor Vidrio Negro montado sobre superficie interior (Z = 0.125 m, visible y prominente):
+            // - Calefactor Orbis de vidrio templado negro idéntico al del Cuarto (simétrico en X = 0.48 m, Z = 0.11 m):
             createCompoundAssembly('Panel Calefactor Estudio', () => {
-                const heatGroup = new THREE.Group();
-                heatGroup.position.set(0.75, 0.52, 0.125);
-
-                // Soporte metálico posterior fijado al muro Norte
-                const bracket = new THREE.Mesh(UNIT_BOX_GEO, getStdMat(0x1e293b, 0.4, 0.8));
-                bracket.scale.set(0.50, 0.36, 0.02);
-                bracket.position.set(0, 0, -0.015);
-                heatGroup.add(bracket);
-
-                // Panel frontal de vidrio templado negro piano brillante
-                const glassMat = new THREE.MeshStandardMaterial({
-                    color: 0x050508,
-                    roughness: 0.10,
-                    metalness: 0.85
-                });
-                const glassPanel = new THREE.Mesh(UNIT_BOX_GEO, glassMat);
-                glassPanel.scale.set(0.65, 0.52, 0.03);
-                glassPanel.position.set(0, 0, 0.01);
-                glassPanel.castShadow = true;
-                heatGroup.add(glassPanel);
-
-                // Display digital con retroiluminación cyan
-                const ledDisplay = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
-                ledDisplay.scale.set(0.06, 0.03, 0.005);
-                ledDisplay.position.set(0.24, 0.18, 0.026);
-                heatGroup.add(ledDisplay);
-
-                (currentAssemblyGroup || decorVideoGroup).add(heatGroup);
+                const heaterEstudio = buildOrbisBlackGlassHeater(0.48, 0.11, 1);
+                (currentAssemblyGroup || decorVideoGroup).add(heaterEstudio);
             });
             // - Cortina de ventana Norte (V4: X = 1.65 a 2.95 m, barral a Z = 2.15 m):
             addCurtainAssembly(1.65, 0.00, 2.85, 0.00, 0, 0.12, 0x57534e);
@@ -7534,9 +7641,10 @@
             labelElements.push({ el, pos: new THREE.Vector3(x, 0.1, z), isDecor });
         }
 
-        // --- LÍNEAS 2D DE EQUIPAMIENTO EXACTO DEL ESTUDIO ---
-        // Calefactor negro en pared Norte [0.45..1.05, 0.10..0.14]
-        addLine2DSegment(0.45, 0.12, 1.05, 0.12, 0.035, 0x0f172a);
+        // --- LÍNEAS 2D DE EQUIPAMIENTO EXACTO DEL ESTUDIO Y CUARTO ---
+        // Calefactores Orbis de vidrio negro simétricos en pared Norte (Estudio) y pared Sur (Cuarto) [X = 0.23..0.73]
+        addLine2DSegment(0.23, 0.11, 0.73, 0.11, 0.035, 0x0f172a);
+        addLine2DSegment(0.23, 7.89, 0.73, 7.89, 0.035, 0x0f172a);
         // Escritorio en L (más flaco 0.52m, L más larga 2.05m):
         // - Tramo Largo Principal [2.48..3.00, 0.00..2.05]
         addLine2DSegment(2.48, 0.00, 2.48, 2.05, 0.018, 0x8f3818);
@@ -9359,9 +9467,9 @@
             { id: 'vid_cucha_ne', name: 'Cucha Perro Esquina NE', room: 'Living', x: 5.55, z: 0.38, y: 0.05, w: 0.92, d: 0.62, h: 0.10, rot: 0, color: 0x94a3b8 },
             { id: 'vid_heladera', name: 'Heladera c/ Freezer + Bodega', room: 'Cocina', x: 4.85, z: 4.88, y: 0.84, w: 0.60, d: 0.62, h: 1.68, rot: 0, color: 0xe2e8f0 },
             { id: 'vid_lavarropas', name: 'Lavarropas + Estación Café (Bajo Ventana)', room: 'Cocina', x: 3.35, z: 6.67, y: 0.43, w: 0.60, d: 0.58, h: 0.86, rot: 0, color: 0xcbd5e1 },
-            { id: 'vid_cama_2p', name: 'Cama 2 Plazas + Respaldo Nogal', room: 'Cuarto', x: 1.00, z: 6.60, y: 0.24, w: 1.82, d: 1.36, h: 0.48, rot: 0, color: 0x475569 },
-            { id: 'vid_luz_n', name: 'Mesa de Luz Norte', room: 'Cuarto', x: 0.24, z: 5.60, y: 0.27, w: 0.36, d: 0.36, h: 0.54, rot: 0, color: 0x4a3222 },
-            { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.24, z: 7.60, y: 0.27, w: 0.36, d: 0.36, h: 0.54, rot: 0, color: 0x4a3222 },
+            { id: 'vid_cama_2p', name: 'Cama 2 Plazas + Respaldo Nogal Extendido', room: 'Cuarto', x: 1.02, z: 6.65, y: 0.24, w: 1.86, d: 1.40, h: 0.48, rot: 0, color: 0x475569 },
+            { id: 'vid_luz_n', name: 'Mesa de Luz Norte', room: 'Cuarto', x: 0.28, z: 5.73, y: 0.29, w: 0.36, d: 0.42, h: 0.58, rot: 0, color: 0x3f2719 },
+            { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.28, z: 7.57, y: 0.29, w: 0.36, d: 0.42, h: 0.58, rot: 0, color: 0x3f2719 },
             { id: 'vid_escr_l', name: 'Escritorio en L + PC Gamer', room: 'Estudio', x: 2.74, z: 1.02, y: 0.38, w: 0.52, d: 2.05, h: 0.76, rot: 0, color: 0x8f3818 },
             { id: 'vid_biblio', name: 'Biblioteca 5 Estantes', room: 'Estudio', x: 0.20, z: 1.10, y: 0.92, w: 0.32, d: 0.82, h: 1.84, rot: 0, color: 0x3b2314 },
             { id: 'vid_ajedrez', name: 'Mesa Ajedrez El Señor de los Anillos', room: 'Estudio', x: 0.35, z: 2.30, y: 0.37, w: 0.44, d: 0.44, h: 0.74, rot: 0, color: 0xd4a373 }
