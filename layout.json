@@ -1,12 +1,13 @@
 {
-  "updatedAt": 1794428467215,
+  "updatedAt": 1794428476572,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
       "accentStudyWall",
       "Elemento Decorativo 3",
       "Elemento Decorativo 1",
-      "Mochila y Bolso Entrada"
+      "Mochila y Bolso Entrada",
+      "Objeto"
     ],
     "transforms": {
       "Comederos de Mascota": {
