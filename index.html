@@ -2154,12 +2154,12 @@
         cyanLedLiving.position.set(6.82, 1.45, 3.10);
         scene.add(cyanLedLiving);
 
-        const bedsideLampLeft = new THREE.PointLight(0xffa834, 1.6, 3.4, 1.8);
-        bedsideLampLeft.position.set(0.35, 0.95, 4.95);
+        const bedsideLampLeft = new THREE.PointLight(0xffa834, 1.4, 3.4, 1.8);
+        bedsideLampLeft.position.set(0.35, 0.95, 5.73);
         scene.add(bedsideLampLeft);
 
-        const bedsideLampRight = new THREE.PointLight(0xffa834, 1.6, 3.4, 1.8);
-        bedsideLampRight.position.set(0.35, 0.95, 7.05);
+        const bedsideLampRight = new THREE.PointLight(0xffa834, 1.4, 3.4, 1.8);
+        bedsideLampRight.position.set(0.35, 0.95, 7.57);
         scene.add(bedsideLampRight);
 
         const kitchenLed = new THREE.PointLight(0xfff4db, 1.4, 4.2, 1.8);
@@ -3488,33 +3488,34 @@
         // 3. PERÍMETRO EXTERIOR CON LAS 7 VENTANAS REALES DEL VIDEO
         // ============================================================================
         // Muro Superior (Norte, Z = 0.00):
-        // 1) SECTOR ESTUDIO (X = 0.00 a 3.00 m, ventana sobre escritorio gamer, techo catedral cumbrera 5.20 m):
-        //    - Tramo izquierdo ciego: de X = 0.00 a 1.65 m (sube de 3.20 m a 4.635 m bajo faldón, aloja calefactor)
-        addSlopedWallSegment(0.00, 0.00, 1.65, 0.00, 3.20, 4.635, EXT_T, exteriorWallsGroup, true);
-        //    - Ventana Norte Estudio: de X = 1.65 a 2.85 m (ancho 1.20 m, idéntica a la ventana del Cuarto, sobre escritorio gamer)
-        addWindowSegment(1.65, 0.00, 2.85, 0.00, 0.95, 1.10, 4.635, 5.20);
-        //    - Tramo derecho ciego plano hasta el eje central (X = 2.85 a 3.00 m, cumbrera 5.20 m)
-        addWallSegment(2.85, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 5.20);
+        // 1) SECTOR ESTUDIO (X = 0.00 a 3.00 m, ventana más chica de 1.00 m centrada en el ambiente, techo catedral cumbrera 5.20 m):
+        //    - Tramo izquierdo ciego: de X = 0.00 a 1.00 m (sube de 3.20 m a 4.07 m bajo faldón, aloja calefactor Orbis en X = 0.45 m)
+        addSlopedWallSegment(0.00, 0.00, 1.00, 0.00, 3.20, 4.07, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Estudio: de X = 1.00 a 2.00 m (ancho 1.00 m, un poco más chica que antes, idéntica a la del Cuarto)
+        addWindowSegment(1.00, 0.00, 2.00, 0.00, 0.98, 1.02, 4.07, 4.94);
+        //    - Tramo derecho ciego bajo faldón y cumbrera hasta el eje central (X = 2.00 a 3.00 m)
+        addSlopedWallSegment(2.00, 0.00, 2.30, 0.00, 4.94, 5.20, EXT_T, exteriorWallsGroup, true);
+        addWallSegment(2.30, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 5.20);
 
         // 2) SECTOR LIVING (X = 3.00 a 7.00 m, faldón este baja de 5.20 m a 3.80 m):
-        //    - Muro inicial junto al eje central (X = 3.00 a 3.35 m, baja de 5.20 m a 5.08 m)
-        addSlopedWallSegment(3.00, 0.00, 3.35, 0.00, 5.20, 5.08, EXT_T, exteriorWallsGroup, true);
-        //    - Ventana Norte Living V1 (X = 3.35 a 4.65 m, baja de 5.08 m a 4.62 m, ancho 1.30 m)
-        addWindowSegment(3.35, 0.00, 4.65, 0.00, 0.95, 1.10, 5.08, 4.62);
-        //    - Muro intermedio entre ventanales (X = 4.65 a 5.35 m, baja de 4.62 m a 4.38 m, pilar central 70 cm)
-        addSlopedWallSegment(4.65, 0.00, 5.35, 0.00, 4.62, 4.38, EXT_T, exteriorWallsGroup, true);
-        //    - Ventana Norte Living V2 (X = 5.35 a 6.65 m, baja de 4.38 m a 3.92 m, ancho 1.30 m)
-        addWindowSegment(5.35, 0.00, 6.65, 0.00, 0.95, 1.10, 4.38, 3.92);
-        //    - Muro esquinero Este (X = 6.65 a 7.00 m, baja de 3.92 m a 3.80 m, columna esquina 35 cm)
-        addSlopedWallSegment(6.65, 0.00, 7.00, 0.00, 3.92, 3.80, EXT_T, exteriorWallsGroup, true);
+        //    - Muro inicial junto al eje central (X = 3.00 a 3.45 m, baja de 5.20 m a 5.04 m)
+        addSlopedWallSegment(3.00, 0.00, 3.45, 0.00, 5.20, 5.04, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Living V1 (X = 3.45 a 4.55 m, baja de 5.04 m a 4.66 m, ancho 1.10 m)
+        addWindowSegment(3.45, 0.00, 4.55, 0.00, 0.98, 1.04, 5.04, 4.66);
+        //    - Muro intermedio entre ventanales (X = 4.55 a 5.45 m, baja de 4.66 m a 4.34 m, pilar central 90 cm)
+        addSlopedWallSegment(4.55, 0.00, 5.45, 0.00, 4.66, 4.34, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Living V2 (X = 5.45 a 6.55 m, baja de 4.34 m a 3.96 m, ancho 1.10 m)
+        addWindowSegment(5.45, 0.00, 6.55, 0.00, 0.98, 1.04, 4.34, 3.96);
+        //    - Muro esquinero Este (X = 6.55 a 7.00 m, baja de 3.96 m a 3.80 m, columna esquina 45 cm)
+        addSlopedWallSegment(6.55, 0.00, 7.00, 0.00, 3.96, 3.80, EXT_T, exteriorWallsGroup, true);
 
         // Muro Derecho (Este, X = 7.00): remata en 3.80 m bajo la solera del techo catedral
-        // - Columna esquinera Norte (Z = 0.00 a 0.25 m)
-        addWallSegment(7.00, 0.00, 7.00, 0.25, EXT_T, exteriorWallsGroup, true, 3.80);
-        // - Ventana lateral Living V3 (Z = 0.25 a 1.45 m, ancho 1.20 m, 2 hojas corredizas)
-        addWindowSegment(7.00, 0.25, 7.00, 1.45, 0.95, 1.10, 3.80);
-        // - Muro sólido Este (Z = 1.45 a 6.30 m, aloja Calefactor en Z=1.85, Rack TV y Perchero Entrada)
-        addWallSegment(7.00, 1.45, 7.00, 6.30, EXT_T, exteriorWallsGroup, true, 3.80);
+        // - Columna esquinera Norte (Z = 0.00 a 0.35 m)
+        addWallSegment(7.00, 0.00, 7.00, 0.35, EXT_T, exteriorWallsGroup, true, 3.80);
+        // - Ventana lateral Living V3 (Z = 0.35 a 1.35 m, ancho 1.00 m, 2 hojas corredizas)
+        addWindowSegment(7.00, 0.35, 7.00, 1.35, 0.98, 1.02, 3.80);
+        // - Muro sólido Este (Z = 1.35 a 6.30 m, aloja Calefactor en Z=1.85, Rack TV y Perchero Entrada)
+        addWallSegment(7.00, 1.35, 7.00, 6.30, EXT_T, exteriorWallsGroup, true, 3.80);
 
         // Retranqueo Palier y Hall de Entrada (de X = 5.75 m a X = 7.00 m -> 1.25 m de ancho total, ~1.13 m libres interior = 3.5 baldosas de 33 cm tal cual la foto real):
         // - Muro Sur de Entrada (Z = 6.30): mocheta derecha/Oeste de 30 cm (X = 5.75 a 6.05 m) donde van la rejilla superior, placa dorada, tapa blanca y macetita verde en el rincón; y jamba izquierda/Este pegada a la pared (X = 6.92 a 7.00 m)
@@ -3534,16 +3535,16 @@
         addWallSegment(5.75, 6.30, 5.75, 8.00, EXT_T, exteriorWallsGroup, true, 4.24);
 
         // Muro Inferior (Sur, Z = 8.00): cierra de [0.00, 8.00] a [5.75, 8.00] (techo catedral a 5.20 m)
-        // - Sector Cuarto (X = 0.00 a 3.00 m, cumbrera a 5.20 m):
-        addSlopedWallSegment(0.00, 8.00, 0.90, 8.00, 3.20, 3.98, EXT_T, exteriorWallsGroup, true);
-        addWindowSegment(0.90, 8.00, 2.10, 8.00, 0.95, 1.10, 3.98, 5.03);
-        addSlopedWallSegment(2.10, 8.00, 2.30, 8.00, 5.03, 5.20, EXT_T, exteriorWallsGroup, true);
+        // - Sector Cuarto (X = 0.00 a 3.00 m, ventana de 1.00 m en X = 1.00 a 2.00 m, simétrica a la del Estudio):
+        addSlopedWallSegment(0.00, 8.00, 1.00, 8.00, 3.20, 4.07, EXT_T, exteriorWallsGroup, true);
+        addWindowSegment(1.00, 8.00, 2.00, 8.00, 0.98, 1.02, 4.07, 4.94);
+        addSlopedWallSegment(2.00, 8.00, 2.30, 8.00, 4.94, 5.20, EXT_T, exteriorWallsGroup, true);
         addWallSegment(2.30, 8.00, 3.00, 8.00, EXT_T, exteriorWallsGroup, true, 5.20);
 
         // - Sector Cocina (X = 3.00 a 5.75 m, bajo faldón Este):
-        addWallSegment(3.00, 8.00, 3.65, 8.00, EXT_T, exteriorWallsGroup, true, 5.20);
-        addWindowSegment(3.65, 8.00, 4.95, 8.00, 1.05, 0.95, 4.97, 4.52);
-        addSlopedWallSegment(4.95, 8.00, 5.75, 8.00, 4.52, 4.24, EXT_T, exteriorWallsGroup, true);
+        addWallSegment(3.00, 8.00, 3.75, 8.00, EXT_T, exteriorWallsGroup, true, 5.20);
+        addWindowSegment(3.75, 8.00, 4.85, 8.00, 1.05, 0.92, 4.94, 4.55);
+        addSlopedWallSegment(4.85, 8.00, 5.75, 8.00, 4.55, 4.24, EXT_T, exteriorWallsGroup, true);
 
         // Muro Izquierdo (Oeste, X = 0.00): sube de [0.00, 0.00] a [0.00, 8.00] a cota exterior 3.20 m
         // - Ventiluz Baño V7 sobre bañera (Z = 3.65 a 4.35, centrado en bañera Z = 4.00 m)
@@ -4881,25 +4882,6 @@
 
             // Living despejado sin alfombra ni paneles falsos delante de la TV (piso cerámico continuo visible)
 
-            // 5. Lámparas de Noche con Tulipas Translúcidas Cálidas en Dormitorio (Foto Referencia)
-            const lampShadeGeo = new THREE.CylinderGeometry(0.08, 0.11, 0.18, 16);
-            const lampShadeMat = new THREE.MeshStandardMaterial({
-                color: 0xffedd5,
-                emissive: 0xff9900,
-                emissiveIntensity: 0.75,
-                roughness: 0.4
-            });
-
-            // Lámpara izquierda
-            const lampLeft = new THREE.Mesh(lampShadeGeo, lampShadeMat);
-            lampLeft.position.set(0.35, 0.95, 4.95);
-            decorVideoGroup.add(lampLeft);
-
-            // Lámpara derecha
-            const lampRight = new THREE.Mesh(lampShadeGeo, lampShadeMat);
-            lampRight.position.set(0.35, 0.95, 7.05);
-            decorVideoGroup.add(lampRight);
-
             // 6. Oclusión Ambiental y Sombras de Contacto Suaves bajo Muebles (Photoreal Grounding)
             const contactShadowGeo = new THREE.PlaneGeometry(1, 1);
             function addContactShadowPlane(x, z, w, d, opacity = 0.52) {
@@ -4919,14 +4901,14 @@
 
             // Sombras de contacto para asentar físicamente cada mueble en el suelo:
             addContactShadowPlane(3.44, 3.10, 1.25, 2.25, 0.55); // Futón / Sillón en Living
-            addContactShadowPlane(4.65, 3.10, 0.90, 1.20, 0.45); // Mesa ratona
-            addContactShadowPlane(4.65, 1.20, 1.45, 1.90, 0.48); // Mesa de comedor y sillas
-            addContactShadowPlane(1.65, 0.85, 1.25, 2.30, 0.52); // Escritorio gamer en Estudio
+            addContactShadowPlane(4.38, 3.10, 0.70, 1.20, 0.45); // Mesa ratona
+            addContactShadowPlane(5.00, 1.15, 1.45, 1.90, 0.48); // Mesa de comedor y sillas
+            addContactShadowPlane(2.74, 1.02, 0.70, 2.15, 0.52); // Escritorio gamer en Estudio
             addContactShadowPlane(1.05, 6.65, 2.05, 1.60, 0.58); // Cama matrimonial en Cuarto
             addContactShadowPlane(0.28, 5.73, 0.50, 0.52, 0.45); // Mesa de luz Norte
             addContactShadowPlane(0.28, 7.57, 0.50, 0.52, 0.45); // Mesa de luz Sur
-            addContactShadowPlane(3.85, 6.60, 1.50, 2.50, 0.54); // Muebles bajo mesada y cocina
-            addContactShadowPlane(6.10, 5.50, 0.65, 1.25, 0.48); // Perchero y zapatero en Entrada
+            addContactShadowPlane(5.35, 6.60, 0.80, 2.50, 0.54); // Muebles bajo mesada y cocina
+            addContactShadowPlane(6.78, 5.38, 0.45, 0.90, 0.48); // Perchero y zapatero en Entrada
 
             // Activar sombras arrojadas y recibidas en toda la arquitectura y mobiliario
             apartmentGroup.traverse(child => {
@@ -6464,9 +6446,9 @@
                 addDecorCyl(6.66, 0.08, 0.78, 0.13, 0.15, 0.14, 0x38bdf8, 0.4, 'Bebedero Celeste con Dispenser');
             });
             // - Cortinas beige con barral de madera en las 3 ventanas del Living (V1, V2 y V3)
-            addCurtainAssembly(3.35, 0.00, 4.65, 0.00, 0, 0.12, 0xd6ccc2);
-            addCurtainAssembly(5.35, 0.00, 6.65, 0.00, 0, 0.12, 0xd6ccc2);
-            addCurtainAssembly(7.00, 0.25, 7.00, 1.45, -0.12, 0, 0xd6ccc2);
+            addCurtainAssembly(3.45, 0.00, 4.55, 0.00, 0, 0.12, 0xd6ccc2);
+            addCurtainAssembly(5.45, 0.00, 6.55, 0.00, 0, 0.12, 0xd6ccc2);
+            addCurtainAssembly(7.00, 0.35, 7.00, 1.35, -0.12, 0, 0xd6ccc2);
 
             // ------------------------------------------------------------------------
             // B) COCINA ([3.00, 5.20] a [5.75, 8.00]) - Relevamiento exacto de las fotos reales
@@ -6503,9 +6485,9 @@
             addDecorCyl(5.27, 0.98, 6.06, 0.045, 0.045, 0.24, 0x475569, 0.3, 'Termo Acero Inox');  // Termo acero
             addDecorBox(5.29, 0.92, 6.95, 0.18, 0.09, 0.22, 0x0284c7, 0.3, 0, 'Tupper Celeste Mesada');    // Recipiente celeste sobre mesada
             // 3. Sector bajo Ventana Sur (Y=8.00):
-            // - Cortina roller blanca en ventana Sur (X=3.65..4.95, Z=7.94)
+            // - Cortina roller blanca en ventana Sur (X=3.75..4.85, Z=7.94)
             setMountWall(4.30, 8.00, true);
-            addDecorBox(4.30, 1.82, 7.94, 1.28, 0.36, 0.03, 0xf8fafc, 0.3, 0, 'Cortina Roller Ventana');
+            addDecorBox(4.30, 1.82, 7.94, 1.08, 0.36, 0.03, 0xf8fafc, 0.3, 0, 'Cortina Roller Ventana');
             setMountWall(null);
             // - Escurridor de platos negro sobre el retorno Sur de la mesada (mitad izquierda bajo la ventana: X=4.55, Z=7.68)
             addDecorBox(4.55, 0.93, 7.68, 0.38, 0.10, 0.36, 0x1e293b, 0.4, 0, 'Escurridor de Platos Negro');
@@ -6537,7 +6519,7 @@
             // - Frente cuadrado de vidrio negro templado (0.50 m x 0.52 m) con 4 botones cromados en las esquinas
             // - Etiqueta blanca de Eficiencia Energética "A" arriba a la derecha
             // - Salida superior marrón claro y cañito de cobre al piso con llave de paso cromada a la derecha
-            function buildOrbisBlackGlassHeater(xPos, zWallSurface, facingDirZ) {
+            function buildOrbisBlackGlassHeater(xPos, zWallSurface, facingDirZ, sideSign = 1) {
                 const hg = new THREE.Group();
                 hg.position.set(xPos, 0.52, zWallSurface);
 
@@ -6549,7 +6531,7 @@
 
                 // Sombrerete / rejilla superior marrón claro (visible arriba del vidrio en la foto)
                 const topVent = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.04, 16), getStdMat(0xb47b48, 0.5));
-                topVent.position.set(-0.08, 0.27, -facingDirZ * 0.005);
+                topVent.position.set(-0.08 * sideSign, 0.27, -facingDirZ * 0.005);
                 hg.add(topVent);
 
                 // 2. Frente de vidrio templado negro espejo (esquinas redondeadas y 4 fijaciones cromadas)
@@ -6572,22 +6554,22 @@
                     hg.add(stud);
                 });
 
-                // 3. Etiqueta blanca de Eficiencia Energética ENARGAS (arriba a la derecha del panel negro)
+                // 3. Etiqueta blanca de Eficiencia Energética ENARGAS (arriba a la derecha mirando de frente al calefactor)
                 const sticker = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0xf8fafc));
                 sticker.scale.set(0.095, 0.14, 0.004);
-                sticker.position.set(0.17, 0.10, facingDirZ * 0.038);
+                sticker.position.set(0.17 * sideSign, 0.10, facingDirZ * 0.038);
                 hg.add(sticker);
                 const stickerBars = new THREE.Mesh(UNIT_BOX_GEO, getBasicMat(0x16a34a));
                 stickerBars.scale.set(0.045, 0.04, 0.005);
-                stickerBars.position.set(0.15, 0.11, facingDirZ * 0.039);
+                stickerBars.position.set(0.15 * sideSign, 0.11, facingDirZ * 0.039);
                 hg.add(stickerBars);
 
-                // 4. Cañito de cobre inferior + llave de paso de gas cromada en la pared
+                // 4. Cañito de cobre inferior + llave de paso de gas cromada en la pared (del lado de la ventana)
                 const pipeV = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.22, 8), getStdMat(0xb45309, 0.35, 0.7));
-                pipeV.position.set(0.14, -0.35, facingDirZ * 0.01);
+                pipeV.position.set(0.14 * sideSign, -0.35, facingDirZ * 0.01);
                 const gasValve = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.045, 10), chromeMat);
                 gasValve.rotation.x = Math.PI / 2;
-                gasValve.position.set(0.28, -0.34, facingDirZ * 0.02);
+                gasValve.position.set(0.28 * sideSign, -0.34, facingDirZ * 0.02);
                 hg.add(pipeV, gasValve);
 
                 return hg;
@@ -6736,13 +6718,14 @@
                 buildNightstandWithShelfAndDrawers(7.57, false);
             });
 
-            // 4. Calefactor Orbis de vidrio templado negro en Muro Sur del Cuarto (X = 0.48 m, Z = 7.89 m, entre esquina Oeste y ventana, foto #2)
+            // 4. Calefactor Orbis de vidrio templado negro en Muro Sur del Cuarto:
+            // En la foto real del Cuarto está en la pared Sur entre el tabique Este (X=3.00) y la ventana (X=1.00..2.00), en X=2.55 m (donde marcaste con el círculo azul), y el cesto queda sobre el muro Este:
             createCompoundAssembly('Panel Calefactor Cuarto', () => {
-                const heaterCuarto = buildOrbisBlackGlassHeater(0.48, 7.89, -1);
+                const heaterCuarto = buildOrbisBlackGlassHeater(2.55, 7.89, -1, -1);
                 (currentAssemblyGroup || decorVideoGroup).add(heaterCuarto);
             });
             createCompoundAssembly('Cesto Ropa Sucia Cuarto', () => {
-                addDecorBox(2.72, 0.35, 7.10, 0.38, 0.70, 0.44, 0x475569, 0.8, 0, 'Cesto Ropa Sucia Gris');
+                addDecorBox(2.74, 0.35, 6.95, 0.36, 0.70, 0.42, 0x475569, 0.8, 0, 'Cesto Ropa Sucia Gris');
             });
 
             // Equipaje, organizador y cajas guardados sobre la losa a Y = 2.20 m en la baulera del cuarto (Z = 4.70..5.20 m):
@@ -6763,8 +6746,8 @@
                 addDecorBox(1.66, 2.20 + 0.285, 5.02, 0.12, 0.015, 0.04, 0x0f172a, 0.2, 0, 'Candado TSA Valija');
                 addDecorBox(1.68, 2.20 + 0.28, 4.82, 0.46, 0.56, 0.20, 0x18181b, 0.8, 0, 'Valija Tela Negra');
             });
-            // 5. Cortina gris topo con barral de madera en la ventana Sur del Cuarto (V5: X=0.90..2.10, Z=8.00)
-            addCurtainAssembly(0.90, 8.00, 2.10, 8.00, 0, -0.12, 0x78716c);
+            // 5. Cortina gris topo con barral de madera en la ventana Sur del Cuarto (V5: X=1.00..2.00, Z=8.00)
+            addCurtainAssembly(1.00, 8.00, 2.00, 8.00, 0, -0.12, 0x78716c);
 
             // ------------------------------------------------------------------------
             // D) ESTUDIO ([0.00, 0.00] a [3.00, 2.30]) - ESPECIFICACIÓN EXACTA ITEM 5
@@ -6796,15 +6779,15 @@
             }
 
             // 1. MURO NORTE (Z = 0.00 m):
-            // - Calefactor Orbis de vidrio templado negro idéntico al del Cuarto (simétrico en X = 0.48 m, Z = 0.11 m):
+            // - Calefactor Orbis de vidrio templado negro en el Estudio: ubicado sobre la pared Norte entre la biblioteca y el ala corta del escritorio (X = 0.62 m, Z = 0.11 m, despejado sin que la biblioteca lo tape):
             createCompoundAssembly('Panel Calefactor Estudio', () => {
-                const heaterEstudio = buildOrbisBlackGlassHeater(0.48, 0.11, 1);
+                const heaterEstudio = buildOrbisBlackGlassHeater(0.62, 0.11, 1, 1);
                 (currentAssemblyGroup || decorVideoGroup).add(heaterEstudio);
             });
-            // - Cortina de ventana Norte (V4: X = 1.65 a 2.95 m, barral a Z = 2.15 m):
-            addCurtainAssembly(1.65, 0.00, 2.85, 0.00, 0, 0.12, 0x57534e);
+            // - Cortina de ventana Norte (V4: X = 1.00 a 2.00 m):
+            addCurtainAssembly(1.00, 0.00, 2.00, 0.00, 0, 0.12, 0x57534e);
 
-            // 2. ESCRITORIO GAMER EN "L" (Más flaco: tapa 0.52 m, L más larga: hasta Z = 2.05 m)
+            // 2. ESCRITORIO GAMER EN "L" (Tramo principal sobre pared Este de 2.05 m; ala de la "L" bajo la ventana más corta en relación a la principal: de X = 1.62 a X = 2.48 m -> 0.86 m de extensión, total 1.38 m hasta la pared Este)
             createCompoundAssembly('Escritorio Gamer en "L"', () => {
 
                 const deskWoodMat = new THREE.MeshStandardMaterial({ color: 0xa65e18, roughness: 0.68, metalness: 0.04 });
@@ -6821,14 +6804,14 @@
                 mainLeg.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(mainTop, mainLeg);
 
-                // Ala Corta en L (bajo ventana Norte Z = 0.00, de X = 1.35 a X = 2.48 m)
+                // Ala Corta en L (bajo ventana Norte Z = 0.00, más corta en relación al tramo largo: de X = 1.62 a X = 2.48 m)
                 const wingTop = new THREE.Mesh(UNIT_BOX_GEO, deskWoodMat);
-                wingTop.scale.set(1.13, 0.035, 0.50);
-                wingTop.position.set(1.915, 0.745, 0.25);
+                wingTop.scale.set(0.86, 0.035, 0.48);
+                wingTop.position.set(2.05, 0.745, 0.24);
                 wingTop.castShadow = true; wingTop.receiveShadow = true;
                 const wingLeg = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
-                wingLeg.scale.set(0.035, 0.72, 0.48);
-                wingLeg.position.set(1.36, 0.36, 0.25);
+                wingLeg.scale.set(0.035, 0.72, 0.46);
+                wingLeg.position.set(1.64, 0.36, 0.24);
                 wingLeg.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(wingTop, wingLeg);
             });
@@ -7544,16 +7527,14 @@
         }
 
         // --- LÍNEAS 2D DE EQUIPAMIENTO EXACTO DEL ESTUDIO Y CUARTO ---
-        // Calefactores Orbis de vidrio negro simétricos en pared Norte (Estudio) y pared Sur (Cuarto) [X = 0.23..0.73]
-        addLine2DSegment(0.23, 0.11, 0.73, 0.11, 0.035, 0x0f172a);
-        addLine2DSegment(0.23, 7.89, 0.73, 7.89, 0.035, 0x0f172a);
-        // Escritorio en L (más flaco 0.52m, L más larga 2.05m):
-        // - Tramo Largo Principal [2.48..3.00, 0.00..2.05]
+        // Calefactores Orbis de vidrio negro en pared Norte (Estudio X = 0.37..0.87) y pared Sur (Cuarto X = 2.30..2.80)
+        addLine2DSegment(0.37, 0.11, 0.87, 0.11, 0.035, 0x0f172a);
+        addLine2DSegment(2.30, 7.89, 2.80, 7.89, 0.035, 0x0f172a);
+        // Escritorio en L (Tramo Largo Principal [2.48..3.00, 0.00..2.05], Ala Corta [1.62..2.48, 0.00..0.48]):
         addLine2DSegment(2.48, 0.00, 2.48, 2.05, 0.018, 0x8f3818);
         addLine2DSegment(2.48, 2.05, 3.00, 2.05, 0.018, 0x8f3818);
-        // - Ala Corta [1.35..2.48, 0.00..0.50]
-        addLine2DSegment(1.35, 0.00, 1.35, 0.50, 0.018, 0x8f3818);
-        addLine2DSegment(1.35, 0.50, 2.48, 0.50, 0.018, 0x8f3818);
+        addLine2DSegment(1.62, 0.00, 1.62, 0.48, 0.018, 0x8f3818);
+        addLine2DSegment(1.62, 0.48, 2.48, 0.48, 0.018, 0x8f3818);
         // 3 Estantes Flotantes Este [2.75..3.00, 0.10..1.55]
         addDashedLine(2.75, 0.10, 2.75, 1.55);
         // Biblioteca Alta Oeste [0.00..0.30, 0.60..1.70]
