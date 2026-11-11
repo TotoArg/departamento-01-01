@@ -2150,8 +2150,8 @@
         scene.add(gamingMagentaLight);
 
         // 7. Tiras LED complementarias y lámparas de noche
-        const cyanLedLiving = new THREE.PointLight(0x00f0ff, 1.8, 3.6, 1.8);
-        cyanLedLiving.position.set(6.15, 1.45, 3.10);
+        const cyanLedLiving = new THREE.PointLight(0x00f0ff, 1.4, 3.6, 1.8);
+        cyanLedLiving.position.set(6.82, 1.45, 3.10);
         scene.add(cyanLedLiving);
 
         const bedsideLampLeft = new THREE.PointLight(0xffa834, 1.6, 3.4, 1.8);
@@ -2645,89 +2645,14 @@
         scene.add(apartmentGroup);
 
         // ============================================================================
-        // LUMINARIAS REALES DETECTADAS EN FOTOGRAFÍAS Y VIDEOS
-        // (Sin downlights ficticios de techo: el machimbre de pino y vigas quedan 100% limpios y auténticos)
-        // Apliques de pared metálicos negros tipo spot orientable (Wall Sconces reales)
+        // LUMINARIAS (Sin apliques negros antiguos: se quitaron los spots negros anteriores a la mudanza)
         // ============================================================================
         const wizFixturesList = [];
 
         function createRealWallSpotlight(x, y, z, rotY = 0, tiltDown = 0.52, isWarm = true, roomLabel = '') {
-            const fixtureGroup = new THREE.Group();
-            fixtureGroup.position.set(x, y, z);
-            fixtureGroup.rotation.y = rotY; // Orienta la base plana contra el muro
-
-            const blackMetalMat = new THREE.MeshStandardMaterial({
-                color: 0x18181b, // Negro carbón mate de las fotos
-                roughness: 0.35,
-                metalness: 0.85
-            });
-
-            // 1. Placa base circular montada a la pared
-            const basePlateGeo = new THREE.CylinderGeometry(0.048, 0.048, 0.014, 24);
-            const basePlate = new THREE.Mesh(basePlateGeo, blackMetalMat);
-            basePlate.rotation.z = Math.PI / 2;
-            basePlate.castShadow = true;
-            basePlate.receiveShadow = true;
-            fixtureGroup.add(basePlate);
-
-            // 2. Vástago / brazo articulado perpendicular
-            const stemGeo = new THREE.CylinderGeometry(0.009, 0.009, 0.038, 16);
-            const stem = new THREE.Mesh(stemGeo, blackMetalMat);
-            stem.rotation.z = Math.PI / 2;
-            stem.position.set(0.026, 0, 0);
-            stem.castShadow = true;
-            fixtureGroup.add(stem);
-
-            // 3. Rótula esférica articulada
-            const knuckleGeo = new THREE.SphereGeometry(0.013, 16, 16);
-            const knuckle = new THREE.Mesh(knuckleGeo, blackMetalMat);
-            knuckle.position.set(0.045, 0, 0);
-            knuckle.castShadow = true;
-            fixtureGroup.add(knuckle);
-
-            // 4. Cabezal spot orientable (campana cónica/cilíndrica)
-            const headGroup = new THREE.Group();
-            headGroup.position.set(0.045, 0, 0);
-            headGroup.rotation.z = -tiltDown; // Inclinación hacia abajo hacia el piso/ambiente
-
-            // Campana cónica
-            const coneGeo = new THREE.CylinderGeometry(0.038, 0.022, 0.082, 24);
-            const cone = new THREE.Mesh(coneGeo, blackMetalMat);
-            cone.rotation.z = Math.PI / 2;
-            cone.position.set(0.041, 0, 0);
-            cone.castShadow = true;
-            headGroup.add(cone);
-
-            // 5. Lente / Bombilla LED interior (E27 cálida 2700K o neutra 4000K)
-            const lensMat = new THREE.MeshStandardMaterial({
-                color: isWarm ? 0xffdfa9 : 0xf8fafc,
-                emissive: isWarm ? 0xffdfa9 : 0xf8fafc,
-                emissiveIntensity: 0.35,
-                roughness: 0.20
-            });
-            const lensGeo = new THREE.SphereGeometry(0.022, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
-            const lens = new THREE.Mesh(lensGeo, lensMat);
-            lens.rotation.z = -Math.PI / 2;
-            lens.position.set(0.076, 0, 0);
-            headGroup.add(lens);
-
-            fixtureGroup.add(headGroup);
-            fixturesGroup.add(fixtureGroup);
-
-            wizFixturesList.push({ g: fixtureGroup, lensMat, isWarm });
-            return fixtureGroup;
+            // Desactivado: los apliques negros eran previos a la mudanza
+            return null;
         }
-
-        // Apliques de pared reales ubicados según relevamiento fotográfico y videos 360°
-        createRealWallSpotlight(6.92, 2.10, 1.65, Math.PI, 0.52, true, 'Living Sur (Zona Futón)');
-        createRealWallSpotlight(6.22, 2.10, 3.10, Math.PI, 0.52, true, 'Living Norte (Zona TV)');
-        createRealWallSpotlight(3.08, 2.10, 2.30, 0, 0.52, true, 'Living Pasillo (Tabique Central)');
-        createRealWallSpotlight(4.60, 2.10, 0.08, -Math.PI / 2, 0.58, true, 'Comedor (Muro Norte sobre Mesa)');
-        createRealWallSpotlight(5.68, 2.10, 6.10, Math.PI, 0.55, true, 'Cocina Este (Sobre Anafes y Sherman)');
-        createRealWallSpotlight(3.28, 2.10, 5.75, 0, 0.52, true, 'Cocina Barra (Muro Desayunador)');
-        createRealWallSpotlight(2.34, 2.45, 3.40, 0, 0.52, true, 'Pasillo Distribuidor (Muro Baño)');
-        createRealWallSpotlight(0.08, 2.45, 6.00, 0, 0.52, true, 'Dormitorio General (Muro Cabecera)');
-        createRealWallSpotlight(2.94, 2.45, 1.15, Math.PI, 0.58, false, 'Estudio Foco 4000K (Muro Escritorio)');
 
         // ============================================================================
         // SISTEMA DE CARGA GLTF/GLB PARA MOBILIARIO EXTERNO DETALLADO
@@ -4954,22 +4879,7 @@
             });
             floorGroup.add(dioramaFloraGroup);
 
-            // Living despejado sin alfombra (piso cerámico continuo visible)
-
-            // 4. Paredes Acento Azul Marino detrás de Pantallas con tira LED Cian (Foto Referencia)
-            // - Estudio:
-            const accentStudyWall = new THREE.Mesh(new THREE.BoxGeometry(0.02, 1.60, 2.40), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.65 }));
-            accentStudyWall.position.set(2.98, 1.30, 1.20);
-            accentStudyWall.receiveShadow = true;
-            accentStudyWall.name = 'accentStudyWall';
-            decorVideoGroup.add(accentStudyWall);
-
-            // - Living:
-            const accentLivingWall = new THREE.Mesh(new THREE.BoxGeometry(0.02, 1.60, 1.80), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.65 }));
-            accentLivingWall.position.set(6.28, 1.30, 3.10);
-            accentLivingWall.receiveShadow = true;
-            accentLivingWall.name = 'accentLivingWall';
-            decorVideoGroup.add(accentLivingWall);
+            // Living despejado sin alfombra ni paneles falsos delante de la TV (piso cerámico continuo visible)
 
             // 5. Lámparas de Noche con Tulipas Translúcidas Cálidas en Dormitorio (Foto Referencia)
             const lampShadeGeo = new THREE.CylinderGeometry(0.08, 0.11, 0.18, 16);
@@ -8662,8 +8572,14 @@
 
             if (remoteLayout && remoteLayout.updatedAt) {
                 const localTs = parseInt(localStorage.getItem('depto_layout_updated_at') || '0', 10);
+                // Unir siempre los elementos eliminados (deleted) entre local y servidor para que ningún objeto borrado reaparezca al sincronizar
+                const mergedDeleted = Array.from(new Set([
+                    ...(decorOverrides?.deleted || []),
+                    ...(remoteLayout.decorOverrides?.deleted || [])
+                ]));
                 if (remoteLayout.updatedAt > localTs) {
                     console.log(`[Sync] Servidor tiene versión más reciente (${new Date(remoteLayout.updatedAt).toLocaleTimeString()}). Sincronizando...`);
+                    if (remoteLayout.decorOverrides) remoteLayout.decorOverrides.deleted = mergedDeleted;
                     saveLocalFullLayout(remoteLayout);
                     applyDecorOverrides();
                     renderFurniture3D();
@@ -8673,6 +8589,7 @@
                     return;
                 } else if (localTs > remoteLayout.updatedAt) {
                     console.log(`[Sync] Cliente local tiene cambios más nuevos. Subiendo al servidor...`);
+                    if (localLayout.decorOverrides) localLayout.decorOverrides.deleted = mergedDeleted;
                     await pushLayoutToServer(localLayout, false);
                     return;
                 } else {
