@@ -1,5 +1,5 @@
 {
-  "updatedAt": 1794428872756,
+  "updatedAt": 1794430013097,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -10,6 +10,24 @@
       "Objeto"
     ],
     "transforms": {
+      "Comederos de Mascota": {
+        "x": 4.33,
+        "y": 0.04,
+        "z": 4.98,
+        "rot": 1.571
+      },
+      "Sansevieria en Pie Nórdico": {
+        "x": 6.71,
+        "y": 0.74,
+        "z": 4.2,
+        "rot": 0
+      },
+      "Perchero y Zapatero Entrada": {
+        "x": 6.7,
+        "y": 0.98,
+        "z": 4.79,
+        "rot": 0
+      },
       "Sillas de Comedor (4)": {
         "x": 5,
         "y": 0.43,
