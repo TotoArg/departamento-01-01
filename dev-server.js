@@ -12,7 +12,8 @@ const clients = [];
 // CONFIGURACIÓN DE SINCRONIZACIÓN BIDIRECCIONAL CON GITHUB
 // ============================================================================
 const GITHUB_REPO = 'TotoArg/departamento-01-01';
-const GITHUB_FILE_PATH = 'layout.json';
+const GITHUB_FILE_PATH = 'config.json';
+const GITHUB_LEGACY_FILE_PATH = 'layout.json';
 let cachedGhToken = process.env.GITHUB_TOKEN || '';
 
 function getGitHubToken() {
@@ -25,16 +26,16 @@ function getGitHubToken() {
     }
 }
 
-// Descargar layout.json desde GitHub API si es más reciente
-async function fetchLayoutFromGitHub() {
+// Descargar config.json (o layout.json) desde GitHub API si es más reciente
+async function fetchFileFromGitHub(filePath = GITHUB_FILE_PATH) {
     const token = getGitHubToken();
     return new Promise((resolve) => {
         const options = {
             hostname: 'api.github.com',
-            path: `/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}?ref=main`,
+            path: `/repos/${GITHUB_REPO}/contents/${filePath}?ref=main`,
             method: 'GET',
             headers: {
-                'User-Agent': 'DepartamentoSync/1.0',
+                'User-Agent': 'DepartamentoSync/2.0',
                 'Accept': 'application/vnd.github.v3+json',
                 ...(token ? { 'Authorization': `token ${token}` } : {})
             }
@@ -63,7 +64,47 @@ async function fetchLayoutFromGitHub() {
     });
 }
 
-// Subir layout.json a GitHub API (commit automático en rama main)
+async function fetchLayoutFromGitHub() {
+    const primary = await fetchFileFromGitHub(GITHUB_FILE_PATH);
+    if (primary && primary.ok) return primary;
+    return await fetchFileFromGitHub(GITHUB_LEGACY_FILE_PATH);
+}
+
+async function putFileToGitHub(filePath, layoutObj, token) {
+    const ghInfo = await fetchFileFromGitHub(filePath);
+    const currentSha = ghInfo && ghInfo.ok ? ghInfo.sha : undefined;
+    const contentBase64 = Buffer.from(JSON.stringify(layoutObj, null, 2), 'utf8').toString('base64');
+    const payload = JSON.stringify({
+        message: `chore(state): sincronizar ${filePath} [${new Date(layoutObj.updatedAt || Date.now()).toLocaleTimeString()}]`,
+        content: contentBase64,
+        branch: 'main',
+        ...(currentSha ? { sha: currentSha } : {})
+    });
+
+    return await new Promise((resolve) => {
+        const req = https.request({
+            hostname: 'api.github.com',
+            path: `/repos/${GITHUB_REPO}/contents/${filePath}`,
+            method: 'PUT',
+            headers: {
+                'User-Agent': 'DepartamentoSync/2.0',
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(payload)
+            }
+        }, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => resolve({ status: res.statusCode, body: data }));
+        });
+        req.on('error', (err) => resolve({ status: 500, error: err.message }));
+        req.write(payload);
+        req.end();
+    });
+}
+
+// Subir config.json y layout.json a GitHub API (commit automático en rama main)
 let isPushingToGitHub = false;
 async function pushLayoutToGitHub(layoutObj, retry = 1) {
     if (isPushingToGitHub) return;
@@ -75,47 +116,17 @@ async function pushLayoutToGitHub(layoutObj, retry = 1) {
 
     isPushingToGitHub = true;
     try {
-        const ghInfo = await fetchLayoutFromGitHub();
-        const currentSha = ghInfo && ghInfo.ok ? ghInfo.sha : undefined;
+        const resConfig = await putFileToGitHub(GITHUB_FILE_PATH, layoutObj, token);
+        const resLayout = await putFileToGitHub(GITHUB_LEGACY_FILE_PATH, layoutObj, token);
 
-        const contentBase64 = Buffer.from(JSON.stringify(layoutObj, null, 2), 'utf8').toString('base64');
-        const payload = JSON.stringify({
-            message: `chore(layout): sincronizar muebles [${new Date(layoutObj.updatedAt || Date.now()).toLocaleTimeString()}]`,
-            content: contentBase64,
-            branch: 'main',
-            ...(currentSha ? { sha: currentSha } : {})
-        });
-
-        const res = await new Promise((resolve) => {
-            const req = https.request({
-                hostname: 'api.github.com',
-                path: `/repos/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`,
-                method: 'PUT',
-                headers: {
-                    'User-Agent': 'DepartamentoSync/1.0',
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json',
-                    'Content-Length': Buffer.byteLength(payload)
-                }
-            }, (res) => {
-                let data = '';
-                res.on('data', chunk => data += chunk);
-                res.on('end', () => resolve({ status: res.statusCode, body: data }));
-            });
-            req.on('error', (err) => resolve({ status: 500, error: err.message }));
-            req.write(payload);
-            req.end();
-        });
-
-        if (res.status === 200 || res.status === 201) {
-            console.log(`[GitHub Sync] ✓ Sincronizado con GitHub (commit en rama main exitoso)`);
-        } else if (res.status === 409 && retry > 0) {
+        if ((resConfig.status === 200 || resConfig.status === 201) && (resLayout.status === 200 || resLayout.status === 201)) {
+            console.log(`[GitHub Sync] ✓ config.json y layout.json sincronizados con GitHub (rama main)`);
+        } else if ((resConfig.status === 409 || resLayout.status === 409) && retry > 0) {
             console.log(`[GitHub Sync] Conflicto de SHA en GitHub, reintentando...`);
             isPushingToGitHub = false;
             return await pushLayoutToGitHub(layoutObj, retry - 1);
         } else {
-            console.warn(`[GitHub Sync] Error subiendo a GitHub (HTTP ${res.status}):`, res.body || res.error);
+            console.warn(`[GitHub Sync] Aviso subiendo a GitHub (HTTP ${resConfig.status}/${resLayout.status})`);
         }
     } catch (e) {
         console.warn('[GitHub Sync] Error al comunicar con GitHub:', e.message);
@@ -128,7 +139,7 @@ async function pushLayoutToGitHub(layoutObj, retry = 1) {
 let reloadTimeout = null;
 try {
     fs.watch(__dirname, { recursive: true }, (eventType, filename) => {
-        if (!filename || filename.includes('node_modules') || filename.startsWith('.') || filename.endsWith('.tmp') || filename.includes('layout.json')) return;
+        if (!filename || filename.includes('node_modules') || filename.startsWith('.') || filename.endsWith('.tmp') || filename.includes('layout.json') || filename.includes('config.json')) return;
         if (reloadTimeout) clearTimeout(reloadTimeout);
         reloadTimeout = setTimeout(() => {
             console.log(`[Auto-Reload] Cambio detectado en ${filename}, actualizando navegador...`);
@@ -204,15 +215,19 @@ const server = http.createServer((req, res) => {
 
     const cleanUrl = req.url.split('?')[0];
 
-    // Endpoint API para Sincronización Bidireccional (Online / Offline / GitHub)
-    if (cleanUrl === '/api/layout') {
+    // Endpoint API para Sincronización Bidireccional ZERO DATA LOSS (config.json + layout.json + GitHub)
+    if (cleanUrl === '/api/config' || cleanUrl === '/api/layout') {
+        const configFilePath = path.join(__dirname, 'config.json');
         const layoutFilePath = path.join(__dirname, 'layout.json');
         if (req.method === 'GET') {
             (async () => {
                 let localLayout = null;
                 let localTs = 0;
                 try {
-                    if (fs.existsSync(layoutFilePath)) {
+                    if (fs.existsSync(configFilePath)) {
+                        localLayout = JSON.parse(fs.readFileSync(configFilePath, 'utf8'));
+                        localTs = localLayout.updatedAt || 0;
+                    } else if (fs.existsSync(layoutFilePath)) {
                         localLayout = JSON.parse(fs.readFileSync(layoutFilePath, 'utf8'));
                         localTs = localLayout.updatedAt || 0;
                     }
@@ -222,8 +237,10 @@ const server = http.createServer((req, res) => {
                 try {
                     const ghRes = await fetchLayoutFromGitHub();
                     if (ghRes && ghRes.ok && ghRes.layout && ghRes.layout.updatedAt > localTs) {
-                        console.log(`[GitHub Sync] Cambios detectados en GitHub (${new Date(ghRes.layout.updatedAt).toLocaleTimeString()}). Actualizando copia local...`);
-                        fs.writeFileSync(layoutFilePath, JSON.stringify(ghRes.layout, null, 2), 'utf8');
+                        console.log(`[GitHub Sync] Cambios detectados en GitHub (${new Date(ghRes.layout.updatedAt).toLocaleTimeString()}). Actualizando config.json y layout.json...`);
+                        const jsonOut = JSON.stringify(ghRes.layout, null, 2);
+                        fs.writeFileSync(configFilePath, jsonOut, 'utf8');
+                        fs.writeFileSync(layoutFilePath, jsonOut, 'utf8');
                         localLayout = ghRes.layout;
                     }
                 } catch (err) {
@@ -238,7 +255,7 @@ const server = http.createServer((req, res) => {
                     res.end(JSON.stringify(localLayout, null, 2));
                 } else {
                     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-                    res.end(JSON.stringify({ updatedAt: 0, decorOverrides: { deleted: [], transforms: {} }, furnitureList: [] }));
+                    res.end(JSON.stringify({ app: 'departamento-01-01', schemaVersion: '2026.11.12.v3', updatedAt: 0, decorOverrides: { deleted: [], transforms: {} }, furnitureList: [] }));
                 }
             })();
             return;
@@ -251,13 +268,17 @@ const server = http.createServer((req, res) => {
                 try {
                     const parsed = JSON.parse(body);
                     if (!parsed.updatedAt) parsed.updatedAt = Date.now();
-                    fs.writeFileSync(layoutFilePath, JSON.stringify(parsed, null, 2), 'utf8');
+                    parsed.app = 'departamento-01-01';
+                    parsed.schemaVersion = parsed.schemaVersion || '2026.11.12.v3';
+                    const jsonOut = JSON.stringify(parsed, null, 2);
+                    fs.writeFileSync(configFilePath, jsonOut, 'utf8');
+                    fs.writeFileSync(layoutFilePath, jsonOut, 'utf8');
                     res.writeHead(200, {
                         'Content-Type': 'application/json; charset=utf-8',
                         'Cache-Control': 'no-cache, no-store, must-revalidate'
                     });
-                    res.end(JSON.stringify({ ok: true, updatedAt: parsed.updatedAt }));
-                    console.log(`[Layout Sync] Distribución sincronizada en disco (${new Date(parsed.updatedAt).toLocaleTimeString()})`);
+                    res.end(JSON.stringify({ ok: true, updatedAt: parsed.updatedAt, files: ['config.json', 'layout.json'] }));
+                    console.log(`[State Sync] config.json y layout.json sincronizados en disco (${new Date(parsed.updatedAt).toLocaleTimeString()})`);
 
                     // Replicar asíncronamente a GitHub para que GitHub Pages y el repositorio remoto queden sincronizados
                     pushLayoutToGitHub(parsed);

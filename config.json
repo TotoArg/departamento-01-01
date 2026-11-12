@@ -1,0 +1,18 @@
+{
+  "app": "departamento-01-01",
+  "schemaVersion": "2026.11.12.v3",
+  "renderQuality": "maqueta-arquitectonica-premium",
+  "updatedAt": 1794505200000,
+  "decorOverrides": {
+    "deleted": [
+      "accentLivingWall",
+      "accentStudyWall",
+      "Elemento Decorativo 3",
+      "Elemento Decorativo 1",
+      "Mochila y Bolso Entrada",
+      "Objeto"
+    ],
+    "transforms": {}
+  },
+  "furnitureList": []
+}

@@ -1,5 +1,8 @@
 {
-  "updatedAt": 1794442600000,
+  "app": "departamento-01-01",
+  "schemaVersion": "2026.11.12.v3",
+  "renderQuality": "maqueta-arquitectonica-premium",
+  "updatedAt": 1794505200000,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -9,14 +12,7 @@
       "Mochila y Bolso Entrada",
       "Objeto"
     ],
-    "transforms": {
-      "Bañera y Ducha Cromada": {
-        "x": 0.4,
-        "y": 1.12,
-        "z": 4,
-        "rot": 0
-      }
-    }
+    "transforms": {}
   },
   "furnitureList": []
 }

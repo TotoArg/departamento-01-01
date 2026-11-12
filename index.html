@@ -1626,31 +1626,31 @@
         </div>
     </div>
 
-    <!-- Modal Gestión de Respaldo y Persistencia -->
+    <!-- Modal Gestión de Respaldo y Persistencia (config.json Zero Data Loss) -->
     <div class="modal-overlay" id="backup-modal" style="display:none;">
         <div class="modal-box glass-panel" style="max-width:480px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <h3 style="font-size:15px; color:#38bdf8; display:flex; align-items:center; gap:8px; margin:0;">
-                    <span>📦</span> Respaldo y Guardado del Plano
+                    <span>📦</span> Respaldo y Estado de Escena (config.json)
                 </h3>
                 <button class="icon-btn" id="btn-close-backup">✕</button>
             </div>
             
             <p style="font-size:12px; color:#cbd5e1; line-height:1.45; margin:0 0 14px 0;">
-                Tus cambios se guardan automáticamente en la memoria de este navegador. Para asegurarte de nunca perderlos o pasarlos a otro dispositivo (PC o celular), podés descargar un archivo de respaldo.
+                Tus modificaciones de escena se sincronizan automáticamente en <b>config.json</b> (Local, Túnel y Nube GitHub) además de la memoria del navegador, evitando pérdidas de estado al cambiar de entorno.
             </p>
 
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <button class="action-btn" id="btn-backup-save-now" style="background:#059669; border:1px solid #10b981; color:#fff; padding:9px 14px; font-size:12.5px; font-weight:700; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-                    <span>💾</span> Guardar ahora en este navegador
+                    <span>💾</span> Sincronizar y guardar config.json ahora
                 </button>
                 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
                     <button class="action-btn" id="btn-backup-download" style="background:rgba(56,189,248,0.20); border:1px solid #38bdf8; color:#7dd3fc; padding:8px 12px; font-size:12px; font-weight:600; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
-                        <span>📥</span> Descargar archivo (.json)
+                        <span>📥</span> Exportar config.json
                     </button>
                     <label class="action-btn" style="background:rgba(168,85,247,0.20); border:1px solid #a855f7; color:#d8b4fe; padding:8px 12px; font-size:12px; font-weight:600; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; margin:0; text-align:center;">
-                        <span>📤</span> Cargar archivo (.json)
+                        <span>📤</span> Importar config.json
                         <input type="file" id="inp-backup-file" accept=".json,application/json" style="display:none;">
                     </label>
                 </div>
@@ -2222,29 +2222,38 @@
             canvas.height = 512;
             const ctx = canvas.getContext('2d');
 
-            // Gradiente fotográfico de cielo, horizonte y tierra
+            // Gradiente fotográfico de Estudio de Maqueta Arquitectónica Premium (cielo difuso, horizonte luminoso y pedestal de roble cálido)
             const skyGrad = ctx.createLinearGradient(0, 0, 0, 512);
-            skyGrad.addColorStop(0.0, '#b0d2f8');  // Cenit celeste
-            skyGrad.addColorStop(0.48, '#eaf2ff'); // Horizonte luminoso
-            skyGrad.addColorStop(0.52, '#d6c4b0'); // Tierra cálida de maqueta
-            skyGrad.addColorStop(1.0, '#a58d72');  // Suelo inferior
+            skyGrad.addColorStop(0.0, '#9ec5f8');  // Cenit estudio celeste limpio
+            skyGrad.addColorStop(0.42, '#f4f8ff'); // Difusor horizonte de alta luminancia
+            skyGrad.addColorStop(0.50, '#fff9f0'); // Línea de rebote cálido rasante
+            skyGrad.addColorStop(0.56, '#dfd1c0'); // Rebote de piso de maqueta arquitectónica
+            skyGrad.addColorStop(1.0, '#9c8368');  // Base pedestal cálida
             ctx.fillStyle = skyGrad;
             ctx.fillRect(0, 0, 1024, 512);
 
-            // Reflejo del sol cálido directo de alta intensidad
-            const sunGrad = ctx.createRadialGradient(280, 110, 4, 280, 110, 160);
+            // Softbox Principal 1: Sol cálido patagónico directo (Key Light de estudio fotográfico)
+            const sunGrad = ctx.createRadialGradient(260, 105, 6, 260, 105, 190);
             sunGrad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
-            sunGrad.addColorStop(0.25, 'rgba(255, 246, 225, 0.85)');
-            sunGrad.addColorStop(0.70, 'rgba(255, 235, 195, 0.25)');
+            sunGrad.addColorStop(0.28, 'rgba(255, 245, 222, 0.92)');
+            sunGrad.addColorStop(0.68, 'rgba(255, 230, 185, 0.35)');
             sunGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
             ctx.fillStyle = sunGrad;
             ctx.fillRect(0, 0, 1024, 512);
 
-            // Reflejo de ventana / cielo secundario suave
-            const fillGrad = ctx.createRadialGradient(780, 160, 10, 780, 160, 240);
-            fillGrad.addColorStop(0.0, 'rgba(255, 248, 235, 0.45)');
-            fillGrad.addColorStop(1.0, 'rgba(255, 248, 235, 0.0)');
+            // Softbox Secundario 2: Luz de relleno cenital/lateral fría (Sky Fill Light para reflejos en vidrio, cromo y acero inoxidable)
+            const fillGrad = ctx.createRadialGradient(760, 140, 12, 760, 140, 260);
+            fillGrad.addColorStop(0.0, 'rgba(240, 249, 255, 0.85)');
+            fillGrad.addColorStop(0.45, 'rgba(219, 234, 254, 0.42)');
+            fillGrad.addColorStop(1.0, 'rgba(240, 249, 255, 0.0)');
             ctx.fillStyle = fillGrad;
+            ctx.fillRect(0, 0, 1024, 512);
+
+            // Softbox 3: Rim Light de recorte arquitectónico (resalta biseles de madera, mesadas de granito y griferías)
+            const rimGrad = ctx.createRadialGradient(512, 70, 8, 512, 70, 150);
+            rimGrad.addColorStop(0.0, 'rgba(255, 250, 240, 0.78)');
+            rimGrad.addColorStop(1.0, 'rgba(255, 250, 240, 0.0)');
+            ctx.fillStyle = rimGrad;
             ctx.fillRect(0, 0, 1024, 512);
 
             const tex = new THREE.CanvasTexture(canvas);
@@ -2252,9 +2261,13 @@
             return tex;
         }
 
-        // Environment Map HDRI para Iluminación Global (IBL) y reflexiones realistas en metales
+        // Environment Map HDRI para Iluminación Global (IBL) y reflexiones realistas en metales, maderas y porcelana
         const pmremGen = new THREE.PMREMGenerator(renderer);
         pmremGen.compileEquirectangularShader();
+
+        // Asignar inmediatamente el HDRI de Estudio Procedural para que desde el frame 0 haya reflejos PBR de alta gama
+        const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
+        scene.environment = studioEnvTarget.texture;
 
         if (typeof THREE.RGBELoader !== 'undefined') {
             const rgbeLoader = new THREE.RGBELoader();
@@ -2264,51 +2277,45 @@
                 scene.environment = hdrTarget.texture;
                 hdrEquirect.dispose();
                 wakeRenderer();
-                console.log('HDRI Environment map cargado exitosamente!');
-            }, undefined, function(err) {
-                console.warn('Fallback a HDRI procedural por error en carga de archivo:', err);
-                const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
-                scene.environment = studioEnvTarget.texture;
+            }, undefined, function() {
+                // Mantiene el HDRI de Estudio Procedural Maqueta Premium ya activo
                 wakeRenderer();
             });
-        } else {
-            const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
-            scene.environment = studioEnvTarget.texture;
         }
 
-        // 1. Rebote natural cielo-suelo (HemisphereLight suave)
-        const hemiLight = new THREE.HemisphereLight(0xfed7aa, 0x92400e, 0.48);
+        // 1. Rebote natural cielo-suelo (HemisphereLight calibrada para Maqueta Arquitectónica Premium)
+        const hemiLight = new THREE.HemisphereLight(0xfff1dc, 0x8c5828, 0.54);
         scene.add(hemiLight);
 
-        // 2. Luz Ambiental suave
-        const ambLight = new THREE.AmbientLight(0xdbeafe, 0.16);
+        // 2. Luz Ambiental suave de base para evitar sombras negras empastadas
+        const ambLight = new THREE.AmbientLight(0xe0ecff, 0.20);
         scene.add(ambLight);
 
         // 3. Sol Físico El Calafate (-50.33° Lat) en Ángulo Rasante Norte con Sombras Suaves 4K
-        const dirLight = new THREE.DirectionalLight(0xff9d42, 1.95);
+        const dirLight = new THREE.DirectionalLight(0xffa952, 2.05);
         dirLight.position.set(-18.0, 6.8, -20.0); // Noroeste rasante entrando por ventanales Norte
         dirLight.target.position.set(3.15, 0.70, 3.80);
         scene.add(dirLight.target);
         dirLight.castShadow = true;
 
-        // Resolución 4K en desktop y 2K en móvil para máxima fidelidad
+        // Resolución 4K en desktop y 2K en móvil para máxima nitidez de biseles y sombras de maqueta
         const shadowRes = isMobileOrLowEnd ? 2048 : 4096;
         dirLight.shadow.mapSize.width = shadowRes;
         dirLight.shadow.mapSize.height = shadowRes;
         dirLight.shadow.camera.near = 10.0;
         dirLight.shadow.camera.far = 120.0;
-        dirLight.shadow.camera.left = -11.0;
-        dirLight.shadow.camera.right = 11.0;
-        dirLight.shadow.camera.top = 11.0;
-        dirLight.shadow.camera.bottom = -11.0;
+        dirLight.shadow.camera.left = -10.5;
+        dirLight.shadow.camera.right = 10.5;
+        dirLight.shadow.camera.top = 10.5;
+        dirLight.shadow.camera.bottom = -10.5;
         dirLight.shadow.bias = -0.00015;
-        dirLight.shadow.normalBias = 0.028;
-        dirLight.shadow.radius = 3.5;
+        dirLight.shadow.normalBias = 0.024;
+        dirLight.shadow.radius = 3.2;
         scene.add(dirLight);
 
-        // 4. Luz de Relleno Suave Posterior
-        const fillLight = new THREE.DirectionalLight(0xffeedd, 0.20);
-        fillLight.position.set(-15, 20, -15);
+        // 4. Luz de Relleno Suave Posterior y Contraluz de Recorte (Rim Light de Maqueta)
+        const fillLight = new THREE.DirectionalLight(0xfff0dd, 0.28);
+        fillLight.position.set(14, 18, 16);
         scene.add(fillLight);
 
         // 5. Luces Domóticas Reales (Apliques de pared tipo spot negro y tiras LED detectadas en fotos/videos)
@@ -3951,37 +3958,196 @@
             return m;
         }
 
-        // 1) 3 CALEFACTORES TIRO BALANCEADO + CAÑO GALVANIZADO AL TECHO
-        // Calefactor Living (Muro Este X=6.30, Z=1.85, medidas relevadas: 35 cm de ancho x 17 cm de profundidad)
-        addBoxFixture(6.14, 0.32, 1.85, 0.17, 0.58, 0.35, 0x9ca3af, fixturesGroup, 0.4, 'Calefactor Tiro Balanceado Living');
-        addBoxFixture(6.14, 0.62, 1.85, 0.18, 0.04, 0.36, 0xf97316, fixturesGroup, 0.4, 'Calefactor Tiro Balanceado Living'); // Tapa/indicador térmico
-        // (El conducto vertical galvanizado bajo la pendiente del techo se modela con altura exacta en decorVideoGroup)
+        // 1) CALEFACTOR TIRO BALANCEADO LIVING (Muro Este X=6.30, Z=1.85, medidas relevadas: 35 cm de ancho x 17 cm de profundidad)
+        // Morfología procedural detallada: gabinete biselado esmaltado, rejillas superiores/frontales estampadas, comando superior y visor de piloto
+        (function buildLivingHeaterMorphology() {
+            const hX = 6.14, hZ = 1.85, hW = 0.35, hD = 0.17, hH = 0.58;
+            const enamelBodyMat = new THREE.MeshStandardMaterial({ color: 0xd6d3d1, roughness: 0.36, metalness: 0.22 });
+            const louverDarkMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.55, metalness: 0.45 });
+            const bodyMesh = new THREE.Mesh(createRoundedBoxGeo(hD, hH, hW, 0.018, 3), enamelBodyMat);
+            bodyMesh.position.set(hX, 0.32, hZ);
+            bodyMesh.castShadow = true; bodyMesh.receiveShadow = true;
+            assignBIMUserData(bodyMesh, {
+                nombre: 'Calefactor Tiro Balanceado Living (35×17 cm)',
+                categoria: 'mueble',
+                dimensiones: { ancho: 0.35, alto: 0.58, profundidad: 0.17, elevacion: 0.03 }
+            });
+            fixturesGroup.add(bodyMesh);
 
-        // (Los calefactores Orbis de vidrio templado negro del Cuarto y del Estudio son idénticos y se modelan en simetría en X=0.48 sobre Muros Sur y Norte)
+            // Rejillas convectoras frontales y superiores
+            for (let i = 0; i < 5; i++) {
+                const slot = new THREE.Mesh(UNIT_BOX_GEO, louverDarkMat);
+                slot.scale.set(0.008, 0.014, hW - 0.06);
+                slot.position.set(hX - hD / 2 - 0.002, 0.44 + i * 0.026, hZ);
+                fixturesGroup.add(slot);
+            }
+            // Perilla de regulación y visor de llama azul
+            const dial = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.018, 12), louverDarkMat);
+            dial.position.set(hX - 0.03, 0.62, hZ - 0.11);
+            const pilotGlow = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+            pilotGlow.scale.set(0.008, 0.016, 0.025);
+            pilotGlow.position.set(hX - hD / 2 - 0.002, 0.14, hZ + 0.09);
+            fixturesGroup.add(dial, pilotGlow);
+        })();
 
-        // 2) COCINA (según fotos reales): Sobre muro Este (X=4.85) van Heladera -> 1° tramo mesada + Calefón mural Orbis/Bosch -> Cocina 4H -> 2° tramo mesada con Bacha + esquina en "L" bajo ventana Sur (Y=8.00) que conecta directo al Lavarropas sin ningún hueco. Muro Oeste (X=3.00) queda con portero y cestos.
-        // - 1° tramo de bajo mesada y mesada de granito entre Heladera y Cocina (Z=5.81..6.16, X=4.52)
+        // 2) COCINA (según fotos reales): Sobre muro Este (X=4.85) van Heladera -> 1° tramo mesada + Calefón mural Orbis/Bosch -> Cocina 4H -> 2° tramo mesada con Bacha + esquina en "L" bajo ventana Sur (Y=8.00) que conecta directo al Lavarropas sin ningún hueco.
+        const kitchenWoodCabinetMat = new THREE.MeshStandardMaterial({ color: 0xb48a64, map: proceduralWoodTex, roughness: 0.48, metalness: 0.04 });
+        const kitchenGraniteMat = new THREE.MeshStandardMaterial({ color: 0xc8b2a6, bumpMap: proceduralPlasterBumpTex, bumpScale: 0.0015, roughness: 0.24, metalness: 0.08 });
+        const inoxApplianceMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, map: proceduralBrushedMetalTex, roughness: 0.24, metalness: 0.82 });
+        const castIronMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.72, metalness: 0.45 });
+
+        // - 1° tramo de bajo mesada y mesada de granito entre Heladera y Cocina (Z=5.81..6.16, X=4.52) con puerta y tirador
         addBoxFixture(4.52, 0.42, 5.98, 0.56, 0.84, 0.35, 0xb48a64, fixturesGroup, 0.4, 'Bajo Mesada Cocina (Tramo Norte)');
-        addBoxFixture(4.51, 0.86, 5.98, 0.60, 0.04, 0.35, 0xc8b2a6, fixturesGroup, 0.4, 'Mesada Granito Cocina (Tramo Norte)');
-        // - Calefón a gas mural blanco (Orbis/Bosch) colgado en pared Este sobre el 1° tramo de mesada (X=4.69, Y=1.44, Z=5.98) + caño amarillo
+        addBoxFixture(4.235, 0.42, 5.98, 0.016, 0.76, 0.31, 0xa37852, fixturesGroup, 0.45, 'Bajo Mesada Cocina (Tramo Norte)');
+        addBoxFixture(4.22, 0.72, 5.88, 0.018, 0.016, 0.09, 0xe2e8f0, fixturesGroup, 0.2, 'Bajo Mesada Cocina (Tramo Norte)');
+        addBoxFixture(4.51, 0.86, 5.98, 0.60, 0.04, 0.35, 0xc8b2a6, fixturesGroup, 0.25, 'Mesada Granito Cocina (Tramo Norte)');
+
+        // - Calefón a gas mural blanco (Orbis/Bosch) colgado en pared Este sobre el 1° tramo de mesada (X=4.69, Y=1.44, Z=5.98) + perillas, visor de llama y flexible de gas
         setMountWall(4.85, 5.98, false);
-        addBoxFixture(4.69, 1.44, 5.98, 0.22, 0.56, 0.34, 0xf8fafc, fixturesGroup, 0.25, 'Calefón a Gas Orbis');
-        addBoxFixture(4.57, 1.28, 5.98, 0.02, 0.08, 0.12, 0x334155, fixturesGroup, 0.25, 'Calefón a Gas Orbis'); // Visor/botonera calefón
-        addBoxFixture(4.73, 1.08, 5.86, 0.03, 0.22, 0.03, 0xeab308, fixturesGroup, 0.25, 'Conexión de Gas Calefón'); // Caño de gas amarillo
+        addBoxFixture(4.69, 1.44, 5.98, 0.22, 0.56, 0.34, 0xf8fafc, fixturesGroup, 0.22, 'Calefón a Gas Orbis');
+        addBoxFixture(4.575, 1.28, 5.98, 0.02, 0.09, 0.14, 0x1e293b, fixturesGroup, 0.25, 'Calefón a Gas Orbis'); // Panel de mando y visor
+        addBoxFixture(4.563, 1.31, 5.98, 0.008, 0.025, 0.045, 0x38bdf8, fixturesGroup, 0.1, 'Calefón a Gas Orbis'); // Visor llama piloto
+        addBoxFixture(4.73, 1.08, 5.86, 0.03, 0.22, 0.03, 0xeab308, fixturesGroup, 0.3, 'Conexión de Gas Calefón'); // Caño de gas amarillo
         setMountWall(null);
-        // - Cocina a gas blanca de 4 hornallas con horno visor negro sobre muro Este (X=4.51, Z=6.41, entre los dos tramos de mesada)
-        addBoxFixture(4.51, 0.43, 6.41, 0.58, 0.86, 0.50, 0xffffff, fixturesGroup, 0.25, 'Cocina a Gas 4 Hornallas');
-        addBoxFixture(4.51, 0.87, 6.41, 0.52, 0.02, 0.46, 0x1e293b, fixturesGroup, 0.25, 'Cocina a Gas 4 Hornallas'); // Rejilla 4 hornallas negra
-        addBoxFixture(4.21, 0.38, 6.41, 0.02, 0.44, 0.42, 0x0f172a, fixturesGroup, 0.25, 'Cocina a Gas 4 Hornallas'); // Visor negro puerta del horno
+
+        // - Cocina a gas blanca de 4 hornallas con plancha inox, 4 rejillas de fundición, 4 coronas de quemadores, 5 perillas, puerta de horno doble vidrio y manija cromada (X=4.51, Z=6.41)
+        (function buildGasStoveMorphology() {
+            const stX = 4.51, stZ = 6.41, stD = 0.58, stH = 0.86, stW = 0.50;
+            const stoveBody = new THREE.Mesh(createRoundedBoxGeo(stD, stH, stW, 0.015, 2), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.22, metalness: 0.12 }));
+            stoveBody.position.set(stX, 0.43, stZ);
+            stoveBody.castShadow = true; stoveBody.receiveShadow = true;
+            assignBIMUserData(stoveBody, {
+                nombre: 'Cocina a Gas 4 Hornallas',
+                categoria: 'mueble',
+                dimensiones: { ancho: 0.50, alto: 0.86, profundidad: 0.58, elevacion: 0 }
+            });
+            fixturesGroup.add(stoveBody);
+
+            // Plancha superior de acero inoxidable cepillado
+            const cooktop = new THREE.Mesh(createRoundedBoxGeo(0.55, 0.022, 0.48, 0.008, 2), inoxApplianceMat);
+            cooktop.position.set(stX, 0.865, stZ);
+            fixturesGroup.add(cooktop);
+
+            // 4 Quemadores circulares (coronas de aluminio + tapas negras esmaltadas) y 2 rejillas de hierro fundido
+            const burnerOffsets = [[-0.13, -0.12], [0.11, -0.12], [-0.13, 0.12], [0.11, 0.12]];
+            burnerOffsets.forEach(([ox, oz], idx) => {
+                const rBurn = (idx === 0 || idx === 3) ? 0.044 : 0.034;
+                const crown = new THREE.Mesh(new THREE.CylinderGeometry(rBurn, rBurn * 0.9, 0.016, 16), inoxApplianceMat);
+                crown.position.set(stX + ox, 0.882, stZ + oz);
+                const cap = new THREE.Mesh(new THREE.CylinderGeometry(rBurn + 0.003, rBurn, 0.006, 16), castIronMat);
+                cap.position.set(stX + ox, 0.892, stZ + oz);
+                // Rejilla individual en cruz sobre cada hornalla
+                const grate1 = new THREE.Mesh(UNIT_BOX_GEO, castIronMat);
+                grate1.scale.set(0.18, 0.012, 0.012);
+                grate1.position.set(stX + ox, 0.896, stZ + oz);
+                const grate2 = new THREE.Mesh(UNIT_BOX_GEO, castIronMat);
+                grate2.scale.set(0.012, 0.012, 0.18);
+                grate2.position.set(stX + ox, 0.896, stZ + oz);
+                const grateFrame = new THREE.Mesh(new THREE.TorusGeometry(0.085, 0.006, 6, 16), castIronMat);
+                grateFrame.rotation.x = Math.PI / 2;
+                grateFrame.position.set(stX + ox, 0.894, stZ + oz);
+                fixturesGroup.add(crown, cap, grate1, grate2, grateFrame);
+            });
+
+            // Frente de perillas (5 perillas giratorias en el frente Oeste X = stX - stD/2)
+            for (let k = -2; k <= 2; k++) {
+                const knob = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.015, 0.018, 12), castIronMat);
+                knob.rotation.z = Math.PI / 2;
+                knob.position.set(stX - stD / 2 - 0.008, 0.79, stZ + k * 0.085);
+                fixturesGroup.add(knob);
+            }
+
+            // Puerta del horno con visor de vidrio templado negro espejado + manijón cilíndrico cromado + rejilla interna
+            const ovenGlass = new THREE.Mesh(createRoundedBoxGeo(0.018, 0.42, 0.42, 0.01, 2), new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.08, metalness: 0.85 }));
+            ovenGlass.position.set(stX - stD / 2 - 0.004, 0.42, stZ);
+            const ovenHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.40, 12), chromePolishMat);
+            ovenHandle.rotation.x = Math.PI / 2;
+            ovenHandle.position.set(stX - stD / 2 - 0.032, 0.60, stZ);
+            fixturesGroup.add(ovenGlass, ovenHandle);
+        })();
+
         // - 2° tramo de bajo mesada y mesada en "L" de granito gris/rosado (Muro Este Z=6.66..7.96 + retorno Sur X=3.65..4.50 pegado directo al lavarropas X=3.05..3.65 sin brecha)
-        addBoxFixture(4.52, 0.42, 7.31, 0.56, 0.84, 1.30, 0xb48a64, fixturesGroup, 0.4, 'Bajo Mesada en L (Muro Este)');
-        addBoxFixture(4.075, 0.42, 7.68, 0.85, 0.84, 0.56, 0xb48a64, fixturesGroup, 0.4, 'Bajo Mesada en L (Retorno Sur)');
-        addBoxFixture(4.51, 0.86, 7.31, 0.60, 0.04, 1.30, 0xc8b2a6, fixturesGroup, 0.4, 'Mesada de Granito en L (Muro Este)');
-        addBoxFixture(4.075, 0.86, 7.68, 0.85, 0.04, 0.58, 0xc8b2a6, fixturesGroup, 0.4, 'Mesada de Granito en L (Retorno Sur)');
-        // - Bacha doble esquinera de acero inoxidable + grifería monocomando + filtro purificador negro PSA (X=4.33, Z=7.55)
-        addBoxFixture(4.47, 0.875, 7.46, 0.40, 0.02, 0.44, 0x94a3b8, fixturesGroup, 0.25, 'Bacha Doble de Acero Inoxidable');
-        addBoxFixture(4.18, 0.875, 7.66, 0.36, 0.02, 0.38, 0x94a3b8, fixturesGroup, 0.25, 'Bacha Doble de Acero Inoxidable');
-        addBoxFixture(4.53, 1.00, 7.66, 0.09, 0.24, 0.09, 0x0f172a, fixturesGroup, 0.2, 'Purificador de Agua PSA'); // Filtro purificador de agua negro PSA
+        const bmEast = new THREE.Mesh(createRoundedBoxGeo(0.56, 0.84, 1.30, 0.012, 2), kitchenWoodCabinetMat);
+        bmEast.position.set(4.52, 0.42, 7.31);
+        bmEast.castShadow = true; bmEast.receiveShadow = true;
+        assignBIMUserData(bmEast, { nombre: 'Bajo Mesada en L (Muro Este)', categoria: 'mueble', dimensiones: { ancho: 1.30, alto: 0.84, profundidad: 0.56, elevacion: 0 } });
+        const bmSouth = new THREE.Mesh(createRoundedBoxGeo(0.85, 0.84, 0.56, 0.012, 2), kitchenWoodCabinetMat);
+        bmSouth.position.set(4.075, 0.42, 7.68);
+        bmSouth.castShadow = true; bmSouth.receiveShadow = true;
+        assignBIMUserData(bmSouth, { nombre: 'Bajo Mesada en L (Retorno Sur)', categoria: 'mueble', dimensiones: { ancho: 0.85, alto: 0.84, profundidad: 0.56, elevacion: 0 } });
+        fixturesGroup.add(bmEast, bmSouth);
+
+        // Puertas y cajones modulados con tiradores cromados en el Bajo Mesada en L
+        [6.84, 7.18].forEach(pz => {
+            const doorPanel = new THREE.Mesh(createRoundedBoxGeo(0.016, 0.74, 0.31, 0.006, 2), kitchenWoodCabinetMat);
+            doorPanel.position.set(4.235, 0.42, pz);
+            const handle = new THREE.Mesh(UNIT_BOX_GEO, chromePolishMat);
+            handle.scale.set(0.018, 0.09, 0.014);
+            handle.position.set(4.22, 0.68, pz - 0.11);
+            fixturesGroup.add(doorPanel, handle);
+        });
+
+        // Mesada en L de granito pulido con bordes biselados
+        const granEast = new THREE.Mesh(createRoundedBoxGeo(0.60, 0.04, 1.30, 0.01, 2), kitchenGraniteMat);
+        granEast.position.set(4.51, 0.86, 7.31);
+        granEast.castShadow = true; granEast.receiveShadow = true;
+        assignBIMUserData(granEast, { nombre: 'Mesada de Granito en L (Muro Este)', categoria: 'mueble', dimensiones: { ancho: 1.30, alto: 0.04, profundidad: 0.60, elevacion: 0.84 } });
+        const granSouth = new THREE.Mesh(createRoundedBoxGeo(0.85, 0.04, 0.58, 0.01, 2), kitchenGraniteMat);
+        granSouth.position.set(4.075, 0.86, 7.68);
+        granSouth.castShadow = true; granSouth.receiveShadow = true;
+        assignBIMUserData(granSouth, { nombre: 'Mesada de Granito en L (Retorno Sur)', categoria: 'mueble', dimensiones: { ancho: 0.85, alto: 0.04, profundidad: 0.58, elevacion: 0.84 } });
+        fixturesGroup.add(granEast, granSouth);
+
+        // - Bacha doble esquinera de acero inoxidable + grifería monocomando pico cisne + filtro purificador negro PSA (X=4.33, Z=7.55)
+        (function buildKitchenSinkAndFaucetMorphology() {
+            const sinkRim1 = new THREE.Mesh(createRoundedBoxGeo(0.40, 0.018, 0.44, 0.012, 2), inoxApplianceMat);
+            sinkRim1.position.set(4.47, 0.878, 7.46);
+            const sinkBowl1 = new THREE.Mesh(createRoundedBoxGeo(0.32, 0.016, 0.36, 0.025, 2), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.30, metalness: 0.85 }));
+            sinkBowl1.position.set(4.47, 0.883, 7.46);
+            const sinkDrain1 = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.008, 16), chromePolishMat);
+            sinkDrain1.position.set(4.47, 0.889, 7.46);
+
+            const sinkRim2 = new THREE.Mesh(createRoundedBoxGeo(0.36, 0.018, 0.38, 0.012, 2), inoxApplianceMat);
+            sinkRim2.position.set(4.18, 0.878, 7.66);
+            const sinkBowl2 = new THREE.Mesh(createRoundedBoxGeo(0.28, 0.016, 0.30, 0.025, 2), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.30, metalness: 0.85 }));
+            sinkBowl2.position.set(4.18, 0.883, 7.66);
+            const sinkDrain2 = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.008, 16), chromePolishMat);
+            sinkDrain2.position.set(4.18, 0.889, 7.66);
+
+            // Grifería monocomando pico alto cisne cromada en la intersección de las dos bachas
+            const tapBase = new THREE.Mesh(new THREE.CylinderGeometry(0.020, 0.024, 0.14, 16), chromePolishMat);
+            tapBase.position.set(4.56, 0.95, 7.56);
+            const tapArch = new THREE.Mesh(new THREE.TorusGeometry(0.085, 0.011, 10, 20, Math.PI), chromePolishMat);
+            tapArch.rotation.y = Math.PI / 4;
+            tapArch.position.set(4.50, 1.02, 7.50);
+            const tapLever = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.07, 10), chromePolishMat);
+            tapLever.rotation.z = 0.45;
+            tapLever.position.set(4.56, 0.96, 7.52);
+
+            [sinkRim1, sinkBowl1, sinkRim2, sinkBowl2, tapBase, tapArch].forEach(m => {
+                assignBIMUserData(m, {
+                    nombre: 'Bacha Doble de Acero Inoxidable y Grifería',
+                    categoria: 'mueble',
+                    dimensiones: { ancho: 0.62, alto: 0.32, profundidad: 0.48, elevacion: 0.86 }
+                });
+            });
+            fixturesGroup.add(sinkRim1, sinkBowl1, sinkDrain1, sinkRim2, sinkBowl2, sinkDrain2, tapBase, tapArch, tapLever);
+
+            // Purificador de agua PSA negro cilíndrico con base y pico vertedor cromado
+            const psaBody = new THREE.Mesh(new THREE.CylinderGeometry(0.044, 0.046, 0.24, 18), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.18, metalness: 0.35 }));
+            psaBody.position.set(4.53, 1.00, 7.68);
+            const psaRing = new THREE.Mesh(new THREE.CylinderGeometry(0.047, 0.047, 0.02, 18), chromePolishMat);
+            psaRing.position.set(4.53, 0.90, 7.68);
+            const psaSpout = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.11, 10), chromePolishMat);
+            psaSpout.rotation.z = Math.PI / 3;
+            psaSpout.position.set(4.48, 1.11, 7.65);
+            assignBIMUserData(psaBody, {
+                nombre: 'Purificador de Agua PSA',
+                categoria: 'mueble',
+                dimensiones: { ancho: 0.10, alto: 0.25, profundidad: 0.10, elevacion: 0.88 }
+            });
+            fixturesGroup.add(psaBody, psaRing, psaSpout);
+        })();
 
         // ============================================================================
         // 3) BAÑO HIPERREALISTA PBR: SANITARIOS ORGÁNICOS, LOZA, CROMO Y ESPEJO
@@ -5329,6 +5495,31 @@
 
             // Living despejado sin alfombra ni paneles falsos delante de la TV (piso cerámico continuo visible)
 
+            // 5B. Pedestal de Presentación de Maqueta Arquitectónica Premium (Base biselada bajo losa)
+            const pedestalGroup = new THREE.Group();
+            pedestalGroup.name = 'architecturalMaquettePedestal';
+            const plinthDarkMat = new THREE.MeshStandardMaterial({
+                color: 0x1e293b,
+                roughness: 0.42,
+                metalness: 0.18
+            });
+            const plinthWalnutTrimMat = new THREE.MeshStandardMaterial({
+                color: 0x3f2719,
+                roughness: 0.48,
+                metalness: 0.06
+            });
+            // Base estructural bajo el perímetro del departamento (6.66m x 8.36m)
+            const plinthBase = new THREE.Mesh(createRoundedBoxGeo(6.68, 0.036, 8.38, 0.012, 2), plinthDarkMat);
+            plinthBase.position.set(3.15, -0.022, 4.00);
+            plinthBase.receiveShadow = true;
+            plinthBase.castShadow = true;
+            // Filete perimetral de madera nogal de maqueta de estudio
+            const plinthTrim = new THREE.Mesh(createRoundedBoxGeo(6.54, 0.016, 8.24, 0.006, 2), plinthWalnutTrimMat);
+            plinthTrim.position.set(3.15, -0.006, 4.00);
+            plinthTrim.receiveShadow = true;
+            pedestalGroup.add(plinthBase, plinthTrim);
+            floorGroup.add(pedestalGroup);
+
             // 6. Oclusión Ambiental y Sombras de Contacto Suaves bajo Muebles (Photoreal Grounding)
             const contactShadowGeo = new THREE.PlaneGeometry(1, 1);
             function addContactShadowPlane(x, z, w, d, opacity = 0.52) {
@@ -5348,13 +5539,19 @@
 
             // Sombras de contacto para asentar físicamente cada mueble en el suelo:
             addContactShadowPlane(3.44, 3.10, 1.25, 2.25, 0.55); // Futón / Sillón en Living
-            addContactShadowPlane(4.38, 3.10, 0.70, 1.20, 0.45); // Mesa ratona
+            addContactShadowPlane(4.46, 3.10, 0.70, 1.15, 0.46); // Mesa ratona
             addContactShadowPlane(4.65, 1.15, 1.45, 1.90, 0.48); // Mesa de comedor y sillas
-            addContactShadowPlane(2.74, 1.02, 0.70, 2.15, 0.52); // Escritorio gamer en Estudio
+            addContactShadowPlane(6.02, 3.10, 0.58, 1.92, 0.52); // Rack de TV 1.77m en Living
+            addContactShadowPlane(2.74, 1.02, 0.70, 2.15, 0.52); // Escritorio en L en Estudio
+            addContactShadowPlane(0.18, 1.00, 0.42, 1.24, 0.52); // Biblioteca Alta en Estudio
             addContactShadowPlane(1.05, 6.65, 2.05, 1.60, 0.58); // Cama matrimonial en Cuarto
             addContactShadowPlane(0.28, 5.73, 0.50, 0.52, 0.45); // Mesa de luz Norte
             addContactShadowPlane(0.28, 7.57, 0.50, 0.52, 0.45); // Mesa de luz Sur
             addContactShadowPlane(4.45, 6.60, 0.80, 2.50, 0.54); // Muebles bajo mesada y cocina
+            addContactShadowPlane(4.53, 5.53, 0.72, 0.70, 0.56); // Heladera con Freezer en Cocina
+            addContactShadowPlane(3.35, 7.67, 0.72, 0.70, 0.54); // Lavarropas Automático en Cocina
+            addContactShadowPlane(1.22, 3.55, 0.65, 0.52, 0.46); // Vanitory en Baño
+            addContactShadowPlane(1.75, 3.58, 0.52, 0.68, 0.46); // Inodoro y Bidet en Baño
             addContactShadowPlane(6.08, 5.38, 0.45, 0.90, 0.48); // Perchero y zapatero en Entrada
 
             // Activar sombras arrojadas y recibidas en toda la arquitectura y mobiliario
@@ -6613,19 +6810,9 @@
                 addDecorCyl(3.46, 1.58, 1.94, 0.08, 0.18, 0.22, 0xffffff, 0.3);
             });
 
-            // - Planta de interior en maceta cerámica cónica con follaje botánico realista
+            // - Planta de interior en maceta cerámica cónica con follaje botánico realista (100% procedural, cero .glb)
             createCompoundAssembly('Planta Calathea en Maceta', () => {
-                loadGLBFurniture({
-                    url: 'models/plant.glb',
-                    targetSize: [0.45,0.75,0.45],
-                    position: [3.25,0,1.66],
-                    rotation: [0,0,0],
-                    fallbackFn: () => {
-
                 addDecorPlantCeramic(3.25, 0.00, 1.66, 0.14, 0.10, 0.28, 0.28, 0.35, 0.28, 0.48, 'Planta Calathea en Maceta');
-            
-                    }
-                });
             });
 
             // - Mesa ratona (Medidas reales relevadas: 90 cm de largo x 50 cm de ancho x 42 cm de alto):
@@ -6916,12 +7103,81 @@
             // ------------------------------------------------------------------------
             // 1. Mueble envolvente de heladera en esquina Noreste (X=4.53, Z=5.53, protegido tras la mocheta Norte X=4.15..4.85):
             createCompoundAssembly('Heladera con Bodega y Alacena', () => {
-                // - Heladera blanca con freezer superior mirando al Oeste + imanes en la puerta
-                addDecorBox(4.53, 0.84, 5.53, 0.58, 1.68, 0.56, 0xf8fafc, 0.25, 0, 'Heladera con Freezer');
+                const fridgeGroup = new THREE.Group();
+                fridgeGroup.position.set(4.53, 0, 5.53);
+                const fridgeBodyMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.22, metalness: 0.14 });
+                const fridgeSealMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.65, metalness: 0.05 });
+                const fridgeHandleMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.20, metalness: 0.82 });
+                const melaminaOakMat = new THREE.MeshStandardMaterial({ color: 0xd6ccc2, map: proceduralLightWoodTex, roughness: 0.46, metalness: 0.04 });
+                const wineBottleMat = new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.15, metalness: 0.25 });
+
+                // Cuerpo gabinete principal de la heladera (0.56m prof x 1.68m alto x 0.56m ancho)
+                const mainChassis = new THREE.Mesh(createRoundedBoxGeo(0.54, 1.66, 0.56, 0.018, 2), fridgeBodyMat);
+                mainChassis.position.set(0.02, 0.84, 0);
+                mainChassis.castShadow = true; mainChassis.receiveShadow = true;
+                // Puerta inferior refrigerador (biselada mirando al Oeste X-)
+                const lowerDoor = new THREE.Mesh(createRoundedBoxGeo(0.042, 1.08, 0.55, 0.014, 2), fridgeBodyMat);
+                lowerDoor.position.set(-0.27, 0.58, 0);
+                lowerDoor.castShadow = true; lowerDoor.receiveShadow = true;
+                // Puerta superior freezer (biselada mirando al Oeste X-)
+                const upperDoor = new THREE.Mesh(createRoundedBoxGeo(0.042, 0.48, 0.55, 0.014, 2), fridgeBodyMat);
+                upperDoor.position.set(-0.27, 1.40, 0);
+                upperDoor.castShadow = true; upperDoor.receiveShadow = true;
+                // Burlete / separación sombreada entre freezer y heladera + uñeros integrados
+                const sealGap = new THREE.Mesh(UNIT_BOX_GEO, fridgeSealMat);
+                sealGap.scale.set(0.044, 0.022, 0.54);
+                sealGap.position.set(-0.27, 1.14, 0);
+                const handleUpper = new THREE.Mesh(createRoundedBoxGeo(0.018, 0.016, 0.22, 0.005, 1), fridgeHandleMat);
+                handleUpper.position.set(-0.294, 1.20, -0.10);
+                const handleLower = new THREE.Mesh(createRoundedBoxGeo(0.018, 0.016, 0.22, 0.005, 1), fridgeHandleMat);
+                handleLower.position.set(-0.294, 1.08, -0.10);
+                // Rejilla zócalo inferior e imanes coloridos en la puerta
+                const baseGrille = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.5 }));
+                baseGrille.scale.set(0.02, 0.035, 0.50);
+                baseGrille.position.set(-0.275, 0.022, 0);
+                const mag1 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4 }));
+                mag1.scale.set(0.006, 0.045, 0.045);
+                mag1.position.set(-0.293, 1.46, 0.12);
+                const mag2 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x3b82f6, roughness: 0.4 }));
+                mag2.scale.set(0.006, 0.055, 0.040);
+                mag2.position.set(-0.293, 1.38, -0.08);
+                const mag3 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 }));
+                mag3.scale.set(0.006, 0.040, 0.050);
+                mag3.position.set(-0.293, 0.92, 0.14);
+                fridgeGroup.add(mainChassis, lowerDoor, upperDoor, sealGap, handleUpper, handleLower, baseGrille, mag1, mag2, mag3);
+                (currentAssemblyGroup || decorVideoGroup).add(fridgeGroup);
+
                 // - Bodega portabotellas de 8 nichos (4x2) + Alacena superior de 2 puertas en melamina roble claro hasta arriba
                 setMountWall(4.85, 5.53, false);
-                addDecorBox(4.53, 1.78, 5.53, 0.58, 0.16, 0.56, 0xd6ccc2, 0.5, 0, 'Bodega Portabotellas');  // Bodega portabotellas
-                addDecorBox(4.53, 2.12, 5.53, 0.58, 0.52, 0.56, 0xd6ccc2, 0.45, 0, 'Alacena sobre Heladera'); // Alacena alta sobre heladera
+                const rackGroup = new THREE.Group();
+                rackGroup.position.set(4.53, 1.78, 5.53);
+                const rackBox = new THREE.Mesh(createRoundedBoxGeo(0.58, 0.16, 0.56, 0.008, 1), melaminaOakMat);
+                rackBox.castShadow = true; rackBox.receiveShadow = true;
+                rackGroup.add(rackBox);
+                // Divisores de nichos y botellas acostadas mirando al Oeste
+                [-0.18, -0.06, 0.06, 0.18].forEach((bz, idx) => {
+                    const bottle = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.26, 12), wineBottleMat);
+                    bottle.rotation.z = Math.PI / 2;
+                    bottle.position.set(-0.16, (idx % 2 === 0 ? -0.03 : 0.03), bz);
+                    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.014, 0.07, 10), new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.3 }));
+                    neck.rotation.z = Math.PI / 2;
+                    neck.position.set(-0.285, (idx % 2 === 0 ? -0.03 : 0.03), bz);
+                    rackGroup.add(bottle, neck);
+                });
+                // Alacena alta de 2 puertas sobre la bodega
+                const topCab = new THREE.Mesh(createRoundedBoxGeo(0.56, 0.52, 0.56, 0.01, 2), melaminaOakMat);
+                topCab.position.set(0.01, 0.34, 0);
+                topCab.castShadow = true; topCab.receiveShadow = true;
+                [-0.135, 0.135].forEach(dz => {
+                    const doorLeaf = new THREE.Mesh(createRoundedBoxGeo(0.018, 0.49, 0.26, 0.006, 1), melaminaOakMat);
+                    doorLeaf.position.set(-0.28, 0.34, dz);
+                    doorLeaf.castShadow = true;
+                    const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.09, 8), fridgeHandleMat);
+                    handle.position.set(-0.295, 0.20, dz > 0 ? dz - 0.09 : dz + 0.09);
+                    rackGroup.add(doorLeaf, handle);
+                });
+                rackGroup.add(topCab);
+                (currentAssemblyGroup || decorVideoGroup).add(rackGroup);
                 setMountWall(null);
             });
             // 2. Alacenas superiores sobre Muro Este (X=4.85):
@@ -6953,12 +7209,72 @@
             // - Escurridor de platos negro sobre el retorno Sur de la mesada (pegado al lavarropas bajo la ventana: X=3.88, Z=7.68)
             addDecorBox(3.88, 0.93, 7.68, 0.38, 0.10, 0.36, 0x1e293b, 0.4, 0, 'Escurridor de Platos Negro');
             // - Lavarropas automático blanco de carga frontal bajo la ventana Sur (X=3.05..3.65, Z=7.67, mirando al Norte) apoyado contra la pared Oeste X=3.00
-            addDecorBox(3.35, 0.42, 7.67, 0.60, 0.84, 0.58, 0xf8fafc, 0.3, 0, 'Lavarropas Automático');  // Cuerpo lavarropas
-            const drum = addDecorCyl(3.35, 0.44, 7.37, 0.18, 0.18, 0.04, 0x334155, 0.2, 'Puerta Lavarropas'); // Ojo de buey mirando al Norte
-            drum.rotation.x = Math.PI / 2;
-            addDecorBox(3.35, 0.86, 7.67, 0.60, 0.04, 0.60, 0xb47b48, 0.45, 0, 'Tapa Madera Lavarropas'); // Tapa de madera que apoya exacta contra pared X=3.00
+            createCompoundAssembly('Lavarropas Automático', () => {
+                const wmGroup = new THREE.Group();
+                wmGroup.position.set(3.35, 0, 7.67);
+                const wmBodyMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.24, metalness: 0.12 });
+                const wmChromeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.16, metalness: 0.90 });
+                const wmDarkGlassMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.08, metalness: 0.85 });
+                const wmPanelMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.30, metalness: 0.10 });
+                const wmTopWoodMat = new THREE.MeshStandardMaterial({ color: 0xb47b48, map: proceduralWoodTex, roughness: 0.46, metalness: 0.05 });
+
+                // Gabinete principal biselado (0.60m ancho x 0.84m alto x 0.58m prof)
+                const wmBody = new THREE.Mesh(createRoundedBoxGeo(0.60, 0.84, 0.58, 0.018, 2), wmBodyMat);
+                wmBody.position.set(0, 0.42, 0);
+                wmBody.castShadow = true; wmBody.receiveShadow = true;
+                // Panel frontal superior de comandos (mirando al Norte Z-)
+                const ctrlPanel = new THREE.Mesh(createRoundedBoxGeo(0.58, 0.13, 0.025, 0.006, 1), wmPanelMat);
+                ctrlPanel.position.set(0, 0.75, -0.288);
+                // Jabonera izquierda, dial giratorio central y display LED negro derecho
+                const soapDrawer = new THREE.Mesh(createRoundedBoxGeo(0.16, 0.075, 0.015, 0.004, 1), wmBodyMat);
+                soapDrawer.position.set(-0.18, 0.75, -0.298);
+                const progDial = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.022, 16), wmChromeMat);
+                progDial.rotation.x = Math.PI / 2;
+                progDial.position.set(0.0, 0.75, -0.302);
+                const ledDisplay = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0x0f172a }));
+                ledDisplay.scale.set(0.14, 0.05, 0.008);
+                ledDisplay.position.set(0.17, 0.75, -0.30);
+                const ledDigits = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+                ledDigits.scale.set(0.06, 0.018, 0.009);
+                ledDigits.position.set(0.17, 0.75, -0.302);
+                // Aro exterior cromado de escotilla / ojo de buey y cúpula de vidrio templado oscuro
+                const outerRing = new THREE.Mesh(new THREE.TorusGeometry(0.185, 0.026, 14, 28), wmChromeMat);
+                outerRing.position.set(0, 0.42, -0.292);
+                outerRing.castShadow = true;
+                const glassDoor = new THREE.Mesh(new THREE.CylinderGeometry(0.165, 0.135, 0.055, 24), wmDarkGlassMat);
+                glassDoor.rotation.x = Math.PI / 2;
+                glassDoor.position.set(0, 0.42, -0.275);
+                // Tapa de filtro inferior derecho
+                const filterFlap = new THREE.Mesh(UNIT_BOX_GEO, wmPanelMat);
+                filterFlap.scale.set(0.11, 0.08, 0.008);
+                filterFlap.position.set(0.20, 0.08, -0.292);
+                // Tapa superior de madera maciza protectora sobre el lavarropas
+                const woodCover = new THREE.Mesh(createRoundedBoxGeo(0.60, 0.036, 0.60, 0.008, 2), wmTopWoodMat);
+                woodCover.position.set(0, 0.858, 0);
+                woodCover.castShadow = true; woodCover.receiveShadow = true;
+
+                wmGroup.add(wmBody, ctrlPanel, soapDrawer, progDial, ledDisplay, ledDigits, outerRing, glassDoor, filterFlap, woodCover);
+                (currentAssemblyGroup || decorVideoGroup).add(wmGroup);
+            });
             // - Estación de café sobre la tapa de madera del lavarropas (frente a la ventana): Cafetera expreso + Pava eléctrica negra
-            addDecorBox(3.45, 1.04, 7.68, 0.26, 0.32, 0.26, 0x334155, 0.3, 0, 'Cafetera Espresso');  // Cafetera expreso plateada/negra
+            createCompoundAssembly('Cafetera Espresso', () => {
+                const espGroup = new THREE.Group();
+                espGroup.position.set(3.45, 0.876, 7.68);
+                const espBodyMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.28, metalness: 0.65 });
+                const espChromeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.15, metalness: 0.92 });
+                const espBase = new THREE.Mesh(createRoundedBoxGeo(0.22, 0.28, 0.24, 0.015, 2), espBodyMat);
+                espBase.position.set(0, 0.14, 0);
+                espBase.castShadow = true;
+                const dripTray = new THREE.Mesh(createRoundedBoxGeo(0.20, 0.025, 0.09, 0.005, 1), espChromeMat);
+                dripTray.position.set(0, 0.015, -0.14);
+                const groupHead = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.04, 14), espChromeMat);
+                groupHead.position.set(0, 0.18, -0.13);
+                const portafilterHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.010, 0.11, 10), new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.4 }));
+                portafilterHandle.rotation.x = Math.PI / 2;
+                portafilterHandle.position.set(0, 0.175, -0.20);
+                espGroup.add(espBase, dripTray, groupHead, portafilterHandle);
+                (currentAssemblyGroup || decorVideoGroup).add(espGroup);
+            });
             addDecorCyl(3.18, 0.98, 7.68, 0.08, 0.09, 0.20, 0x0f172a, 0.3, 'Pava Eléctrica Negra');  // Pava eléctrica negra
             // 4. Pared Oeste de la Cocina (X=3.00): 2 Cestos de basura en fila + bolso térmico + escoba azul con pala + portero eléctrico + aplique luz
             addDecorBox(3.22, 0.26, 7.08, 0.30, 0.52, 0.30, 0xf8fafc, 0.4, 0, 'Cesto Basura Blanco');  // Cesto blanco (junto a pared X=3.00)
@@ -7880,9 +8196,17 @@
             });
         }
         // ============================================================================
-        // SISTEMA DE PERSISTENCIA DE MODIFICACIONES (MUEBLES MOVIDOS Y ELIMINADOS)
+        // SISTEMA DE PERSISTENCIA DE MODIFICACIONES (CONFIG.JSON + LAYOUT.JSON ZERO DATA LOSS)
         // ============================================================================
-        const DECOR_OVERRIDES_KEY = 'depto_decor_overrides_v3';
+        const CURRENT_SCHEMA_VERSION = '2026.11.12.v3';
+        const DECOR_OVERRIDES_KEY = 'depto_decor_overrides_v4';
+        // Purgar automáticamente overrides obsoletos de esquemas previos en cualquier dispositivo
+        if (localStorage.getItem('depto_schema_version') !== CURRENT_SCHEMA_VERSION) {
+            localStorage.removeItem('depto_decor_overrides_v3');
+            localStorage.removeItem(DECOR_OVERRIDES_KEY);
+            localStorage.removeItem('depto_layout_updated_at');
+            localStorage.setItem('depto_schema_version', CURRENT_SCHEMA_VERSION);
+        }
         let decorOverrides = { deleted: [], transforms: {} };
         try {
             const savedDecor = localStorage.getItem(DECOR_OVERRIDES_KEY);
@@ -8128,93 +8452,108 @@
                 g.rotation.y = (item.rot || 0) * (Math.PI / 180);
                 g.userData = { id: item.id };
 
-                const woodPbr = new THREE.MeshStandardMaterial({ color: item.color || 0xb47b48, roughness: 0.70, metalness: 0.05 });
-                const darkMetalPbr = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.30, metalness: 0.80 });
-                const fabricPbr = new THREE.MeshStandardMaterial({ color: item.color || 0x3b82f6, roughness: 1.0, metalness: 0.0 });
+                const woodPbr = new THREE.MeshStandardMaterial({ color: item.color || 0xb47b48, map: proceduralWoodTex, roughness: 0.48, metalness: 0.05 });
+                const darkMetalPbr = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.28, metalness: 0.82 });
+                const fabricPbr = new THREE.MeshStandardMaterial({ color: item.color || 0x3b82f6, map: proceduralFabricBumpTex, bumpMap: proceduralFabricBumpTex, bumpScale: 0.004, roughness: 0.92, metalness: 0.0 });
 
-                if (item.type === 'cama') {
-                    // Cama compuesta con patas, base de madera, colchón y almohadas
-                    const base = new THREE.Mesh(UNIT_BOX_GEO, woodPbr);
-                    base.scale.set(item.w, item.h * 0.35, item.d);
-                    base.position.set(0, -item.h * 0.32, 0);
+                if (item.type === 'cama' || item.type === 'cama_simple') {
+                    // Cama morfológica con cabecera, patas torneadas, base sommier biselada, colchón y almohadas
+                    const base = new THREE.Mesh(createRoundedBoxGeo(item.w, item.h * 0.35, item.d, 0.018, 2), woodPbr);
+                    base.position.set(0, -item.h * 0.30, 0);
                     base.castShadow = true; base.receiveShadow = true;
 
-                    const mat = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.95 }));
-                    mat.scale.set(item.w * 0.96, item.h * 0.45, item.d * 0.96);
-                    mat.position.set(0, 0, 0);
+                    const headb = new THREE.Mesh(createRoundedBoxGeo(item.w, item.h * 0.95, 0.045, 0.012, 2), woodPbr);
+                    headb.position.set(0, item.h * 0.12, -item.d * 0.48);
+                    headb.castShadow = true; headb.receiveShadow = true;
+
+                    const mat = new THREE.Mesh(createRoundedBoxGeo(item.w * 0.96, item.h * 0.44, item.d * 0.95, 0.032, 3), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.90 }));
+                    mat.position.set(0, 0.02, 0.01);
                     mat.castShadow = true; mat.receiveShadow = true;
 
-                    const duvet = new THREE.Mesh(UNIT_BOX_GEO, fabricPbr);
-                    duvet.scale.set(item.w * 0.98, item.h * 0.12, item.d * 0.70);
-                    duvet.position.set(0, item.h * 0.24, item.d * 0.12);
-                    duvet.castShadow = true;
+                    const duvet = new THREE.Mesh(createRoundedBoxGeo(item.w * 0.98, item.h * 0.14, item.d * 0.70, 0.028, 3), fabricPbr);
+                    duvet.position.set(0, item.h * 0.25, item.d * 0.12);
+                    duvet.castShadow = true; duvet.receiveShadow = true;
 
-                    const p1 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 1.0 }));
-                    p1.scale.set(item.w * 0.38, item.h * 0.15, item.d * 0.22);
-                    p1.position.set(-item.w * 0.24, item.h * 0.25, -item.d * 0.32);
-                    p1.rotation.x = 0.25; p1.castShadow = true;
-
-                    const p2 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 1.0 }));
-                    p2.scale.set(item.w * 0.38, item.h * 0.15, item.d * 0.22);
-                    p2.position.set(item.w * 0.24, item.h * 0.25, -item.d * 0.32);
-                    p2.rotation.x = 0.25; p2.castShadow = true;
-
-                    g.add(base, mat, duvet, p1, p2);
+                    const pillowMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.92 });
+                    if (item.type === 'cama_simple') {
+                        const p1 = new THREE.Mesh(createRoundedBoxGeo(item.w * 0.68, item.h * 0.15, item.d * 0.20, 0.025, 2), pillowMat);
+                        p1.position.set(0, item.h * 0.26, -item.d * 0.32);
+                        p1.rotation.x = 0.22; p1.castShadow = true;
+                        g.add(p1);
+                    } else {
+                        [-1, 1].forEach(side => {
+                            const p = new THREE.Mesh(createRoundedBoxGeo(item.w * 0.38, item.h * 0.15, item.d * 0.20, 0.025, 2), pillowMat);
+                            p.position.set(side * item.w * 0.24, item.h * 0.26, -item.d * 0.32);
+                            p.rotation.x = 0.22; p.castShadow = true;
+                            g.add(p);
+                        });
+                    }
+                    g.add(base, headb, mat, duvet);
                 } else if (item.type === 'sillon') {
-                    // Sillón seccional con cojines individuales y apoyabrazos
-                    const base = new THREE.Mesh(UNIT_BOX_GEO, woodPbr);
-                    base.scale.set(item.w, item.h * 0.25, item.d);
-                    base.position.set(0, -item.h * 0.35, 0);
-                    base.castShadow = true;
+                    // Sillón seccional con cojines biselados, apoyabrazos y patas
+                    const base = new THREE.Mesh(createRoundedBoxGeo(item.w, item.h * 0.24, item.d, 0.016, 2), woodPbr);
+                    base.position.set(0, -item.h * 0.34, 0);
+                    base.castShadow = true; base.receiveShadow = true;
 
-                    // 2 Cojines de asiento separados
                     [-1, 1].forEach(side => {
-                        const seat = new THREE.Mesh(UNIT_BOX_GEO, fabricPbr);
-                        seat.scale.set(item.w * 0.44, item.h * 0.25, item.d * 0.75);
-                        seat.position.set(side * item.w * 0.23, -item.h * 0.10, item.d * 0.08);
+                        const seat = new THREE.Mesh(createRoundedBoxGeo(item.w * 0.43, item.h * 0.24, item.d * 0.74, 0.026, 2), fabricPbr);
+                        seat.position.set(side * item.w * 0.225, -item.h * 0.10, item.d * 0.08);
                         seat.castShadow = true; seat.receiveShadow = true;
 
-                        const back = new THREE.Mesh(UNIT_BOX_GEO, fabricPbr);
-                        back.scale.set(item.w * 0.44, item.h * 0.50, item.d * 0.22);
-                        back.position.set(side * item.w * 0.23, item.h * 0.20, -item.d * 0.32);
-                        back.rotation.x = 0.15;
-                        back.castShadow = true;
+                        const back = new THREE.Mesh(createRoundedBoxGeo(item.w * 0.43, item.h * 0.48, item.d * 0.22, 0.026, 2), fabricPbr);
+                        back.position.set(side * item.w * 0.225, item.h * 0.20, -item.d * 0.32);
+                        back.rotation.x = 0.14;
+                        back.castShadow = true; back.receiveShadow = true;
                         g.add(seat, back);
                     });
 
-                    // Apoyabrazos
                     [-1, 1].forEach(side => {
-                        const arm = new THREE.Mesh(UNIT_BOX_GEO, woodPbr);
-                        arm.scale.set(item.w * 0.08, item.h * 0.55, item.d);
+                        const arm = new THREE.Mesh(createRoundedBoxGeo(item.w * 0.08, item.h * 0.54, item.d * 0.96, 0.018, 2), woodPbr);
                         arm.position.set(side * (item.w * 0.46), -item.h * 0.05, 0);
-                        arm.castShadow = true;
+                        arm.castShadow = true; arm.receiveShadow = true;
                         g.add(arm);
                     });
                     g.add(base);
-                } else if (item.type === 'mesa') {
-                    // Mesa con patas de metal oscuro y tapa de madera biselada
-                    const top = new THREE.Mesh(UNIT_BOX_GEO, woodPbr);
-                    top.scale.set(item.w, 0.04, item.d);
+                } else if (item.type === 'mesa' || item.type === 'escritorio') {
+                    // Mesa / Escritorio con tapa de madera biselada y estructura metálica
+                    const top = new THREE.Mesh(createRoundedBoxGeo(item.w, 0.04, item.d, 0.008, 2), woodPbr);
                     top.position.set(0, item.h / 2 - 0.02, 0);
                     top.castShadow = true; top.receiveShadow = true;
                     g.add(top);
 
                     const legH = item.h - 0.04;
-                    const legGeo = new THREE.CylinderGeometry(0.018, 0.014, legH, 10);
-                    const offsets = [[-0.42, -0.42], [0.42, -0.42], [-0.42, 0.42], [0.42, 0.42]];
+                    const legGeo = new THREE.CylinderGeometry(0.018, 0.014, legH, 12);
+                    const offsets = [[-0.43, -0.42], [0.43, -0.42], [-0.43, 0.42], [0.43, 0.42]];
                     offsets.forEach(([ox, oz]) => {
                         const leg = new THREE.Mesh(legGeo, darkMetalPbr);
                         leg.position.set(ox * item.w, -0.02, oz * item.d);
                         leg.castShadow = true;
                         g.add(leg);
                     });
+                } else if (item.type === 'placard' || item.type === 'heladera') {
+                    // Gabinete morfológico con puertas frontales biseladas y tiradores
+                    const bodyMat = item.type === 'heladera'
+                        ? new THREE.MeshStandardMaterial({ color: item.color || 0xf8fafc, roughness: 0.22, metalness: 0.18 })
+                        : woodPbr;
+                    const body = new THREE.Mesh(createRoundedBoxGeo(item.w, item.h, item.d * 0.92, 0.016, 2), bodyMat);
+                    body.position.set(0, 0, -item.d * 0.03);
+                    body.castShadow = true; body.receiveShadow = true;
+                    g.add(body);
+                    [-1, 1].forEach(side => {
+                        const leaf = new THREE.Mesh(createRoundedBoxGeo(item.w * 0.48, item.h * 0.96, 0.024, 0.006, 1), bodyMat);
+                        leaf.position.set(side * item.w * 0.245, 0, item.d * 0.45);
+                        leaf.castShadow = true;
+                        const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.16, 8), darkMetalPbr);
+                        handle.position.set(side * item.w * 0.06, 0, item.d * 0.47);
+                        g.add(leaf, handle);
+                    });
                 } else {
-                    // Fallback para otros muebles detallados
-                    const geo = new THREE.BoxGeometry(item.w, item.h, item.d);
+                    // Volumen arquitectónico con cantos biselados suaves
+                    const geo = createRoundedBoxGeo(item.w, item.h, item.d, Math.min(0.02, item.w * 0.08, item.h * 0.08), 2);
                     const mat = new THREE.MeshStandardMaterial({
                         color: item.color || 0x0284c7,
-                        roughness: 0.60,
-                        metalness: 0.10
+                        roughness: 0.48,
+                        metalness: 0.08
                     });
                     const mesh = new THREE.Mesh(geo, mat);
                     mesh.castShadow = true;
@@ -8915,6 +9254,9 @@
             } catch (e) {}
 
             return {
+                app: 'departamento-01-01',
+                schemaVersion: CURRENT_SCHEMA_VERSION,
+                renderQuality: 'maqueta-arquitectonica-premium',
                 updatedAt: localUpdatedAt || Date.now(),
                 decorOverrides: decorOverrides,
                 furnitureList: furnitureList
@@ -8924,6 +9266,7 @@
         function saveLocalFullLayout(layout) {
             if (!layout) return;
             try {
+                localStorage.setItem('depto_schema_version', CURRENT_SCHEMA_VERSION);
                 if (layout.updatedAt) {
                     localStorage.setItem('depto_layout_updated_at', layout.updatedAt.toString());
                     lastSyncTimestamp = layout.updatedAt;
@@ -8945,6 +9288,8 @@
             if (typeof isReadOnlyShareMode !== 'undefined' && isReadOnlyShareMode) return false;
             updateSyncStatusBadge('syncing', 'Sincronizando...');
             try {
+                layout.schemaVersion = CURRENT_SCHEMA_VERSION;
+                layout.renderQuality = 'maqueta-arquitectonica-premium';
                 layout.updatedAt = Date.now();
                 localStorage.setItem('depto_layout_updated_at', layout.updatedAt.toString());
                 lastSyncTimestamp = layout.updatedAt;
@@ -8952,7 +9297,8 @@
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 3500);
 
-                const res = await fetch('/api/layout', {
+                // Escribir simultáneamente en /api/config (config.json + layout.json en servidor local y GitHub)
+                const res = await fetch('/api/config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(layout),
@@ -8962,7 +9308,7 @@
 
                 if (res.ok) {
                     updateSyncStatusBadge('synced', 'Sincronizado');
-                    if (notify) showToast('☁️ Cambios sincronizados con la nube y guardados offline', false, 3200);
+                    if (notify) showToast('☁️ config.json sincronizado en Local, Túnel y Nube', false, 3200);
                     return true;
                 } else {
                     updateSyncStatusBadge('offline', 'Guardado local');
@@ -8992,7 +9338,7 @@
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 2800);
-                const res = await fetch('/api/layout', { cache: 'no-store', signal: controller.signal });
+                const res = await fetch('/api/config', { cache: 'no-store', signal: controller.signal });
                 clearTimeout(timeoutId);
                 if (res.ok) {
                     remoteLayout = await res.json();
@@ -9000,8 +9346,8 @@
             } catch (e) {
                 // Fallback para GitHub Pages o entorno estático sin dev-server
                 try {
-                    // Intento 1: API de GitHub directa (para GitHub Pages siempre fresco)
-                    const ghRes = await fetch('https://api.github.com/repos/TotoArg/departamento-01-01/contents/layout.json?ref=main', {
+                    // Intento 1: API de GitHub directa (config.json en main siempre fresco)
+                    const ghRes = await fetch('https://api.github.com/repos/TotoArg/departamento-01-01/contents/config.json?ref=main', {
                         headers: { 'Accept': 'application/vnd.github.v3+json' },
                         cache: 'no-store'
                     });
@@ -9014,7 +9360,7 @@
                     }
                 } catch (errGh) {
                     try {
-                        const resStatic = await fetch('./layout.json', { cache: 'no-store' });
+                        const resStatic = await fetch('./config.json', { cache: 'no-store' });
                         if (resStatic.ok) {
                             remoteLayout = await resStatic.json();
                         }
@@ -9023,6 +9369,11 @@
             }
 
             if (remoteLayout && remoteLayout.updatedAt) {
+                // Ignorar estados remotos de esquemas viejos pre-calibración
+                if (remoteLayout.schemaVersion && remoteLayout.schemaVersion !== CURRENT_SCHEMA_VERSION) {
+                    updateSyncStatusBadge('synced', 'Sincronizado');
+                    return;
+                }
                 const localTs = parseInt(localStorage.getItem('depto_layout_updated_at') || '0', 10);
                 // Unir siempre los elementos eliminados (deleted) entre local y servidor para que ningún objeto borrado reaparezca al sincronizar
                 const mergedDeleted = Array.from(new Set([
@@ -9030,21 +9381,20 @@
                     ...(remoteLayout.decorOverrides?.deleted || [])
                 ]));
                 if (remoteLayout.updatedAt > localTs) {
-                    console.log(`[Sync] Servidor tiene versión más reciente (${new Date(remoteLayout.updatedAt).toLocaleTimeString()}). Sincronizando...`);
+                    console.log(`[Sync] config.json remoto más reciente (${new Date(remoteLayout.updatedAt).toLocaleTimeString()}). Sincronizando...`);
                     if (remoteLayout.decorOverrides) remoteLayout.decorOverrides.deleted = mergedDeleted;
                     saveLocalFullLayout(remoteLayout);
                     applyDecorOverrides();
                     renderFurniture3D();
                     wakeRenderer();
                     updateSyncStatusBadge('synced', 'Sincronizado');
-                    showToast('☁️ Distribución sincronizada con éxito', false, 2500);
                     return;
                 } else if (localTs > remoteLayout.updatedAt) {
                     if (typeof isReadOnlyShareMode !== 'undefined' && isReadOnlyShareMode) {
                         updateSyncStatusBadge('synced', 'Sincronizado');
                         return;
                     }
-                    console.log(`[Sync] Cliente local tiene cambios más nuevos. Subiendo al servidor...`);
+                    console.log(`[Sync] Cliente local tiene cambios más nuevos. Subiendo a config.json...`);
                     if (localLayout.decorOverrides) localLayout.decorOverrides.deleted = mergedDeleted;
                     await pushLayoutToServer(localLayout, false);
                     return;
@@ -9124,7 +9474,9 @@
             btnBackupDownload.addEventListener('click', () => {
                 const data = {
                     app: 'departamento-01-01',
-                    version: '1.0',
+                    schemaVersion: CURRENT_SCHEMA_VERSION,
+                    renderQuality: 'maqueta-arquitectonica-premium',
+                    updatedAt: Date.now(),
                     savedAt: new Date().toISOString(),
                     decorOverrides: decorOverrides,
                     furnitureList: furnitureList
@@ -9134,12 +9486,12 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `depto_muebles_personalizados_${new Date().toISOString().slice(0, 10)}.json`;
+                a.download = `config.json`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                showToast('📥 Archivo de respaldo descargado');
+                showToast('📥 Archivo config.json descargado');
             });
         }
 
@@ -9162,7 +9514,8 @@
                             renderFurniture3D();
                         }
                         applyDecorOverrides();
-                        showToast('✓ Respaldo cargado y guardado correctamente');
+                        pushLayoutToServer(getLocalFullLayout(), true);
+                        showToast('✓ config.json cargado y sincronizado');
                         if (backupModal) backupModal.style.display = 'none';
                         wakeRenderer();
                     } catch (err) {
@@ -9179,7 +9532,9 @@
             btnBackupCopy.addEventListener('click', () => {
                 const data = {
                     app: 'departamento-01-01',
-                    version: '1.0',
+                    schemaVersion: CURRENT_SCHEMA_VERSION,
+                    renderQuality: 'maqueta-arquitectonica-premium',
+                    updatedAt: Date.now(),
                     savedAt: new Date().toISOString(),
                     decorOverrides: decorOverrides,
                     furnitureList: furnitureList
@@ -9187,12 +9542,12 @@
                 const jsonStr = JSON.stringify(data, null, 2);
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(jsonStr).then(() => {
-                        showToast('📋 Configuración copiada al portapapeles');
+                        showToast('📋 config.json copiado al portapapeles');
                     }).catch(() => {
-                        prompt('Copiá tu código JSON:', jsonStr);
+                        prompt('Copiá tu código config.json:', jsonStr);
                     });
                 } else {
-                    prompt('Copiá tu código JSON:', jsonStr);
+                    prompt('Copiá tu código config.json:', jsonStr);
                 }
             });
         }
@@ -9223,7 +9578,8 @@
                         renderFurniture3D();
                     }
                     applyDecorOverrides();
-                    showToast('✓ Cambios pegados y guardados con éxito');
+                    pushLayoutToServer(getLocalFullLayout(), true);
+                    showToast('✓ config.json pegado y sincronizado con éxito');
                     if (backupModal) backupModal.style.display = 'none';
                     wakeRenderer();
                 } catch (err) {
