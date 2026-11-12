@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.12.v3",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794513476349,
+  "updatedAt": 1794513485046,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -35,6 +35,12 @@
         "x": 5.99,
         "y": 0.57,
         "z": 4.24,
+        "rot": 0
+      },
+      "Comederos de Mascota": {
+        "x": 4.52,
+        "y": 0.05,
+        "z": 5.02,
         "rot": 0
       }
     }
