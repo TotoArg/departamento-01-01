@@ -1152,6 +1152,105 @@
             font-weight: 700;
             color: #a7f3d0;
         }
+        #bim-context-card .bim-mat-section {
+            margin-top: 7px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.10);
+        }
+        #bim-context-card .bim-mat-lbl {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        #bim-context-card .bim-swatches-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        #bim-context-card .bim-swatch-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 7px;
+            border-radius: 7px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #f8fafc;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        #bim-context-card .bim-swatch-btn:hover,
+        #bim-context-card .bim-swatch-btn.active {
+            border-color: #38bdf8;
+            background: rgba(14, 165, 233, 0.25);
+            color: #e0f2fe;
+        }
+        #bim-context-card .bim-swatch-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.45);
+            flex-shrink: 0;
+        }
+        #iso-compass-bar {
+            display: none;
+            position: fixed;
+            top: 56px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 95;
+            background: rgba(15, 23, 42, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.45);
+            border-radius: 999px;
+            padding: 4px 8px;
+            gap: 5px;
+            align-items: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+        #iso-compass-bar .iso-corner-btn {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            color: #e2e8f0;
+            border-radius: 999px;
+            padding: 3px 9px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        #iso-compass-bar .iso-corner-btn:hover,
+        #iso-compass-bar .iso-corner-btn.active {
+            background: #0284c7;
+            border-color: #7dd3fc;
+            color: #ffffff;
+        }
+        #bim-tool-hud {
+            display: none;
+            position: fixed;
+            top: 56px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 115;
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(12px);
+            border: 1.5px solid #38bdf8;
+            border-radius: 14px;
+            padding: 7px 13px;
+            color: #f8fafc;
+            font-size: 11.5px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            max-width: 94vw;
+        }
         @media (max-width: 800px) {
             #bim-context-card {
                 left: 50% !important;
@@ -1161,13 +1260,36 @@
                 width: calc(100vw - 24px);
                 max-width: 350px;
             }
+            #iso-compass-bar, #bim-tool-hud {
+                top: 86px;
+            }
         }
     </style>
 </head>
 <body>
     <button id="btn-exit-clean-screen" style="display:none; position:fixed; top:12px; right:12px; z-index:9999; background:rgba(15,23,42,0.92); border:1.5px solid #38bdf8; color:#38bdf8; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; backdrop-filter:blur(12px); box-shadow:0 4px 20px rgba(0,0,0,0.6); align-items:center; gap:6px;">👁️ Mostrar controles</button>
 
-    <!-- Panel Contextual de Información BIM (Oculto por defecto) -->
+    <!-- Barra de Vistas Axonométricas Predefinidas (1 Clic: NO / NE / SE / SO en Modo Isométrica) -->
+    <div id="iso-compass-bar">
+        <span style="font-size:10.5px; color:#7dd3fc; font-weight:800; padding:0 4px;">🧭 Esquina 45°:</span>
+        <button class="iso-corner-btn" data-iso-corner="NO" title="Vista Axonométrica Noroeste (45°)">↖ NO</button>
+        <button class="iso-corner-btn" data-iso-corner="NE" title="Vista Axonométrica Noreste (45°)">↗ NE</button>
+        <button class="iso-corner-btn" data-iso-corner="SE" title="Vista Axonométrica Sudeste (45°)">↘ SE</button>
+        <button class="iso-corner-btn active" data-iso-corner="SO" title="Vista Axonométrica Sudoeste (45°)">↙ SO</button>
+    </div>
+
+    <!-- Banner HUD para Cinta Métrica Punto a Punto y Modo Colgar Cuadros / Espejos -->
+    <div id="bim-tool-hud">
+        <span id="bim-tool-hud-text">📏 Tocá dos puntos en la escena 3D para medir</span>
+        <div id="bim-wallhang-presets" style="display:none; gap:4px; align-items:center;">
+            <button class="iso-corner-btn active" data-hang-type="cuadro" title="Cuadro Enmarcado (0.65×0.50m)">🖼️ Cuadro</button>
+            <button class="iso-corner-btn" data-hang-type="espejo" title="Espejo Redondo / Vertical (0.55×0.85m)">🪞 Espejo</button>
+            <button class="iso-corner-btn" data-hang-type="estante" title="Estante Flotante Madera (0.80×0.20m)">🪵 Estante</button>
+        </div>
+        <button id="btn-bim-tool-clear" style="background:rgba(239,68,68,0.22); border:1px solid #ef4444; color:#fca5a5; border-radius:8px; padding:3px 8px; font-size:10.5px; font-weight:700; cursor:pointer;">✕ Cerrar</button>
+    </div>
+
+    <!-- Panel Contextual de Información BIM + Catálogo de Materiales en Tiempo Real (Oculto por defecto) -->
     <div id="bim-context-card" style="display: none;">
         <div class="bim-card-header">
             <span id="bim-card-cat" class="bim-cat-badge">MUEBLE</span>
@@ -1191,6 +1313,16 @@
         <div class="bim-elev-row">
             <span>Altura s/ piso (Elevación):</span>
             <span id="bim-card-elev" class="bim-elev-val">+0.00 m</span>
+        </div>
+        <div id="bim-card-extra-info" style="display:none; font-size:10.5px; color:#93c5fd; margin-top:4px; padding-top:4px; border-top:1px dashed rgba(56,189,248,0.25);"></div>
+        <div id="bim-card-mat-section" class="bim-mat-section">
+            <span id="bim-card-mat-lbl" class="bim-mat-lbl">🎨 Probar Acabado / Material en Vivo:</span>
+            <div id="bim-card-swatches" class="bim-swatches-row"></div>
+        </div>
+        <div id="bim-card-wallitem-actions" style="display:none; margin-top:7px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.1); gap:6px;">
+            <button id="btn-bim-wallitem-up" class="bim-swatch-btn" title="Subir +5 cm">⬆️ +5cm</button>
+            <button id="btn-bim-wallitem-down" class="bim-swatch-btn" title="Bajar -5 cm">⬇️ -5cm</button>
+            <button id="btn-bim-wallitem-del" class="bim-swatch-btn" style="background:rgba(239,68,68,0.25); border-color:#ef4444; color:#fca5a5; margin-left:auto;">🗑️ Quitar</button>
         </div>
     </div>
 
@@ -1247,8 +1379,14 @@
             <button class="mode-btn active" id="btn-mode-sims" title="3D Maqueta con corte dinámico estilo Los Sims"><span>✂️</span> 3D Sims</button>
             <button class="mode-btn" id="btn-mode-walk" style="background:rgba(14,165,233,0.22); border:1px solid #38bdf8; color:#bae6fd; font-weight:700;" title="Caminar por adentro en 1° Persona (Joystick / WASD / Toque en el piso)"><span>🚶</span> Caminar 3D</button>
             <button class="mode-btn" id="btn-mode-tour" style="background:rgba(168,85,247,0.24); border:1px solid #c084fc; color:#e9d5ff; font-weight:700;" title="Recorrido 3D Guiado Automático (Estilo Reel / Walkthrough)"><span>🎬</span> Tour 3D</button>
-            <button class="mode-btn" id="btn-bim-mode" style="background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.55); color:#7dd3fc; font-weight:700;" title="Modo Planificación Técnica (BIM View): Estilo translúcido/wireframe con cajas delimitadoras de volúmenes, muebles y aberturas">
+            <button class="mode-btn" id="btn-bim-mode" style="background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.55); color:#7dd3fc; font-weight:700;" title="Modo Planificación Técnica (BIM View): Estilo translúcido/wireframe con cajas delimitadoras y arcos de barrido de puertas con detección de colisiones">
                 <span>📏</span> <span id="lbl-bim-mode">Modo Planificación</span>
+            </button>
+            <button class="mode-btn" id="btn-measure-tape" style="background:rgba(16,185,129,0.18); border:1px solid rgba(16,185,129,0.55); color:#6ee7b7; font-weight:700;" title="Cinta Métrica Interactiva Punto a Punto (Tocá 2 puntos en el modelo para medir distancia libre ΔX, ΔZ y diagonal)">
+                <span>📐</span> <span id="lbl-measure-tape">Medir A↔B</span>
+            </button>
+            <button class="mode-btn" id="btn-wall-hang" style="background:rgba(244,114,182,0.18); border:1px solid rgba(244,114,182,0.55); color:#f9a8d4; font-weight:700;" title="Modo Colgar Cuadros, Espejos y Estantes directamente sobre las paredes con altura al ojo (1.60m)">
+                <span>🖼️</span> <span id="lbl-wall-hang">Cuadros</span>
             </button>
 
             <button class="mode-btn" id="btn-share-readonly" style="background:rgba(14,165,233,0.24); border:1.5px solid #38bdf8; color:#e0f2fe; font-weight:700;" title="Compartir enlace de solo lectura para que otros vean e interactúen con el modelo sin poder editarlo">
@@ -1300,11 +1438,17 @@
     <div id="sidebar-right" class="glass-panel">
         <div class="panel-title" style="margin-bottom:4px;">☀️ Estudio Solar & Domótica WiZ</div>
         <div style="font-size:10px; color:#94a3b8; margin-bottom:6px;">El Calafate, Santa Cruz (-50.33° Lat, -72.26° Lon)</div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:10px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:6px;">
             <button class="action-btn solar-btn-sb" data-time="morning" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#f8fafc;">🌅 Mañana</button>
             <button class="action-btn solar-btn-sb active" data-time="noon" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fbbf24; font-weight:700;">☀️ Mediodía</button>
             <button class="action-btn solar-btn-sb" data-time="golden" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#f8fafc;">🌇 Atardecer</button>
             <button class="action-btn solar-btn-sb" data-time="night" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(56,189,248,0.15); border:1px solid #0284c7; color:#bae6fd;">🌙 Noche WiZ</button>
+        </div>
+        <div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">Balance de Blancos Fotográfico (Sin Sombras Marrones)</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; margin-bottom:10px;">
+            <button class="action-btn wb-btn" data-wb="5500k" style="padding:4px 5px; font-size:10px; text-align:center; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#bae6fd;">❄️ 5500K</button>
+            <button class="action-btn wb-btn active" data-wb="4500k" style="padding:4px 5px; font-size:10px; text-align:center; border-radius:6px; cursor:pointer; background:rgba(56,189,248,0.22); border:1px solid #38bdf8; color:#ffffff; font-weight:700;">⚪ 4500K</button>
+            <button class="action-btn wb-btn" data-wb="3200k" style="padding:4px 5px; font-size:10px; text-align:center; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#fde68a;">🌤️ 3200K</button>
         </div>
         <div class="panel-title">Paredes (Estilo Los Sims)</div>
         <label class="toggle-row" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 6px; padding: 5px 8px;">
@@ -10150,6 +10294,11 @@
             pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(pointer, activeCamera);
 
+            // 00. Si está activa la Cinta Métrica Punto a Punto o el Modo Colgar Cuadros/Espejos, procesar el clic
+            if (typeof handleActiveBIMToolPointerClick === 'function' && handleActiveBIMToolPointerClick(e)) {
+                return;
+            }
+
             // 0. Raycast sobre puertas y hojas de placard animadas (en Perspectiva 3D e Isométrica 3D)
             if (activeCamera !== orthoCam) {
                 const doorHits = raycaster.intersectObjects(doorClickCandidates, false);
@@ -10777,7 +10926,9 @@
                 if (btnLabel) btnLabel.innerText = "Perspectiva";
                 if (btnIcon) btnIcon.innerText = "📷";
                 if (btn) btn.classList.add('active');
-                showToast('📐 Vista Isométrica 3D activa (Sin deformación de perspectiva — escala técnica exacta)');
+                const isoBar = document.getElementById('iso-compass-bar');
+                if (isoBar) isoBar.style.display = 'flex';
+                showToast('📐 Vista Isométrica 3D activa (Usá los botones NO / NE / SE / SO para rotar a 45°)');
             } else {
                 perspCam.position.copy(orthoIsoCam.position);
                 perspCam.lookAt(controlsPersp.target);
@@ -10787,6 +10938,8 @@
                 if (btnLabel) btnLabel.innerText = "Isométrica";
                 if (btnIcon) btnIcon.innerText = "📐";
                 if (btn) btn.classList.remove('active');
+                const isoBar = document.getElementById('iso-compass-bar');
+                if (isoBar) isoBar.style.display = 'none';
                 showToast('📷 Vista Perspectiva 3D activa (Lente natural con profundidad real)');
             }
             updateSimsWalls(true);
@@ -10799,6 +10952,8 @@
             if (typeof walkthroughState !== 'undefined' && walkthroughState.active) {
                 stopWalkthrough(null);
             }
+            const isoBar = document.getElementById('iso-compass-bar');
+            if (isoBar) isoBar.style.display = 'none';
             const dioramaGround = floorGroup.getObjectByName('dioramaGround');
             const dioramaFlora = floorGroup.getObjectByName('dioramaFlora');
             const studioGround = floorGroup.getObjectByName('studioGround');
@@ -11887,7 +12042,8 @@
                     curr.parent === windows3DGroup ||
                     curr.parent === doors3DGroup ||
                     curr.parent === exteriorWallsGroup ||
-                    curr.parent === interiorWallsGroup
+                    curr.parent === interiorWallsGroup ||
+                    (typeof wallHangGroup !== 'undefined' && curr.parent === wallHangGroup)
                 ) {
                     return curr;
                 }
@@ -12034,6 +12190,40 @@
                     });
                 });
             }
+
+            // 6. Pisos y Solados (floorMainMesh, floorSouthMesh, bathFloorMesh, palierMesh)
+            if (typeof floorMainMesh !== 'undefined' && floorMainMesh) {
+                assignBIMUserData(floorMainMesh, {
+                    id: 'piso_principal',
+                    nombre: 'Piso Cerámico 33×33 (Living / Estudio / Cuarto)',
+                    categoria: 'piso',
+                    dimensiones: { ancho: 6.30, alto: 0.02, profundidad: 6.30, elevacion: 0.00 }
+                });
+            }
+            if (typeof floorSouthMesh !== 'undefined' && floorSouthMesh) {
+                assignBIMUserData(floorSouthMesh, {
+                    id: 'piso_sur_cocina',
+                    nombre: 'Piso Cerámico 33×33 (Sector Sur / Cocina)',
+                    categoria: 'piso',
+                    dimensiones: { ancho: 4.85, alto: 0.02, profundidad: 1.70, elevacion: 0.00 }
+                });
+            }
+            if (typeof bathFloorMesh !== 'undefined' && bathFloorMesh) {
+                assignBIMUserData(bathFloorMesh, {
+                    id: 'piso_bano',
+                    nombre: 'Piso Damero B&N 20×20 (Baño)',
+                    categoria: 'piso',
+                    dimensiones: { ancho: 2.30, alto: 0.02, profundidad: 1.40, elevacion: 0.00 }
+                });
+            }
+            if (typeof palierMesh !== 'undefined' && palierMesh) {
+                assignBIMUserData(palierMesh, {
+                    id: 'piso_palier',
+                    nombre: 'Solado Palier Común Edificio',
+                    categoria: 'piso',
+                    dimensiones: { ancho: 1.45, alto: 0.02, profundidad: 1.70, elevacion: 0.00 }
+                });
+            }
         }
 
         function restoreBIMSelectedEmissive() {
@@ -12153,7 +12343,13 @@
 
             if (catEl) {
                 catEl.className = `bim-cat-badge cat-${categoria}`;
-                const catLabels = { mueble: '🪑 Mueble / Equipamiento', abertura: '🪟 Abertura', muro: '🧱 Muro / Estructura' };
+                const catLabels = {
+                    mueble: '🪑 Mueble / Equipamiento',
+                    abertura: '🪟 Abertura',
+                    muro: '🧱 Muro / Estructura',
+                    piso: '⬜ Piso / Solado',
+                    cuadro: '🖼️ Cuadro / Espejo en Muro'
+                };
                 catEl.textContent = catLabels[categoria] || categoria.toUpperCase();
             }
             if (titleEl) titleEl.textContent = nombre;
@@ -12165,11 +12361,15 @@
                 elevEl.textContent = elevVal <= 0.02 ? '0.00 m (Sobre piso)' : `${elevVal.toFixed(2)} m`;
             }
 
+            if (typeof updateBIMCardExtrasAndSwatches === 'function') {
+                updateBIMCardExtrasAndSwatches(targetForBox, categoria, uData);
+            }
+
             if (card) {
                 card.style.display = 'block';
                 if (window.innerWidth > 768 && typeof clientX === 'number' && typeof clientY === 'number') {
-                    const cardW = 290;
-                    const cardH = 195;
+                    const cardW = 305;
+                    const cardH = 265;
                     const pad = 16;
                     const leftPos = Math.min(window.innerWidth - cardW - pad, Math.max(pad, clientX + 18));
                     const topPos = Math.min(window.innerHeight - cardH - pad, Math.max(76, clientY - 24));
@@ -12207,6 +12407,9 @@
                 exteriorWallsGroup,
                 interiorWallsGroup
             ];
+            if (typeof wallHangGroup !== 'undefined' && wallHangGroup) {
+                groupsToScan.unshift(wallHangGroup);
+            }
             groupsToScan.forEach(grp => {
                 if (!grp || !grp.visible) return;
                 grp.traverse(child => {
@@ -12236,7 +12439,14 @@
                 return true;
             }
 
+            // Si no tocó mueble/muro y no estamos restringidos a solo no-pisos, permitir inspeccionar el Piso Cerámico para ver medidas o probar materiales
             if (!onlyNonFloor) {
+                const floorCandidates = [floorMainMesh, floorSouthMesh, bathFloorMesh, palierMesh].filter(Boolean);
+                const floorHits = raycaster.intersectObjects(floorCandidates, false);
+                if (floorHits.length > 0) {
+                    selectBIMObject(floorHits[0].object, e.clientX, e.clientY);
+                    return true;
+                }
                 clearBIMSelection();
             }
             return false;
@@ -12337,7 +12547,11 @@
                     bimPlanningBoxHelpers.push(bh);
                 });
 
-                showToast('📐 Modo Planificación BIM activo: Volúmenes, aberturas y áreas de circulación visibles', false, 3200);
+                if (typeof updateBIMClashDetectionArcs === 'function') {
+                    updateBIMClashDetectionArcs(true);
+                }
+
+                showToast('📐 Modo Planificación BIM activo: Volúmenes, barrido de puertas (Clash Detection) y áreas de circulación visibles', false, 3200);
             } else {
                 targetGroups.forEach(grp => {
                     if (!grp) return;
@@ -12348,6 +12562,9 @@
                         }
                     });
                 });
+                if (typeof updateBIMClashDetectionArcs === 'function') {
+                    updateBIMClashDetectionArcs(false);
+                }
                 showToast('🎨 Vista fotorrealista PBR restaurada', false, 2200);
             }
 
@@ -12365,6 +12582,876 @@
             }
         }
 
+        // ============================================================================
+        // PACK DE 8 MEJORAS BIM, ARQUITECTURA Y RENDIMIENTO WEBGL (BACKLOG COMPLETO)
+        // ============================================================================
+
+        // --- Variables de Estado de Herramientas BIM ---
+        let isMeasureToolMode = false;
+        let measurePoints = [];
+        const bimMeasureGroup = new THREE.Group();
+        bimMeasureGroup.name = 'bimMeasureGroup';
+        scene.add(bimMeasureGroup);
+
+        let isWallHangMode = false;
+        let currentWallHangPreset = 'cuadro';
+        const wallHangGroup = new THREE.Group();
+        wallHangGroup.name = 'wallHangGroup';
+        scene.add(wallHangGroup);
+
+        const bimClashDetectionGroup = new THREE.Group();
+        bimClashDetectionGroup.name = 'bimClashDetectionGroup';
+        bimClashDetectionGroup.visible = false;
+        scene.add(bimClashDetectionGroup);
+
+        const zocalosAndThresholdsGroup = new THREE.Group();
+        zocalosAndThresholdsGroup.name = 'zocalosAndThresholdsGroup';
+        scene.add(zocalosAndThresholdsGroup);
+
+        const instancedBooksGroup = new THREE.Group();
+        instancedBooksGroup.name = 'instancedBooksGroup';
+        scene.add(instancedBooksGroup);
+
+        let currentWhiteBalanceKey = '4500k';
+        const bimOriginalMaterialCache = new WeakMap();
+
+        // ----------------------------------------------------------------------------
+        // 1. CINTA MÉTRICA INTERACTIVA PUNTO A PUNTO (📏 Medir A↔B)
+        // ----------------------------------------------------------------------------
+        function clearMeasureTapeVisuals() {
+            measurePoints = [];
+            while (bimMeasureGroup.children.length > 0) {
+                const c = bimMeasureGroup.children[0];
+                bimMeasureGroup.remove(c);
+                if (c.geometry) c.geometry.dispose();
+                if (c.material) {
+                    if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
+                    else c.material.dispose();
+                }
+            }
+            const hudText = document.getElementById('bim-tool-hud-text');
+            if (hudText && isMeasureToolMode) {
+                hudText.innerHTML = '📏 <strong>Cinta Métrica 3D:</strong> Hacé clic en el <strong>Punto A</strong> sobre cualquier piso, muro o mueble';
+            }
+            wakeRenderer();
+        }
+
+        function setMeasureToolMode(enabled) {
+            isMeasureToolMode = !!enabled;
+            if (isMeasureToolMode && isWallHangMode) {
+                setWallHangMode(false);
+            }
+            const btn = document.getElementById('btn-measure-tape');
+            const hud = document.getElementById('bim-tool-hud');
+            const presets = document.getElementById('bim-wallhang-presets');
+            if (btn) btn.classList.toggle('active-bim', isMeasureToolMode);
+            if (presets) presets.style.display = 'none';
+            if (hud) {
+                hud.style.display = isMeasureToolMode ? 'flex' : 'none';
+            }
+            if (isMeasureToolMode) {
+                clearMeasureTapeVisuals();
+                showToast('📏 Cinta Métrica activa: Tocá dos puntos (A y B) en la escena 3D', false, 2600);
+            } else {
+                clearMeasureTapeVisuals();
+            }
+            wakeRenderer();
+        }
+
+        function addMeasurePoint3D(pt) {
+            if (measurePoints.length >= 2) {
+                clearMeasureTapeVisuals();
+            }
+            measurePoints.push(pt.clone());
+
+            // Marcador esférico láser en el punto
+            const markerColor = measurePoints.length === 1 ? 0x38bdf8 : 0x10b981;
+            const sphereGeo = new THREE.SphereGeometry(0.045, 16, 16);
+            const sphereMat = new THREE.MeshBasicMaterial({ color: markerColor, depthTest: false, transparent: true, opacity: 0.95 });
+            const marker = new THREE.Mesh(sphereGeo, sphereMat);
+            marker.position.copy(pt);
+            marker.renderOrder = 1000;
+            bimMeasureGroup.add(marker);
+
+            // Anillo de pulso alrededor del marcador
+            const ringGeo = new THREE.RingGeometry(0.06, 0.095, 24);
+            ringGeo.rotateX(-Math.PI / 2);
+            const ringMat = new THREE.MeshBasicMaterial({ color: markerColor, side: THREE.DoubleSide, depthTest: false, transparent: true, opacity: 0.75 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.position.set(pt.x, pt.y + 0.005, pt.z);
+            ring.renderOrder = 999;
+            bimMeasureGroup.add(ring);
+
+            const hudText = document.getElementById('bim-tool-hud-text');
+            if (measurePoints.length === 1) {
+                if (hudText) {
+                    hudText.innerHTML = `📏 <strong>Punto A fijado</strong> (${pt.x.toFixed(2)}, ${pt.z.toFixed(2)}, H:${pt.y.toFixed(2)}m) — Tocá el <strong>Punto B</strong> para medir`;
+                }
+            } else if (measurePoints.length === 2) {
+                const pA = measurePoints[0];
+                const pB = measurePoints[1];
+                const dist = pA.distanceTo(pB);
+                const dx = Math.abs(pB.x - pA.x);
+                const dz = Math.abs(pB.z - pA.z);
+                const dy = Math.abs(pB.y - pA.y);
+
+                // Línea láser principal A <-> B
+                const lineGeo = new THREE.BufferGeometry().setFromPoints([pA, pB]);
+                const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, depthTest: false, transparent: true, opacity: 0.98 });
+                const mainLine = new THREE.Line(lineGeo, lineMat);
+                mainLine.renderOrder = 1000;
+                bimMeasureGroup.add(mainLine);
+
+                // Tubo delgado 3D para que la línea tenga grosor visible en cualquier dispositivo
+                const dir = new THREE.Vector3().subVectors(pB, pA);
+                const len = dir.length();
+                if (len > 0.01) {
+                    const cylGeo = new THREE.CylinderGeometry(0.011, 0.011, len, 8);
+                    const cylMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, depthTest: false, transparent: true, opacity: 0.85 });
+                    const cyl = new THREE.Mesh(cylGeo, cylMat);
+                    cyl.position.copy(pA).add(pB).multiplyScalar(0.5);
+                    cyl.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+                    cyl.renderOrder = 998;
+                    bimMeasureGroup.add(cyl);
+                }
+
+                // Proyección ortogonal en planta (ΔX y ΔZ)
+                const cornerPt = new THREE.Vector3(pB.x, pA.y, pA.z);
+                const orthoGeo = new THREE.BufferGeometry().setFromPoints([pA, cornerPt, new THREE.Vector3(pB.x, pA.y, pB.z)]);
+                const orthoMat = new THREE.LineDashedMaterial({ color: 0x10b981, dashSize: 0.08, gapSize: 0.05, depthTest: false, transparent: true, opacity: 0.78 });
+                const orthoLine = new THREE.Line(orthoGeo, orthoMat);
+                orthoLine.computeLineDistances();
+                orthoLine.renderOrder = 997;
+                bimMeasureGroup.add(orthoLine);
+
+                if (hudText) {
+                    hudText.innerHTML = `📏 <strong>A↔B: ${dist.toFixed(2)} m</strong> <span style="color:#6ee7b7;">(${Math.round(dist * 100)} cm)</span> &nbsp;|&nbsp; ΔX: <strong>${dx.toFixed(2)}m</strong> · ΔZ: <strong>${dz.toFixed(2)}m</strong> · ΔH: <strong>${dy.toFixed(2)}m</strong>`;
+                }
+                showToast(`📏 Distancia A↔B: ${dist.toFixed(2)} m (${Math.round(dist * 100)} cm)`, false, 3200);
+            }
+            wakeRenderer();
+        }
+
+        // ----------------------------------------------------------------------------
+        // 2. CATÁLOGO DE VARIANTES DE MATERIALES EN TIEMPO REAL (#bim-card-swatches)
+        // ----------------------------------------------------------------------------
+        const bimFloorVariantMaterials = {};
+        function getOrCreateFloorVariantMaterial(variantKey) {
+            if (variantKey === 'ceramico_orig') return pbrCeramicFloorMat;
+            if (bimFloorVariantMaterials[variantKey]) return bimFloorVariantMaterials[variantKey];
+
+            const c = document.createElement('canvas');
+            c.width = 512; c.height = 512;
+            const g = c.getContext('2d');
+
+            if (variantKey === 'porcelanato_gris') {
+                g.fillStyle = '#cbd5e1';
+                g.fillRect(0, 0, 512, 512);
+                const n = 2;
+                const s = 512 / n;
+                for (let r = 0; r < n; r++) {
+                    for (let col = 0; col < n; col++) {
+                        g.fillStyle = (r + col) % 2 === 0 ? '#d5dde6' : '#cfd8e2';
+                        g.fillRect(col * s + 2, r * s + 2, s - 4, s - 4);
+                    }
+                }
+                const tex = new THREE.CanvasTexture(c);
+                tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+                tex.repeat.set(1.2, 1.2);
+                tex.colorSpace = THREE.SRGBColorSpace;
+                bimFloorVariantMaterials[variantKey] = new THREE.MeshStandardMaterial({
+                    map: tex, color: 0xf8fafc, roughness: 0.28, metalness: 0.04
+                });
+            } else if (variantKey === 'madera_roble') {
+                g.fillStyle = '#b48a5a';
+                g.fillRect(0, 0, 512, 512);
+                const planks = 6;
+                const ph = 512 / planks;
+                for (let i = 0; i < planks; i++) {
+                    g.fillStyle = i % 2 === 0 ? '#d8b486' : '#cfa775';
+                    g.fillRect(0, i * ph + 2, 512, ph - 3);
+                    g.strokeStyle = 'rgba(110,72,35,0.22)';
+                    g.lineWidth = 2;
+                    g.beginPath();
+                    g.moveTo(0, i * ph + ph * 0.5);
+                    g.lineTo(512, i * ph + ph * 0.5);
+                    g.stroke();
+                }
+                const tex = new THREE.CanvasTexture(c);
+                tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+                tex.repeat.set(1.6, 1.6);
+                tex.colorSpace = THREE.SRGBColorSpace;
+                bimFloorVariantMaterials[variantKey] = new THREE.MeshStandardMaterial({
+                    map: tex, color: 0xfffbeb, roughness: 0.42, metalness: 0.02
+                });
+            } else if (variantKey === 'marmol_carrara') {
+                g.fillStyle = '#f8fafc';
+                g.fillRect(0, 0, 512, 512);
+                g.strokeStyle = 'rgba(148,163,184,0.34)';
+                g.lineWidth = 3;
+                for (let v = 0; v < 8; v++) {
+                    g.beginPath();
+                    g.moveTo(0, v * 64 + 12);
+                    g.bezierCurveTo(170, v * 64 + 45, 340, v * 64 - 20, 512, v * 64 + 30);
+                    g.stroke();
+                }
+                const tex = new THREE.CanvasTexture(c);
+                tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+                tex.repeat.set(1.1, 1.1);
+                tex.colorSpace = THREE.SRGBColorSpace;
+                bimFloorVariantMaterials[variantKey] = new THREE.MeshPhysicalMaterial({
+                    map: tex, color: 0xffffff, roughness: 0.16, metalness: 0.02, clearcoat: 0.45, clearcoatRoughness: 0.18
+                });
+            }
+            return bimFloorVariantMaterials[variantKey];
+        }
+
+        const BIM_MATERIAL_CATALOG = {
+            piso: [
+                { key: 'ceramico_orig', label: 'Cerámico 33×33 Original', css: 'linear-gradient(135deg, #f3efe8, #e5dfd5)' },
+                { key: 'porcelanato_gris', label: 'Porcelanato Gris 60×60', css: 'linear-gradient(135deg, #e2e8f0, #cbd5e1)' },
+                { key: 'madera_roble', label: 'Piso Flotante Roble', css: 'linear-gradient(135deg, #dfc096, #b88b58)' },
+                { key: 'marmol_carrara', label: 'Mármol Carrara Pulido', css: 'linear-gradient(135deg, #ffffff, #dbe2ea)' }
+            ],
+            muro: [
+                { key: 'yeso_orig', label: 'Blanco Yeso Original', hex: 0xf6f4ef, css: '#f6f4ef' },
+                { key: 'arena_calido', label: 'Arena Cálido', hex: 0xe8dfd1, css: '#e8dfd1' },
+                { key: 'gris_perla', label: 'Gris Perla Nórdico', hex: 0xd8dde2, css: '#d8dde2' },
+                { key: 'verde_salvia', label: 'Verde Salvia', hex: 0xcbd5c0, css: '#cbd5c0' },
+                { key: 'azul_petroleo', label: 'Azul Petróleo Suave', hex: 0xb8cad4, css: '#b8cad4' }
+            ],
+            mueble: [
+                { key: 'mueble_orig', label: 'Acabado Original', hex: null, css: 'linear-gradient(135deg, #94a3b8, #475569)' },
+                { key: 'roble_natural', label: 'Roble Natural', hex: 0xc89d66, rough: 0.48, css: '#c89d66' },
+                { key: 'nogal_oscuro', label: 'Nogal Americano', hex: 0x5c3a21, rough: 0.44, css: '#5c3a21' },
+                { key: 'blanco_laqueado', label: 'Blanco Laqueado Satinado', hex: 0xf4f4f6, rough: 0.22, css: '#f4f4f6' },
+                { key: 'grafito_mate', label: 'Grafito Mate', hex: 0x334155, rough: 0.55, css: '#334155' }
+            ]
+        };
+
+        function applyBIMMaterialVariant(targetObj, categoria, variant) {
+            if (!targetObj || !variant) return;
+            restoreBIMSelectedEmissive();
+
+            if (categoria === 'piso') {
+                const newFloorMat = getOrCreateFloorVariantMaterial(variant.key);
+                [floorMainMesh, floorSouthMesh].forEach(fm => {
+                    if (fm && newFloorMat) fm.material = newFloorMat;
+                });
+                targetObj.userData.activeVariantKey = variant.key;
+                showToast(`⬜ Solado actualizado: ${variant.label}`, false, 2200);
+            } else if (categoria === 'muro') {
+                targetObj.traverse(child => {
+                    if (!child.isMesh) return;
+                    if (!bimOriginalMaterialCache.has(child)) {
+                        bimOriginalMaterialCache.set(child, child.material);
+                    }
+                    if (variant.key === 'yeso_orig') {
+                        child.material = bimOriginalMaterialCache.get(child);
+                    } else {
+                        const mat = bimOriginalMaterialCache.get(child).clone();
+                        mat.color.setHex(variant.hex);
+                        child.material = mat;
+                    }
+                });
+                targetObj.userData.activeVariantKey = variant.key;
+                showToast(`🧱 Pintura de muro aplicada: ${variant.label}`, false, 2200);
+            } else if (categoria === 'mueble') {
+                targetObj.traverse(child => {
+                    if (!child.isMesh || child.name === 'contactShadow') return;
+                    if (!bimOriginalMaterialCache.has(child)) {
+                        bimOriginalMaterialCache.set(child, child.material);
+                    }
+                    if (variant.key === 'mueble_orig') {
+                        child.material = bimOriginalMaterialCache.get(child);
+                    } else {
+                        const baseMat = bimOriginalMaterialCache.get(child);
+                        const mat = baseMat.clone();
+                        mat.color.setHex(variant.hex);
+                        if (variant.rough !== undefined && mat.roughness !== undefined) {
+                            mat.roughness = variant.rough;
+                        }
+                        child.material = mat;
+                    }
+                });
+                targetObj.userData.activeVariantKey = variant.key;
+                showToast(`🪑 Acabado aplicado: ${variant.label}`, false, 2200);
+            }
+            wakeRenderer();
+        }
+
+        function updateBIMCardExtrasAndSwatches(targetObj, categoria, uData) {
+            const extraInfoEl = document.getElementById('bim-card-extra-info');
+            const matSectionEl = document.getElementById('bim-card-mat-section');
+            const swatchesEl = document.getElementById('bim-card-swatches');
+            const wallActionsEl = document.getElementById('bim-card-wallitem-actions');
+
+            if (extraInfoEl) {
+                if (categoria === 'cuadro' && uData && uData.wallPlacementInfo) {
+                    const info = uData.wallPlacementInfo;
+                    extraInfoEl.style.display = 'block';
+                    extraInfoEl.innerHTML = `📐 <strong>Altura eje:</strong> ${info.centerY.toFixed(2)} m &nbsp;|&nbsp; <strong>Esquinas:</strong> izq ${info.distLeft.toFixed(2)}m · der ${info.distRight.toFixed(2)}m`;
+                } else {
+                    extraInfoEl.style.display = 'none';
+                }
+            }
+
+            if (wallActionsEl) {
+                wallActionsEl.style.display = (categoria === 'cuadro' && !isReadOnlyShareMode) ? 'flex' : 'none';
+            }
+
+            const variants = BIM_MATERIAL_CATALOG[categoria];
+            if (matSectionEl && swatchesEl && variants && !isReadOnlyShareMode) {
+                matSectionEl.style.display = 'block';
+                swatchesEl.innerHTML = '';
+                const activeKey = targetObj?.userData?.activeVariantKey || variants[0].key;
+                variants.forEach(v => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'bim-swatch-btn' + (v.key === activeKey ? ' active' : '');
+                    btn.innerHTML = `<span class="bim-swatch-dot" style="background:${v.css};"></span><span>${v.label}</span>`;
+                    btn.addEventListener('click', (ev) => {
+                        ev.stopPropagation();
+                        applyBIMMaterialVariant(targetObj, categoria, v);
+                        swatchesEl.querySelectorAll('.bim-swatch-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    });
+                    swatchesEl.appendChild(btn);
+                });
+            } else if (matSectionEl) {
+                matSectionEl.style.display = 'none';
+            }
+        }
+
+        // ----------------------------------------------------------------------------
+        // 3. OPTIMIZACIÓN WEBGL MOBILE: THREE.InstancedMesh PARA LIBROS Y OBJETOS REPETITIVOS
+        // ----------------------------------------------------------------------------
+        let instancedBooksMesh = null;
+        function buildInstancedBookClustersAndOptimize() {
+            while (instancedBooksGroup.children.length > 0) {
+                const c = instancedBooksGroup.children[0];
+                instancedBooksGroup.remove(c);
+            }
+
+            // Geometría única compartida para todos los libros en estantes de Estudio y Living (1 solo draw call)
+            const bookSlots = [
+                // Estantes flotantes Estudio (pared Este del Estudio X=2.55, Z=0.70..1.85, Y=1.42 / 1.72)
+                { x: 2.46, y: 1.49, z: 0.78, ry: 0, sx: 0.16, sy: 0.22, sz: 0.035, color: 0x1e3a8a },
+                { x: 2.46, y: 1.48, z: 0.82, ry: 0, sx: 0.15, sy: 0.20, sz: 0.032, color: 0xb91c1c },
+                { x: 2.46, y: 1.50, z: 0.86, ry: 0, sx: 0.16, sy: 0.24, sz: 0.038, color: 0x047857 },
+                { x: 2.46, y: 1.47, z: 0.90, ry: 0, sx: 0.15, sy: 0.19, sz: 0.030, color: 0xd97706 },
+                { x: 2.46, y: 1.49, z: 0.94, ry: 0, sx: 0.16, sy: 0.22, sz: 0.034, color: 0x475569 },
+                { x: 2.46, y: 1.48, z: 0.98, ry: 0.12, sx: 0.15, sy: 0.21, sz: 0.032, color: 0x7c3aed },
+                // Segundo nivel estante Estudio
+                { x: 2.46, y: 1.79, z: 1.15, ry: 0, sx: 0.16, sy: 0.23, sz: 0.036, color: 0x0f766e },
+                { x: 2.46, y: 1.78, z: 1.19, ry: 0, sx: 0.15, sy: 0.21, sz: 0.032, color: 0xbe123c },
+                { x: 2.46, y: 1.80, z: 1.23, ry: 0, sx: 0.16, sy: 0.24, sz: 0.038, color: 0x1d4ed8 },
+                { x: 2.46, y: 1.77, z: 1.27, ry: 0, sx: 0.15, sy: 0.19, sz: 0.030, color: 0xb45309 },
+                // Libros apilados en Rack TV Living (X=6.00, Z=2.35..3.45, Y=0.52)
+                { x: 6.02, y: 0.56, z: 2.42, ry: 0, sx: 0.18, sy: 0.22, sz: 0.036, color: 0x334155 },
+                { x: 6.02, y: 0.55, z: 2.46, ry: 0, sx: 0.17, sy: 0.20, sz: 0.034, color: 0x991b1b },
+                { x: 6.02, y: 0.57, z: 2.50, ry: 0, sx: 0.18, sy: 0.23, sz: 0.038, color: 0x065f46 },
+                { x: 6.02, y: 0.55, z: 2.54, ry: 0, sx: 0.17, sy: 0.20, sz: 0.032, color: 0x1e40af }
+            ];
+
+            const unitBookGeo = new THREE.BoxGeometry(1, 1, 1);
+            const bookInstMat = new THREE.MeshStandardMaterial({
+                roughness: 0.55,
+                metalness: 0.05
+            });
+
+            instancedBooksMesh = new THREE.InstancedMesh(unitBookGeo, bookInstMat, bookSlots.length);
+            instancedBooksMesh.castShadow = true;
+            instancedBooksMesh.receiveShadow = true;
+            instancedBooksMesh.name = 'Colección de Libros (InstancedMesh ×14)';
+
+            const dummy = new THREE.Object3D();
+            const colorObj = new THREE.Color();
+            for (let i = 0; i < bookSlots.length; i++) {
+                const s = bookSlots[i];
+                dummy.position.set(s.x, s.y, s.z);
+                dummy.rotation.set(0, s.ry || 0, 0);
+                dummy.scale.set(s.sx, s.sy, s.sz);
+                dummy.updateMatrix();
+                instancedBooksMesh.setMatrixAt(i, dummy.matrix);
+                colorObj.setHex(s.color);
+                instancedBooksMesh.setColorAt(i, colorObj);
+            }
+            instancedBooksMesh.instanceMatrix.needsUpdate = true;
+            if (instancedBooksMesh.instanceColor) instancedBooksMesh.instanceColor.needsUpdate = true;
+
+            assignBIMUserData(instancedBooksMesh, {
+                id: 'libros_instanced_bim',
+                nombre: 'Set de Libros en Estantes (InstancedMesh WebGL)',
+                categoria: 'mueble',
+                dimensiones: { ancho: 0.24, alto: 0.24, profundidad: 0.18, elevacion: 0.55 }
+            });
+
+            instancedBooksGroup.add(instancedBooksMesh);
+        }
+
+        // ----------------------------------------------------------------------------
+        // 4. SIMULADOR DE BARRIDO DE PUERTAS Y CAJONES (BIM CLASH DETECTION)
+        // ----------------------------------------------------------------------------
+        const BIM_DOOR_SWING_SPECS = [
+            { id: 'swing_entrada', label: 'Barrido Puerta Entrada (0.89m)', x: 6.265, z: 6.30, radius: 0.89, startAngle: Math.PI, endAngle: Math.PI * 1.5 },
+            { id: 'swing_estudio', label: 'Barrido Puerta Estudio (0.72m)', x: 2.35, z: 2.35, radius: 0.72, startAngle: Math.PI, endAngle: Math.PI * 1.5 },
+            { id: 'swing_bano', label: 'Barrido Puerta Baño (0.67m)', x: 2.35, z: 3.12, radius: 0.67, startAngle: Math.PI * 0.5, endAngle: Math.PI },
+            { id: 'swing_cuarto', label: 'Barrido Puerta Cuarto (0.72m)', x: 2.35, z: 4.50, radius: 0.72, startAngle: 0, endAngle: Math.PI * 0.5 },
+            { id: 'swing_heladera', label: 'Apertura Heladera / Mesada Cocina (0.60m)', x: 4.25, z: 5.55, radius: 0.58, startAngle: Math.PI * 0.5, endAngle: Math.PI }
+        ];
+
+        function updateBIMClashDetectionArcs(visible) {
+            if (visible !== undefined) {
+                bimClashDetectionGroup.visible = !!visible;
+            }
+            if (!bimClashDetectionGroup.visible) return;
+
+            while (bimClashDetectionGroup.children.length > 0) {
+                const c = bimClashDetectionGroup.children[0];
+                bimClashDetectionGroup.remove(c);
+                if (c.geometry) c.geometry.dispose();
+                if (c.material) c.material.dispose();
+            }
+
+            // Cajas de colisión de todos los muebles móviles actuales
+            const furnitureBoxes = [];
+            if (furnitureGroup) {
+                furnitureGroup.children.forEach(fMesh => {
+                    if (!fMesh.visible) return;
+                    const box = new THREE.Box3().setFromObject(fMesh);
+                    furnitureBoxes.push({ mesh: fMesh, box });
+                });
+            }
+
+            let clashesFound = 0;
+            BIM_DOOR_SWING_SPECS.forEach(spec => {
+                // Caja de barrido aproximada para detección de colisión
+                const minX = spec.x + Math.min(0, Math.cos(spec.startAngle) * spec.radius, Math.cos(spec.endAngle) * spec.radius) - 0.15;
+                const maxX = spec.x + Math.max(0, Math.cos(spec.startAngle) * spec.radius, Math.cos(spec.endAngle) * spec.radius) + 0.15;
+                const minZ = spec.z + Math.min(0, Math.sin(spec.startAngle) * spec.radius, Math.sin(spec.endAngle) * spec.radius) - 0.15;
+                const maxZ = spec.z + Math.max(0, Math.sin(spec.startAngle) * spec.radius, Math.sin(spec.endAngle) * spec.radius) + 0.15;
+                const swingBox = new THREE.Box3(
+                    new THREE.Vector3(minX, 0.02, minZ),
+                    new THREE.Vector3(maxX, 1.95, maxZ)
+                );
+
+                let hasClash = false;
+                for (let i = 0; i < furnitureBoxes.length; i++) {
+                    if (swingBox.intersectsBox(furnitureBoxes[i].box)) {
+                        // Verificar distancia real al pivote en planta
+                        const center = new THREE.Vector3();
+                        furnitureBoxes[i].box.getCenter(center);
+                        const dist2D = Math.hypot(center.x - spec.x, center.z - spec.z);
+                        if (dist2D < spec.radius + 0.22) {
+                            hasClash = true;
+                            break;
+                        }
+                    }
+                }
+                if (hasClash) clashesFound++;
+
+                const arcColor = hasClash ? 0xef4444 : 0x10b981;
+                const thetaLength = spec.endAngle - spec.startAngle;
+                const sectorGeo = new THREE.CircleGeometry(spec.radius, 28, spec.startAngle, thetaLength);
+                sectorGeo.rotateX(-Math.PI / 2);
+                const sectorMat = new THREE.MeshBasicMaterial({
+                    color: arcColor,
+                    transparent: true,
+                    opacity: hasClash ? 0.42 : 0.24,
+                    side: THREE.DoubleSide,
+                    depthWrite: false
+                });
+                const sectorMesh = new THREE.Mesh(sectorGeo, sectorMat);
+                sectorMesh.position.set(spec.x, 0.012, spec.z);
+                bimClashDetectionGroup.add(sectorMesh);
+
+                // Borde de arco punteado/continuo
+                const pts = [];
+                const steps = 24;
+                pts.push(new THREE.Vector3(spec.x, 0.015, spec.z));
+                for (let s = 0; s <= steps; s++) {
+                    const ang = spec.startAngle + (thetaLength * s) / steps;
+                    pts.push(new THREE.Vector3(
+                        spec.x + Math.cos(ang) * spec.radius,
+                        0.015,
+                        spec.z - Math.sin(ang) * spec.radius
+                    ));
+                }
+                pts.push(new THREE.Vector3(spec.x, 0.015, spec.z));
+                const borderGeo = new THREE.BufferGeometry().setFromPoints(pts);
+                const borderMat = new THREE.LineBasicMaterial({ color: arcColor, transparent: true, opacity: 0.92 });
+                const borderLine = new THREE.Line(borderGeo, borderMat);
+                bimClashDetectionGroup.add(borderLine);
+            });
+
+            if (clashesFound > 0) {
+                showToast(`⚠️ BIM Clash Detection: ${clashesFound} colisión(es) detectada(s) en barrido de puertas (Sector Rojo)`, true, 3400);
+            }
+            wakeRenderer();
+        }
+
+        // ----------------------------------------------------------------------------
+        // 5. MODO "COLGAR CUADROS, ESPEJOS Y ESTANTES" SOBRE MUROS (🖼️ Cuadros)
+        // ----------------------------------------------------------------------------
+        const WALL_HANG_PRESETS = {
+            cuadro: { nombre: 'Cuadro Enmarcado Roble (65×50 cm)', w: 0.65, h: 0.50, d: 0.035, defaultY: 1.60 },
+            espejo: { nombre: 'Espejo Biselado Vertical (55×85 cm)', w: 0.55, h: 0.85, d: 0.028, defaultY: 1.55 },
+            estante: { nombre: 'Estante Flotante Roble (80×20 cm)', w: 0.80, h: 0.045, d: 0.20, defaultY: 1.50 }
+        };
+
+        function setWallHangMode(enabled) {
+            isWallHangMode = !!enabled;
+            if (isWallHangMode && isMeasureToolMode) {
+                setMeasureToolMode(false);
+            }
+            const btn = document.getElementById('btn-wall-hang');
+            const hud = document.getElementById('bim-tool-hud');
+            const hudText = document.getElementById('bim-tool-hud-text');
+            const presets = document.getElementById('bim-wallhang-presets');
+            if (btn) btn.classList.toggle('active-bim', isWallHangMode);
+            if (presets) presets.style.display = isWallHangMode ? 'inline-flex' : 'none';
+            if (hud) hud.style.display = isWallHangMode ? 'flex' : 'none';
+            if (isWallHangMode && hudText) {
+                const p = WALL_HANG_PRESETS[currentWallHangPreset] || WALL_HANG_PRESETS.cuadro;
+                hudText.innerHTML = `🖼️ <strong>Modo Colgar en Muro:</strong> Tocá cualquier pared para colgar <strong>${p.nombre}</strong> a H=1.60m`;
+                showToast('🖼️ Tocá cualquier pared en 3D para colgar un cuadro, espejo o estante', false, 2800);
+            }
+            wakeRenderer();
+        }
+
+        function createWallHungItem(presetKey, hitPoint, worldNormal, hitWallMesh) {
+            const spec = WALL_HANG_PRESETS[presetKey] || WALL_HANG_PRESETS.cuadro;
+            const grp = new THREE.Group();
+
+            // Normal horizontalizada para alinear perfectamente paralelo al muro
+            const n = new THREE.Vector3(worldNormal.x, 0, worldNormal.z);
+            if (n.lengthSq() < 0.001) n.set(0, 0, 1);
+            n.normalize();
+
+            const centerY = Math.max(0.65, Math.min(2.25, hitPoint.y > 0.5 ? hitPoint.y : spec.defaultY));
+            const pos = new THREE.Vector3(
+                hitPoint.x + n.x * (spec.d * 0.5 + 0.006),
+                centerY,
+                hitPoint.z + n.z * (spec.d * 0.5 + 0.006)
+            );
+            grp.position.copy(pos);
+
+            const lookTarget = pos.clone().add(n);
+            grp.lookAt(lookTarget);
+
+            if (presetKey === 'cuadro') {
+                const frameMat = new THREE.MeshStandardMaterial({ color: 0x5c3a21, roughness: 0.42, metalness: 0.05 });
+                const frameMesh = new THREE.Mesh(new THREE.BoxGeometry(spec.w, spec.h, spec.d), frameMat);
+                frameMesh.castShadow = true;
+                grp.add(frameMesh);
+
+                const passepartoutMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.7 });
+                const ppMesh = new THREE.Mesh(new THREE.BoxGeometry(spec.w - 0.06, spec.h - 0.06, 0.006), passepartoutMat);
+                ppMesh.position.z = spec.d * 0.5 + 0.001;
+                grp.add(ppMesh);
+
+                const artMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.45 });
+                const artMesh = new THREE.Mesh(new THREE.BoxGeometry(spec.w - 0.16, spec.h - 0.16, 0.008), artMat);
+                artMesh.position.z = spec.d * 0.5 + 0.003;
+                grp.add(artMesh);
+            } else if (presetKey === 'espejo') {
+                const rimMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.25, metalness: 0.82 });
+                const rimMesh = new THREE.Mesh(new THREE.BoxGeometry(spec.w, spec.h, spec.d), rimMat);
+                rimMesh.castShadow = true;
+                grp.add(rimMesh);
+
+                const glassMat = new THREE.MeshPhysicalMaterial({
+                    color: 0xe0f2fe, roughness: 0.05, metalness: 0.9, clearcoat: 1.0
+                });
+                const glassMesh = new THREE.Mesh(new THREE.BoxGeometry(spec.w - 0.04, spec.h - 0.04, 0.006), glassMat);
+                glassMesh.position.z = spec.d * 0.5 + 0.002;
+                grp.add(glassMesh);
+            } else {
+                const shelfMat = new THREE.MeshStandardMaterial({ color: 0xc89d66, roughness: 0.45, metalness: 0.04 });
+                const shelfMesh = new THREE.Mesh(new THREE.BoxGeometry(spec.w, spec.h, spec.d), shelfMat);
+                shelfMesh.castShadow = true;
+                shelfMesh.receiveShadow = true;
+                grp.add(shelfMesh);
+            }
+
+            // Calcular distancia a las esquinas/bordes del muro tocado
+            let distLeft = 0.85, distRight = 0.85;
+            if (hitWallMesh) {
+                const wBox = new THREE.Box3().setFromObject(hitWallMesh);
+                const spanX = wBox.max.x - wBox.min.x;
+                const spanZ = wBox.max.z - wBox.min.z;
+                if (spanX >= spanZ) {
+                    distLeft = Math.max(0, pos.x - wBox.min.x);
+                    distRight = Math.max(0, wBox.max.x - pos.x);
+                } else {
+                    distLeft = Math.max(0, pos.z - wBox.min.z);
+                    distRight = Math.max(0, wBox.max.z - pos.z);
+                }
+            }
+
+            const elevFromFloor = +(centerY - spec.h * 0.5).toFixed(2);
+            assignBIMUserData(grp, {
+                id: `wall_item_${Date.now()}`,
+                nombre: spec.nombre,
+                categoria: 'cuadro',
+                dimensiones: {
+                    ancho: spec.w,
+                    alto: spec.h,
+                    profundidad: spec.d,
+                    elevacion: elevFromFloor
+                }
+            });
+            grp.userData.wallPlacementInfo = {
+                centerY: +centerY.toFixed(2),
+                distLeft: +distLeft.toFixed(2),
+                distRight: +distRight.toFixed(2),
+                presetKey
+            };
+
+            wallHangGroup.add(grp);
+            showToast(`🖼️ ${spec.nombre} colgado a ${centerY.toFixed(2)} m de altura (al eje)`, false, 2800);
+            wakeRenderer();
+            return grp;
+        }
+
+        // ----------------------------------------------------------------------------
+        // INTERCEPTOR UNIFICADO DE CLIC EN 3D PARA CINTA MÉTRICA Y CUADROS
+        // ----------------------------------------------------------------------------
+        function handleActiveBIMToolPointerClick(e) {
+            if (!isMeasureToolMode && !isWallHangMode) return false;
+            const rect = renderer.domElement.getBoundingClientRect();
+            const ndc = new THREE.Vector2(
+                ((e.clientX - rect.left) / rect.width) * 2 - 1,
+                -((e.clientY - rect.top) / rect.height) * 2 + 1
+            );
+            bimRaycaster.setFromCamera(ndc, activeCamera);
+
+            if (isMeasureToolMode) {
+                const candidates = [wallsGroup, furnitureGroup, fixturesGroup, decorVideoGroup, doors3DGroup, windows3DGroup].filter(Boolean);
+                const floorCandidates = [floorMainMesh, floorSouthMesh, bathFloorMesh, palierMesh].filter(Boolean);
+                const hits = bimRaycaster.intersectObjects([...candidates, ...floorCandidates], true);
+                const validHit = hits.find(h => h.object && h.object.visible && h.object.name !== 'contactShadow');
+                if (validHit) {
+                    addMeasurePoint3D(validHit.point);
+                    return true;
+                }
+                return false;
+            }
+
+            if (isWallHangMode) {
+                if (!wallsGroup) return false;
+                const wallHits = bimRaycaster.intersectObject(wallsGroup, true);
+                const validWallHit = wallHits.find(h => h.object && h.object.visible && h.face);
+                if (validWallHit) {
+                    const worldNormal = validWallHit.face.normal.clone().transformDirection(validWallHit.object.matrixWorld).normalize();
+                    // Si tocó la cara superior del muro, usar normal horizontal hacia la cámara
+                    if (Math.abs(worldNormal.y) > 0.7) {
+                        worldNormal.subVectors(activeCamera.position, validWallHit.point);
+                        worldNormal.y = 0;
+                        worldNormal.normalize();
+                    }
+                    const created = createWallHungItem(currentWallHangPreset, validWallHit.point, worldNormal, validWallHit.object);
+                    if (created) {
+                        selectBIMObject(created, e.clientX, e.clientY);
+                    }
+                    return true;
+                } else {
+                    showToast('🧱 Hacé clic directamente sobre una pared para colgar el elemento', true, 2200);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // ----------------------------------------------------------------------------
+        // 6. ZÓCALOS CERÁMICOS PERIMETRALES 3D (7 CM) Y SOLIAS DE TRANSICIÓN EN UMBRALES
+        // ----------------------------------------------------------------------------
+        function buildRealBaseboardsAndThresholds() {
+            while (zocalosAndThresholdsGroup.children.length > 0) {
+                const c = zocalosAndThresholdsGroup.children[0];
+                zocalosAndThresholdsGroup.remove(c);
+                if (c.geometry) c.geometry.dispose();
+            }
+
+            const zocaloH = 0.07; // 7 cm de alto reales
+            const zocaloT = 0.014; // 1.4 cm de espesor
+            const zocaloY = zocaloH / 2 + 0.001;
+
+            // Tramos perimetrales interiores de zócalo cerámico (respetando vanos de puertas)
+            const zocaloSegments = [
+                // Living / Comedor Norte (Z = 0.16, X = 2.60 a 6.14)
+                { x1: 2.60, z1: 0.16, x2: 6.14, z2: 0.16 },
+                // Living Muro Este (X = 6.14, Z = 0.16 a 6.14)
+                { x1: 6.14, z1: 0.16, x2: 6.14, z2: 6.14 },
+                // Living Tabique Divisor Oeste (X = 2.62, Z = 0.16 a 5.05)
+                { x1: 2.62, z1: 0.16, x2: 2.62, z2: 5.05 },
+                // Estudio Norte (Z = 0.16, X = 0.16 a 2.48)
+                { x1: 0.16, z1: 0.16, x2: 2.48, z2: 0.16 },
+                // Estudio Oeste (X = 0.16, Z = 0.16 a 2.92)
+                { x1: 0.16, z1: 0.16, x2: 0.16, z2: 2.92 },
+                // Dormitorio Oeste (X = 0.16, Z = 4.42 a 7.84)
+                { x1: 0.16, z1: 4.42, x2: 0.16, z2: 7.84 },
+                // Dormitorio Sur (Z = 7.84, X = 0.16 a 3.12)
+                { x1: 0.16, z1: 7.84, x2: 3.12, z2: 7.84 },
+                // Dormitorio Este (X = 3.12, Z = 5.15 a 7.84)
+                { x1: 3.12, z1: 5.15, x2: 3.12, z2: 7.84 },
+                // Cocina Sur y Oeste (Z = 7.84, X = 3.28 a 4.78; X = 3.28, Z = 6.08 a 7.84)
+                { x1: 3.28, z1: 7.84, x2: 4.78, z2: 7.84 },
+                { x1: 3.28, z1: 6.08, x2: 3.28, z2: 7.84 }
+            ];
+
+            zocaloSegments.forEach((seg, idx) => {
+                const dx = seg.x2 - seg.x1;
+                const dz = seg.z2 - seg.z1;
+                const len = Math.hypot(dx, dz);
+                if (len < 0.05) return;
+                const isHoriz = Math.abs(dx) >= Math.abs(dz);
+                const geo = new THREE.BoxGeometry(isHoriz ? len : zocaloT, zocaloH, isHoriz ? zocaloT : len);
+                const mesh = new THREE.Mesh(geo, pbrCeramicFloorMat);
+                mesh.position.set((seg.x1 + seg.x2) * 0.5, zocaloY, (seg.z1 + seg.z2) * 0.5);
+                mesh.receiveShadow = true;
+                assignBIMUserData(mesh, {
+                    id: `zocalo_ceramico_${idx + 1}`,
+                    nombre: 'Zócalo Cerámico Perimetral (h=7 cm)',
+                    categoria: 'piso',
+                    dimensiones: {
+                        ancho: +(isHoriz ? len : zocaloT).toFixed(2),
+                        alto: zocaloH,
+                        profundidad: +(isHoriz ? zocaloT : len).toFixed(2),
+                        elevacion: 0.00
+                    }
+                });
+                zocalosAndThresholdsGroup.add(mesh);
+            });
+
+            // Solias de transición pulidas en umbrales de puertas (Entrada, Estudio, Baño, Cuarto)
+            const soliaMat = new THREE.MeshStandardMaterial({
+                color: 0xd6d3cd,
+                roughness: 0.24,
+                metalness: 0.12
+            });
+            const thresholds = [
+                { nombre: 'Solia Umbral Puerta Entrada (0.89m)', x: 5.82, z: 6.30, w: 0.89, d: 0.16 },
+                { nombre: 'Solia Umbral Puerta Estudio (0.72m)', x: 1.99, z: 2.35, w: 0.72, d: 0.14 },
+                { nombre: 'Solia Umbral Puerta Baño (0.67m)', x: 2.35, z: 3.45, w: 0.14, d: 0.67 },
+                { nombre: 'Solia Umbral Puerta Cuarto (0.72m)', x: 2.71, z: 4.50, w: 0.72, d: 0.14 }
+            ];
+            thresholds.forEach((t, idx) => {
+                const geo = new THREE.BoxGeometry(t.w, 0.008, t.d);
+                const mesh = new THREE.Mesh(geo, soliaMat);
+                mesh.position.set(t.x, 0.004, t.z);
+                mesh.receiveShadow = true;
+                assignBIMUserData(mesh, {
+                    id: `solia_umbral_${idx + 1}`,
+                    nombre: t.nombre,
+                    categoria: 'piso',
+                    dimensiones: { ancho: t.w, alto: 0.01, profundidad: t.d, elevacion: 0.00 }
+                });
+                zocalosAndThresholdsGroup.add(mesh);
+            });
+        }
+
+        // ----------------------------------------------------------------------------
+        // 7. VISTAS AXONOMÉTRICAS PREDEFINIDAS DE 1 CLIC (NO / NE / SE / SO) EN ISOMÉTRICA
+        // ----------------------------------------------------------------------------
+        const ISO_CORNER_VECTORS = {
+            SE: { dx: 11.5, dz: 11.5, label: 'Sureste (SE 45°)' },
+            SO: { dx: -11.5, dz: 11.5, label: 'Suroeste (SO 45°)' },
+            NE: { dx: 11.5, dz: -11.5, label: 'Noreste (NE 45°)' },
+            NO: { dx: -11.5, dz: -11.5, label: 'Noroeste (NO 45°)' }
+        };
+
+        function setIsoCornerView(cornerKey) {
+            const spec = ISO_CORNER_VECTORS[cornerKey] || ISO_CORNER_VECTORS.SE;
+            const center = new THREE.Vector3(3.15, 0.40, 4.00);
+
+            if (!isIsoOrthoMode) {
+                toggleCameraProjection();
+            }
+
+            controlsPersp.target.copy(center);
+            orthoIsoCam.position.set(center.x + spec.dx, 12.2, center.z + spec.dz);
+            orthoIsoCam.zoom = 1.08;
+            orthoIsoCam.lookAt(center);
+            orthoIsoCam.updateProjectionMatrix();
+
+            perspCam.position.set(center.x + spec.dx * 0.72, 9.2, center.z + spec.dz * 0.72);
+            perspCam.lookAt(center);
+            controlsPersp.update();
+
+            if (typeof updateSimsWalls === 'function') updateSimsWalls(true);
+            if (typeof updateLabels === 'function') updateLabels(true);
+            if (typeof updateComposerCamera === 'function') updateComposerCamera();
+
+            document.querySelectorAll('.iso-corner-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-iso-corner') === cornerKey);
+            });
+            showToast(`📐 Vista Isométrica 45°: ${spec.label}`, false, 2000);
+            wakeRenderer();
+        }
+
+        // ----------------------------------------------------------------------------
+        // 8. BALANCE DE BLANCOS AJUSTABLE (5500K FRÍA / 4500K NEUTRA / 3200K CÁLIDA)
+        // ----------------------------------------------------------------------------
+        const WHITE_BALANCE_PRESETS = {
+            '5500k': {
+                label: '5500K Luz Día Fría',
+                sunHex: 0xf4f9ff,
+                hemiSkyHex: 0xf0f7ff,
+                hemiGroundHex: 0xe6edf5,
+                ambHex: 0xf8fbff,
+                fillHex: 0xf5faff
+            },
+            '4500k': {
+                label: '4500K Luz Día Neutra',
+                sunHex: 0xffffff,
+                hemiSkyHex: 0xffffff,
+                hemiGroundHex: 0xf0ede6,
+                ambHex: 0xffffff,
+                fillHex: 0xfffdf9
+            },
+            '3200k': {
+                label: '3200K Cálida Editorial',
+                sunHex: 0xfff5e4,
+                hemiSkyHex: 0xfffaf0,
+                hemiGroundHex: 0xf3ece0,
+                ambHex: 0xfffcf5,
+                fillHex: 0xfff4e0
+            }
+        };
+
+        function setWhiteBalanceTemp(wbKey, silent = false) {
+            const p = WHITE_BALANCE_PRESETS[wbKey] || WHITE_BALANCE_PRESETS['4500k'];
+            currentWhiteBalanceKey = wbKey;
+
+            if (typeof dirLight !== 'undefined' && dirLight) dirLight.color.setHex(p.sunHex);
+            if (typeof hemiLight !== 'undefined' && hemiLight) {
+                hemiLight.color.setHex(p.hemiSkyHex);
+                hemiLight.groundColor.setHex(p.hemiGroundHex);
+            }
+            if (typeof ambLight !== 'undefined' && ambLight) ambLight.color.setHex(p.ambHex);
+            if (typeof fillLight !== 'undefined' && fillLight) fillLight.color.setHex(p.fillHex);
+            if (typeof roomLights !== 'undefined' && Array.isArray(roomLights)) {
+                roomLights.forEach(rl => {
+                    if (rl && rl.color) rl.color.setHex(p.fillHex);
+                });
+            }
+
+            document.querySelectorAll('.wb-btn').forEach(btn => {
+                const isMatch = btn.getAttribute('data-wb') === wbKey;
+                btn.classList.toggle('active', isMatch);
+                btn.style.background = isMatch ? 'rgba(56,189,248,0.2)' : 'rgba(255,255,255,0.06)';
+                btn.style.color = isMatch ? '#e0f2fe' : '#cbd5e1';
+                btn.style.borderColor = isMatch ? 'rgba(56,189,248,0.45)' : 'rgba(255,255,255,0.12)';
+            });
+
+            if (!silent) {
+                showToast(`🌡️ Balance de Blancos: ${p.label}`, false, 2000);
+            }
+            wakeRenderer();
+        }
+
         (function setupBIMControls() {
             const btnBim = document.getElementById('btn-bim-mode');
             if (btnBim) {
@@ -12380,6 +13467,106 @@
                     clearBIMSelection();
                 });
             }
+
+            // Botón Cinta Métrica 3D (A <-> B)
+            const btnMeasure = document.getElementById('btn-measure-tape');
+            if (btnMeasure) {
+                btnMeasure.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    setMeasureToolMode(!isMeasureToolMode);
+                });
+            }
+
+            // Botón Colgar Cuadros / Espejos / Estantes
+            const btnWallHang = document.getElementById('btn-wall-hang');
+            if (btnWallHang) {
+                btnWallHang.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    setWallHangMode(!isWallHangMode);
+                });
+            }
+
+            // Selector de preset de Cuadro / Espejo / Estante
+            document.querySelectorAll('.wallhang-preset-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    currentWallHangPreset = btn.getAttribute('data-hang-type') || 'cuadro';
+                    document.querySelectorAll('.wallhang-preset-btn').forEach(b => {
+                        const active = b === btn;
+                        b.style.background = active ? 'rgba(56,189,248,0.22)' : 'rgba(255,255,255,0.07)';
+                        b.style.color = active ? '#e0f2fe' : '#cbd5e1';
+                        b.style.borderColor = active ? 'rgba(56,189,248,0.5)' : 'rgba(255,255,255,0.18)';
+                    });
+                    const hudText = document.getElementById('bim-tool-hud-text');
+                    const p = WALL_HANG_PRESETS[currentWallHangPreset];
+                    if (hudText && p) {
+                        hudText.innerHTML = `🖼️ <strong>Modo Colgar en Muro:</strong> Tocá cualquier pared para colgar <strong>${p.nombre}</strong>`;
+                    }
+                });
+            });
+
+            // Botón Limpiar / Cerrar HUD de herramienta BIM
+            const btnToolClear = document.getElementById('btn-bim-tool-clear');
+            if (btnToolClear) {
+                btnToolClear.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (isMeasureToolMode) {
+                        if (measurePoints.length > 0) clearMeasureTapeVisuals();
+                        else setMeasureToolMode(false);
+                    } else if (isWallHangMode) {
+                        setWallHangMode(false);
+                    }
+                });
+            }
+
+            // Controles de ajuste fino de altura (+5cm / -5cm / Quitar) para Cuadros en Muro
+            const btnUp = document.getElementById('btn-bim-wallitem-up');
+            const btnDown = document.getElementById('btn-bim-wallitem-down');
+            const btnDel = document.getElementById('btn-bim-wallitem-del');
+            function adjustSelectedWallItemHeight(deltaY) {
+                if (!bimSelectedTarget || bimSelectedTarget.userData?.categoria !== 'cuadro') return;
+                bimSelectedTarget.position.y = Math.max(0.40, Math.min(2.45, bimSelectedTarget.position.y + deltaY));
+                if (bimSelectedTarget.userData.wallPlacementInfo) {
+                    bimSelectedTarget.userData.wallPlacementInfo.centerY = +bimSelectedTarget.position.y.toFixed(2);
+                }
+                if (bimSelectedTarget.userData.dimensiones) {
+                    const h = bimSelectedTarget.userData.dimensiones.alto || 0.50;
+                    bimSelectedTarget.userData.dimensiones.elevacion = +(bimSelectedTarget.position.y - h * 0.5).toFixed(2);
+                }
+                selectBIMObject(bimSelectedTarget);
+                wakeRenderer();
+            }
+            if (btnUp) btnUp.addEventListener('click', (e) => { e.stopPropagation(); adjustSelectedWallItemHeight(0.05); });
+            if (btnDown) btnDown.addEventListener('click', (e) => { e.stopPropagation(); adjustSelectedWallItemHeight(-0.05); });
+            if (btnDel) {
+                btnDel.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (bimSelectedTarget && bimSelectedTarget.userData?.categoria === 'cuadro') {
+                        wallHangGroup.remove(bimSelectedTarget);
+                        clearBIMSelection();
+                        showToast('🗑️ Elemento retirado del muro', false, 1800);
+                        wakeRenderer();
+                    }
+                });
+            }
+
+            // Botones de Vistas Axonométricas 45° (NO / NE / SE / SO)
+            document.querySelectorAll('.iso-corner-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const corner = btn.getAttribute('data-iso-corner') || 'SE';
+                    setIsoCornerView(corner);
+                });
+            });
+
+            // Botones de Balance de Blancos (5500K / 4500K / 3200K)
+            document.querySelectorAll('.wb-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const wb = btn.getAttribute('data-wb') || '4500k';
+                    setWhiteBalanceTemp(wb);
+                });
+            });
         })();
 
         // Inicializar en 3D Maqueta Realista al cargar con edición protegida y sincronización de distribución
@@ -12387,6 +13574,8 @@
             switchTo3D('isom', 'sims', true);
             setFurnitureEditMode(false, true);
             applyReadOnlyShareUI(isReadOnlyShareMode);
+            buildRealBaseboardsAndThresholds();
+            buildInstancedBookClustersAndOptimize();
             enrichAllSceneBIMUserData();
             if (typeof initLayoutSync === 'function') {
                 initLayoutSync();
