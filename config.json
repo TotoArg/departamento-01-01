@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.12.v3",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794513456690,
+  "updatedAt": 1794513461954,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -26,9 +26,9 @@
         "rot": 0
       },
       "Perchero y Zapatero Entrada": {
-        "x": 6.05,
+        "x": 5.93,
         "y": 1.01,
-        "z": 4.93,
+        "z": 4.85,
         "rot": 0
       }
     }
