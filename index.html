@@ -1102,6 +1102,9 @@
             <button class="mode-btn" id="btn-mode-walk" style="background:rgba(14,165,233,0.22); border:1px solid #38bdf8; color:#bae6fd; font-weight:700;" title="Caminar por adentro en 1° Persona (Joystick / WASD / Toque en el piso)"><span>🚶</span> Caminar 3D</button>
             <button class="mode-btn" id="btn-mode-tour" style="background:rgba(168,85,247,0.24); border:1px solid #c084fc; color:#e9d5ff; font-weight:700;" title="Recorrido 3D Guiado Automático (Estilo Reel / Walkthrough)"><span>🎬</span> Tour 3D</button>
 
+            <button class="mode-btn" id="btn-share-readonly" style="background:rgba(14,165,233,0.24); border:1.5px solid #38bdf8; color:#e0f2fe; font-weight:700;" title="Compartir enlace de solo lectura para que otros vean e interactúen con el modelo sin poder editarlo">
+                <span>🔗</span> <span id="btn-share-text">Compartir (Solo Lectura)</span>
+            </button>
             <button class="mode-btn" id="btn-global-undo" style="display:none; background:rgba(239,68,68,0.22); border:1px solid #ef4444; color:#fca5a5;" title="Deshacer último cambio (Ctrl+Z)">
                 <span>↩️</span> <span id="btn-undo-text">Deshacer</span>
             </button>
@@ -1113,6 +1116,9 @@
             </button>
             <div id="sync-status-badge" class="sync-badge" title="Estado de sincronización en tiempo real (Nube y Local)">
                 <span style="color:#34d399;">🟢</span> <span class="badge-txt">Sincronizado</span>
+            </div>
+            <div id="viewer-readonly-badge" class="sync-badge" style="display:none; background:rgba(14,165,233,0.18); border:1px solid rgba(56,189,248,0.45); color:#bae6fd;" title="Modo Visor Interactivo (Solo Lectura): podés recorrer en 3D y abrir puertas/ventanas/mesa sin modificar el plano">
+                <span>👁️</span> <span class="badge-txt">Visor Interactivo</span>
             </div>
             <button class="mode-btn" id="btn-backup-menu" style="background:rgba(56,189,248,0.18); border:1px solid #0284c7; color:#bae6fd;" title="Opciones de respaldo (Descargar/Cargar archivo)">
                 <span>📦</span> <span id="btn-backup-text">Respaldo</span>
@@ -1517,6 +1523,45 @@
                 <div style="border-top:1px solid rgba(255,255,255,0.12); margin-top:8px; padding-top:8px;">
                     <button class="action-btn btn-delete" id="btn-modal-reset" style="width:100%; padding:7px 12px; font-size:11.5px; border-radius:8px; display:flex; align-items:center; justify-content:center; gap:6px;">
                         <span>↺</span> Restablecer plano original de fábrica
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Compartir Enlace de Solo Lectura (Visor Interactivo) -->
+    <div class="modal-overlay" id="share-modal" style="display:none;">
+        <div class="modal-box glass-panel" style="max-width:490px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="font-size:15px; color:#38bdf8; display:flex; align-items:center; gap:8px; margin:0;">
+                    <span>🔗</span> Compartir Modelo 3D (Solo Lectura)
+                </h3>
+                <button class="icon-btn" id="btn-close-share">✕</button>
+            </div>
+            <p style="font-size:12px; color:#cbd5e1; line-height:1.45; margin:0 0 12px 0;">
+                Quienes abran estos enlaces entrarán en <b>Modo Visor Interactivo</b>: podrán recorrer en 1° persona, usar el Auto-Tour 3D, cambiar la hora del sol y abrir puertas, placards, ventanas, cortinas y la mesa extensible, pero <b>no podrán mover, borrar ni editar ningún mueble</b>.
+            </p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="background:rgba(15,23,42,0.75); border:1px solid rgba(56,189,248,0.35); border-radius:10px; padding:10px;">
+                    <div style="font-size:11px; font-weight:700; color:#38bdf8; margin-bottom:5px;">🌐 Enlace Público Permanente (GitHub Pages - Solo Lectura)</div>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="inp-share-gh-url" readonly value="https://totoarg.github.io/departamento-01-01/?view=1" style="flex:1; background:#060911; color:#e2e8f0; border:1px solid rgba(255,255,255,0.18); border-radius:6px; padding:6px 8px; font-size:11.5px; font-family:monospace;">
+                        <button id="btn-copy-share-gh" style="background:#0284c7; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap;">📋 Copiar</button>
+                    </div>
+                </div>
+                <div style="background:rgba(15,23,42,0.75); border:1px solid rgba(16,185,129,0.35); border-radius:10px; padding:10px;">
+                    <div style="font-size:11px; font-weight:700; color:#34d399; margin-bottom:5px;">📱 Enlace Actual (Este Servidor / Túnel - Solo Lectura)</div>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="inp-share-cur-url" readonly value="" style="flex:1; background:#060911; color:#e2e8f0; border:1px solid rgba(255,255,255,0.18); border-radius:6px; padding:6px 8px; font-size:11.5px; font-family:monospace;">
+                        <button id="btn-copy-share-cur" style="background:#059669; color:#fff; border:none; border-radius:6px; padding:6px 12px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap;">📋 Copiar</button>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:2px;">
+                    <button id="btn-native-share" style="background:linear-gradient(135deg,#0284c7,#2563eb); color:#fff; border:none; border-radius:8px; padding:9px 12px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+                        <span>📤</span> Compartir (WhatsApp / Apps)
+                    </button>
+                    <button id="btn-preview-readonly" style="background:rgba(255,255,255,0.08); color:#e2e8f0; border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:9px 12px; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+                        <span>👁️</span> Probar vista invitado
                     </button>
                 </div>
             </div>
@@ -8991,11 +9036,63 @@
         const dragIntersection = new THREE.Vector3();
 
         // ============================================================================
-        // MODO SEPARADO: "EDITAR MUEBLES" (BLOQUEO CONTRA ERRORES ACCIDENTALES)
+        // MODO SEPARADO: "EDITAR MUEBLES" Y MODO VISOR COMPARTIDO (SOLO LECTURA)
         // ============================================================================
         let isFurnitureEditMode = false;
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        let isReadOnlyShareMode = (
+            urlSearchParams.get('view') === '1' ||
+            urlSearchParams.get('readonly') === '1' ||
+            urlSearchParams.get('modo') === 'ver' ||
+            urlSearchParams.get('share') === '1' ||
+            window.location.hash.includes('view') ||
+            window.location.hash.includes('readonly')
+        );
+
+        function applyReadOnlyShareUI(enableReadOnly) {
+            isReadOnlyShareMode = !!enableReadOnly;
+            if (isReadOnlyShareMode) {
+                isFurnitureEditMode = false;
+                clearSelection();
+            }
+            const editIdsToHide = [
+                'btn-toggle-edit-mode',
+                'btn-save-layout',
+                'btn-backup-menu',
+                'btn-reset-layout',
+                'btn-global-undo',
+                'sync-status-badge',
+                'furniture-editor',
+                'selected-object-bar'
+            ];
+            editIdsToHide.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (isReadOnlyShareMode) {
+                        el.style.display = 'none';
+                    } else if (id === 'sync-status-badge') {
+                        el.style.display = '';
+                    } else if (id === 'btn-toggle-edit-mode' || id === 'btn-save-layout' || id === 'btn-backup-menu' || id === 'btn-reset-layout') {
+                        el.style.display = '';
+                    }
+                }
+            });
+            const roBadge = document.getElementById('viewer-readonly-badge');
+            if (roBadge) roBadge.style.display = isReadOnlyShareMode ? 'inline-flex' : 'none';
+            const chkFurnRow = document.getElementById('chk-furniture')?.closest('label');
+            if (chkFurnRow) chkFurnRow.style.display = isReadOnlyShareMode ? 'none' : '';
+            const btnPreviewRo = document.getElementById('btn-preview-readonly');
+            if (btnPreviewRo) {
+                btnPreviewRo.innerHTML = isReadOnlyShareMode
+                    ? '<span>✏️</span> Volver a modo propietario'
+                    : '<span>👁️</span> Probar vista invitado';
+            }
+        }
 
         function setFurnitureEditMode(enable, silent = false) {
+            if (isReadOnlyShareMode && enable) {
+                return;
+            }
             isFurnitureEditMode = enable;
             const btnTop = document.getElementById('btn-toggle-edit-mode');
             const iconTop = document.getElementById('btn-edit-mode-icon');
@@ -9247,6 +9344,11 @@
 
             // PROTECCIÓN CONTRA ERRORES: Si el modo "Editar muebles" NO está activo, ignorar selección de muebles
             if (!isFurnitureEditMode) {
+                // En modo compartido (Solo Lectura), no mostrar cartel de edición al tocar muebles para una experiencia limpia
+                if (isReadOnlyShareMode) {
+                    clearSelection();
+                    return;
+                }
                 // Comprobar si tocó un mueble para mostrar aviso amigable
                 const testCandidates = [...furnitureMeshes];
                 decorVideoGroup.traverse(child => {
@@ -10765,10 +10867,91 @@
         // ============================================================================
         // 12. INICIALIZACIÓN CANÓNICA FOTORREALISTA PBR (DIORAMA DIGITAL TWIN)
         // ============================================================================
+        // ============================================================================
+        // CONTROLADOR DE COMPARTIR EN MODO SOLO LECTURA (VISOR INTERACTIVO)
+        // ============================================================================
+        (function setupShareReadOnlyModal() {
+            const shareModal = document.getElementById('share-modal');
+            const btnShareOpen = document.getElementById('btn-share-readonly');
+            const btnShareClose = document.getElementById('btn-close-share');
+            const inpGh = document.getElementById('inp-share-gh-url');
+            const inpCur = document.getElementById('inp-share-cur-url');
+            const btnCopyGh = document.getElementById('btn-copy-share-gh');
+            const btnCopyCur = document.getElementById('btn-copy-share-cur');
+            const btnNativeShare = document.getElementById('btn-native-share');
+            const btnPreviewRo = document.getElementById('btn-preview-readonly');
+
+            function getShareUrls() {
+                const ghUrl = 'https://totoarg.github.io/departamento-01-01/?view=1';
+                const u = new URL(window.location.href);
+                u.searchParams.set('view', '1');
+                const curUrl = u.toString();
+                return { ghUrl, curUrl };
+            }
+
+            if (btnShareOpen && shareModal) {
+                btnShareOpen.addEventListener('click', () => {
+                    const { ghUrl, curUrl } = getShareUrls();
+                    if (inpGh) inpGh.value = ghUrl;
+                    if (inpCur) inpCur.value = curUrl;
+                    shareModal.style.display = 'flex';
+                });
+            }
+            if (btnShareClose && shareModal) {
+                btnShareClose.addEventListener('click', () => {
+                    shareModal.style.display = 'none';
+                });
+            }
+            if (btnCopyGh) {
+                btnCopyGh.addEventListener('click', async () => {
+                    const { ghUrl } = getShareUrls();
+                    try { await navigator.clipboard.writeText(ghUrl); } catch (e) {}
+                    showToast('🔗 Enlace público de Solo Lectura copiado al portapapeles');
+                });
+            }
+            if (btnCopyCur) {
+                btnCopyCur.addEventListener('click', async () => {
+                    const { curUrl } = getShareUrls();
+                    try { await navigator.clipboard.writeText(curUrl); } catch (e) {}
+                    showToast('🔗 Enlace actual de Solo Lectura copiado al portapapeles');
+                });
+            }
+            if (btnNativeShare) {
+                btnNativeShare.addEventListener('click', async () => {
+                    const { ghUrl, curUrl } = getShareUrls();
+                    const bestUrl = window.location.hostname.includes('localhost') ? ghUrl : curUrl;
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                title: 'Departamento 3D Interactivo (Solo Lectura)',
+                                text: 'Recorré el departamento en 3D y 1° persona (podés abrir puertas, ventanas, placards y la mesa extensible):',
+                                url: bestUrl
+                            });
+                            return;
+                        } catch (err) {}
+                    }
+                    try { await navigator.clipboard.writeText(bestUrl); } catch (e) {}
+                    showToast('🔗 Enlace de Solo Lectura copiado para compartir');
+                });
+            }
+            if (btnPreviewRo) {
+                btnPreviewRo.addEventListener('click', () => {
+                    applyReadOnlyShareUI(!isReadOnlyShareMode);
+                    if (shareModal) shareModal.style.display = 'none';
+                    showToast(
+                        isReadOnlyShareMode
+                            ? '👁️ Vista de Invitado activa (Solo Lectura: sin edición de muebles)'
+                            : '✏️ Modo Propietario restaurado'
+                    );
+                });
+            }
+        })();
+
         // Inicializar en 3D Maqueta Realista al cargar con edición protegida y sincronización de distribución
         setTimeout(() => {
             switchTo3D('isom', 'sims', true);
             setFurnitureEditMode(false, true);
+            applyReadOnlyShareUI(isReadOnlyShareMode);
             if (typeof initLayoutSync === 'function') {
                 initLayoutSync();
             }
