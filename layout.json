@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.12.v3",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794505200000,
+  "updatedAt": 1794513277070,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -12,7 +12,14 @@
       "Mochila y Bolso Entrada",
       "Objeto"
     ],
-    "transforms": {}
+    "transforms": {
+      "Vanitory y Bacha de Baño": {
+        "x": 1.42,
+        "y": 0.67,
+        "z": 3.48,
+        "rot": 0
+      }
+    }
   },
   "furnitureList": []
 }
