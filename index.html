@@ -1758,6 +1758,26 @@
         }
         const orthoCam = createOrthoCam();
 
+        // Cámara Isométrica / Axonométrica 3D Pura (Sin deformación de perspectiva)
+        var isIsoOrthoMode = false;
+        function createOrthoIsoCam() {
+            const aspect = window.innerWidth / window.innerHeight;
+            const viewSize = 10.5;
+            const cam = new THREE.OrthographicCamera(
+                -viewSize * aspect / 2,
+                viewSize * aspect / 2,
+                viewSize / 2,
+                -viewSize / 2,
+                0.1,
+                150
+            );
+            cam.position.set(-3.20, 12.20, 12.50);
+            cam.lookAt(3.15, 0.40, 4.00);
+            return cam;
+        }
+        const orthoIsoCam = createOrthoIsoCam();
+        window.orthoIsoCam = orthoIsoCam;
+
         // Arranca directamente en 3D Maqueta Realista (Axonométrica con sombras)
         let activeCamera = perspCam;
         var composer = null;
@@ -2585,21 +2605,40 @@
         }
 
         // Textura procedural PBR de alta fidelidad para el piso cerámico esmaltado beige 33.33×33.33 cm real
-        function createRealisticCeramic33Texture(repeatX, repeatY) {
+        // (Sin aros circulares artificiales: veteado pétreo travertino beige cálido real + bisel rectilíneo + pastina gris pardo)
+        let _ceramic33ColorCanvas = null;
+        let _ceramic33BumpCanvas = null;
+        let _ceramic33RoughCanvas = null;
+
+        function ensureCeramic33MasterCanvases() {
+            if (_ceramic33ColorCanvas) return;
+
             const canvas = document.createElement('canvas');
             canvas.width = 1024;
             canvas.height = 1024;
             const ctx = canvas.getContext('2d');
 
-            // Junta de pastina cementicia gris cálida suave (foto real)
-            ctx.fillStyle = '#d1c7ba';
+            // Junta de pastina cementicia gris-pardo oscura real (fotos/foto_01.jpg, foto_04.jpg, video_13/sec_086.jpg)
+            ctx.fillStyle = '#756a5f';
             ctx.fillRect(0, 0, 1024, 1024);
 
-            const numTiles = 3; // 3 baldosas de 33.33 cm en 1 metro lineal
-            const tileSize = 1024 / numTiles; // ~341.33 px por baldosa
-            const grout = 4.5; // Junta de 3 a 4 mm a escala
+            const numTiles = 3; // 3 baldosas de 33.33 cm exactos en 1.00 metro lineal
+            const tileSize = 1024 / numTiles; // 341.33 px por baldosa
+            const grout = 3.5; // Junta rectificada fina de ~3.5 mm a escala
 
-            const tileShades = ['#f5f0e6', '#f2ece0', '#f6f1e8', '#eee8dc', '#f4eee4', '#f1ebe0'];
+            // Tonos reales muestreados de las fotos de Living, Entrada, Estudio, Cocina, Cuarto y Baño
+            const tileShades = [
+                '#e8dfd1', '#e3d9ca', '#eae1d4', '#dfd4c4',
+                '#e6dccd', '#e1d6c6', '#e9e0d2', '#ded3c2',
+                '#e5dbcc'
+            ];
+
+            // Semilla determinística para que todas las repeticiones sean continuas y naturales
+            let seed = 1337;
+            function nextRand() {
+                seed = (seed * 16807) % 2147483647;
+                return (seed - 1) / 2147483646;
+            }
 
             for (let ty = 0; ty < numTiles; ty++) {
                 for (let tx = 0; tx < numTiles; tx++) {
@@ -2608,78 +2647,140 @@
                     const w = tileSize - grout * 2;
                     const h = tileSize - grout * 2;
 
-                    // Color de base del esmalte con sutil destonificado artesanal
+                    // 1. Base de esmalte cerámico beige cálido con sutil destonificado entre piezas
                     const baseColor = tileShades[(tx + ty * 3) % tileShades.length];
                     ctx.fillStyle = baseColor;
                     ctx.fillRect(x, y, w, h);
 
-                    // Bisel / cushion edge perimetral de la baldosa (gradiente suave en los 4 bordes)
-                    const grad = ctx.createRadialGradient(x + w / 2, y + h / 2, w * 0.36, x + w / 2, y + h / 2, w * 0.51);
-                    grad.addColorStop(0, 'rgba(255, 255, 255, 0.09)');
-                    grad.addColorStop(0.85, 'rgba(255, 255, 255, 0)');
-                    grad.addColorStop(1, 'rgba(110, 95, 80, 0.14)');
-                    ctx.fillStyle = grad;
-                    ctx.fillRect(x, y, w, h);
+                    // 2. Veteado pétreo / marmolado travertino lineal muy sutil (propio del cerámico real de las fotos)
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(x, y, w, h);
+                    ctx.clip();
 
-                    // Micro-moteado y esmalte cerámico fino
-                    for (let p = 0; p < 90; p++) {
-                        const px = x + Math.random() * w;
-                        const py = y + Math.random() * h;
-                        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.05)' : 'rgba(130, 110, 90, 0.035)';
-                        ctx.fillRect(px, py, 2, 2);
+                    for (let v = 0; v < 14; v++) {
+                        const vx1 = x + nextRand() * w;
+                        const vy1 = y + nextRand() * h;
+                        const vx2 = vx1 + (nextRand() - 0.35) * w * 0.85;
+                        const vy2 = vy1 + (nextRand() - 0.35) * h * 0.85;
+                        const vGrad = ctx.createLinearGradient(vx1, vy1, vx2, vy2);
+                        const isLightVein = nextRand() > 0.48;
+                        vGrad.addColorStop(0, 'rgba(255,255,255,0)');
+                        vGrad.addColorStop(0.5, isLightVein ? 'rgba(255, 252, 245, 0.16)' : 'rgba(165, 145, 122, 0.11)');
+                        vGrad.addColorStop(1, 'rgba(255,255,255,0)');
+                        ctx.strokeStyle = vGrad;
+                        ctx.lineWidth = 10 + nextRand() * 28;
+                        ctx.lineCap = 'round';
+                        ctx.beginPath();
+                        ctx.moveTo(vx1, vy1);
+                        ctx.quadraticCurveTo(
+                            (vx1 + vx2) * 0.5 + (nextRand() - 0.5) * 35,
+                            (vy1 + vy2) * 0.5 + (nextRand() - 0.5) * 35,
+                            vx2, vy2
+                        );
+                        ctx.stroke();
                     }
+
+                    // 3. Micro-grano mineral del esmalte cerámico (sin ningún patrón circular)
+                    for (let p = 0; p < 160; p++) {
+                        const px = x + nextRand() * w;
+                        const py = y + nextRand() * h;
+                        ctx.fillStyle = nextRand() > 0.5 ? 'rgba(255, 255, 255, 0.045)' : 'rgba(130, 112, 92, 0.04)';
+                        ctx.fillRect(px, py, 2.5, 2.5);
+                    }
+                    ctx.restore();
+
+                    // 4. Bisel rectilíneo perimetral en los 4 bordes rectos de la baldosa
+                    ctx.strokeStyle = 'rgba(255, 252, 245, 0.28)';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
+
+                    ctx.strokeStyle = 'rgba(95, 82, 68, 0.22)';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(x, y, w, h);
                 }
             }
+            _ceramic33ColorCanvas = canvas;
 
-            const tex = new THREE.CanvasTexture(canvas);
+            // Roughness Map: Esmalte satinado (0.32) vs junta cementicia mate (0.92)
+            const rCanvas = document.createElement('canvas');
+            rCanvas.width = 512;
+            rCanvas.height = 512;
+            const rCtx = rCanvas.getContext('2d');
+            rCtx.fillStyle = '#ebebeb'; // Junta muy rugosa/mate
+            rCtx.fillRect(0, 0, 512, 512);
+            const rTileSize = 512 / numTiles;
+            const rGrout = 2.5;
+            for (let ty = 0; ty < numTiles; ty++) {
+                for (let tx = 0; tx < numTiles; tx++) {
+                    rCtx.fillStyle = '#525252'; // Esmalte cerámico satinado natural
+                    rCtx.fillRect(tx * rTileSize + rGrout, ty * rTileSize + rGrout, rTileSize - rGrout * 2, rTileSize - rGrout * 2);
+                }
+            }
+            _ceramic33RoughCanvas = rCanvas;
+
+            // Bump Map: Junta hundida oscura (#101010) y cara de baldosa perfectamente plana (#f5f5f5)
+            const bCanvas = document.createElement('canvas');
+            bCanvas.width = 512;
+            bCanvas.height = 512;
+            const bCtx = bCanvas.getContext('2d');
+            bCtx.fillStyle = '#101010';
+            bCtx.fillRect(0, 0, 512, 512);
+            for (let ty = 0; ty < numTiles; ty++) {
+                for (let tx = 0; tx < numTiles; tx++) {
+                    bCtx.fillStyle = '#f5f5f5';
+                    bCtx.fillRect(tx * rTileSize + rGrout, ty * rTileSize + rGrout, rTileSize - rGrout * 2, rTileSize - rGrout * 2);
+                }
+            }
+            _ceramic33BumpCanvas = bCanvas;
+        }
+
+        function createRealisticCeramic33Texture(repeatX, repeatY, offsetX = 0, offsetY = 0) {
+            ensureCeramic33MasterCanvases();
+            const tex = new THREE.CanvasTexture(_ceramic33ColorCanvas);
             tex.wrapS = THREE.RepeatWrapping;
             tex.wrapT = THREE.RepeatWrapping;
             tex.repeat.set(repeatX, repeatY);
+            tex.offset.set(offsetX, offsetY);
+            tex.anisotropy = 4;
             return tex;
         }
 
-        // Mapa de Rugosidad (Roughness Map): Esmalte cerámico liso y brillante (0.18), juntas de cemento rugosas y mates (0.90)
-        function createCeramic33RoughnessTexture(repeatX, repeatY) {
+        function createCeramic33RoughnessTexture(repeatX, repeatY, offsetX = 0, offsetY = 0) {
+            ensureCeramic33MasterCanvases();
+            const tex = new THREE.CanvasTexture(_ceramic33RoughCanvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(repeatX, repeatY);
+            tex.offset.set(offsetX, offsetY);
+            return tex;
+        }
+
+        function createCeramic33BumpTexture(repeatX, repeatY, offsetX = 0, offsetY = 0) {
+            ensureCeramic33MasterCanvases();
+            const tex = new THREE.CanvasTexture(_ceramic33BumpCanvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(repeatX, repeatY);
+            tex.offset.set(offsetX, offsetY);
+            return tex;
+        }
+
+        // Textura para el piso cerámico gris pizarra antideslizante del Palier Exterior del edificio
+        function createPalierCeramicTexture(repeatX, repeatY) {
             const canvas = document.createElement('canvas');
             canvas.width = 512;
             canvas.height = 512;
             const ctx = canvas.getContext('2d');
-            // Juntas rugosas mates
-            ctx.fillStyle = '#e5e5e5'; // 90% rugoso
+            ctx.fillStyle = '#1e293b';
             ctx.fillRect(0, 0, 512, 512);
-
             const numTiles = 3;
             const tileSize = 512 / numTiles;
-            const grout = 3;
+            const grout = 2.5;
+            const shades = ['#3b495e', '#364356', '#3f4e63', '#334052'];
             for (let ty = 0; ty < numTiles; ty++) {
                 for (let tx = 0; tx < numTiles; tx++) {
-                    // Baldosa esmaltada brillante suave (18% rugoso)
-                    ctx.fillStyle = '#2f2f2f';
-                    ctx.fillRect(tx * tileSize + grout, ty * tileSize + grout, tileSize - grout * 2, tileSize - grout * 2);
-                }
-            }
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.wrapS = THREE.RepeatWrapping;
-            tex.wrapT = THREE.RepeatWrapping;
-            tex.repeat.set(repeatX, repeatY);
-            return tex;
-        }
-
-        // Bump map para profundidad física real de las juntas
-        function createCeramic33BumpTexture(repeatX, repeatY) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 512;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#080808'; // Junta oscura hundida
-            ctx.fillRect(0, 0, 512, 512);
-
-            const numTiles = 3;
-            const tileSize = 512 / numTiles;
-            const grout = 3;
-            for (let ty = 0; ty < numTiles; ty++) {
-                for (let tx = 0; tx < numTiles; tx++) {
-                    ctx.fillStyle = '#ffffff'; // Baldosa elevada
+                    ctx.fillStyle = shades[(tx + ty * 2) % shades.length];
                     ctx.fillRect(tx * tileSize + grout, ty * tileSize + grout, tileSize - grout * 2, tileSize - grout * 2);
                 }
             }
@@ -2777,33 +2878,60 @@
             metalness: 0.05
         });
 
-        // Piso Cerámico Esmaltado 33×33 cm real (fotos/foto_01.jpg, foto_04.jpg y corridor_floor.jpg)
-        const ceramicTile33MainTex = createRealisticCeramic33Texture(6.30, 6.30);
-        const ceramicTile33SouthTex = createRealisticCeramic33Texture(4.85, 1.70);
+        // Piso Cerámico Esmaltado 33.33×33.33 cm real unificado en TODOS los ambientes interiores (Living, Entrada, Pasillo, Estudio, Cocina, Cuarto y Baño)
+        // según fotos/foto_01.jpg, foto_04.jpg, corridor_floor.jpg y walkthrough/video_13/sec_086.jpg (Baño)
+        const ceramicTile33MainTex = createRealisticCeramic33Texture(6.30, 6.30, 0.00, 0.00);
+        const ceramicTile33MainBump = createCeramic33BumpTexture(6.30, 6.30, 0.00, 0.00);
+        const ceramicTile33MainRough = createCeramic33RoughnessTexture(6.30, 6.30, 0.00, 0.00);
+
+        // Offset Y = 0.30 alinea al milímetro las juntas en Z = 6.30 m entre el bloque Norte (6.30m) y el bloque Sur (1.70m)
+        const ceramicTile33SouthTex = createRealisticCeramic33Texture(4.85, 1.70, 0.00, 0.30);
+        const ceramicTile33SouthBump = createCeramic33BumpTexture(4.85, 1.70, 0.00, 0.30);
+        const ceramicTile33SouthRough = createCeramic33RoughnessTexture(4.85, 1.70, 0.00, 0.30);
+
+        // Offset Y = 0.60 alinea al milímetro las juntas del Baño (Z = 3.30..4.70 m) con el pasillo y resto de la planta
+        const ceramicTile33BathTex = createRealisticCeramic33Texture(2.30, 1.40, 0.00, 0.60);
+        const ceramicTile33BathBump = createCeramic33BumpTexture(2.30, 1.40, 0.00, 0.60);
+        const ceramicTile33BathRough = createCeramic33RoughnessTexture(2.30, 1.40, 0.00, 0.60);
+
         const pbrCeramicFloorMat = new THREE.MeshStandardMaterial({
-            color: 0xe2dcd3, // Baldosas cerámicas beige cálidas con juntas oscuras
+            color: 0xfaf6f0, // Neutro cálido para respetar el tono beige arena exacto de la textura
             map: ceramicTile33MainTex,
-            bumpMap: ceramicTile33MainTex,
-            bumpScale: 0.003,
-            roughness: 0.80, // Rugosidad táctil cerámica exacta
-            metalness: 0.05
+            bumpMap: ceramicTile33MainBump,
+            bumpScale: 0.0022,
+            roughnessMap: ceramicTile33MainRough,
+            roughness: 0.58, // Brillo satinado cerámico natural con juntas mates
+            metalness: 0.04
         });
         const pbrCeramicSouthFloorMat = new THREE.MeshStandardMaterial({
-            color: 0xe2dcd3,
+            color: 0xfaf6f0,
             map: ceramicTile33SouthTex,
-            bumpMap: ceramicTile33SouthTex,
-            bumpScale: 0.003,
-            roughness: 0.80,
-            metalness: 0.05
+            bumpMap: ceramicTile33SouthBump,
+            bumpScale: 0.0022,
+            roughnessMap: ceramicTile33SouthRough,
+            roughness: 0.58,
+            metalness: 0.04
         });
         const floorMatMain = pbrCeramicFloorMat;
         const floorMatSouth = pbrCeramicSouthFloorMat;
         const bathFloorMat = new THREE.MeshStandardMaterial({
-            map: proceduralTileTex,
-            roughness: 0.35,
+            color: 0xfaf6f0,
+            map: ceramicTile33BathTex,
+            bumpMap: ceramicTile33BathBump,
+            bumpScale: 0.0022,
+            roughnessMap: ceramicTile33BathRough,
+            roughness: 0.58,
+            metalness: 0.04
+        });
+        const palierTileTex = createPalierCeramicTexture(1.45, 1.70);
+        const palierMat = new THREE.MeshStandardMaterial({
+            color: 0xdbe4ee,
+            map: palierTileTex,
+            bumpMap: palierTileTex,
+            bumpScale: 0.002,
+            roughness: 0.68,
             metalness: 0.08
         });
-        const palierMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.60, metalness: 0.10 });
         const extWallMat = wallPlasterMat;
         const intWallMat = wallPlasterMat;
         const topCapMat = wallCapCutMat; // Trazo arquitectónico oscuro de corte
@@ -10069,8 +10197,8 @@
             pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(pointer, activeCamera);
 
-            // 0. Raycast sobre puertas y hojas de placard animadas
-            if (activeCamera === perspCam) {
+            // 0. Raycast sobre puertas y hojas de placard animadas (en Perspectiva 3D e Isométrica 3D)
+            if (activeCamera !== orthoCam) {
                 const doorHits = raycaster.intersectObjects(doorClickCandidates, false);
                 if (doorHits.length > 0) {
                     const hitMesh = doorHits[0].object;
@@ -10402,8 +10530,9 @@
 
         function updateSimsWalls(instant = false) {
             const is2D = (activeCamera === orthoCam);
-            const cx = perspCam.position.x;
-            const cz = perspCam.position.z;
+            const cam3D = (activeCamera === orthoIsoCam) ? orthoIsoCam : perspCam;
+            const cx = cam3D.position.x;
+            const cz = cam3D.position.z;
             const tx = controlsPersp.target.x;
             const tz = controlsPersp.target.z;
             const dxCam = cx - tx;
@@ -10456,7 +10585,7 @@
             document.getElementById('chk-int-walls').checked = showInt;
             const allHidden = !showExt && !showInt;
             document.getElementById('chk-hide-all-walls').checked = allHidden;
-            if (activeCamera === perspCam) {
+            if (activeCamera !== orthoCam) {
                 doors3DGroup.visible = !allHidden && document.getElementById('chk-doors').checked;
             }
             wakeRenderer();
@@ -10468,7 +10597,7 @@
             if (chkSims) chkSims.checked = (mode === 'sims');
             const chkCut = document.getElementById('chk-wall-cut');
             if (chkCut) chkCut.checked = (mode === 'down' || mode === 'cut');
-            if (activeCamera === perspCam) {
+            if (activeCamera !== orthoCam) {
                 if (mode === 'sims') setActiveTopBtn('btn-mode-sims');
                 else if (mode === 'up') setActiveTopBtn('btn-mode-3d');
                 else if (mode === 'down' || mode === 'cut') setActiveTopBtn('btn-mode-cut');
@@ -10508,7 +10637,7 @@
             if (activeCamera === orthoCam && e.target.checked) {
                 switchTo3D(current3DPreset, wallMode);
             }
-            doors3DGroup.visible = (activeCamera === perspCam) && e.target.checked;
+            doors3DGroup.visible = (activeCamera !== orthoCam) && e.target.checked;
             wakeRenderer();
         });
         document.getElementById('chk-fixtures').addEventListener('change', (e) => {
@@ -10649,7 +10778,7 @@
         });
 
         function setActiveTopBtn(id) {
-            document.querySelectorAll('.mode-btn:not(#btn-toggle-roof):not(#btn-toggle-video-decor):not(#btn-toggle-labels):not(#btn-toggle-doors):not(#btn-toggle-dining-table)').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.mode-btn:not(#btn-toggle-cam-proj):not(#btn-bim-mode):not(#btn-toggle-roof):not(#btn-toggle-video-decor):not(#btn-toggle-labels):not(#btn-toggle-doors):not(#btn-toggle-windows):not(#btn-toggle-curtains):not(#btn-toggle-dining-table)').forEach(b => b.classList.remove('active'));
             const el = document.getElementById(id);
             if (el) el.classList.add('active');
         }
@@ -10666,7 +10795,7 @@
 
         function toggleCameraProjection() {
             if (activeCamera === orthoCam) {
-                switchTo3D('isom', 'sims', true);
+                switchTo3D('isom', wallMode || 'sims', true);
             }
             isIsoOrthoMode = !isIsoOrthoMode;
             const btnLabel = document.getElementById('cam-proj-label');
@@ -10680,21 +10809,35 @@
                 orthoIsoCam.right = viewSize * aspect / 2;
                 orthoIsoCam.top = viewSize / 2;
                 orthoIsoCam.bottom = -viewSize / 2;
+                orthoIsoCam.zoom = 1.05;
+                orthoIsoCam.position.copy(perspCam.position);
+                if (orthoIsoCam.position.y < 6.0) {
+                    orthoIsoCam.position.set(-3.20, 12.20, 12.50);
+                    controlsPersp.target.set(3.15, 0.40, 4.00);
+                }
+                orthoIsoCam.lookAt(controlsPersp.target);
                 orthoIsoCam.updateProjectionMatrix();
 
                 activeCamera = orthoIsoCam;
                 controlsPersp.object = orthoIsoCam;
-                if (btnLabel) btnLabel.innerText = "Persp (24°)";
+                controlsPersp.update();
+                if (btnLabel) btnLabel.innerText = "Perspectiva";
                 if (btnIcon) btnIcon.innerText = "📷";
                 if (btn) btn.classList.add('active');
+                showToast('📐 Vista Isométrica 3D activa (Sin deformación de perspectiva — escala técnica exacta)');
             } else {
+                perspCam.position.copy(orthoIsoCam.position);
+                perspCam.lookAt(controlsPersp.target);
                 activeCamera = perspCam;
                 controlsPersp.object = perspCam;
+                controlsPersp.update();
                 if (btnLabel) btnLabel.innerText = "Isométrica";
                 if (btnIcon) btnIcon.innerText = "📐";
                 if (btn) btn.classList.remove('active');
+                showToast('📷 Vista Perspectiva 3D activa (Lente natural con profundidad real)');
             }
-            controlsPersp.target.set(3.15, 0.40, 4.00);
+            updateSimsWalls(true);
+            updateLabels(true);
             updateComposerCamera();
             wakeRenderer();
         }
@@ -10740,7 +10883,8 @@
             if (studioGround) studioGround.visible = true; // Base diorama con sombras
             
             current3DPreset = presetName;
-            activeCamera = perspCam;
+            activeCamera = (typeof isIsoOrthoMode !== 'undefined' && isIsoOrthoMode) ? orthoIsoCam : perspCam;
+            controlsPersp.object = activeCamera;
             controlsOrtho.enabled = false;
             controlsPersp.enabled = true;
             
@@ -10755,14 +10899,13 @@
             applyShadowsRecursively(apartmentGroup);
             updateComposerCamera();
             
-
-            
             applyWallsVisibility(true, true);
             setWallMode(mode || 'sims');
             
             if (moveCam) {
                 const v = viewPresets[presetName] || viewPresets.isom;
                 perspCam.position.set(v.pos[0], v.pos[1], v.pos[2]);
+                orthoIsoCam.position.set(v.pos[0], v.pos[1], v.pos[2]);
                 controlsPersp.target.set(v.target[0], v.target[1], v.target[2]);
                 controlsPersp.update();
             }
@@ -10810,6 +10953,9 @@
             if (activeCamera === orthoCam) {
                 orthoCam.zoom = Math.min(orthoCam.zoom * 1.25, 4.0);
                 orthoCam.updateProjectionMatrix();
+            } else if (activeCamera === orthoIsoCam) {
+                orthoIsoCam.zoom = Math.min(orthoIsoCam.zoom * 1.22, 4.0);
+                orthoIsoCam.updateProjectionMatrix();
             } else {
                 perspCam.position.lerp(controlsPersp.target, 0.2);
             }
@@ -10819,6 +10965,9 @@
             if (activeCamera === orthoCam) {
                 orthoCam.zoom = Math.max(orthoCam.zoom / 1.25, 0.35);
                 orthoCam.updateProjectionMatrix();
+            } else if (activeCamera === orthoIsoCam) {
+                orthoIsoCam.zoom = Math.max(orthoIsoCam.zoom / 1.22, 0.35);
+                orthoIsoCam.updateProjectionMatrix();
             } else {
                 const dir = perspCam.position.clone().sub(controlsPersp.target).normalize();
                 perspCam.position.addScaledVector(dir, 1.5);
@@ -10833,6 +10982,8 @@
                 orthoCam.updateProjectionMatrix();
                 controlsOrtho.update();
             } else {
+                orthoIsoCam.zoom = 1.05;
+                orthoIsoCam.updateProjectionMatrix();
                 switchTo3D('isom', wallMode, true);
             }
             wakeRenderer();
@@ -10874,7 +11025,7 @@
 
         // Cambiar cursor a pointer al pasar sobre puertas, ventanas o cortinas animadas
         window.addEventListener('pointermove', (e) => {
-            if (activeCamera !== perspCam || isDraggingFurniture || isRotatingFurniture) return;
+            if (activeCamera === orthoCam || isDraggingFurniture || isRotatingFurniture) return;
             const rect = renderer.domElement.getBoundingClientRect();
             const px = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             const py = -((e.clientY - rect.top) / rect.height) * 2 + 1;
