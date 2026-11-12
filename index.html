@@ -3488,14 +3488,13 @@
         // 3. PERÍMETRO EXTERIOR CON LAS 7 VENTANAS REALES DEL VIDEO
         // ============================================================================
         // Muro Superior (Norte, Z = 0.00):
-        // 1) SECTOR ESTUDIO (X = 0.00 a 3.00 m, ventana más chica de 1.00 m centrada en el ambiente, techo catedral cumbrera 5.20 m):
-        //    - Tramo izquierdo ciego: de X = 0.00 a 1.00 m (sube de 3.20 m a 4.07 m bajo faldón, aloja calefactor Orbis en X = 0.45 m)
-        addSlopedWallSegment(0.00, 0.00, 1.00, 0.00, 3.20, 4.07, EXT_T, exteriorWallsGroup, true);
-        //    - Ventana Norte Estudio: de X = 1.00 a 2.00 m (ancho 1.00 m, un poco más chica que antes, idéntica a la del Cuarto)
-        addWindowSegment(1.00, 0.00, 2.00, 0.00, 0.98, 1.02, 4.07, 4.94);
-        //    - Tramo derecho ciego bajo faldón y cumbrera hasta el eje central (X = 2.00 a 3.00 m)
-        addSlopedWallSegment(2.00, 0.00, 2.30, 0.00, 4.94, 5.20, EXT_T, exteriorWallsGroup, true);
-        addWallSegment(2.30, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 5.20);
+        // 1) SECTOR ESTUDIO (X = 0.00 a 3.00 m, ventana más chica de 1.00 m ubicada sobre el ala de la mesa en L, techo catedral cumbrera 5.20 m):
+        //    - Tramo izquierdo ciego: de X = 0.00 a 1.50 m (sube de 3.20 m a 4.50 m bajo faldón, aloja calefactor Orbis en X = 1.12 m manteniendo la distancia a la ventana)
+        addSlopedWallSegment(0.00, 0.00, 1.50, 0.00, 3.20, 4.50, EXT_T, exteriorWallsGroup, true);
+        //    - Ventana Norte Estudio: de X = 1.50 a 2.50 m (ancho 1.00 m, prácticamente toda sobre el ala Norte de la mesa del escritorio)
+        addWindowSegment(1.50, 0.00, 2.50, 0.00, 0.98, 1.02, 4.50, 5.20);
+        //    - Tramo derecho ciego bajo cumbrera hasta el eje central (X = 2.50 a 3.00 m)
+        addWallSegment(2.50, 0.00, 3.00, 0.00, EXT_T, exteriorWallsGroup, true, 5.20);
 
         // 2) SECTOR LIVING (X = 3.00 a 6.30 m, faldón este baja de 5.20 m a 3.80 m):
         //    - Muro inicial junto al eje central (X = 3.00 a 3.30 m, baja de 5.20 m a 5.07 m)
@@ -6779,13 +6778,13 @@
             }
 
             // 1. MURO NORTE (Z = 0.00 m):
-            // - Calefactor Orbis de vidrio templado negro en el Estudio: ubicado sobre la pared Norte entre la biblioteca y el ala corta del escritorio (X = 0.62 m, Z = 0.11 m, despejado sin que la biblioteca lo tape):
+            // - Calefactor Orbis de vidrio templado negro en el Estudio: ubicado a la izquierda de la ventana manteniendo su separación exacta (X = 1.12 m, Z = 0.11 m):
             createCompoundAssembly('Panel Calefactor Estudio', () => {
-                const heaterEstudio = buildOrbisBlackGlassHeater(0.62, 0.11, 1, 1);
+                const heaterEstudio = buildOrbisBlackGlassHeater(1.12, 0.11, 1, 1);
                 (currentAssemblyGroup || decorVideoGroup).add(heaterEstudio);
             });
-            // - Cortina de ventana Norte (V4: X = 1.00 a 2.00 m):
-            addCurtainAssembly(1.00, 0.00, 2.00, 0.00, 0, 0.12, 0x57534e);
+            // - Cortina de ventana Norte (V4: X = 1.50 a 2.50 m, prácticamente toda sobre el ala Norte de la mesa):
+            addCurtainAssembly(1.50, 0.00, 2.50, 0.00, 0, 0.12, 0x57534e);
 
             // 2. ESCRITORIO GAMER EN "L" (Tramo principal sobre pared Este de 2.05 m; ala de la "L" bajo la ventana más corta en relación a la principal: de X = 1.62 a X = 2.48 m -> 0.86 m de extensión, total 1.38 m hasta la pared Este)
             createCompoundAssembly('Escritorio Gamer en "L"', () => {
@@ -7527,8 +7526,8 @@
         }
 
         // --- LÍNEAS 2D DE EQUIPAMIENTO EXACTO DEL ESTUDIO Y CUARTO ---
-        // Calefactores Orbis de vidrio negro en pared Norte (Estudio X = 0.37..0.87) y pared Sur (Cuarto X = 2.30..2.80)
-        addLine2DSegment(0.37, 0.11, 0.87, 0.11, 0.035, 0x0f172a);
+        // Calefactores Orbis de vidrio negro en pared Norte (Estudio X = 0.87..1.37) y pared Sur (Cuarto X = 2.30..2.80)
+        addLine2DSegment(0.87, 0.11, 1.37, 0.11, 0.035, 0x0f172a);
         addLine2DSegment(2.30, 7.89, 2.80, 7.89, 0.035, 0x0f172a);
         // Escritorio en L (Tramo Largo Principal [2.48..3.00, 0.00..2.05], Ala Corta [1.62..2.48, 0.00..0.48]):
         addLine2DSegment(2.48, 0.00, 2.48, 2.05, 0.018, 0x8f3818);
