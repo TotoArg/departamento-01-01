@@ -4480,9 +4480,9 @@
             cavity.position.set(0.405, 0.47, 3.89);
             bathGroup.add(cavity);
 
-            // Columna / Mocheta estructural Sur del Baño junto a la bañera (medida relevada: 31 cm x 69 cm en esquina Suroeste Z = 4.48 a 4.70 m)
-            const bathCol = new THREE.Mesh(new THREE.BoxGeometry(0.69, 3.20, 0.22), intWallMat);
-            bathCol.position.set(0.405, 1.60, 4.59);
+            // Columna / Mocheta estructural Sur del Baño junto a la bañera (medida relevada: 31 cm x 69 cm en esquina Suroeste)
+            const bathCol = new THREE.Mesh(new THREE.BoxGeometry(0.69, 3.20, 0.31), intWallMat);
+            bathCol.position.set(0.405, 1.60, 4.635);
             bathCol.castShadow = true; bathCol.receiveShadow = true;
             assignBIMUserData(bathCol, {
                 nombre: 'Columna Estructural Baño (31×69 cm)',
@@ -4966,10 +4966,9 @@
         // - PUERTA CUARTO: De X = 2.30 a X = 3.00 (bisagra en X = 3.00, abre hacia el Cuarto)
         addDashedLine(2.30, 5.20, 3.00, 5.20);
         addDoorSymbol2D(2.95, 5.20, 2.75, 5.42, 2.55, 5.42, 2.42, 5.20);
-        // - VANO ABIERTO COCINA:
-        //   Paso libre desde X = 3.00 a X = 4.15 (1.15 m); la mocheta Norte (X = 4.15 a 4.85 m, 70 cm) cubre únicamente el ancho de la heladera sin invadir el paso
-        addDashedLine(3.00, 5.20, 4.15, 5.20);
-        addSlopedWallSegment(4.15, 5.20, 4.85, 5.20, 4.71, 4.41, INT_T, interiorWallsGroup, false);
+        // - VANO ABIERTO COCINA (relevamiento exacto: 84 cm de vano libre X = 3.00..3.95 + 90 cm de mocheta Norte X = 3.95..4.85):
+        addDashedLine(3.00, 5.20, 3.95, 5.20);
+        addSlopedWallSegment(3.95, 5.20, 4.85, 5.20, 4.79, 4.41, INT_T, interiorWallsGroup, false);
 
         // ============================================================================
         // 4B. PUERTAS 3D REALES EXTRAÍDAS DEL VIDEO (MARCOS DE CHAPA, HOJAS MADERA,
@@ -5815,8 +5814,8 @@
             decorVideoGroup.add(entranceMat);
 
             buildWoodenRoof();
-            // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 4.15, Z = 5.20, ancho 1.15 m)
-            const wCocinaVano = 1.15;
+            // Dintel sobre el Vano Abierto de Cocina (X = 3.00 a 3.95, Z = 5.20, vano libre relevado 84 cm)
+            const wCocinaVano = 0.95;
             const lintelTopH = 4.95;
             const lintelH = lintelTopH - DOOR_H;
             const cocinaLintelHolder = new THREE.Group();
@@ -5831,6 +5830,11 @@
             cocinaCap.position.set(0, lintelTopH + 0.01, 0);
             cocinaCap.userData.isCap = true;
             cocinaLintelHolder.add(cocinaCap);
+            assignBIMUserData(cocinaLintelHolder, {
+                nombre: 'Vano Acceso Cocina (84 cm libres / Mocheta 90 cm)',
+                categoria: 'abertura',
+                dimensiones: { ancho: 0.84, alto: 2.04, profundidad: INT_T, elevacion: 0 }
+            });
             doors3DGroup.add(cocinaLintelHolder);
             simsWalls.push({
                 type: 'doorLintel',
@@ -5843,10 +5847,10 @@
                 currentH: lintelTopH,
                 targetH: lintelTopH,
                 linkedObjs: [],
-                ...getWallNormals(3.00, 5.20, 4.15, 5.20, false)
+                ...getWallNormals(3.00, 5.20, 3.95, 5.20, false)
             });
 
-            // Dintel sobre el Vano Abierto Living-Pasillo (X = 3.00, Z = 4.45 a 5.20, ancho 0.75 m)
+            // Dintel sobre el Vano Abierto Living-Pasillo (X = 3.00, Z = 4.45 a 5.20, paso relevado 1.03 m / mocheta 89 cm)
             const wPasilloVano = 0.75;
             const pasilloLintelH = 5.20 - 2.20;
             const pasilloLintelHolder = new THREE.Group();
@@ -5861,6 +5865,11 @@
             pasilloCap.position.set(0, 5.20 + 0.01, 0);
             pasilloCap.userData.isCap = true;
             pasilloLintelHolder.add(pasilloCap);
+            assignBIMUserData(pasilloLintelHolder, {
+                nombre: 'Paso Living-Pasillo (1.03 m / Mocheta 89 cm)',
+                categoria: 'abertura',
+                dimensiones: { ancho: 1.03, alto: 2.20, profundidad: INT_T, elevacion: 0 }
+            });
             doors3DGroup.add(pasilloLintelHolder);
             simsWalls.push({
                 type: 'doorLintel',
@@ -8551,11 +8560,11 @@
         // Calefactores Orbis de vidrio negro en pared Norte (Estudio X = 0.87..1.37) y pared Sur (Cuarto X = 2.30..2.80)
         addLine2DSegment(0.87, 0.11, 1.37, 0.11, 0.035, 0x0f172a);
         addLine2DSegment(2.30, 7.89, 2.80, 7.89, 0.035, 0x0f172a);
-        // Escritorio en L (Tramo Largo Principal [2.48..3.00, 0.00..2.05], Ala Corta [1.62..2.48, 0.00..0.48]):
-        addLine2DSegment(2.48, 0.00, 2.48, 2.05, 0.018, 0x8f3818);
-        addLine2DSegment(2.48, 2.05, 3.00, 2.05, 0.018, 0x8f3818);
-        addLine2DSegment(1.62, 0.00, 1.62, 0.48, 0.018, 0x8f3818);
-        addLine2DSegment(1.62, 0.48, 2.48, 0.48, 0.018, 0x8f3818);
+        // Escritorio en L relevado exacto (Tramo Este [2.40..3.00, 0.00..2.13] = 2.13m x 0.60m, Ala Norte [1.68..3.00, 0.00..0.52] = 1.32m x 0.52m):
+        addLine2DSegment(2.40, 0.00, 2.40, 2.13, 0.018, 0x8f3818);
+        addLine2DSegment(2.40, 2.13, 3.00, 2.13, 0.018, 0x8f3818);
+        addLine2DSegment(1.68, 0.00, 1.68, 0.52, 0.018, 0x8f3818);
+        addLine2DSegment(1.68, 0.52, 2.40, 0.52, 0.018, 0x8f3818);
         // 3 Estantes Flotantes Este [2.75..3.00, 0.10..1.55]
         addDashedLine(2.75, 0.10, 2.75, 1.55);
         // Biblioteca Alta Oeste [0.00..0.30, 0.44..1.56]
@@ -8570,26 +8579,29 @@
         // Silla Gamer [2.15, 1.05]
         addLine2DSegment(2.00, 1.05, 2.30, 1.05, 0.02, 0xdc2626);
 
-        // Estudio: [0.00, 0.00] a [3.00, 2.80] (3.00 m x 2.80 m = 8.40 m², idéntico al Cuarto)
+        // Estudio: [0.00, 0.00] a [3.00, 2.80]
         addPlanLabel(1.50, 1.40, "ESTUDIO");
-        // Baño: [0.00, 3.30] a [2.30, 4.70]
+        // Baño: [0.00, 3.30] a [2.30, 4.70] (Largo interior relevado 2.02 m)
         addPlanLabel(1.15, 4.00, "BAÑO");
         // Pasillo Distribuidor: [2.30, 2.80] a [3.00, 5.20]
         addPlanLabel(2.70, 4.00, "PASILLO", "arch-label vertical");
-        // Cuarto: [0.00, 5.20] a [3.00, 8.00] (3.00 m x 2.80 m = 8.40 m², idéntico al Estudio)
+        // Cuarto: [0.00, 5.20] a [3.00, 8.00] (2.95 m x 3.28 m)
         addPlanLabel(1.50, 6.60, "CUARTO");
-        // Living: [3.00, 0.00] a [6.30, 5.20]
+        // Living: [3.00, 0.00] a [6.30, 5.20] (2.90 m x 5.10 m)
         addPlanLabel(4.85, 2.60, "LIVING");
-        // Cocina: [3.00, 5.20] a [4.85, 8.00]
+        // Cocina: [3.00, 5.20] a [4.85, 8.00] (1.55 m Sur / Vano 84 cm + Mocheta 90 cm)
         addPlanLabel(3.85, 6.60, "COCINA");
-        // Entrada: [4.85, 5.20] a [6.30, 6.30]
+        // Entrada: [4.85, 5.20] a [6.30, 6.30] (97 cm tabique / Puerta 89x204 cm + Mocheta 30 cm)
         addPlanLabel(5.58, 5.75, "ENTRADA", "arch-label sm");
-        // Palier Edificio (Exterior): [4.85, 6.30] a [6.30, 8.00]
+        // Palier Edificio (Exterior): [4.85, 6.30] a [6.30, 8.00] (Frente 1.20 m)
         addPlanLabel(5.58, 7.15, "PALIER\nEDIFICIO", "arch-label palier");
 
-        // Cotas Exteriores
-        addPlanLabel(3.15, -0.30, "6.30 m", "arch-label dim");
-        addPlanLabel(-0.32, 4.00, "8.00 m", "arch-label dim-v");
+        // Cotas Perimetrales e Interiores Relevadas (según plano manuscrito del usuario)
+        addPlanLabel(4.65, -0.28, "2.90 m", "arch-label dim");
+        addPlanLabel(6.64, 3.15, "6.90 m", "arch-label dim-v");
+        addPlanLabel(5.58, 6.52, "1.20 m", "arch-label dim");
+        addPlanLabel(3.92, 8.28, "1.55 m", "arch-label dim");
+        addPlanLabel(1.50, 8.28, "2.95 m", "arch-label dim");
 
         const _projVec = new THREE.Vector3();
         function updateRoofCapsVisibility() {
@@ -12073,15 +12085,74 @@
         function enrichAllSceneBIMUserData() {
             scene.updateMatrixWorld(true);
 
-            // 1. Muros Exteriores e Interiores
+            // 1. Muros Exteriores e Interiores (con etiquetado arquitectónico exacto del relevamiento)
             [exteriorWallsGroup, interiorWallsGroup].forEach((grp, idx) => {
                 if (!grp) return;
                 grp.traverse(child => {
                     if (!child.isMesh || child.userData.isCap) return;
                     if (!child.userData.categoria || !child.userData.dimensiones) {
                         const dims = computeWorldDimensions(child);
+                        const wBox = new THREE.Box3().setFromObject(child);
+                        const cx = (wBox.min.x + wBox.max.x) * 0.5;
+                        const cz = (wBox.min.z + wBox.max.z) * 0.5;
+                        let wallName = child.userData.nombre;
+                        if (!wallName) {
+                            if (idx === 0) {
+                                if (cz < 0.25 && cx > 3.00) {
+                                    wallName = 'Muro Norte Living (Ancho interior 2.90 m)';
+                                    dims.ancho = 2.90;
+                                } else if (cz < 0.25 && cx <= 3.00) {
+                                    wallName = 'Muro Norte Estudio';
+                                } else if (cx > 6.10) {
+                                    wallName = 'Muro Exterior Este Living/Entrada (Largo 6.90 m)';
+                                    dims.ancho = 6.90;
+                                } else if (cz > 6.10 && cz < 6.50 && cx > 4.80) {
+                                    wallName = 'Frente Entrada / Palier (1.20 m — Mocheta 30 cm + Puerta 89×204 cm)';
+                                } else if (cz > 7.80 && cx >= 3.00) {
+                                    wallName = 'Muro Sur Cocina (Ancho 1.55 m)';
+                                    dims.ancho = 1.55;
+                                } else if (cz > 7.80 && cx < 3.00) {
+                                    wallName = 'Muro Sur Cuarto (Ancho 2.95 m)';
+                                    dims.ancho = 2.95;
+                                } else if (cx > 4.70 && cx < 5.00 && cz > 6.20) {
+                                    wallName = 'Muro Exterior Este Cocina';
+                                } else if (cx < 0.25) {
+                                    wallName = 'Muro Medianero Oeste';
+                                } else {
+                                    wallName = 'Muro Perimetral Exterior';
+                                }
+                            } else {
+                                if (Math.abs(cx - 3.00) < 0.20 && cz < 4.60) {
+                                    wallName = 'Tabique Divisorio Living (Largo 5.10 m / Mocheta Sur 89 cm)';
+                                    dims.ancho = 5.10;
+                                } else if (Math.abs(cx - 3.00) < 0.20 && cz > 5.10) {
+                                    wallName = 'Tabique Divisorio Cuarto / Cocina (Largo 3.28 m)';
+                                    dims.ancho = 3.28;
+                                } else if (Math.abs(cx - 4.85) < 0.20 && cz > 5.10 && cz < 6.40) {
+                                    wallName = 'Tabique Divisorio Entrada / Cocina (97 cm)';
+                                    dims.ancho = 0.97;
+                                } else if (Math.abs(cz - 5.20) < 0.20 && cx > 3.80) {
+                                    wallName = 'Mocheta Norte Cocina (90 cm — Vano Libre 84 cm)';
+                                    dims.ancho = 0.90;
+                                } else if (Math.abs(cz - 3.30) < 0.20 && cx < 2.40) {
+                                    wallName = 'Muro Norte Baño (Largo interior 2.02 m)';
+                                    dims.ancho = 2.02;
+                                } else if (Math.abs(cz - 4.70) < 0.20 && cx < 2.40) {
+                                    wallName = 'Muro Sur Baño (Largo interior 2.02 m)';
+                                    dims.ancho = 2.02;
+                                } else if (Math.abs(cx - 2.30) < 0.20 && cz < 3.70) {
+                                    wallName = 'Mocheta Norte Puerta Baño / Pasillo (65 cm)';
+                                    dims.ancho = 0.65;
+                                } else if (Math.abs(cx - 2.30) < 0.20 && cz > 4.30) {
+                                    wallName = 'Mocheta Sur Puerta Baño / Pasillo (83 cm — Paso 1.48 m)';
+                                    dims.ancho = 0.83;
+                                } else {
+                                    wallName = 'Tabique Divisorio Interior';
+                                }
+                            }
+                        }
                         assignBIMUserData(child, {
-                            nombre: child.userData.nombre || (idx === 0 ? 'Muro Perimetral Exterior' : 'Tabique Divisorio Interior'),
+                            nombre: wallName,
                             categoria: 'muro',
                             dimensiones: dims
                         });
@@ -12146,22 +12217,22 @@
                     // Dimensiones canónicas exactas del relevamiento para conjuntos principales
                     const lower = (fName || '').toLowerCase();
                     if (lower.includes('escritorio en l') || lower.includes('escritorio gamer')) {
-                        fName = 'Escritorio en L (Estudio)';
+                        fName = 'Escritorio en L Estudio (2.13×0.60m + Ala 1.32×0.52m)';
                         fDims = { ancho: 2.13, alto: 0.76, profundidad: 1.32, elevacion: 0.00 };
                     } else if (lower.includes('rack tv')) {
-                        fName = 'Rack TV Living (1.77×0.44 m)';
+                        fName = 'Rack TV Living (1.77×0.44 m + Smart TV 50")';
                         fDims = { ancho: 1.77, alto: 0.76, profundidad: 0.44, elevacion: 0.00 };
                     } else if (lower.includes('futón') || lower.includes('futon')) {
-                        fName = 'Sillón Futón 3 Cuerpos';
+                        fName = 'Sillón Futón 3 Cuerpos (2.10×1.00 m)';
                         fDims = { ancho: 2.10, alto: 0.82, profundidad: 1.00, elevacion: 0.00 };
                     } else if (lower.includes('mesa ratona')) {
-                        fName = 'Mesa Ratona de Living';
+                        fName = 'Mesa Ratona de Living (90×50 cm)';
                         fDims = { ancho: 0.90, alto: 0.42, profundidad: 0.50, elevacion: 0.00 };
                     } else if (lower.includes('estantes flotantes estudio')) {
                         fName = 'Estantes Flotantes Estudio (×3)';
                         fDims = { ancho: 1.40, alto: 0.75, profundidad: 0.20, elevacion: 1.35 };
                     } else if (lower.includes('bañera') || lower.includes('banera')) {
-                        fName = 'Bañera de Loza y Ducha';
+                        fName = 'Bañera de Loza (1.18×0.69 m) y Ducha';
                         fDims = { ancho: 1.18, alto: 0.48, profundidad: 0.69, elevacion: 0.00 };
                     }
                     if (!fDims) {
@@ -12195,7 +12266,7 @@
             if (typeof floorMainMesh !== 'undefined' && floorMainMesh) {
                 assignBIMUserData(floorMainMesh, {
                     id: 'piso_principal',
-                    nombre: 'Piso Cerámico 33×33 (Living / Estudio / Cuarto)',
+                    nombre: 'Piso Cerámico 33×33 (Living 2.90×5.10m / Estudio / Cuarto 2.95×3.28m)',
                     categoria: 'piso',
                     dimensiones: { ancho: 6.30, alto: 0.02, profundidad: 6.30, elevacion: 0.00 }
                 });
@@ -12203,7 +12274,7 @@
             if (typeof floorSouthMesh !== 'undefined' && floorSouthMesh) {
                 assignBIMUserData(floorSouthMesh, {
                     id: 'piso_sur_cocina',
-                    nombre: 'Piso Cerámico 33×33 (Sector Sur / Cocina)',
+                    nombre: 'Piso Cerámico 33×33 (Cocina 1.55m Sur / Entrada)',
                     categoria: 'piso',
                     dimensiones: { ancho: 4.85, alto: 0.02, profundidad: 1.70, elevacion: 0.00 }
                 });
@@ -12211,17 +12282,17 @@
             if (typeof bathFloorMesh !== 'undefined' && bathFloorMesh) {
                 assignBIMUserData(bathFloorMesh, {
                     id: 'piso_bano',
-                    nombre: 'Piso Damero B&N 20×20 (Baño)',
+                    nombre: 'Piso Cerámico 33×33 (Baño — Largo interior 2.02 m)',
                     categoria: 'piso',
-                    dimensiones: { ancho: 2.30, alto: 0.02, profundidad: 1.40, elevacion: 0.00 }
+                    dimensiones: { ancho: 2.02, alto: 0.02, profundidad: 1.40, elevacion: 0.00 }
                 });
             }
             if (typeof palierMesh !== 'undefined' && palierMesh) {
                 assignBIMUserData(palierMesh, {
                     id: 'piso_palier',
-                    nombre: 'Solado Palier Común Edificio',
+                    nombre: 'Solado Palier Común Edificio (Frente 1.20 m)',
                     categoria: 'piso',
-                    dimensiones: { ancho: 1.45, alto: 0.02, profundidad: 1.70, elevacion: 0.00 }
+                    dimensiones: { ancho: 1.20, alto: 0.02, profundidad: 1.70, elevacion: 0.00 }
                 });
             }
         }
@@ -12994,11 +13065,11 @@
         // 4. SIMULADOR DE BARRIDO DE PUERTAS Y CAJONES (BIM CLASH DETECTION)
         // ----------------------------------------------------------------------------
         const BIM_DOOR_SWING_SPECS = [
-            { id: 'swing_entrada', label: 'Barrido Puerta Entrada (0.89m)', x: 6.265, z: 6.30, radius: 0.89, startAngle: Math.PI, endAngle: Math.PI * 1.5 },
-            { id: 'swing_estudio', label: 'Barrido Puerta Estudio (0.72m)', x: 2.35, z: 2.35, radius: 0.72, startAngle: Math.PI, endAngle: Math.PI * 1.5 },
-            { id: 'swing_bano', label: 'Barrido Puerta Baño (0.67m)', x: 2.35, z: 3.12, radius: 0.67, startAngle: Math.PI * 0.5, endAngle: Math.PI },
-            { id: 'swing_cuarto', label: 'Barrido Puerta Cuarto (0.72m)', x: 2.35, z: 4.50, radius: 0.72, startAngle: 0, endAngle: Math.PI * 0.5 },
-            { id: 'swing_heladera', label: 'Apertura Heladera / Mesada Cocina (0.60m)', x: 4.25, z: 5.55, radius: 0.58, startAngle: Math.PI * 0.5, endAngle: Math.PI }
+            { id: 'swing_entrada', label: 'Barrido Puerta Entrada (89×204 cm)', x: 6.20, z: 6.30, radius: 0.89, startAngle: Math.PI, endAngle: Math.PI * 1.5 },
+            { id: 'swing_estudio', label: 'Barrido Puerta Estudio (70×204 cm)', x: 2.96, z: 2.80, radius: 0.70, startAngle: Math.PI, endAngle: Math.PI * 1.5 },
+            { id: 'swing_bano', label: 'Barrido Puerta Baño (67×204 cm)', x: 2.30, z: 4.31, radius: 0.67, startAngle: Math.PI * 0.5, endAngle: Math.PI },
+            { id: 'swing_cuarto', label: 'Barrido Puerta Cuarto (70×204 cm)', x: 2.96, z: 5.20, radius: 0.70, startAngle: 0, endAngle: Math.PI * 0.5 },
+            { id: 'swing_heladera', label: 'Apertura Heladera / Mesada Cocina (60 cm)', x: 4.25, z: 5.55, radius: 0.58, startAngle: Math.PI * 0.5, endAngle: Math.PI }
         ];
 
         function updateBIMClashDetectionArcs(visible) {
@@ -13278,27 +13349,27 @@
             const zocaloT = 0.014; // 1.4 cm de espesor
             const zocaloY = zocaloH / 2 + 0.001;
 
-            // Tramos perimetrales interiores de zócalo cerámico (respetando vanos de puertas)
+            // Tramos perimetrales interiores de zócalo cerámico (respetando exactamente caras de muros y vanos de puertas)
             const zocaloSegments = [
-                // Living / Comedor Norte (Z = 0.16, X = 2.60 a 6.14)
-                { x1: 2.60, z1: 0.16, x2: 6.14, z2: 0.16 },
-                // Living Muro Este (X = 6.14, Z = 0.16 a 6.14)
-                { x1: 6.14, z1: 0.16, x2: 6.14, z2: 6.14 },
-                // Living Tabique Divisor Oeste (X = 2.62, Z = 0.16 a 5.05)
-                { x1: 2.62, z1: 0.16, x2: 2.62, z2: 5.05 },
-                // Estudio Norte (Z = 0.16, X = 0.16 a 2.48)
-                { x1: 0.16, z1: 0.16, x2: 2.48, z2: 0.16 },
-                // Estudio Oeste (X = 0.16, Z = 0.16 a 2.92)
-                { x1: 0.16, z1: 0.16, x2: 0.16, z2: 2.92 },
-                // Dormitorio Oeste (X = 0.16, Z = 4.42 a 7.84)
-                { x1: 0.16, z1: 4.42, x2: 0.16, z2: 7.84 },
-                // Dormitorio Sur (Z = 7.84, X = 0.16 a 3.12)
-                { x1: 0.16, z1: 7.84, x2: 3.12, z2: 7.84 },
-                // Dormitorio Este (X = 3.12, Z = 5.15 a 7.84)
-                { x1: 3.12, z1: 5.15, x2: 3.12, z2: 7.84 },
-                // Cocina Sur y Oeste (Z = 7.84, X = 3.28 a 4.78; X = 3.28, Z = 6.08 a 7.84)
-                { x1: 3.28, z1: 7.84, x2: 4.78, z2: 7.84 },
-                { x1: 3.28, z1: 6.08, x2: 3.28, z2: 7.84 }
+                // Living / Comedor Norte (Z = 0.11, X = 3.06 a 6.19)
+                { x1: 3.06, z1: 0.11, x2: 6.19, z2: 0.11 },
+                // Living / Entrada Muro Este (X = 6.19, Z = 0.11 a 6.19)
+                { x1: 6.19, z1: 0.11, x2: 6.19, z2: 6.19 },
+                // Living Tabique Divisor Oeste (X = 3.06, Z = 0.11 a 4.45 — largo relevado 5.10 m)
+                { x1: 3.06, z1: 0.11, x2: 3.06, z2: 4.45 },
+                // Estudio Norte (Z = 0.11, X = 0.11 a 2.94)
+                { x1: 0.11, z1: 0.11, x2: 2.94, z2: 0.11 },
+                // Estudio Oeste (X = 0.11, Z = 0.11 a 2.74)
+                { x1: 0.11, z1: 0.11, x2: 0.11, z2: 2.74 },
+                // Cuarto Oeste (X = 0.11, Z = 5.26 a 7.89)
+                { x1: 0.11, z1: 5.26, x2: 0.11, z2: 7.89 },
+                // Cuarto Sur (Z = 7.89, X = 0.11 a 2.94 — ancho relevado 2.95 m)
+                { x1: 0.11, z1: 7.89, x2: 2.94, z2: 7.89 },
+                // Cuarto Este (X = 2.94, Z = 5.26 a 7.89 — largo relevado 3.28 m)
+                { x1: 2.94, z1: 5.26, x2: 2.94, z2: 7.89 },
+                // Cocina Sur y Oeste (Z = 7.89, X = 3.06 a 4.74; X = 3.06, Z = 5.26 a 7.89)
+                { x1: 3.06, z1: 7.89, x2: 4.74, z2: 7.89 },
+                { x1: 3.06, z1: 5.26, x2: 3.06, z2: 7.89 }
             ];
 
             zocaloSegments.forEach((seg, idx) => {
@@ -13332,10 +13403,10 @@
                 metalness: 0.12
             });
             const thresholds = [
-                { nombre: 'Solia Umbral Puerta Entrada (0.89m)', x: 5.82, z: 6.30, w: 0.89, d: 0.16 },
-                { nombre: 'Solia Umbral Puerta Estudio (0.72m)', x: 1.99, z: 2.35, w: 0.72, d: 0.14 },
-                { nombre: 'Solia Umbral Puerta Baño (0.67m)', x: 2.35, z: 3.45, w: 0.14, d: 0.67 },
-                { nombre: 'Solia Umbral Puerta Cuarto (0.72m)', x: 2.71, z: 4.50, w: 0.72, d: 0.14 }
+                { nombre: 'Solia Umbral Puerta Entrada (89×204 cm)', x: 5.775, z: 6.30, w: 0.89, d: 0.16 },
+                { nombre: 'Solia Umbral Puerta Estudio (70×204 cm)', x: 2.65, z: 2.80, w: 0.70, d: 0.14 },
+                { nombre: 'Solia Umbral Puerta Baño (67×204 cm)', x: 2.30, z: 3.995, w: 0.14, d: 0.67 },
+                { nombre: 'Solia Umbral Puerta Cuarto (70×204 cm)', x: 2.65, z: 5.20, w: 0.70, d: 0.14 }
             ];
             thresholds.forEach((t, idx) => {
                 const geo = new THREE.BoxGeometry(t.w, 0.008, t.d);
