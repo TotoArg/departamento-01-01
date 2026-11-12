@@ -1284,8 +1284,8 @@
             <button class="mode-btn" id="btn-toggle-dining-table" style="background:rgba(234,88,12,0.22); border:1px solid #f97316; color:#fdba74; font-weight:700;" title="Ampliar / Cerrar Mesa de Comedor Ovalada en 3 tandas (Ø 1.00m → 1.23m → 1.47m → 1.70m) [Tecla M]"><span>🍽️</span> <span id="lbl-dining-table-btn">Mesa 1.00m</span></button>
             <div id="solar-time-group" style="display:flex; gap:2px; border-left:1px solid rgba(255,255,255,0.18); padding-left:4px;">
                 <button class="mode-btn solar-btn" data-time="morning" title="09:30 - Mañana Fresca (El Calafate)" style="padding:4px 6px;">🌅</button>
-                <button class="mode-btn solar-btn" data-time="noon" title="13:30 - Mediodía Patagónico" style="padding:4px 6px;">☀️</button>
-                <button class="mode-btn solar-btn active" data-time="golden" title="18:45 - Atardecer Golden Hour 3200K (Sombras largas)" style="padding:4px 6px; background:#f59e0b; border-color:#fbbf24; color:#0f172a;">🌇</button>
+                <button class="mode-btn solar-btn active" data-time="noon" title="13:30 - Mediodía Patagónico (Luz Día Natural)" style="padding:4px 6px; background:#f59e0b; border-color:#fbbf24; color:#0f172a;">☀️</button>
+                <button class="mode-btn solar-btn" data-time="golden" title="17:30 - Tarde Cálida" style="padding:4px 6px;">🌇</button>
                 <button class="mode-btn solar-btn" data-time="night" title="22:30 - Noche Domótica WiZ (2700K/4000K + Gaming RGB)" style="padding:4px 6px;">🌙</button>
             </div>
             <div style="display:flex; gap:3px; margin-left:2px; border-left:1px solid rgba(255,255,255,0.15); padding-left:4px;">
@@ -1302,8 +1302,8 @@
         <div style="font-size:10px; color:#94a3b8; margin-bottom:6px;">El Calafate, Santa Cruz (-50.33° Lat, -72.26° Lon)</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:10px;">
             <button class="action-btn solar-btn-sb" data-time="morning" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#f8fafc;">🌅 Mañana</button>
-            <button class="action-btn solar-btn-sb" data-time="noon" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#f8fafc;">☀️ Mediodía</button>
-            <button class="action-btn solar-btn-sb active" data-time="golden" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fbbf24; font-weight:700;">🌇 Atardecer</button>
+            <button class="action-btn solar-btn-sb active" data-time="noon" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fbbf24; font-weight:700;">☀️ Mediodía</button>
+            <button class="action-btn solar-btn-sb" data-time="golden" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#f8fafc;">🌇 Atardecer</button>
             <button class="action-btn solar-btn-sb" data-time="night" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(56,189,248,0.15); border:1px solid #0284c7; color:#bae6fd;">🌙 Noche WiZ</button>
         </div>
         <div class="panel-title">Paredes (Estilo Los Sims)</div>
@@ -2244,38 +2244,29 @@
             canvas.height = 512;
             const ctx = canvas.getContext('2d');
 
-            // Gradiente fotográfico de Estudio de Maqueta Arquitectónica Premium (cielo difuso, horizonte luminoso y pedestal de roble cálido)
+            // Gradiente fotográfico de Estudio Neutro Luz Día (sin tintes marrones ni naranjas que alteren el color de los pisos)
             const skyGrad = ctx.createLinearGradient(0, 0, 0, 512);
-            skyGrad.addColorStop(0.0, '#9ec5f8');  // Cenit estudio celeste limpio
-            skyGrad.addColorStop(0.42, '#f4f8ff'); // Difusor horizonte de alta luminancia
-            skyGrad.addColorStop(0.50, '#fff9f0'); // Línea de rebote cálido rasante
-            skyGrad.addColorStop(0.56, '#dfd1c0'); // Rebote de piso de maqueta arquitectónica
-            skyGrad.addColorStop(1.0, '#9c8368');  // Base pedestal cálida
+            skyGrad.addColorStop(0.0, '#e2eefc');  // Cenit estudio limpio neutro
+            skyGrad.addColorStop(0.45, '#ffffff'); // Difusor horizonte blanco puro
+            skyGrad.addColorStop(0.55, '#f8fafc'); // Rebote neutro limpio
+            skyGrad.addColorStop(1.0, '#e2e8f0');  // Base estudio gris perla claro (sin marrón)
             ctx.fillStyle = skyGrad;
             ctx.fillRect(0, 0, 1024, 512);
 
-            // Softbox Principal 1: Sol cálido patagónico directo (Key Light de estudio fotográfico)
+            // Softbox Principal 1: Luz Día Blanca Neutra (Key Light de estudio fotográfico)
             const sunGrad = ctx.createRadialGradient(260, 105, 6, 260, 105, 190);
             sunGrad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
-            sunGrad.addColorStop(0.28, 'rgba(255, 245, 222, 0.92)');
-            sunGrad.addColorStop(0.68, 'rgba(255, 230, 185, 0.35)');
+            sunGrad.addColorStop(0.40, 'rgba(255, 253, 250, 0.90)');
             sunGrad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
             ctx.fillStyle = sunGrad;
             ctx.fillRect(0, 0, 1024, 512);
 
-            // Softbox Secundario 2: Luz de relleno cenital/lateral fría (Sky Fill Light para reflejos en vidrio, cromo y acero inoxidable)
+            // Softbox Secundario 2: Luz de relleno cenital/lateral neutra
             const fillGrad = ctx.createRadialGradient(760, 140, 12, 760, 140, 260);
-            fillGrad.addColorStop(0.0, 'rgba(240, 249, 255, 0.85)');
-            fillGrad.addColorStop(0.45, 'rgba(219, 234, 254, 0.42)');
-            fillGrad.addColorStop(1.0, 'rgba(240, 249, 255, 0.0)');
+            fillGrad.addColorStop(0.0, 'rgba(248, 250, 252, 0.85)');
+            fillGrad.addColorStop(0.50, 'rgba(241, 245, 249, 0.45)');
+            fillGrad.addColorStop(1.0, 'rgba(248, 250, 252, 0.0)');
             ctx.fillStyle = fillGrad;
-            ctx.fillRect(0, 0, 1024, 512);
-
-            // Softbox 3: Rim Light de recorte arquitectónico (resalta biseles de madera, mesadas de granito y griferías)
-            const rimGrad = ctx.createRadialGradient(512, 70, 8, 512, 70, 150);
-            rimGrad.addColorStop(0.0, 'rgba(255, 250, 240, 0.78)');
-            rimGrad.addColorStop(1.0, 'rgba(255, 250, 240, 0.0)');
-            ctx.fillStyle = rimGrad;
             ctx.fillRect(0, 0, 1024, 512);
 
             const tex = new THREE.CanvasTexture(canvas);
@@ -2283,47 +2274,30 @@
             return tex;
         }
 
-        // Environment Map HDRI para Iluminación Global (IBL) y reflexiones realistas en metales, maderas y porcelana
+        // Environment Map HDRI Neutro de Estudio para Iluminación Global (IBL) sin teñir pisos de marrón
         let pmremGen = null;
         try {
             pmremGen = new THREE.PMREMGenerator(renderer);
             pmremGen.compileEquirectangularShader();
 
-            // Asignar inmediatamente el HDRI de Estudio Procedural para que desde el frame 0 haya reflejos PBR de alta gama
             const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
             scene.environment = studioEnvTarget.texture;
-
-            if (typeof THREE.RGBELoader !== 'undefined') {
-                const rgbeLoader = new THREE.RGBELoader();
-                rgbeLoader.setDataType(THREE.UnsignedByteType);
-                rgbeLoader.load('textures/hdr/ferndale_studio_04_1k.hdr', function(hdrEquirect) {
-                    try {
-                        const hdrTarget = pmremGen.fromEquirectangular(hdrEquirect);
-                        scene.environment = hdrTarget.texture;
-                        hdrEquirect.dispose();
-                    } catch (eHdr) {}
-                    wakeRenderer();
-                }, undefined, function() {
-                    // Mantiene el HDRI de Estudio Procedural Maqueta Premium ya activo
-                    wakeRenderer();
-                });
-            }
         } catch (pmremErr) {
             console.warn('PMREM fallback a luces de seguridad activado:', pmremErr);
         }
 
-        // 1. Luces de Emergencia y Rebote Cielo-Suelo (HemisphereLight + AmbientLight garantizan visibilidad anti-black-screen)
-        const hemiLight = new THREE.HemisphereLight(0xfff4e2, 0x9c6634, 0.65);
+        // 1. Luces de Emergencia y Rebote Cielo-Suelo Neutras (sin tinte marrón en sombras)
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0xe2e8f0, 0.78);
         scene.add(hemiLight);
 
-        // 2. Luz Ambiental de seguridad calibrada para evitar sombras negras empastadas si falla el HDRI o ACESFilmicToneMapping
-        const ambLight = new THREE.AmbientLight(0xeef6ff, 0.30);
+        // 2. Luz Ambiental de seguridad calibrada para mantener fidelidad cromática real en pisos y muros
+        const ambLight = new THREE.AmbientLight(0xffffff, 0.42);
         scene.add(ambLight);
 
-        // 3. Sol Físico El Calafate (-50.33° Lat) en Ángulo Rasante Norte con Sombras Suaves 4K
-        const dirLight = new THREE.DirectionalLight(0xffad5c, 2.05);
-        dirLight.position.set(-18.0, 6.8, -20.0); // Noroeste rasante entrando por ventanales Norte
-        dirLight.target.position.set(3.15, 0.70, 3.80);
+        // 3. Sol Físico Luz Día Elevado con Sombras Suaves 4K (evita sombras largas oscuras que cubran el piso)
+        const dirLight = new THREE.DirectionalLight(0xfffdf9, 1.45);
+        dirLight.position.set(8.0, 28.0, -16.0);
+        dirLight.target.position.set(3.15, 0.50, 4.00);
         scene.add(dirLight.target);
         dirLight.castShadow = true;
 
@@ -2342,40 +2316,40 @@
         dirLight.shadow.radius = 3.2;
         scene.add(dirLight);
 
-        // 4. Luz de Relleno Suave Posterior y Contraluz de Recorte (Rim Light de Maqueta)
-        const fillLight = new THREE.DirectionalLight(0xfff2e2, 0.34);
-        fillLight.position.set(14, 18, 16);
+        // 4. Luz de Relleno Suave Posterior y Contraluz de Recorte (Rim Light Neutro)
+        const fillLight = new THREE.DirectionalLight(0xf8fafc, 0.38);
+        fillLight.position.set(14, 22, 16);
         scene.add(fillLight);
 
         // 5. Luces Domóticas Reales (Apliques de pared tipo spot negro y tiras LED detectadas en fotos/videos)
         // WiZ Cálida 2700K (Living y Dormitorio - apliques de pared reales a 2.10m de altura)
-        const wizLivingLight = new THREE.PointLight(0xffd7a0, 0.4, 7.5, 1.8);
+        const wizLivingLight = new THREE.PointLight(0xffd7a0, 0.0, 7.5, 1.8);
         wizLivingLight.position.set(6.05, 2.05, 2.25);
         scene.add(wizLivingLight);
 
-        const wizDiningLight = new THREE.PointLight(0xffd7a0, 0.4, 6.5, 1.8);
+        const wizDiningLight = new THREE.PointLight(0xffd7a0, 0.0, 6.5, 1.8);
         wizDiningLight.position.set(4.60, 2.05, 0.25);
         scene.add(wizDiningLight);
 
-        const wizBedroomLight = new THREE.PointLight(0xffd7a0, 0.3, 6.8, 1.8);
+        const wizBedroomLight = new THREE.PointLight(0xffd7a0, 0.0, 6.8, 1.8);
         wizBedroomLight.position.set(0.25, 2.05, 6.00);
         scene.add(wizBedroomLight);
 
         // WiZ Neutra Focal 4000K (Estudio y Baño - foco dirigido y espejo)
-        const wizStudyLight = new THREE.PointLight(0xf4f8ff, 0.6, 6.5, 1.8);
+        const wizStudyLight = new THREE.PointLight(0xf4f8ff, 0.0, 6.5, 1.8);
         wizStudyLight.position.set(2.75, 1.85, 1.15);
         scene.add(wizStudyLight);
 
-        const wizBathLight = new THREE.PointLight(0xf4f8ff, 0.5, 5.5, 1.8);
+        const wizBathLight = new THREE.PointLight(0xf4f8ff, 0.0, 5.5, 1.8);
         wizBathLight.position.set(1.15, 1.95, 2.90);
         scene.add(wizBathLight);
 
         // 6. Contaminación Lumínica Gaming en Estudio (Noche)
-        const gamingBlueLight = new THREE.PointLight(0x0066ff, 1.8, 3.8, 1.8);
+        const gamingBlueLight = new THREE.PointLight(0x0066ff, 0.4, 3.8, 1.8);
         gamingBlueLight.position.set(2.65, 1.10, 0.85);
         scene.add(gamingBlueLight);
 
-        const gamingMagentaLight = new THREE.PointLight(0xff0055, 1.5, 3.0, 1.8);
+        const gamingMagentaLight = new THREE.PointLight(0xff0055, 0.3, 3.0, 1.8);
         gamingMagentaLight.position.set(2.78, 0.45, 1.45);
         scene.add(gamingMagentaLight);
 
@@ -2399,19 +2373,19 @@
         // ============================================================================
         // MOTOR DE ESTUDIO SOLAR Y DOMÓTICA WIZ (EL CALAFATE -50.33° LAT, -72.26° LON)
         // ============================================================================
-        let currentSolarTime = 'golden';
+        let currentSolarTime = 'noon';
 
         const SOLAR_PRESETS = {
             morning: {
                 name: 'Mañana Fresca (09:30)',
-                sunPos: [16.0, 18.0, -20.0],
-                sunColor: 0xfff0d8,
-                sunIntensity: 1.45,
-                hemiSky: 0xb9e1ff,
-                hemiGround: 0xc49c74,
-                hemiIntensity: 0.55,
-                ambIntensity: 0.18,
-                fillIntensity: 0.25,
+                sunPos: [14.0, 24.0, -18.0],
+                sunColor: 0xfffcf5,
+                sunIntensity: 1.40,
+                hemiSky: 0xf0f7ff,
+                hemiGround: 0xe2e8f0,
+                hemiIntensity: 0.75,
+                ambIntensity: 0.40,
+                fillIntensity: 0.35,
                 bgColor: 0xf0f7ff,
                 wizLiving: 0.0,
                 wizDining: 0.0,
@@ -2424,14 +2398,14 @@
             },
             noon: {
                 name: 'Mediodía Patagónico (13:30)',
-                sunPos: [3.15, 30.0, -22.0],
-                sunColor: 0xfffdf6,
-                sunIntensity: 1.70,
-                hemiSky: 0xdbeafe,
-                hemiGround: 0xb88850,
-                hemiIntensity: 0.60,
-                ambIntensity: 0.20,
-                fillIntensity: 0.30,
+                sunPos: [6.0, 30.0, -16.0],
+                sunColor: 0xfffef8,
+                sunIntensity: 1.45,
+                hemiSky: 0xffffff,
+                hemiGround: 0xe5e7eb,
+                hemiIntensity: 0.80,
+                ambIntensity: 0.44,
+                fillIntensity: 0.38,
                 bgColor: 0xf8fafc,
                 wizLiving: 0.0,
                 wizDining: 0.0,
@@ -2443,23 +2417,23 @@
                 isNight: false
             },
             golden: {
-                name: 'Atardecer Golden Hour 3200K (18:45)',
-                sunPos: [-18.0, 6.8, -20.0],
-                sunColor: 0xff9d42,
-                sunIntensity: 1.95,
-                hemiSky: 0xfed7aa,
-                hemiGround: 0x92400e,
-                hemiIntensity: 0.48,
-                ambIntensity: 0.15,
-                fillIntensity: 0.20,
-                bgColor: 0xfff7ed,
-                wizLiving: 0.4,
-                wizDining: 0.4,
-                wizBedroom: 0.3,
-                wizStudy: 0.6,
-                wizBath: 0.5,
-                gamingBlue: 1.8,
-                gamingMagenta: 1.5,
+                name: 'Tarde Cálida (17:30)',
+                sunPos: [-12.0, 18.0, -16.0],
+                sunColor: 0xfff3df,
+                sunIntensity: 1.50,
+                hemiSky: 0xfffaf2,
+                hemiGround: 0xded8ce,
+                hemiIntensity: 0.72,
+                ambIntensity: 0.36,
+                fillIntensity: 0.32,
+                bgColor: 0xfaf8f5,
+                wizLiving: 0.25,
+                wizDining: 0.25,
+                wizBedroom: 0.20,
+                wizStudy: 0.35,
+                wizBath: 0.30,
+                gamingBlue: 1.2,
+                gamingMagenta: 1.0,
                 isNight: false
             },
             night: {
@@ -2618,19 +2592,19 @@
             canvas.height = 1024;
             const ctx = canvas.getContext('2d');
 
-            // Junta de pastina cementicia gris-pardo oscura real (fotos/foto_01.jpg, foto_04.jpg, video_13/sec_086.jpg)
-            ctx.fillStyle = '#756a5f';
+            // Junta de pastina cementicia gris neutro cálido suave real (fotos/foto_01.jpg, foto_09.jpg, foto_20.jpg, video_13/sec_086.jpg)
+            ctx.fillStyle = '#9e988f';
             ctx.fillRect(0, 0, 1024, 1024);
 
             const numTiles = 3; // 3 baldosas de 33.33 cm exactos en 1.00 metro lineal
             const tileSize = 1024 / numTiles; // 341.33 px por baldosa
             const grout = 3.5; // Junta rectificada fina de ~3.5 mm a escala
 
-            // Tonos reales muestreados de las fotos de Living, Entrada, Estudio, Cocina, Cuarto y Baño
+            // Tonos marfil perla / gris-crema muy claro reales muestreados de las fotos de Living, Entrada, Estudio, Cocina, Cuarto y Baño (sin marrón)
             const tileShades = [
-                '#e8dfd1', '#e3d9ca', '#eae1d4', '#dfd4c4',
-                '#e6dccd', '#e1d6c6', '#e9e0d2', '#ded3c2',
-                '#e5dbcc'
+                '#f2efe9', '#eeebe4', '#f4f1ec', '#ece8e0',
+                '#f1eee8', '#edeae3', '#f3f0ea', '#ebe7df',
+                '#f0ede6'
             ];
 
             // Semilla determinística para que todas las repeticiones sean continuas y naturales
@@ -2647,29 +2621,29 @@
                     const w = tileSize - grout * 2;
                     const h = tileSize - grout * 2;
 
-                    // 1. Base de esmalte cerámico beige cálido con sutil destonificado entre piezas
+                    // 1. Base de esmalte cerámico marfil/crema claro con sutil destonificado entre piezas
                     const baseColor = tileShades[(tx + ty * 3) % tileShades.length];
                     ctx.fillStyle = baseColor;
                     ctx.fillRect(x, y, w, h);
 
-                    // 2. Veteado pétreo / marmolado travertino lineal muy sutil (propio del cerámico real de las fotos)
+                    // 2. Veteado pétreo / marmolado lineal muy sutil (sin aros circulares ni tinte marrón)
                     ctx.save();
                     ctx.beginPath();
                     ctx.rect(x, y, w, h);
                     ctx.clip();
 
-                    for (let v = 0; v < 14; v++) {
+                    for (let v = 0; v < 12; v++) {
                         const vx1 = x + nextRand() * w;
                         const vy1 = y + nextRand() * h;
                         const vx2 = vx1 + (nextRand() - 0.35) * w * 0.85;
                         const vy2 = vy1 + (nextRand() - 0.35) * h * 0.85;
                         const vGrad = ctx.createLinearGradient(vx1, vy1, vx2, vy2);
-                        const isLightVein = nextRand() > 0.48;
+                        const isLightVein = nextRand() > 0.45;
                         vGrad.addColorStop(0, 'rgba(255,255,255,0)');
-                        vGrad.addColorStop(0.5, isLightVein ? 'rgba(255, 252, 245, 0.16)' : 'rgba(165, 145, 122, 0.11)');
+                        vGrad.addColorStop(0.5, isLightVein ? 'rgba(255, 253, 250, 0.22)' : 'rgba(205, 196, 184, 0.12)');
                         vGrad.addColorStop(1, 'rgba(255,255,255,0)');
                         ctx.strokeStyle = vGrad;
-                        ctx.lineWidth = 10 + nextRand() * 28;
+                        ctx.lineWidth = 10 + nextRand() * 26;
                         ctx.lineCap = 'round';
                         ctx.beginPath();
                         ctx.moveTo(vx1, vy1);
@@ -2682,20 +2656,20 @@
                     }
 
                     // 3. Micro-grano mineral del esmalte cerámico (sin ningún patrón circular)
-                    for (let p = 0; p < 160; p++) {
+                    for (let p = 0; p < 120; p++) {
                         const px = x + nextRand() * w;
                         const py = y + nextRand() * h;
-                        ctx.fillStyle = nextRand() > 0.5 ? 'rgba(255, 255, 255, 0.045)' : 'rgba(130, 112, 92, 0.04)';
+                        ctx.fillStyle = nextRand() > 0.5 ? 'rgba(255, 255, 255, 0.05)' : 'rgba(185, 176, 164, 0.035)';
                         ctx.fillRect(px, py, 2.5, 2.5);
                     }
                     ctx.restore();
 
                     // 4. Bisel rectilíneo perimetral en los 4 bordes rectos de la baldosa
-                    ctx.strokeStyle = 'rgba(255, 252, 245, 0.28)';
+                    ctx.strokeStyle = 'rgba(255, 253, 250, 0.35)';
                     ctx.lineWidth = 1.5;
                     ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
 
-                    ctx.strokeStyle = 'rgba(95, 82, 68, 0.22)';
+                    ctx.strokeStyle = 'rgba(165, 155, 142, 0.22)';
                     ctx.lineWidth = 1.5;
                     ctx.strokeRect(x, y, w, h);
                 }
@@ -2895,33 +2869,36 @@
         const ceramicTile33BathRough = createCeramic33RoughnessTexture(2.30, 1.40, 0.00, 0.60);
 
         const pbrCeramicFloorMat = new THREE.MeshStandardMaterial({
-            color: 0xfaf6f0, // Neutro cálido para respetar el tono beige arena exacto de la textura
+            color: 0xffffff, // Blanco puro para respetar el tono marfil perla exacto de la textura sin multiplicar tintes
             map: ceramicTile33MainTex,
             bumpMap: ceramicTile33MainBump,
             bumpScale: 0.0022,
             roughnessMap: ceramicTile33MainRough,
-            roughness: 0.58, // Brillo satinado cerámico natural con juntas mates
-            metalness: 0.04
+            roughness: 0.72,
+            metalness: 0.02,
+            envMapIntensity: 0.25
         });
         const pbrCeramicSouthFloorMat = new THREE.MeshStandardMaterial({
-            color: 0xfaf6f0,
+            color: 0xffffff,
             map: ceramicTile33SouthTex,
             bumpMap: ceramicTile33SouthBump,
             bumpScale: 0.0022,
             roughnessMap: ceramicTile33SouthRough,
-            roughness: 0.58,
-            metalness: 0.04
+            roughness: 0.72,
+            metalness: 0.02,
+            envMapIntensity: 0.25
         });
         const floorMatMain = pbrCeramicFloorMat;
         const floorMatSouth = pbrCeramicSouthFloorMat;
         const bathFloorMat = new THREE.MeshStandardMaterial({
-            color: 0xfaf6f0,
+            color: 0xffffff,
             map: ceramicTile33BathTex,
             bumpMap: ceramicTile33BathBump,
             bumpScale: 0.0022,
             roughnessMap: ceramicTile33BathRough,
-            roughness: 0.58,
-            metalness: 0.04
+            roughness: 0.72,
+            metalness: 0.02,
+            envMapIntensity: 0.25
         });
         const palierTileTex = createPalierCeramicTexture(1.45, 1.70);
         const palierMat = new THREE.MeshStandardMaterial({
@@ -3183,18 +3160,19 @@
         floorSouthMesh.name = 'floorSouthMesh';
         floorGroup.add(floorSouthMesh);
 
-        // Piso cerámico blanco del Baño [0.00, 3.30] a [2.30, 4.70] (centrado en Z = 4.00 m)
-        const bathFloorGeo = new THREE.BoxGeometry(2.30, 0.062, 1.40);
+        // Piso cerámico 33.33×33.33 cm del Baño [0.00, 3.30] a [2.30, 4.70] (centrado en Z = 4.00 m)
+        const bathFloorGeo = new THREE.BoxGeometry(2.30, 0.0604, 1.40);
         const bathFloorMesh = new THREE.Mesh(bathFloorGeo, bathFloorMat);
-        bathFloorMesh.position.set(1.15, -0.029, 4.00);
+        bathFloorMesh.position.set(1.15, -0.0298, 4.00);
         bathFloorMesh.receiveShadow = true;
         bathFloorMesh.name = 'bathFloorMesh';
         floorGroup.add(bathFloorMesh);
 
         // Palier Edificio Exterior [4.85, 6.30] a [6.30, 8.00] (1.45 m de ancho x 1.70 m de profundidad)
-        const palierGeo = new THREE.BoxGeometry(1.45, 0.05, 1.70);
+        const palierGeo = new THREE.BoxGeometry(1.45, 0.06, 1.70);
         const palierMesh = new THREE.Mesh(palierGeo, palierMat);
         palierMesh.position.set(5.575, -0.03, 7.15);
+        palierMesh.receiveShadow = true;
         palierMesh.name = 'palierMesh';
         floorGroup.add(palierMesh);
 
@@ -5581,7 +5559,7 @@
             });
             const dioramaGround = new THREE.Mesh(dioramaGroundGeo, dioramaGroundMat);
             dioramaGround.rotation.x = -Math.PI / 2;
-            dioramaGround.position.set(3.15, -0.05, 4.00);
+            dioramaGround.position.set(3.15, -0.065, 4.00);
             dioramaGround.receiveShadow = true;
             dioramaGround.name = 'dioramaGround';
             floorGroup.add(dioramaGround);
@@ -5595,7 +5573,7 @@
             });
             const studioGround = new THREE.Mesh(studioGroundGeo, studioGroundMat);
             studioGround.rotation.x = -Math.PI / 2;
-            studioGround.position.set(3.15, -0.05, 4.00);
+            studioGround.position.set(3.15, -0.065, 4.00);
             studioGround.receiveShadow = true;
             studioGround.name = 'studioGround';
             floorGroup.add(studioGround);
@@ -5631,32 +5609,7 @@
             });
             floorGroup.add(dioramaFloraGroup);
 
-            // Living despejado sin alfombra ni paneles falsos delante de la TV (piso cerámico continuo visible)
-
-            // 5B. Pedestal de Presentación de Maqueta Arquitectónica Premium (Base biselada bajo losa)
-            const pedestalGroup = new THREE.Group();
-            pedestalGroup.name = 'architecturalMaquettePedestal';
-            const plinthDarkMat = new THREE.MeshStandardMaterial({
-                color: 0x1e293b,
-                roughness: 0.42,
-                metalness: 0.18
-            });
-            const plinthWalnutTrimMat = new THREE.MeshStandardMaterial({
-                color: 0x3f2719,
-                roughness: 0.48,
-                metalness: 0.06
-            });
-            // Base estructural bajo el perímetro del departamento (6.66m x 8.36m)
-            const plinthBase = new THREE.Mesh(createRoundedBoxGeo(6.68, 0.036, 8.38, 0.012, 2), plinthDarkMat);
-            plinthBase.position.set(3.15, -0.022, 4.00);
-            plinthBase.receiveShadow = true;
-            plinthBase.castShadow = true;
-            // Filete perimetral de madera nogal de maqueta de estudio
-            const plinthTrim = new THREE.Mesh(createRoundedBoxGeo(6.54, 0.016, 8.24, 0.006, 2), plinthWalnutTrimMat);
-            plinthTrim.position.set(3.15, -0.006, 4.00);
-            plinthTrim.receiveShadow = true;
-            pedestalGroup.add(plinthBase, plinthTrim);
-            floorGroup.add(pedestalGroup);
+            // Living despejado sin alfombra ni paneles falsos ni pedestales marrones sobre la losa (piso cerámico continuo visible a Y = 0.000 m)
 
             // 6. Oclusión Ambiental y Sombras de Contacto Suaves bajo Muebles (Photoreal Grounding)
             const contactShadowGeo = new THREE.PlaneGeometry(1, 1);
