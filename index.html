@@ -2116,9 +2116,11 @@
         }
 
         const proceduralWoodTex = createProceduralWoodTexture();
+        const proceduralLightWoodTex = proceduralWoodTex;
         const proceduralBrickTex = createProceduralBrickTexture();
         const proceduralTileTex = createProceduralTileTexture();
         const proceduralRugTex = createProceduralRugTexture();
+        const proceduralFabricBumpTex = proceduralRugTex;
         const proceduralSandTex = createProceduralSandTexture();
         const proceduralScreenTex = createProceduralScreenTexture();
 
@@ -2262,37 +2264,44 @@
         }
 
         // Environment Map HDRI para Iluminación Global (IBL) y reflexiones realistas en metales, maderas y porcelana
-        const pmremGen = new THREE.PMREMGenerator(renderer);
-        pmremGen.compileEquirectangularShader();
+        let pmremGen = null;
+        try {
+            pmremGen = new THREE.PMREMGenerator(renderer);
+            pmremGen.compileEquirectangularShader();
 
-        // Asignar inmediatamente el HDRI de Estudio Procedural para que desde el frame 0 haya reflejos PBR de alta gama
-        const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
-        scene.environment = studioEnvTarget.texture;
+            // Asignar inmediatamente el HDRI de Estudio Procedural para que desde el frame 0 haya reflejos PBR de alta gama
+            const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
+            scene.environment = studioEnvTarget.texture;
 
-        if (typeof THREE.RGBELoader !== 'undefined') {
-            const rgbeLoader = new THREE.RGBELoader();
-            rgbeLoader.setDataType(THREE.UnsignedByteType);
-            rgbeLoader.load('textures/hdr/ferndale_studio_04_1k.hdr', function(hdrEquirect) {
-                const hdrTarget = pmremGen.fromEquirectangular(hdrEquirect);
-                scene.environment = hdrTarget.texture;
-                hdrEquirect.dispose();
-                wakeRenderer();
-            }, undefined, function() {
-                // Mantiene el HDRI de Estudio Procedural Maqueta Premium ya activo
-                wakeRenderer();
-            });
+            if (typeof THREE.RGBELoader !== 'undefined') {
+                const rgbeLoader = new THREE.RGBELoader();
+                rgbeLoader.setDataType(THREE.UnsignedByteType);
+                rgbeLoader.load('textures/hdr/ferndale_studio_04_1k.hdr', function(hdrEquirect) {
+                    try {
+                        const hdrTarget = pmremGen.fromEquirectangular(hdrEquirect);
+                        scene.environment = hdrTarget.texture;
+                        hdrEquirect.dispose();
+                    } catch (eHdr) {}
+                    wakeRenderer();
+                }, undefined, function() {
+                    // Mantiene el HDRI de Estudio Procedural Maqueta Premium ya activo
+                    wakeRenderer();
+                });
+            }
+        } catch (pmremErr) {
+            console.warn('PMREM fallback a luces de seguridad activado:', pmremErr);
         }
 
-        // 1. Rebote natural cielo-suelo (HemisphereLight calibrada para Maqueta Arquitectónica Premium)
-        const hemiLight = new THREE.HemisphereLight(0xfff1dc, 0x8c5828, 0.54);
+        // 1. Luces de Emergencia y Rebote Cielo-Suelo (HemisphereLight + AmbientLight garantizan visibilidad anti-black-screen)
+        const hemiLight = new THREE.HemisphereLight(0xfff4e2, 0x9c6634, 0.65);
         scene.add(hemiLight);
 
-        // 2. Luz Ambiental suave de base para evitar sombras negras empastadas
-        const ambLight = new THREE.AmbientLight(0xe0ecff, 0.20);
+        // 2. Luz Ambiental de seguridad calibrada para evitar sombras negras empastadas si falla el HDRI o ACESFilmicToneMapping
+        const ambLight = new THREE.AmbientLight(0xeef6ff, 0.30);
         scene.add(ambLight);
 
         // 3. Sol Físico El Calafate (-50.33° Lat) en Ángulo Rasante Norte con Sombras Suaves 4K
-        const dirLight = new THREE.DirectionalLight(0xffa952, 2.05);
+        const dirLight = new THREE.DirectionalLight(0xffad5c, 2.05);
         dirLight.position.set(-18.0, 6.8, -20.0); // Noroeste rasante entrando por ventanales Norte
         dirLight.target.position.set(3.15, 0.70, 3.80);
         scene.add(dirLight.target);
@@ -2314,7 +2323,7 @@
         scene.add(dirLight);
 
         // 4. Luz de Relleno Suave Posterior y Contraluz de Recorte (Rim Light de Maqueta)
-        const fillLight = new THREE.DirectionalLight(0xfff0dd, 0.28);
+        const fillLight = new THREE.DirectionalLight(0xfff2e2, 0.34);
         fillLight.position.set(14, 18, 16);
         scene.add(fillLight);
 
@@ -2834,6 +2843,7 @@
         const interiorWallsGroup = new THREE.Group();
         const doors3DGroup = new THREE.Group();
         doors3DGroup.visible = false; // Oculto en vista 2D ortogonal para no tapar arcos CAD; visible automáticamente en 3D
+        const windows3DGroup = new THREE.Group();
         const fixturesGroup = new THREE.Group();
         const decorVideoGroup = new THREE.Group(); // Muebles, electrodomésticos, cortinas y decoración extraídos del 2do video
         decorVideoGroup.visible = true;
@@ -2842,7 +2852,7 @@
         const furnitureGroup = new THREE.Group();
         const lines2DGroup = new THREE.Group();
 
-        apartmentGroup.add(floorGroup, exteriorWallsGroup, interiorWallsGroup, doors3DGroup, fixturesGroup, decorVideoGroup, roofGroup, furnitureGroup, lines2DGroup);
+        apartmentGroup.add(floorGroup, exteriorWallsGroup, interiorWallsGroup, doors3DGroup, windows3DGroup, fixturesGroup, decorVideoGroup, roofGroup, furnitureGroup, lines2DGroup);
         scene.add(apartmentGroup);
 
         // ============================================================================
@@ -10734,13 +10744,16 @@
             controlsOrtho.enabled = false;
             controlsPersp.enabled = true;
             
-            // ACTIVAR SOMBRAS FOTORREALISTAS OBLIGATORIAMENTE EN 3D
+            // ACTIVAR SOMBRAS E ILUMINACIÓN FOTORREALISTA OBLIGATORIAMENTE EN 3D
             dirLight.castShadow = true;
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.shadowMap.needsUpdate = true;
+            if (typeof setSolarTime === 'function' && typeof currentSolarTime !== 'undefined') {
+                setSolarTime(currentSolarTime);
+            }
             applyShadowsRecursively(apartmentGroup);
-            if (ssaoPass) ssaoPass.camera = perspCam;
+            updateComposerCamera();
             
 
             
@@ -11053,14 +11066,15 @@
                 renderPass = new THREE.RenderPass(scene, activeCamera);
                 composer.addPass(renderPass);
 
-                // 2. Pase SSAO (Screen Space Ambient Occlusion) de alta intensidad
-                // kernelRadius en espacio de mundo (0.38m = 38cm): profundidad perfecta para sombras de contacto
+                // 2. Pase SSAO (Screen Space Ambient Occlusion) calibrado Anti-Black-Screen
+                // Parámetros suaves que acentúan encuentros de muros sin oscurecer el canvas ni fallar en depth-buffers móviles
                 ssaoPass = new THREE.SSAOPass(scene, activeCamera, width, height);
-                ssaoPass.kernelRadius = 0.38;
-                ssaoPass.kernelSize = 32; // 32 muestras para máxima suavidad sin ruido
-                ssaoPass.minDistance = 0.002;
-                ssaoPass.maxDistance = 0.45;
+                ssaoPass.kernelRadius = 0.22;
+                ssaoPass.kernelSize = isMobileOrLowEnd ? 16 : 24;
+                ssaoPass.minDistance = 0.004;
+                ssaoPass.maxDistance = 0.26;
                 ssaoPass.output = THREE.SSAOPass.OUTPUT.Default;
+                ssaoPass.enabled = !isMobileOrLowEnd;
                 composer.addPass(ssaoPass);
 
                 // 3. Pase Antialiasing SMAA (Subpixel Morphological Antialiasing)
@@ -11589,6 +11603,13 @@
             });
         })();
 
+        var bimSelectionBoxHelper = null;
+        var bimSelectedTarget = null;
+        var bimOriginalEmissives = [];
+        var isBIMPlanningMode = false;
+        var bimPlanningBoxHelpers = [];
+        var bimSavedMaterialsMap = new WeakMap();
+
         function animate() {
             requestAnimationFrame(animate);
             const movedPersp = controlsPersp.enabled && controlsPersp.update();
@@ -11607,8 +11628,10 @@
                 if (selectionBox) selectionBox.update();
                 if (typeof updateBIMHelpersInAnimate === 'function') updateBIMHelpersInAnimate();
                 
-                if (composer && activeCamera !== orthoCam) {
+                if (composer && activeCamera === perspCam) {
                     try {
+                        if (renderPass) renderPass.camera = activeCamera;
+                        if (ssaoPass) ssaoPass.camera = activeCamera;
                         composer.render();
                     } catch (e) {
                         console.warn("Fallo transitorio en composer.render(), cayendo a renderizador nativo:", e);
@@ -11747,12 +11770,6 @@
         //     SELECCIÓN RAYCASTER + BOXHELPER + EMISIVIDAD, PANEL CONTEXTUAL W×H×D
         //     Y MODO "PLANIFICACIÓN TÉCNICA" (WIREFRAME / TRANSLÚCIDO + BOXHELPERS)
         // ============================================================================
-        let bimSelectionBoxHelper = null;
-        let bimSelectedTarget = null;
-        let bimOriginalEmissives = [];
-        let isBIMPlanningMode = false;
-        const bimPlanningBoxHelpers = [];
-        const bimSavedMaterialsMap = new WeakMap();
 
         function resolveBIMAssemblyRoot(mesh) {
             if (!mesh) return null;
