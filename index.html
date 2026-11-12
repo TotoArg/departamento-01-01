@@ -7823,7 +7823,12 @@
                 mainLeg.scale.set(0.58, 0.72, 0.035);
                 mainLeg.position.set(2.65, 0.36, 2.11);
                 mainLeg.castShadow = true;
-                (currentAssemblyGroup || decorVideoGroup).add(mainTop, mainLeg);
+                // Cajón / faldón de madera bajo mesada en extremo Sur sobre gabinete PC (foto_32)
+                const southDrawer = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
+                southDrawer.scale.set(0.54, 0.11, 0.48);
+                southDrawer.position.set(2.65, 0.66, 1.84);
+                southDrawer.castShadow = true;
+                (currentAssemblyGroup || decorVideoGroup).add(mainTop, mainLeg, southDrawer);
 
                 // Ala Norte en L (bajo ventana Norte Z = 0.00, 1.32 m total desde pared Este X=2.95 hasta X=1.63 m -> extensión neta 0.72 m [X = 1.63 a 2.35 m] x 0.52 m de profundidad [Z = 0.00 a 0.52 m])
                 const wingTop = new THREE.Mesh(UNIT_BOX_GEO, deskWoodMat);
@@ -7834,7 +7839,25 @@
                 wingLeg.scale.set(0.035, 0.72, 0.50);
                 wingLeg.position.set(1.65, 0.36, 0.26);
                 wingLeg.castShadow = true;
-                (currentAssemblyGroup || decorVideoGroup).add(wingTop, wingLeg);
+                // Estante inferior bajo el Ala Norte (foto_31: sostiene resmas A4)
+                const wingUnderShelf = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
+                wingUnderShelf.scale.set(0.68, 0.022, 0.46);
+                wingUnderShelf.position.set(2.00, 0.55, 0.26);
+                wingUnderShelf.castShadow = true; wingUnderShelf.receiveShadow = true;
+                // Módulo de 2 estantes inferiores bajo la esquina en L (foto_31: Z = 0.50 a 1.14 m, X = 2.40 a 2.92 m)
+                const cornerSidePanel = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
+                cornerSidePanel.scale.set(0.52, 0.72, 0.028);
+                cornerSidePanel.position.set(2.66, 0.36, 1.12);
+                cornerSidePanel.castShadow = true;
+                const cornerMidShelf = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
+                cornerMidShelf.scale.set(0.50, 0.022, 0.62);
+                cornerMidShelf.position.set(2.66, 0.42, 0.80);
+                cornerMidShelf.castShadow = true; cornerMidShelf.receiveShadow = true;
+                const cornerBotShelf = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
+                cornerBotShelf.scale.set(0.50, 0.022, 0.62);
+                cornerBotShelf.position.set(2.66, 0.06, 0.80);
+                cornerBotShelf.castShadow = true; cornerBotShelf.receiveShadow = true;
+                (currentAssemblyGroup || decorVideoGroup).add(wingTop, wingLeg, wingUnderShelf, cornerSidePanel, cornerMidShelf, cornerBotShelf);
             });
 
             // Gabinete PC Gamer Thermaltake con iluminación RGB (independiente)
@@ -8008,21 +8031,31 @@
 
 
 
-            // 3. 3 ESTANTES FLOTANTES (Muro Este X = 3.00 m sobre escritorio, medidas relevadas: 1.40 m de largo x 0.20 m [20 cm] de profundidad):
-            createCompoundAssembly('Estantes Flotantes Estudio (1.40×0.20 m)', () => {
-                // 1° Estante (Y = 1.35 m): consolas portátiles y estuches (1.40 m x 0.20 m)
-                addDecorBox(2.85, 1.35, 0.85, 0.20, 0.03, 1.40, 0x9a441e, 0.45, 0, 'Estante Flotante Inferior (1.40×0.20 m)');
-                addDecorBox(2.85, 1.42, 0.45, 0.15, 0.10, 0.18, 0xfacc15, 0.3, 0, 'Game Boy / Switch Pikachu');
-                addDecorBox(2.85, 1.42, 0.75, 0.15, 0.10, 0.24, 0x38bdf8, 0.4, 0, 'Consola Azul');
-                addDecorBox(2.85, 1.44, 1.20, 0.16, 0.14, 0.30, 0x334155, 0.5, 0, 'Estuches Periféricos');
-                // 2° Estante (Y = 1.70 m): colección libros Tolkien y bolso cámara (1.40 m x 0.20 m)
-                addDecorBox(2.85, 1.70, 0.85, 0.20, 0.03, 1.40, 0x9a441e, 0.45, 0, 'Estante Flotante Medio (1.40×0.20 m)');
-                addDecorBox(2.85, 1.83, 0.95, 0.16, 0.22, 0.75, 0x7f1d1d, 0.6, 0, 'Libros Colección Tolkien');
-                addDecorBox(2.85, 1.80, 0.45, 0.16, 0.16, 0.26, 0x18181b, 0.7, 0, 'Bolso Cámara Fotográfica');
-                // 3° Estante (Y = 2.05 m): planta Potus colgante y figura Goku (1.40 m x 0.20 m)
-                addDecorBox(2.85, 2.05, 0.85, 0.20, 0.03, 1.40, 0x9a441e, 0.45, 0, 'Estante Flotante Superior (1.40×0.20 m)');
-                addDecorPlantCeramic(2.85, 2.065, 0.35, 0.07, 0.05, 0.12, 0.16, 0.26, 0.16, 0.24, 'Planta Potus Colgante');
-                addDecorBox(2.85, 2.16, 1.15, 0.10, 0.18, 0.12, 0xf97316, 0.4, 0, 'Figura Coleccionable Goku');
+            // 3. 3 ESTANTES FLOTANTES (Muro Este X = 3.00 m sobre escritorio, medidas relevadas: 180 cm [1.80 m] de largo x 20 cm [0.20 m] de profundidad, desde Z = 0.03 a 1.83 m dejando 30 cm libres al Sur del escritorio de 2.13 m):
+            createCompoundAssembly('Estantes Flotantes Estudio (1.80×0.20 m)', () => {
+                setMountWall(3.00, 0.93, false);
+                // 1° Estante Inferior (Y = 1.35 m, Z = 0.03..1.83 m, centro Z = 0.93 m, X = 2.845 m): jarrón Norte, Game Boys, fila de libros central y estuche negro al Sur (foto_18)
+                addDecorBox(2.845, 1.35, 0.93, 0.20, 0.03, 1.80, 0x9a441e, 0.45, 0, 'Estante Flotante Inferior (1.80×0.20 m)');
+                addDecorBox(2.85, 1.43, 0.18, 0.09, 0.14, 0.09, 0x8c583a, 0.5, 0, 'Jarrón Cerámico Norte');
+                addDecorBox(2.85, 1.41, 0.34, 0.08, 0.10, 0.09, 0xfacc15, 0.3, 0, 'Game Boy Color Pikachu');
+                addDecorBox(2.85, 1.41, 0.46, 0.08, 0.10, 0.09, 0x94a3b8, 0.35, 0, 'Game Boy Classic');
+                addDecorBox(2.85, 1.40, 0.60, 0.10, 0.08, 0.14, 0x38bdf8, 0.4, 0, 'Consola Portátil Switch');
+                addDecorBox(2.845, 1.42, 1.64, 0.16, 0.11, 0.32, 0x18181b, 0.65, 0, 'Estuche Rígido Negro (Sur)');
+
+                // 2° Estante Medio (Y = 1.68 m, Z = 0.03..1.83 m, centro Z = 0.93 m): Planta Potus en punta Norte junto a ventana + Tomos grandes Tolkien al Sur (foto_18)
+                addDecorBox(2.845, 1.68, 0.93, 0.20, 0.03, 1.80, 0x9a441e, 0.45, 0, 'Estante Flotante Medio (1.80×0.20 m)');
+                addDecorPlantCeramic(2.845, 1.695, 0.14, 0.065, 0.05, 0.11, 0.15, 0.24, 0.15, 0.22, 'Planta Potus Colgante (Esquina Norte)');
+                addDecorBox(2.845, 1.81, 1.46, 0.16, 0.24, 0.28, 0x18181b, 0.5, 0, 'Colección Tomos Negros Tolkien');
+                addDecorBox(2.845, 1.81, 1.68, 0.16, 0.24, 0.14, 0xf1f5f9, 0.45, 0, 'Tomos Ilustrados Tolkien Blancos');
+
+                // 3° Estante Superior (Y = 2.01 m, Z = 0.03..1.83 m, centro Z = 0.93 m): 1.80 m x 0.20 m + ménsulas negras en los 3 niveles (foto_18)
+                addDecorBox(2.845, 2.01, 0.93, 0.20, 0.03, 1.80, 0x9a441e, 0.45, 0, 'Estante Flotante Superior (1.80×0.20 m)');
+                [0.18, 0.68, 1.18, 1.68].forEach(bz => {
+                    [1.33, 1.66, 1.99].forEach(by => {
+                        addDecorBox(2.845, by, bz, 0.205, 0.018, 0.024, 0x111827, 0.35, 0, 'Ménsula Negra de Estante');
+                    });
+                });
+                setMountWall(null);
             });
 
             // 4. BIBLIOTECA DEL ESTUDIO HIPERREALISTA (Muro Oeste X = 0.00 m, PBR y Clutter Realista)
@@ -8565,8 +8598,8 @@
         addLine2DSegment(2.40, 2.13, 3.00, 2.13, 0.018, 0x8f3818);
         addLine2DSegment(1.68, 0.00, 1.68, 0.52, 0.018, 0x8f3818);
         addLine2DSegment(1.68, 0.52, 2.40, 0.52, 0.018, 0x8f3818);
-        // 3 Estantes Flotantes Este [2.75..3.00, 0.10..1.55]
-        addDashedLine(2.75, 0.10, 2.75, 1.55);
+        // 3 Estantes Flotantes Este [2.75..2.95, 0.03..1.83] (1.80 m de largo x 0.20 m de profundidad, dejando 30 cm libres al Sur del escritorio de 2.13 m)
+        addDashedLine(2.75, 0.03, 2.75, 1.83);
         // Biblioteca Alta Oeste [0.00..0.30, 0.44..1.56]
         addLine2DSegment(0.30, 0.44, 0.30, 1.56, 0.018, 0x18181b);
         addLine2DSegment(0.00, 0.44, 0.30, 0.44, 0.018, 0x18181b);
@@ -12229,8 +12262,8 @@
                         fName = 'Mesa Ratona de Living (90×50 cm)';
                         fDims = { ancho: 0.90, alto: 0.42, profundidad: 0.50, elevacion: 0.00 };
                     } else if (lower.includes('estantes flotantes estudio')) {
-                        fName = 'Estantes Flotantes Estudio (×3)';
-                        fDims = { ancho: 1.40, alto: 0.75, profundidad: 0.20, elevacion: 1.35 };
+                        fName = 'Estantes Flotantes Estudio (×3 — 1.80×0.20 m)';
+                        fDims = { ancho: 1.80, alto: 0.75, profundidad: 0.20, elevacion: 1.35 };
                     } else if (lower.includes('bañera') || lower.includes('banera')) {
                         fName = 'Bañera de Loza (1.18×0.69 m) y Ducha';
                         fDims = { ancho: 1.18, alto: 0.48, profundidad: 0.69, elevacion: 0.00 };
@@ -13006,18 +13039,19 @@
 
             // Geometría única compartida para todos los libros en estantes de Estudio y Living (1 solo draw call)
             const bookSlots = [
-                // Estantes flotantes Estudio (pared Este del Estudio X=2.55, Z=0.70..1.85, Y=1.42 / 1.72)
-                { x: 2.46, y: 1.49, z: 0.78, ry: 0, sx: 0.16, sy: 0.22, sz: 0.035, color: 0x1e3a8a },
-                { x: 2.46, y: 1.48, z: 0.82, ry: 0, sx: 0.15, sy: 0.20, sz: 0.032, color: 0xb91c1c },
-                { x: 2.46, y: 1.50, z: 0.86, ry: 0, sx: 0.16, sy: 0.24, sz: 0.038, color: 0x047857 },
-                { x: 2.46, y: 1.47, z: 0.90, ry: 0, sx: 0.15, sy: 0.19, sz: 0.030, color: 0xd97706 },
-                { x: 2.46, y: 1.49, z: 0.94, ry: 0, sx: 0.16, sy: 0.22, sz: 0.034, color: 0x475569 },
-                { x: 2.46, y: 1.48, z: 0.98, ry: 0.12, sx: 0.15, sy: 0.21, sz: 0.032, color: 0x7c3aed },
-                // Segundo nivel estante Estudio
-                { x: 2.46, y: 1.79, z: 1.15, ry: 0, sx: 0.16, sy: 0.23, sz: 0.036, color: 0x0f766e },
-                { x: 2.46, y: 1.78, z: 1.19, ry: 0, sx: 0.15, sy: 0.21, sz: 0.032, color: 0xbe123c },
-                { x: 2.46, y: 1.80, z: 1.23, ry: 0, sx: 0.16, sy: 0.24, sz: 0.038, color: 0x1d4ed8 },
-                { x: 2.46, y: 1.77, z: 1.27, ry: 0, sx: 0.15, sy: 0.19, sz: 0.030, color: 0xb45309 },
+                // 1° Estante flotante Estudio (pared Este X=2.845, Z=0.75..1.42, Y=1.47 — hilera central de libros, foto_18)
+                { x: 2.845, y: 1.47, z: 0.76, ry: 0, sx: 0.15, sy: 0.22, sz: 0.035, color: 0xbe185d },
+                { x: 2.845, y: 1.46, z: 0.80, ry: 0, sx: 0.14, sy: 0.20, sz: 0.032, color: 0x1e293b },
+                { x: 2.845, y: 1.48, z: 0.84, ry: 0, sx: 0.15, sy: 0.24, sz: 0.038, color: 0x7f1d1d },
+                { x: 2.845, y: 1.45, z: 0.88, ry: 0, sx: 0.14, sy: 0.19, sz: 0.030, color: 0x0f172a },
+                { x: 2.845, y: 1.47, z: 0.92, ry: 0, sx: 0.15, sy: 0.22, sz: 0.034, color: 0x1e3a8a },
+                { x: 2.845, y: 1.46, z: 0.96, ry: 0, sx: 0.14, sy: 0.21, sz: 0.032, color: 0xf8fafc },
+                { x: 2.845, y: 1.47, z: 1.01, ry: 0, sx: 0.15, sy: 0.22, sz: 0.036, color: 0x065f46 },
+                { x: 2.845, y: 1.46, z: 1.06, ry: 0, sx: 0.14, sy: 0.20, sz: 0.032, color: 0xd97706 },
+                { x: 2.845, y: 1.48, z: 1.11, ry: 0, sx: 0.15, sy: 0.23, sz: 0.036, color: 0xb91c1c },
+                { x: 2.845, y: 1.45, z: 1.16, ry: 0, sx: 0.14, sy: 0.19, sz: 0.030, color: 0x334155 },
+                { x: 2.845, y: 1.47, z: 1.21, ry: 0, sx: 0.15, sy: 0.21, sz: 0.034, color: 0x14532d },
+                { x: 2.845, y: 1.46, z: 1.26, ry: 0.08, sx: 0.14, sy: 0.20, sz: 0.032, color: 0x475569 },
                 // Libros apilados en Rack TV Living (X=6.00, Z=2.35..3.45, Y=0.52)
                 { x: 6.02, y: 0.56, z: 2.42, ry: 0, sx: 0.18, sy: 0.22, sz: 0.036, color: 0x334155 },
                 { x: 6.02, y: 0.55, z: 2.46, ry: 0, sx: 0.17, sy: 0.20, sz: 0.034, color: 0x991b1b },
