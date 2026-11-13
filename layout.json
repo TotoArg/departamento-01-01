@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.12.v3",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794535760738,
+  "updatedAt": 1794535763959,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -47,7 +47,7 @@
         "x": 2.81,
         "y": 0.24,
         "z": 1.75,
-        "rot": 0.785,
+        "rot": 3.142,
         "sx": 1,
         "sy": 1,
         "sz": 1
