@@ -1947,12 +1947,21 @@
         var fxaaPass = null;
         var renderPass = null;
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', alpha: false, powerPreference: 'high-performance' });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', alpha: false });
         renderer.setClearColor(0xf8fafc, 1.0); // Prevenir pantalla negra en WebGL bajo cualquier circunstancia
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(isMobileOrLowEnd ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2.0));
+        renderer.setPixelRatio(isMobileOrLowEnd ? Math.min(window.devicePixelRatio, 1.25) : Math.min(window.devicePixelRatio, 1.5));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        // Optimización Chrome WebGL: evitar re-renderizar 1600+ mallas en el ShadowMap en cada frame de órbita de cámara
+        renderer.shadowMap.autoUpdate = false;
+        renderer.shadowMap.needsUpdate = true;
+        function requestShadowMapUpdate() {
+            if (renderer && renderer.shadowMap) {
+                renderer.shadowMap.needsUpdate = true;
+            }
+        }
+        window.requestShadowMapUpdate = requestShadowMapUpdate;
         // Motor de color fotográfico y mapeo tonal cinematográfico (ArchViz PBR)
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.08;
@@ -2463,8 +2472,8 @@
         scene.add(dirLight.target);
         dirLight.castShadow = true;
 
-        // Resolución 4K en desktop y 2K en móvil para máxima nitidez de biseles y sombras de maqueta
-        const shadowRes = isMobileOrLowEnd ? 2048 : 4096;
+        // Resolución 2K optimizada en desktop y 1K en móvil para máxima fluidez 60fps en Chrome sin perder nitidez de sombras
+        const shadowRes = isMobileOrLowEnd ? 1024 : 2048;
         dirLight.shadow.mapSize.width = shadowRes;
         dirLight.shadow.mapSize.height = shadowRes;
         dirLight.shadow.camera.near = 10.0;
@@ -2473,9 +2482,9 @@
         dirLight.shadow.camera.right = 10.5;
         dirLight.shadow.camera.top = 10.5;
         dirLight.shadow.camera.bottom = -10.5;
-        dirLight.shadow.bias = -0.00015;
+        dirLight.shadow.bias = -0.00018;
         dirLight.shadow.normalBias = 0.024;
-        dirLight.shadow.radius = 3.2;
+        dirLight.shadow.radius = 2.4;
         scene.add(dirLight);
 
         // 4. Luz de Relleno Suave Posterior y Contraluz de Recorte (Rim Light Neutro)
@@ -2485,52 +2494,65 @@
 
         // 5. Luces Domóticas Reales (Apliques de pared tipo spot negro y tiras LED detectadas en fotos/videos)
         // WiZ Cálida 2700K (Living y Dormitorio - apliques de pared reales a 2.10m de altura)
+        // NOTA DE RENDIMIENTO CHROME WEBGL: .visible = false cuando intensity === 0 evita compilar 14 PointLights en cada fragment shader PBR
         const wizLivingLight = new THREE.PointLight(0xffd7a0, 0.0, 7.5, 1.8);
         wizLivingLight.position.set(6.05, 2.05, 2.25);
+        wizLivingLight.visible = false;
         scene.add(wizLivingLight);
 
         const wizDiningLight = new THREE.PointLight(0xffd7a0, 0.0, 6.5, 1.8);
         wizDiningLight.position.set(4.60, 2.05, 0.25);
+        wizDiningLight.visible = false;
         scene.add(wizDiningLight);
 
         const wizBedroomLight = new THREE.PointLight(0xffd7a0, 0.0, 6.8, 1.8);
         wizBedroomLight.position.set(0.25, 2.05, 6.00);
+        wizBedroomLight.visible = false;
         scene.add(wizBedroomLight);
 
         // WiZ Neutra Focal 4000K (Estudio y Baño - foco dirigido y espejo)
         const wizStudyLight = new THREE.PointLight(0xf4f8ff, 0.0, 6.5, 1.8);
         wizStudyLight.position.set(2.75, 1.85, 1.15);
+        wizStudyLight.visible = false;
         scene.add(wizStudyLight);
 
         const wizBathLight = new THREE.PointLight(0xf4f8ff, 0.0, 5.5, 1.8);
         wizBathLight.position.set(1.15, 1.95, 2.90);
+        wizBathLight.visible = false;
         scene.add(wizBathLight);
 
         // 6. Contaminación Lumínica Gaming en Estudio (Noche)
-        const gamingBlueLight = new THREE.PointLight(0x0066ff, 0.4, 3.8, 1.8);
+        const gamingBlueLight = new THREE.PointLight(0x0066ff, 0.0, 3.8, 1.8);
         gamingBlueLight.position.set(2.65, 1.10, 0.85);
+        gamingBlueLight.visible = false;
         scene.add(gamingBlueLight);
 
-        const gamingMagentaLight = new THREE.PointLight(0xff0055, 0.3, 3.0, 1.8);
+        const gamingMagentaLight = new THREE.PointLight(0xff0055, 0.0, 3.0, 1.8);
         gamingMagentaLight.position.set(2.78, 0.45, 1.45);
+        gamingMagentaLight.visible = false;
         scene.add(gamingMagentaLight);
 
         // 7. Tiras LED complementarias y lámparas de noche
-        const cyanLedLiving = new THREE.PointLight(0x00f0ff, 1.4, 3.6, 1.8);
+        const cyanLedLiving = new THREE.PointLight(0x00f0ff, 0.0, 3.6, 1.8);
         cyanLedLiving.position.set(6.82, 1.45, 3.10);
+        cyanLedLiving.visible = false;
         scene.add(cyanLedLiving);
 
-        const bedsideLampLeft = new THREE.PointLight(0xffa834, 1.4, 3.4, 1.8);
+        const bedsideLampLeft = new THREE.PointLight(0xffa834, 0.0, 3.4, 1.8);
         bedsideLampLeft.position.set(0.35, 0.95, 5.73);
+        bedsideLampLeft.visible = false;
         scene.add(bedsideLampLeft);
 
-        const bedsideLampRight = new THREE.PointLight(0xffa834, 1.4, 3.4, 1.8);
+        const bedsideLampRight = new THREE.PointLight(0xffa834, 0.0, 3.4, 1.8);
         bedsideLampRight.position.set(0.35, 0.95, 7.57);
+        bedsideLampRight.visible = false;
         scene.add(bedsideLampRight);
 
-        const kitchenLed = new THREE.PointLight(0xfff4db, 1.4, 4.2, 1.8);
+        const kitchenLed = new THREE.PointLight(0xfff4db, 0.0, 4.2, 1.8);
         kitchenLed.position.set(4.10, 1.75, 6.10);
+        kitchenLed.visible = false;
         scene.add(kitchenLed);
+        const dynamicAccentLights = [];
 
         // ============================================================================
         // MOTOR DE ESTUDIO SOLAR Y DOMÓTICA WIZ (EL CALAFATE -50.33° LAT, -72.26° LON)
@@ -2554,8 +2576,8 @@
                 wizBedroom: 0.0,
                 wizStudy: 0.0,
                 wizBath: 0.0,
-                gamingBlue: 0.6,
-                gamingMagenta: 0.4,
+                gamingBlue: 0.0,
+                gamingMagenta: 0.0,
                 isNight: false
             },
             noon: {
@@ -2574,8 +2596,8 @@
                 wizBedroom: 0.0,
                 wizStudy: 0.0,
                 wizBath: 0.0,
-                gamingBlue: 0.4,
-                gamingMagenta: 0.3,
+                gamingBlue: 0.0,
+                gamingMagenta: 0.0,
                 isNight: false
             },
             golden: {
@@ -2651,6 +2673,21 @@
             if (typeof bedsideLampLeft !== 'undefined') bedsideLampLeft.intensity = preset.isNight ? 1.4 : 0.0;
             if (typeof bedsideLampRight !== 'undefined') bedsideLampRight.intensity = preset.isNight ? 1.4 : 0.0;
             if (typeof cyanLedLiving !== 'undefined') cyanLedLiving.intensity = preset.isNight ? 1.5 : (presetKey === 'golden' ? 0.5 : 0.0);
+
+            // Optimización Chrome WebGL: apagar (.visible = false) los PointLights con intensidad 0 para aligerar el fragment shader PBR
+            [
+                wizLivingLight, wizDiningLight, wizBedroomLight, wizStudyLight, wizBathLight,
+                gamingBlueLight, gamingMagentaLight, kitchenLed, bedsideLampLeft, bedsideLampRight, cyanLedLiving
+            ].forEach(pl => {
+                if (pl) pl.visible = (pl.intensity > 0.01);
+            });
+            if (typeof dynamicAccentLights !== 'undefined' && Array.isArray(dynamicAccentLights)) {
+                const showAccents = (preset.isNight || presetKey === 'golden');
+                dynamicAccentLights.forEach(al => {
+                    if (al) al.visible = showAccents;
+                });
+            }
+            if (typeof requestShadowMapUpdate === 'function') requestShadowMapUpdate();
 
             document.querySelectorAll('.solar-btn, .solar-btn-sb').forEach(btn => {
                 if (btn.dataset.time === presetKey) {
@@ -4658,9 +4695,11 @@
             ledStrip.position.set(0, 0, 0.005);
             mirGroup.add(ledStrip);
 
-            // Luz puntual cálida difusa para iluminación indirecta sobre la bacha
+            // Luz puntual cálida difusa para iluminación indirecta sobre la bacha (solo activa en Tarde/Noche para optimizar shaders Chrome)
             const mirrorLedLight = new THREE.PointLight(0xffe6a3, 0.65, 1.8);
             mirrorLedLight.position.set(0, -0.32, 0.20);
+            mirrorLedLight.visible = false;
+            if (typeof dynamicAccentLights !== 'undefined') dynamicAccentLights.push(mirrorLedLight);
             mirGroup.add(mirrorLedLight);
 
             (currentAssemblyGroup || decorVideoGroup).add(mirGroup);
@@ -5806,13 +5845,8 @@
             addContactShadowPlane(1.75, 3.58, 0.52, 0.68, 0.46); // Inodoro y Bidet en Baño
             addContactShadowPlane(6.08, 5.38, 0.45, 0.90, 0.48); // Perchero y zapatero en Entrada
 
-            // Activar sombras arrojadas y recibidas en toda la arquitectura y mobiliario
-            apartmentGroup.traverse(child => {
-                if (child.isMesh) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                }
-            });
+            // Activar sombras arrojadas y recibidas de forma selectiva (optimización Chrome WebGL)
+            applyShadowsRecursively(apartmentGroup);
 
             // 7. Plantas reales relevadas: se eliminaron las 6 macetas genéricas ficticias que bloqueaban pasos, puertas y mesas.
             // Se conservan exclusivamente las plantas reales del departamento en sus posiciones exactas:
@@ -6605,15 +6639,16 @@
 
         
         // ============================================================================
-        // CONFIGURADOR UNIVERSAL DE SOMBRAS FOTORREALISTAS (castShadow + receiveShadow)
+        // CONFIGURADOR INTELIGENTE DE SOMBRAS (castShadow selectivo para Chrome 60fps)
         // ============================================================================
+        const _shadowSizeVec = new THREE.Vector3();
         function applyShadowsRecursively(root = apartmentGroup) {
             if (!root) return;
             root.traverse((child) => {
                 if (child.isMesh) {
-                    if (child.name === 'contactShadow') {
+                    if (child.name === 'contactShadow' || child.name === 'dioramaGround' || child.name === 'studioGround' || child.userData.isCap) {
                         child.castShadow = false;
-                        child.receiveShadow = false;
+                        child.receiveShadow = (child.name === 'dioramaGround' || child.name === 'studioGround');
                         return;
                     }
                     if (child.material && child.material.transparent && child.material.opacity < 0.25) {
@@ -6621,10 +6656,24 @@
                         child.receiveShadow = false;
                         return;
                     }
-                    child.castShadow = true;
-                    child.receiveShadow = true;
+                    // Solo proyectan sombra al ShadowMap los volúmenes arquitectónicos y muebles >= 22 cm
+                    // (Evita redibujar 1,200+ micro-mallas de libros, teclas, perillas y hojas en el pase de sombra)
+                    let maxDim = 0.5;
+                    if (child.geometry) {
+                        if (!child.geometry.boundingBox) child.geometry.computeBoundingBox();
+                        if (child.geometry.boundingBox) {
+                            child.geometry.boundingBox.getSize(_shadowSizeVec);
+                            const sx = Math.abs(child.scale.x || 1);
+                            const sy = Math.abs(child.scale.y || 1);
+                            const sz = Math.abs(child.scale.z || 1);
+                            maxDim = Math.max(_shadowSizeVec.x * sx, _shadowSizeVec.y * sy, _shadowSizeVec.z * sz);
+                        }
+                    }
+                    child.castShadow = (maxDim >= 0.22);
+                    child.receiveShadow = (maxDim >= 0.14);
                 }
             });
+            if (typeof requestShadowMapUpdate === 'function') requestShadowMapUpdate();
         }
 
         function buildFurnishedVideoDecor() {
@@ -6855,9 +6904,11 @@
                 tvStem.castShadow = true;
                 tvGroup.add(tvBase, tvStem);
 
-                // Luz LED trasera azul ambiental (PointLight en muro este) para rebote en la pared
+                // Luz LED trasera azul ambiental (PointLight en muro este) para rebote en la pared (solo Tarde/Noche)
                 const tvBackLed = new THREE.PointLight(0x0284c7, 1.1, 3.2, 1.6);
                 tvBackLed.position.set(0.08, 0, 0);
+                tvBackLed.visible = false;
+                if (typeof dynamicAccentLights !== 'undefined') dynamicAccentLights.push(tvBackLed);
                 tvGroup.add(tvBackLed);
                 (currentAssemblyGroup || decorVideoGroup).add(tvGroup);
 
@@ -7979,9 +8030,11 @@
                 monGroup.add(lightBarLens);
                 wizFixturesList.push({ g: lightBar, lensMat: lightBarLedMat, isWarm: false });
 
-                // Luz ambiental trasera de rebote LED suave (RGB / Cyan tenue contra la pared este)
+                // Luz ambiental trasera de rebote LED suave (RGB / Cyan tenue contra la pared este, solo Tarde/Noche)
                 const backLed = new THREE.PointLight(0x00e5ff, 0.90, 2.5, 1.8);
                 backLed.position.set(0.08, 0, 0);
+                backLed.visible = false;
+                if (typeof dynamicAccentLights !== 'undefined') dynamicAccentLights.push(backLed);
                 monGroup.add(backLed);
 
                 (currentAssemblyGroup || decorVideoGroup).add(monGroup);
@@ -8161,21 +8214,14 @@
                 function createSingleBook(thick, h, depth, colorIdx, isRotatedDeg = 0) {
                     const bg = new THREE.Group();
                     const mat = bookMats[colorIdx % bookMats.length];
-                    // Lomo y tapa del libro
+                    // Lomo y tapa del libro unificados en 1 malla sin castShadow individual para máxima fluidez Chrome
                     const cover = new THREE.Mesh(UNIT_BOX_GEO, mat);
                     cover.scale.set(depth, h, thick);
                     cover.position.set(0, h / 2, 0);
-                    cover.castShadow = true; cover.receiveShadow = true;
                     bg.add(cover);
 
-                    // Páginas interiores de papel color crema suave
-                    const pages = new THREE.Mesh(UNIT_BOX_GEO, paperPageMat);
-                    pages.scale.set(depth - 0.015, h - 0.015, thick - 0.006);
-                    pages.position.set(0.004, h / 2, 0);
-                    bg.add(pages);
-
                     // Detalle dorado en el lomo para libros elegantes
-                    if (colorIdx % 3 === 0) {
+                    if (colorIdx % 4 === 0) {
                         const band = new THREE.Mesh(UNIT_BOX_GEO, goldSpineMat);
                         band.scale.set(0.003, h * 0.18, thick + 0.002);
                         band.position.set(depth / 2 + 0.001, h * 0.65, 0);
@@ -10726,8 +10772,11 @@
                 }
 
                 if (instant) {
-                    w.currentH = w.targetH;
-                    applyWallHeight(w, w.currentH);
+                    if (w.currentH !== w.targetH) {
+                        w.currentH = w.targetH;
+                        applyWallHeight(w, w.currentH);
+                        anyAnimating = true;
+                    }
                 } else {
                     const diff = w.targetH - w.currentH;
                     if (Math.abs(diff) > 0.004) {
@@ -10737,8 +10786,12 @@
                     } else if (w.currentH !== w.targetH) {
                         w.currentH = w.targetH;
                         applyWallHeight(w, w.currentH);
+                        anyAnimating = true;
                     }
                 }
+            }
+            if (anyAnimating && typeof requestShadowMapUpdate === 'function') {
+                requestShadowMapUpdate();
             }
             return anyAnimating;
         }
@@ -10753,6 +10806,7 @@
             if (activeCamera !== orthoCam) {
                 doors3DGroup.visible = !allHidden && document.getElementById('chk-doors').checked;
             }
+            if (typeof requestShadowMapUpdate === 'function') requestShadowMapUpdate();
             wakeRenderer();
         }
 
@@ -11188,22 +11242,31 @@
 
         renderFurniture3D();
 
-        let dirtyFrames = 45;
-        function wakeRenderer() { dirtyFrames = 45; }
-        ['pointerdown', 'pointermove', 'wheel', 'touchstart', 'touchmove', 'keydown', 'click', 'change', 'input'].forEach(ev => {
+        let dirtyFrames = 30;
+        function wakeRenderer() { dirtyFrames = 24; }
+        ['pointerdown', 'wheel', 'touchstart', 'touchmove', 'keydown', 'click', 'change', 'input'].forEach(ev => {
             window.addEventListener(ev, wakeRenderer, { passive: true });
         });
 
-        // Cambiar cursor a pointer al pasar sobre puertas, ventanas o cortinas animadas
+        // Cambiar cursor a pointer al pasar sobre puertas, ventanas o cortinas animadas (con throttle de 70ms para no bloquear Chrome al mover el mouse)
+        let _lastHoverRayTime = 0;
+        const _hoverRaycaster = new THREE.Raycaster();
+        const _hoverPointerVec = new THREE.Vector2();
         window.addEventListener('pointermove', (e) => {
-            if (activeCamera === orthoCam || isDraggingFurniture || isRotatingFurniture) return;
+            if (e.buttons > 0) {
+                dirtyFrames = Math.max(dirtyFrames, 12);
+                return;
+            }
+            const now = performance.now();
+            if (now - _lastHoverRayTime < 75) return;
+            _lastHoverRayTime = now;
+            if (activeCamera === orthoCam || isDraggingFurniture || isRotatingFurniture || (typeof walkthroughState !== 'undefined' && walkthroughState.active)) return;
             const rect = renderer.domElement.getBoundingClientRect();
-            const px = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-            const py = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-            const ray = new THREE.Raycaster();
-            ray.setFromCamera(new THREE.Vector2(px, py), activeCamera);
+            _hoverPointerVec.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            _hoverPointerVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            _hoverRaycaster.setFromCamera(_hoverPointerVec, activeCamera);
             const allInteractives = [...doorClickCandidates, ...windowClickCandidates, ...curtainClickCandidates];
-            const dHits = ray.intersectObjects(allInteractives, false);
+            const dHits = _hoverRaycaster.intersectObjects(allInteractives, false);
             renderer.domElement.style.cursor = dHits.length > 0 ? 'pointer' : '';
         }, { passive: true });
 
@@ -11311,11 +11374,12 @@
             return moving;
         }
 
-        // Actualizador de cortinas: apertura suave y ondulación orgánica por brisa patagónica
+        // Actualizador de cortinas: apertura suave y ondulación orgánica por brisa patagónica (solo cuando la ventana está abierta o la cortina está en transición)
         let curtainWindClock = 0;
         function updateAnimCurtains() {
             let moving = false;
-            curtainWindClock += 0.016;
+            const anyWinOpen = animWindows.some(w => w.isOpen);
+            if (anyWinOpen) curtainWindClock += 0.016;
             for (let i = 0; i < animCurtains.length; i++) {
                 const c = animCurtains[i];
                 // 1. Interpolación de apertura / recogida
@@ -11326,12 +11390,14 @@
                 } else if (c.currentProgress !== c.targetProgress) {
                     c.currentProgress = c.targetProgress;
                     c.applyProgress(c.currentProgress);
+                    moving = true;
                 }
 
-                // 2. Simulación de brisa patagónica continua
+                // 2. Simulación de brisa patagónica cuando la ventana vinculada está abierta
                 const isWinOpen = c.linkedWindow ? c.linkedWindow.isOpen : false;
-                const targetWind = isWinOpen ? 1.0 : 0.35;
-                c.windAmp += (targetWind - c.windAmp) * 0.06;
+                if (!isWinOpen && !moving) continue;
+                const targetWind = isWinOpen ? 1.0 : 0.0;
+                c.windAmp += (targetWind - c.windAmp) * 0.08;
 
                 const t = curtainWindClock * 2.8 + c.phase;
                 const wave = Math.sin(t) * 0.038 * c.windAmp;
@@ -11354,7 +11420,6 @@
                     c.rightSheer.position.z = Math.cos(t * 1.9) * 0.014 * c.windAmp;
                 }
             }
-            const anyWinOpen = animWindows.some(w => w.isOpen);
             if (anyWinOpen || moving) {
                 moving = true;
             }
@@ -11365,8 +11430,8 @@
         // MOTOR DE POST-PROCESAMIENTO PBR: EffectComposer + SSAO + Antialiasing (FXAA)
         // ============================================================================
         // ============================================================================
-        // CAPA 5: POST-PROCESAMIENTO CINEMATOGRÁFICO (EffectComposer + SSAO Alta Intensidad + SMAA)
-        // Genera sombras de contacto oscuras donde las paredes tocan el piso y en esquinas de muebles
+        // CAPA 5: POST-PROCESAMIENTO CINEMATOGRÁFICO (EffectComposer + SSAO Optimizado + SMAA)
+        // Genera sombras de contacto suaves donde las paredes tocan el piso y en esquinas de muebles
         // ============================================================================
         var smaaPass = null;
 
@@ -11380,7 +11445,7 @@
 
                 const width = window.innerWidth;
                 const height = window.innerHeight;
-                const pr = Math.min(window.devicePixelRatio, 2.0);
+                const pr = renderer.getPixelRatio();
 
                 composer = new THREE.EffectComposer(renderer);
 
@@ -11388,11 +11453,11 @@
                 renderPass = new THREE.RenderPass(scene, activeCamera);
                 composer.addPass(renderPass);
 
-                // 2. Pase SSAO (Screen Space Ambient Occlusion) calibrado Anti-Black-Screen
-                // Parámetros suaves que acentúan encuentros de muros sin oscurecer el canvas ni fallar en depth-buffers móviles
-                ssaoPass = new THREE.SSAOPass(scene, activeCamera, width, height);
+                // 2. Pase SSAO (Screen Space Ambient Occlusion) calibrado Anti-Black-Screen y Optimizado para Chrome 60fps
+                // Se activa automáticamente cuando la cámara se estabiliza (evita duplicar los 1600 draw calls durante el giro rápido con el mouse)
+                ssaoPass = new THREE.SSAOPass(scene, activeCamera, Math.round(width * 0.85), Math.round(height * 0.85));
                 ssaoPass.kernelRadius = 0.22;
-                ssaoPass.kernelSize = isMobileOrLowEnd ? 16 : 24;
+                ssaoPass.kernelSize = isMobileOrLowEnd ? 8 : 12;
                 ssaoPass.minDistance = 0.004;
                 ssaoPass.maxDistance = 0.26;
                 ssaoPass.output = THREE.SSAOPass.OUTPUT.Default;
@@ -11410,7 +11475,7 @@
                     composer.addPass(fxaaPass);
                 }
 
-                console.log("EffectComposer con SSAO (Alta Intensidad) y SMAA inicializado exitosamente.");
+                console.log("EffectComposer con SSAO Optimizado y SMAA inicializado exitosamente.");
             } catch (err) {
                 console.warn("Fallo al inicializar EffectComposer, usando renderizador estándar:", err);
                 composer = null;
@@ -11944,6 +12009,9 @@
                 const windowsMoving = updateAnimWindows();
                 const curtainsMoving = updateAnimCurtains();
                 const tableMoving = updateAnimDiningTable();
+                if (doorsMoving || windowsMoving || tableMoving) {
+                    if (typeof requestShadowMapUpdate === 'function') requestShadowMapUpdate();
+                }
                 if (wallsMoving || doorsMoving || windowsMoving || curtainsMoving || tableMoving || movedWalk) dirtyFrames = Math.max(dirtyFrames, 3);
                 dirtyFrames--;
                 updateLabels();
@@ -11953,7 +12021,13 @@
                 if (composer && activeCamera === perspCam) {
                     try {
                         if (renderPass) renderPass.camera = activeCamera;
-                        if (ssaoPass) ssaoPass.camera = activeCamera;
+                        if (ssaoPass) {
+                            ssaoPass.camera = activeCamera;
+                            // Optimización Chrome 60fps: durante el giro/órbita rápida de cámara omitir el 2° pase completo de escena del SSAOPass,
+                            // y activarlo automáticamente en los frames de asentamiento para conservar toda la calidad visual
+                            const isCameraMovingFast = !!(movedPersp || movedWalk || wallsMoving);
+                            ssaoPass.enabled = !isMobileOrLowEnd && !isCameraMovingFast && (dirtyFrames <= 3);
+                        }
                         composer.render();
                     } catch (e) {
                         console.warn("Fallo transitorio en composer.render(), cayendo a renderizador nativo:", e);
@@ -12133,7 +12207,10 @@
             };
         }
 
-        function enrichAllSceneBIMUserData() {
+        let _bimUserDataEnriched = false;
+        function enrichAllSceneBIMUserData(force = false) {
+            if (_bimUserDataEnriched && !force) return;
+            _bimUserDataEnriched = true;
             scene.updateMatrixWorld(true);
 
             // 1. Muros Exteriores e Interiores (con etiquetado arquitectónico exacto del relevamiento)
