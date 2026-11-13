@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.12.v3",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794535822347,
+  "updatedAt": 1794535827511,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -59,6 +59,18 @@
         "x": 0.28,
         "y": 0.36,
         "z": 2.39,
+        "rot": 0
+      },
+      "Set de Pintura de Miniaturas y Pinceles": {
+        "x": 0.28,
+        "y": 0.74,
+        "z": 2.4,
+        "rot": 0
+      },
+      "Biblioteca Alta con Libros y Coleccionables": {
+        "x": 0.22,
+        "y": 1.05,
+        "z": 1.25,
         "rot": 0
       }
     }
