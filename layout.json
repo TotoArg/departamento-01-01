@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.12.v3",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794535803039,
+  "updatedAt": 1794535822347,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -53,6 +53,12 @@
         "x": 2.85,
         "y": 1.67,
         "z": 1.05,
+        "rot": 0
+      },
+      "Mesita Auxiliar (Miniaturas)": {
+        "x": 0.28,
+        "y": 0.36,
+        "z": 2.39,
         "rot": 0
       }
     }
