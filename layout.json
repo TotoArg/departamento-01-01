@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.12.v3",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794513485046,
+  "updatedAt": 1794535760738,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -42,6 +42,15 @@
         "y": 0.05,
         "z": 5.02,
         "rot": 0
+      },
+      "Gabinete PC Gamer Thermaltake": {
+        "x": 2.81,
+        "y": 0.24,
+        "z": 1.75,
+        "rot": 0.785,
+        "sx": 1,
+        "sy": 1,
+        "sz": 1
       }
     }
   },
