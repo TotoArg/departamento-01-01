@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.12.v3",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794535784234,
+  "updatedAt": 1794535803039,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -48,6 +48,12 @@
         "y": 0.24,
         "z": 1.96,
         "rot": 4.712
+      },
+      "Estantes Flotantes Estudio (1.80×0.20 m)": {
+        "x": 2.85,
+        "y": 1.67,
+        "z": 1.05,
+        "rot": 0
       }
     }
   },
