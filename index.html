@@ -2,8 +2,26 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Plano Arquitectónico 2D y 3D (6.30m × 8.00m)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Gemelo Digital 3D — Departamento 01-01</title>
+
+    <!-- ==========================================================================
+         CONFIGURACIÓN PROGRESSIVE WEB APP (PWA) — NATIVO iOS & ANDROID
+         Para usar tus propios íconos, reemplazá los archivos PNG en:
+         - icons/icon-192x192.png (192x192 px)
+         - icons/icon-512x512.png (512x512 px)
+         ========================================================================== -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="background-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gemelo 3D">
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512x512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <!-- Carga local offline con fallback a CDN -->
     <script src="libs/three.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'">
@@ -13692,11 +13710,37 @@
         
         </script>
 
-
-
-
-    
-
-    
+    <!-- ==========================================================================
+         REGISTRO DEL SERVICE WORKER (PWA OFFLINE-FIRST: Cache First -> Network)
+         Precarga index.html, Three.js, GLTFLoader, EffectComposer, .glb y .hdr
+         ========================================================================== -->
+    <script>
+        (function registerGemeloPWA() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                    navigator.serviceWorker
+                        .register('./sw.js', { scope: './' })
+                        .then(function (reg) {
+                            console.log('[PWA] Service Worker registrado con éxito en scope:', reg.scope);
+                            if (reg.waiting) {
+                                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                            }
+                            reg.addEventListener('updatefound', function () {
+                                const newWorker = reg.installing;
+                                if (!newWorker) return;
+                                newWorker.addEventListener('statechange', function () {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                    }
+                                });
+                            });
+                        })
+                        .catch(function (err) {
+                            console.warn('[PWA] Aviso al registrar Service Worker:', err);
+                        });
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

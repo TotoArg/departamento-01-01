@@ -1,0 +1,27 @@
+{
+  "name": "Gemelo Digital 3D — Departamento 01-01",
+  "short_name": "Gemelo 3D",
+  "description": "Visor arquitectónico 2D/3D interactivo y herramienta de planificación espacial BIM Mobile-First.",
+  "lang": "es-AR",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#0f172a",
+  "background_color": "#0f172a",
+  "_comentario_iconos": "REEMPLAZÁ TUS ÍCONOS PERSONALIZADOS AQUÍ: Subí tus propios archivos PNG en la carpeta /icons/ con los nombres 'icons/icon-192x192.png' (192x192 px) e 'icons/icon-512x512.png' (512x512 px) manteniendo las rutas del array 'icons' de abajo.",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

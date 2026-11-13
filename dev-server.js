@@ -157,10 +157,14 @@ const mimeTypes = {
     '.js': 'application/javascript; charset=utf-8',
     '.css': 'text/css; charset=utf-8',
     '.json': 'application/json; charset=utf-8',
+    '.webmanifest': 'application/manifest+json; charset=utf-8',
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
     '.ico': 'image/x-icon',
-    '.svg': 'image/svg+xml'
+    '.svg': 'image/svg+xml',
+    '.glb': 'model/gltf-binary',
+    '.gltf': 'model/gltf+json',
+    '.hdr': 'application/octet-stream'
 };
 
 const liveReloadScript = `
