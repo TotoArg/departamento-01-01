@@ -86,9 +86,9 @@ function getJson(url) {
 
         await sendCmd('Runtime.enable');
         await sendCmd('Page.enable');
-        await new Promise(r => setTimeout(r, 2500));
+        await new Promise(r => setTimeout(r, 4500));
 
-        const evalRes = await sendCmd('Runtime.evaluate', {
+        let evalRes = await sendCmd('Runtime.evaluate', {
             returnByValue: true,
             expression: `(function() {
                 try {
@@ -193,6 +193,18 @@ function getJson(url) {
                 }
             })()`
         });
+
+        if (evalRes && evalRes.error && evalRes.error.message && evalRes.error.message.includes('navigated')) {
+            await new Promise(r => setTimeout(r, 2000));
+            evalRes = await sendCmd('Runtime.evaluate', {
+                returnByValue: true,
+                expression: `JSON.stringify({
+                    hasCanvas: !!document.querySelector('#webgl-container canvas'),
+                    logicalWallsCount: typeof logicalWallsRegistry !== 'undefined' ? logicalWallsRegistry.size : 0,
+                    westWallDims: (typeof logicalWallsRegistry !== 'undefined' && logicalWallsRegistry.get('muro_ext_oeste')) ? logicalWallsRegistry.get('muro_ext_oeste').dimensiones : null
+                })`
+            });
+        }
 
         console.log('=== RESULTADO AUDITORÍA WEBGL ===');
         console.log('Runtime Errors:', JSON.stringify(runtimeErrors, null, 2));
