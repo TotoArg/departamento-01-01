@@ -1462,12 +1462,12 @@
                 <option value="reset" class="owner-only-opt">↺ Acción: Restablecer Original</option>
             </select>
 
-            <!-- 5. Desplegable de Hora Solar y Domótica WiZ -->
-            <select id="select-solar-time" class="toolbar-select" title="Hora solar y luces interiores WiZ">
-                <option value="morning">🌅 Luz: Mañana (09:30)</option>
-                <option value="noon" selected>☀️ Luz: Mediodía (13:30)</option>
-                <option value="golden">🌇 Luz: Atardecer (17:30)</option>
-                <option value="night">🌙 Luz: Noche Domótica WiZ (22:30)</option>
+            <!-- 5. Desplegable de Hora Solar y Domótica WiZ (Orientación Real Calle G. Plüschow 235) -->
+            <select id="select-solar-time" class="toolbar-select" title="Trayectoria solar real (Calle Günther Plüschow 235, UF 01-01) y planificación de luces WiZ">
+                <option value="morning">🌅 Mañana (09:00 — Sol Este: Cuarto y Cocina)</option>
+                <option value="noon" selected>☀️ Mediodía (13:30 — Sol Norte: Comedor y Living)</option>
+                <option value="golden">🌇 Atardecer (18:00 — Sol Oeste: Calle G. Plüschow)</option>
+                <option value="night">🌙 Noche WiZ (22:30 — Luminarias Interiores)</option>
             </select>
 
             <!-- Badges de estado y controles de zoom compactos -->
@@ -1521,13 +1521,16 @@
 
     <!-- Right Sidebar (Visibility & Layers) -->
     <div id="sidebar-right" class="glass-panel">
-        <div class="panel-title" style="margin-bottom:4px;">☀️ Estudio Solar & Domótica WiZ</div>
-        <div style="font-size:10px; color:#94a3b8; margin-bottom:6px;">El Calafate, Santa Cruz (-50.33° Lat, -72.26° Lon)</div>
+        <div class="panel-title" style="margin-bottom:4px;">☀️ Trayectoria Solar Real & Domótica WiZ</div>
+        <div style="font-size:10px; color:#94a3b8; margin-bottom:6px; line-height:1.35;">
+            📍 <b>Calle Günther Plüschow 235 (UF 01-01, Mz 193 Pc 15)</b><br>
+            El Calafate (-50.336° S, -72.248° O) · Frente Oeste (Calle) · Contrafrente Este
+        </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:6px;">
-            <button class="action-btn solar-btn-sb" data-time="morning" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#f8fafc;">🌅 Mañana</button>
-            <button class="action-btn solar-btn-sb active" data-time="noon" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fbbf24; font-weight:700;">☀️ Mediodía</button>
-            <button class="action-btn solar-btn-sb" data-time="golden" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#f8fafc;">🌇 Atardecer</button>
-            <button class="action-btn solar-btn-sb" data-time="night" style="padding:5px 8px; font-size:11px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(56,189,248,0.15); border:1px solid #0284c7; color:#bae6fd;">🌙 Noche WiZ</button>
+            <button class="action-btn solar-btn-sb" data-time="morning" title="Sol sale por el Este (Z=8.00): ilumina Dormitorio y Cocina; enciende apoyo en Estudio y Baño" style="padding:5px 8px; font-size:10.5px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#f8fafc;">🌅 Mañana (Sol Este)</button>
+            <button class="action-btn solar-btn-sb active" data-time="noon" title="Sol culmina al Norte (X=6.30): entra directo por ventana Norte de Comedor y oblicuo en Living/Estudio" style="padding:5px 8px; font-size:10.5px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fbbf24; font-weight:700;">☀️ Mediodía (Sol Norte)</button>
+            <button class="action-btn solar-btn-sb" data-time="golden" title="Sol se pone al Oeste sobre Calle G. Plüschow (Z=0): sol directo en Estudio y Living; enciende Cocina y Cuarto" style="padding:5px 8px; font-size:10.5px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#f8fafc;">🌇 Tarde (Sol Oeste)</button>
+            <button class="action-btn solar-btn-sb" data-time="night" title="Noche cerrada exterior: activación completa de luminarias WiZ 2700K/4000K, cocina y veladores" style="padding:5px 8px; font-size:10.5px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(56,189,248,0.15); border:1px solid #0284c7; color:#bae6fd;">🌙 Noche WiZ</button>
         </div>
         <div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">Balance de Blancos Fotográfico (Sin Sombras Marrones)</div>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; margin-bottom:10px;">
@@ -2624,73 +2627,98 @@
         const dynamicAccentLights = [];
 
         // ============================================================================
-        // MOTOR DE ESTUDIO SOLAR Y DOMÓTICA WIZ (EL CALAFATE -50.33° LAT, -72.26° LON)
+        // MOTOR DE ESTUDIO SOLAR REAL Y PLANIFICACIÓN DOMÓTICA WIZ
+        // Dirección Oficial: Calle Günther Plüschow N° 217/235 (UF 01-01, Mz 193 Pc 15, El Calafate)
+        // Coordenadas GPS: -50.3362° Lat Sur, -72.2484° Lon Oeste
+        // Correspondencia Cardinal Exacta según Plano de Mensura (Agrim. M. A. Piombi):
+        //   • Lado Z = 0.00 (6.20 m, Living y Estudio)  --> OESTE-NOROESTE (Azimut 277°, Frente a Calle Günther Plüschow): Recibe SOL DE TARDE / ATARDECER
+        //   • Lado X = 6.30 (7.00 m, Ventana Comedor)   --> NORTE-NORESTE (Azimut 7°, Retiro libre 1.90m frente a UF 01-02): Recibe SOL DE MEDIODÍA
+        //   • Lado Z = 8.00 (4.80 m + Palier Entrada)   --> ESTE-SURESTE (Azimut 97°, Patio Aire y Luz interno): Recibe SOL DE MAÑANA (Dormitorio y Cocina)
+        //   • Lado X = 0.00 (8.00 m, Mocheta Baño 50×50)--> SUR-SUROESTE (Azimut 187°, Retiro lateral Aire y Luz): Luz difusa austral (sin sol directo)
         // ============================================================================
         let currentSolarTime = 'noon';
 
         const SOLAR_PRESETS = {
             morning: {
-                name: 'Mañana Fresca (09:30)',
-                sunPos: [14.0, 24.0, -18.0],
-                sunColor: 0xfffcf5,
-                sunIntensity: 1.40,
+                name: 'Mañana (09:00 — Sol por el Este: ilumina Dormitorio y Cocina; apoyo focal en Estudio y Baño)',
+                // Sol matinal desde el ESTE-NORESTE (+Z = Este, +X = Norte): entra directo por ventanas de Dormitorio (Z=8.00), Cocina (Z=8.00) y Comedor Norte (X=6.30)
+                sunPos: [14.0, 19.0, 24.0],
+                sunColor: 0xfffaf0,
+                sunIntensity: 1.42,
                 hemiSky: 0xf0f7ff,
                 hemiGround: 0xe2e8f0,
-                hemiIntensity: 0.75,
-                ambIntensity: 0.40,
-                fillIntensity: 0.35,
+                hemiIntensity: 0.74,
+                ambIntensity: 0.38,
+                fillIntensity: 0.32,
                 bgColor: 0xf0f7ff,
+                // Planificación lumínica matinal: Estudio (Oeste) y Baño (Sur) están en sombra matinal -> se enciende apoyo focal 4000K
                 wizLiving: 0.0,
                 wizDining: 0.0,
                 wizBedroom: 0.0,
-                wizStudy: 0.0,
-                wizBath: 0.0,
+                wizStudy: 0.75,
+                wizBath: 0.65,
+                kitchenLed: 0.25,
+                bedsideLamps: 0.0,
+                cyanLed: 0.0,
                 gamingBlue: 0.0,
                 gamingMagenta: 0.0,
+                facadeWeights: { east: 0.60, north: 0.25, west: 0.15 },
                 isNight: false
             },
             noon: {
-                name: 'Mediodía Patagónico (13:30)',
-                sunPos: [6.0, 30.0, -16.0],
+                name: 'Mediodía Solar (13:30 — Sol al Norte Franco: entra por Ventana Norte de Comedor y Living)',
+                // En latitud -50.33° S, al mediodía el sol culmina al NORTE Franco (+X = Norte, con leve ángulo hacia -Z = Oeste 277°)
+                sunPos: [24.0, 29.0, -6.5],
                 sunColor: 0xfffef8,
-                sunIntensity: 1.45,
+                sunIntensity: 1.48,
                 hemiSky: 0xffffff,
                 hemiGround: 0xe5e7eb,
                 hemiIntensity: 0.80,
                 ambIntensity: 0.44,
                 fillIntensity: 0.38,
                 bgColor: 0xf8fafc,
+                // Planificación lumínica mediodía: pleno sol natural en Living, Comedor y Estudio; solo apoyo suave en Baño Sur
                 wizLiving: 0.0,
                 wizDining: 0.0,
                 wizBedroom: 0.0,
                 wizStudy: 0.0,
-                wizBath: 0.0,
+                wizBath: 0.35,
+                kitchenLed: 0.0,
+                bedsideLamps: 0.0,
+                cyanLed: 0.0,
                 gamingBlue: 0.0,
                 gamingMagenta: 0.0,
+                facadeWeights: { north: 0.45, west: 0.40, east: 0.15 },
                 isNight: false
             },
             golden: {
-                name: 'Tarde Cálida (17:30)',
-                sunPos: [-12.0, 18.0, -16.0],
-                sunColor: 0xfff3df,
-                sunIntensity: 1.50,
+                name: 'Atardecer / Puesta del Sol (18:00 — Sol al Oeste sobre Calle G. Plüschow: entra en Estudio y Living; enciende Cocina y Cuarto)',
+                // Puesta del sol en el OESTE-NOROESTE (-Z = Fachada Calle Günther Plüschow Z=0, +X = Norte): entra de frente por ventanales de Estudio y Living
+                sunPos: [6.0, 14.5, -25.0],
+                sunColor: 0xffefd6,
+                sunIntensity: 1.52,
                 hemiSky: 0xfffaf2,
                 hemiGround: 0xded8ce,
-                hemiIntensity: 0.72,
-                ambIntensity: 0.36,
-                fillIntensity: 0.32,
+                hemiIntensity: 0.70,
+                ambIntensity: 0.34,
+                fillIntensity: 0.28,
                 bgColor: 0xfaf8f5,
+                // Planificación lumínica vespertina: Contrafrente Este (Cocina y Dormitorio) y Baño Sur quedan en sombra -> se activan sus luminarias
                 wizLiving: 0.25,
-                wizDining: 0.25,
-                wizBedroom: 0.20,
+                wizDining: 0.30,
+                wizBedroom: 0.95,
                 wizStudy: 0.35,
-                wizBath: 0.30,
-                gamingBlue: 1.2,
-                gamingMagenta: 1.0,
+                wizBath: 0.85,
+                kitchenLed: 1.35,
+                bedsideLamps: 0.80,
+                cyanLed: 0.65,
+                gamingBlue: 1.4,
+                gamingMagenta: 1.1,
+                facadeWeights: { west: 0.70, north: 0.20, east: 0.10 },
                 isNight: false
             },
             night: {
-                name: 'Noche Domótica WiZ (22:30)',
+                name: 'Noche Domótica WiZ (22:30 — Oscuridad Exterior Real + Luminarias Activas)',
                 sunPos: [0.0, -10.0, 0.0],
                 sunColor: 0x0f172a,
                 sunIntensity: 0.0,
@@ -2705,8 +2733,12 @@
                 wizBedroom: 2.2,
                 wizStudy: 2.6,
                 wizBath: 2.2,
+                kitchenLed: 2.1,
+                bedsideLamps: 1.8,
+                cyanLed: 1.6,
                 gamingBlue: 3.6,
                 gamingMagenta: 2.8,
+                facadeWeights: { west: 0.34, north: 0.33, east: 0.33 },
                 isNight: true
             }
         };
@@ -2763,10 +2795,15 @@
             gamingBlueLight.intensity = preset.gamingBlue;
             gamingMagentaLight.intensity = preset.gamingMagenta;
 
-            if (typeof kitchenLed !== 'undefined') kitchenLed.intensity = preset.isNight ? 2.1 : (presetKey === 'golden' ? 0.5 : 0.0);
-            if (typeof bedsideLampLeft !== 'undefined') bedsideLampLeft.intensity = preset.isNight ? 1.8 : (presetKey === 'golden' ? 0.35 : 0.0);
-            if (typeof bedsideLampRight !== 'undefined') bedsideLampRight.intensity = preset.isNight ? 1.8 : (presetKey === 'golden' ? 0.35 : 0.0);
-            if (typeof cyanLedLiving !== 'undefined') cyanLedLiving.intensity = preset.isNight ? 1.6 : (presetKey === 'golden' ? 0.5 : 0.0);
+            if (typeof kitchenLed !== 'undefined') kitchenLed.intensity = (preset.kitchenLed !== undefined) ? preset.kitchenLed : (preset.isNight ? 2.1 : 0.0);
+            if (typeof bedsideLampLeft !== 'undefined') bedsideLampLeft.intensity = (preset.bedsideLamps !== undefined) ? preset.bedsideLamps : (preset.isNight ? 1.8 : 0.0);
+            if (typeof bedsideLampRight !== 'undefined') bedsideLampRight.intensity = (preset.bedsideLamps !== undefined) ? preset.bedsideLamps : (preset.isNight ? 1.8 : 0.0);
+            if (typeof cyanLedLiving !== 'undefined') cyanLedLiving.intensity = (preset.cyanLed !== undefined) ? preset.cyanLed : (preset.isNight ? 1.6 : 0.0);
+
+            const selSolar = document.getElementById('select-solar-time');
+            if (selSolar && selSolar.value !== presetKey) {
+                selSolar.value = presetKey;
+            }
 
             // Optimización Chrome WebGL: apagar (.visible = false) los PointLights con intensidad 0 para aligerar el fragment shader PBR
             [
@@ -2827,29 +2864,35 @@
         }
 
         // Atenuador físico en tiempo real de luz solar exterior según el estado de las dos cortinas (Visillo Difuminador vs. Blackout Total)
+        // ponderado por la orientación cardinal real de cada ventana según la posición del sol (Este en Mañana, Norte al Mediodía, Oeste en Tarde)
         function updateCurtainLightBlocking() {
             const preset = SOLAR_PRESETS[currentSolarTime] || SOLAR_PRESETS.noon;
             if (preset.isNight || !Array.isArray(animCurtains) || animCurtains.length === 0) return;
 
-            // Calcular factor medio de transmisión de luz exterior por ventana:
-            // - Ambas abiertas (sheerOpen=1, blackoutOpen=1) => transmisión = 1.00 (100% luz solar)
-            // - Visillo difuminador cerrado (sheerOpen=0, blackoutOpen=1) => transmisión = 0.78 (difumina y suaviza el sol directo)
-            // - Blackout cerrado (blackoutOpen=0) => transmisión = 0.00 (corta el 100% de la luz exterior de esa ventana)
+            const weights = preset.facadeWeights || { west: 0.40, north: 0.30, east: 0.30 };
+            let weightedSum = 0;
+            let weightTotal = 0;
             let totalTrans = 0;
-            let blackoutCount = 0;
+
             for (let i = 0; i < animCurtains.length; i++) {
                 const c = animCurtains[i];
                 const bOpen = (typeof c.currentBlackoutOpen === 'number') ? c.currentBlackoutOpen : 1.0;
                 const sOpen = (typeof c.currentSheerOpen === 'number') ? c.currentSheerOpen : 0.0;
-                if (bOpen < 0.15) blackoutCount++;
                 const sheerFactor = 0.78 + 0.22 * sOpen;
                 const winTransmission = bOpen * sheerFactor;
                 totalTrans += winTransmission;
-            }
-            const avgTrans = totalTrans / animCurtains.length; // 0.0 (todas blackout cerradas) .. 1.0 (todas abiertas)
 
-            // Ajustar luces exteriores e interiores diurnas proporcionalmente al bloqueo de cortinas Blackout
-            dirLight.intensity = preset.sunIntensity * Math.pow(avgTrans, 1.25);
+                const facade = c.facade || 'west';
+                const w = (weights[facade] !== undefined) ? weights[facade] : 0.33;
+                weightedSum += winTransmission * w;
+                weightTotal += w;
+            }
+            const avgTrans = totalTrans / animCurtains.length;
+            const sunDirectionalTrans = weightTotal > 0 ? (weightedSum / weightTotal) : avgTrans;
+
+            // El haz de sol directo (dirLight) responde a las cortinas de la fachada por donde entra el sol en ese horario,
+            // mientras que la luz difusa ambiental responde al promedio de todas las ventanas
+            dirLight.intensity = preset.sunIntensity * Math.pow(sunDirectionalTrans, 1.25);
             hemiLight.intensity = preset.hemiIntensity * (0.08 + 0.92 * avgTrans);
             ambLight.intensity = preset.ambIntensity * (0.10 + 0.90 * avgTrans);
             fillLight.intensity = preset.fillIntensity * avgTrans;
@@ -2864,7 +2907,26 @@
                 });
             }
 
-            // Si la mayoría de los blackouts están cerrados de día, apagar reflejos IBL diurnos para oscuridad real interior
+            // Si los blackouts están cerrados de día (< 18% transmisión), activar automáticamente las luminarias interiores para no dejar el ambiente a oscuras
+            if (avgTrans < 0.25) {
+                const autoBoost = (1.0 - avgTrans / 0.25);
+                wizLivingLight.intensity = Math.max(preset.wizLiving || 0, 1.8 * autoBoost);
+                wizDiningLight.intensity = Math.max(preset.wizDining || 0, 1.6 * autoBoost);
+                wizStudyLight.intensity = Math.max(preset.wizStudy || 0, 1.8 * autoBoost);
+                wizBedroomLight.intensity = Math.max(preset.wizBedroom || 0, 1.6 * autoBoost);
+                [wizLivingLight, wizDiningLight, wizStudyLight, wizBedroomLight].forEach(pl => {
+                    if (pl) pl.visible = (pl.intensity > 0.01);
+                });
+            } else {
+                wizLivingLight.intensity = preset.wizLiving || 0;
+                wizDiningLight.intensity = preset.wizDining || 0;
+                wizStudyLight.intensity = preset.wizStudy || 0;
+                wizBedroomLight.intensity = preset.wizBedroom || 0;
+                [wizLivingLight, wizDiningLight, wizStudyLight, wizBedroomLight].forEach(pl => {
+                    if (pl) pl.visible = (pl.intensity > 0.01);
+                });
+            }
+
             if (typeof studioDayEnvTexture !== 'undefined' && studioDayEnvTexture) {
                 scene.environment = (avgTrans < 0.18) ? null : studioDayEnvTexture;
             }
@@ -6869,13 +6931,28 @@
             g.position.set(cMidX, 0, cMidZ);
             g.rotation.y = -angle;
 
-            // Identificación unívoca del ambiente
+            // Identificación unívoca del ambiente y su orientación cardinal real según Plano de Mensura (Calle G. Plüschow 235)
             let curtainTitle = "Cortina Doble (Visillo + Blackout)";
-            if (Math.abs(z1) < 0.1 && cMidX < 2.5) curtainTitle = "Cortina Doble Estudio (Visillo + Blackout)";
-            else if (Math.abs(z1) < 0.1 && cMidX < 5.0) curtainTitle = "Cortina Doble Living V1 (Visillo + Blackout)";
-            else if (Math.abs(z1) < 0.1 && cMidX >= 5.0) curtainTitle = "Cortina Doble Living V2 (Visillo + Blackout)";
-            else if (Math.abs(x1 - 7.00) < 0.1 || Math.abs(x1 - 6.30) < 0.1) curtainTitle = "Cortina Doble Living V3 Este (Visillo + Blackout)";
-            else if (Math.abs(z1 - 8.00) < 0.1) curtainTitle = "Cortina Doble Dormitorio (Visillo + Blackout)";
+            let curtainFacade = 'west'; // 'west' (Frente Calle G. Plüschow Z=0) | 'north' (Lateral Norte X=6.30) | 'east' (Contrafrente Este Z=8.00)
+            if (Math.abs(z1) < 0.1 && cMidX < 2.5) {
+                curtainTitle = "Cortina Doble Estudio — Frente Oeste Calle G. Plüschow (Visillo + Blackout)";
+                curtainFacade = 'west';
+            } else if (Math.abs(z1) < 0.1 && cMidX < 5.0) {
+                curtainTitle = "Cortina Doble Living — Frente Oeste Calle G. Plüschow (Visillo + Blackout)";
+                curtainFacade = 'west';
+            } else if (Math.abs(z1) < 0.1 && cMidX >= 5.0) {
+                curtainTitle = "Cortina Doble Living V2 — Frente Oeste (Visillo + Blackout)";
+                curtainFacade = 'west';
+            } else if (Math.abs(x1 - 7.00) < 0.1 || Math.abs(x1 - 6.30) < 0.1) {
+                curtainTitle = "Cortina Doble Comedor — Lateral Norte Sol Mediodía (Visillo + Blackout)";
+                curtainFacade = 'north';
+            } else if (Math.abs(z1 - 8.00) < 0.1 && cMidX < 3.0) {
+                curtainTitle = "Cortina Doble Dormitorio — Contrafrente Este Sol Mañana (Visillo + Blackout)";
+                curtainFacade = 'east';
+            } else if (Math.abs(z1 - 8.00) < 0.1 && cMidX >= 3.0) {
+                curtainTitle = "Cortina Doble Cocina — Contrafrente Este Sol Mañana (Visillo + Blackout)";
+                curtainFacade = 'east';
+            }
 
             // 1. DOBLE BARRAL DE MADERA MACIZA Y TERMINALES TORNEADOS A Y = 2.12 m (Riel interior Visillo + Riel exterior Blackout)
             const rodMat = getStdMat(0x6c2e12, 0.45);
@@ -6983,6 +7060,7 @@
 
             const curtainEntry = {
                 name: curtainTitle,
+                facade: curtainFacade,
                 mode: 'sheer', // 'open' (Abiertas) | 'sheer' (Visillo Difuminador) | 'blackout' (Blackout Total Cerrado)
                 isOpen: false,
                 currentSheerOpen: 0.0,
@@ -12783,56 +12861,56 @@
                 if (cx < 0.25) {
                     return {
                         id: 'muro_ext_oeste',
-                        nombre: 'Muro Exterior Oeste Completo (Medianera — 8.00 m)',
+                        nombre: 'Muro Exterior Sur Completo (Retiro Aire y Luz / Mocheta Baño — 8.00 m)',
                         dimensiones: { ancho: 8.00, alto: 3.20, profundidad: 0.12, elevacion: 0.00 }
                     };
                 }
                 if (cz < 0.25 && cx <= 3.00) {
                     return {
                         id: 'muro_ext_norte_estudio',
-                        nombre: 'Muro Exterior Norte Estudio (3.00 m)',
+                        nombre: 'Muro Frente Oeste Estudio (Calle Günther Plüschow 235 — 3.00 m)',
                         dimensiones: { ancho: 3.00, alto: 5.20, profundidad: 0.12, elevacion: 0.00 }
                     };
                 }
                 if (cz < 0.25 && cx > 3.00) {
                     return {
                         id: 'muro_ext_norte_living',
-                        nombre: 'Muro Exterior Norte Living-Comedor (Ancho int. 2.90 m)',
+                        nombre: 'Muro Frente Oeste Living-Comedor (Calle Günther Plüschow 235 — 2.90 m)',
                         dimensiones: { ancho: 2.90, alto: 5.20, profundidad: 0.12, elevacion: 0.00 }
                     };
                 }
                 if (cx > 6.10) {
                     return {
                         id: 'muro_ext_este_living',
-                        nombre: 'Muro Exterior Este Living y Entrada (Largo 6.90 m)',
+                        nombre: 'Muro Lateral Norte Living y Entrada (1.90m Libre Sol Norte + 5.10m UF 01-02 — Total 6.90 m)',
                         dimensiones: { ancho: 6.90, alto: 3.80, profundidad: 0.12, elevacion: 0.00 }
                     };
                 }
                 if (cz > 6.10 && cz < 6.50 && cx > 4.80) {
                     return {
                         id: 'muro_ext_sur_entrada',
-                        nombre: 'Muro Frente Entrada / Palier (Frente 1.20 m)',
+                        nombre: 'Muro Contrafrente Este Entrada / Palier Común (1.20 m)',
                         dimensiones: { ancho: 1.20, alto: 4.41, profundidad: 0.12, elevacion: 0.00 }
                     };
                 }
                 if (cx > 4.70 && cx < 5.00 && cz > 6.20) {
                     return {
                         id: 'muro_ext_este_cocina',
-                        nombre: 'Muro Exterior Este Cocina / Palier (1.70 m)',
+                        nombre: 'Muro Quiebre Palier / Cocina (1.70 m)',
                         dimensiones: { ancho: 1.70, alto: 4.41, profundidad: 0.12, elevacion: 0.00 }
                     };
                 }
                 if (cz > 7.80 && cx >= 3.00) {
                     return {
                         id: 'muro_ext_sur_cocina',
-                        nombre: 'Muro Exterior Sur Cocina (Ancho int. 1.55 m)',
+                        nombre: 'Muro Contrafrente Este Cocina (Aire y Luz Sol Mañana — 1.55 m)',
                         dimensiones: { ancho: 1.55, alto: 5.20, profundidad: 0.12, elevacion: 0.00 }
                     };
                 }
                 if (cz > 7.80 && cx < 3.00) {
                     return {
                         id: 'muro_ext_sur_cuarto',
-                        nombre: 'Muro Exterior Sur Dormitorio (Ancho int. 2.95 m)',
+                        nombre: 'Muro Contrafrente Este Dormitorio (Aire y Luz Sol Mañana — 2.95 m)',
                         dimensiones: { ancho: 2.95, alto: 5.20, profundidad: 0.12, elevacion: 0.00 }
                     };
                 }
@@ -14517,12 +14595,24 @@
                     const act = e.target.value;
                     if (!act) return;
                     if (act === 'curtains') document.getElementById('btn-toggle-curtains')?.click();
-                    else if (act === 'windows') document.getElementById('btn-toggle-windows')?.click();
-                    else if (act === 'doors') document.getElementById('btn-toggle-doors')?.click();
-                    else if (act === 'dining') document.getElementById('btn-toggle-dining-table')?.click();
-                    else if (act === 'roof') document.getElementById('btn-toggle-roof')?.click();
-                    else if (act === 'labels') document.getElementById('btn-toggle-labels')?.click();
-                    else if (act === 'decor') document.getElementById('btn-toggle-video-decor')?.click();
+                    else if (act === 'curtains_sheer') {
+                        animCurtains.forEach(c => c.setMode && c.setMode('sheer'));
+                        showToast('🌤️ Todas las cortinas en Visillo Difuminador (Luz solar tamizada)');
+                        wakeRenderer();
+                    } else if (act === 'curtains_blackout') {
+                        animCurtains.forEach(c => c.setMode && c.setMode('blackout'));
+                        showToast('🌑 Todas las cortinas Blackout cerradas (Corta toda la luz exterior)');
+                        wakeRenderer();
+                    } else if (act === 'curtains_open') {
+                        animCurtains.forEach(c => c.setMode && c.setMode('open'));
+                        showToast('☀️ Todas las cortinas abiertas (100% luz exterior)');
+                        wakeRenderer();
+                    } else if (act === 'windows' || act === 'toggle_windows') document.getElementById('btn-toggle-windows')?.click();
+                    else if (act === 'doors' || act === 'toggle_doors') document.getElementById('btn-toggle-doors')?.click();
+                    else if (act === 'dining' || act === 'cycle_table') document.getElementById('btn-toggle-dining-table')?.click();
+                    else if (act === 'roof' || act === 'toggle_roof') document.getElementById('btn-toggle-roof')?.click();
+                    else if (act === 'labels' || act === 'toggle_labels') document.getElementById('btn-toggle-labels')?.click();
+                    else if (act === 'decor' || act === 'toggle_decor') document.getElementById('btn-toggle-video-decor')?.click();
                     e.target.value = '';
                 });
             }
