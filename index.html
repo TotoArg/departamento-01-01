@@ -2189,6 +2189,64 @@
         }
         const machimbreRoofTex = createProceduralMachimbreRoofTexture();
 
+        function createProceduralMachimbreBumpTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#d0d0d0';
+            ctx.fillRect(0, 0, 1024, 1024);
+
+            const slatW = 1024 / 9;
+            for (let i = 0; i < 9; i++) {
+                const x = i * slatW;
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(x + slatW - 3, 0, 3, 1024);
+                ctx.fillStyle = '#666666';
+                ctx.fillRect(x + slatW - 6, 0, 3, 1024);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(x + 1, 0, 2, 1024);
+
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
+                ctx.lineWidth = 1.0;
+                for (let v = 0; v < 12; v++) {
+                    const vx = x + 4 + (v * (slatW - 8) / 12);
+                    ctx.beginPath();
+                    ctx.moveTo(vx, 0);
+                    ctx.bezierCurveTo(vx + 3, 340, vx - 3, 680, vx + 2, 1024);
+                    ctx.stroke();
+                }
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(2.5, 3.5);
+            return tex;
+        }
+        const machimbreRoofBumpTex = createProceduralMachimbreBumpTexture();
+
+        function createProceduralMachimbreRoughnessTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#8e8e8e';
+            ctx.fillRect(0, 0, 512, 512);
+
+            const slatW = 512 / 9;
+            for (let i = 0; i < 9; i++) {
+                const x = i * slatW;
+                ctx.fillStyle = '#cccccc';
+                ctx.fillRect(x + slatW - 2, 0, 2, 512);
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(2.5, 3.5);
+            return tex;
+        }
+        const machimbreRoofRoughTex = createProceduralMachimbreRoughnessTexture();
+
         function createProceduralWoodTexture() {
             const canvas = document.createElement('canvas');
             canvas.width = 1024;
@@ -2420,6 +2478,62 @@
 
         const proceduralWoodTex = createProceduralWoodTexture();
         const proceduralLightWoodTex = proceduralWoodTex;
+
+        function createProceduralWoodBumpTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#d8d8d8';
+            ctx.fillRect(0, 0, 1024, 1024);
+
+            const rowH = 64;
+            const plankW = 256;
+            let rowIdx = 0;
+            for (let y = 0; y < 1024; y += rowH) {
+                const shift = ((rowIdx * 137) % plankW);
+                for (let x = -plankW + shift; x < 1024 + plankW; x += plankW) {
+                    ctx.fillStyle = '#222222';
+                    ctx.fillRect(x, y + rowH - 2, plankW, 2);
+                    ctx.fillRect(x + plankW - 2, y, 2, rowH);
+                }
+                rowIdx++;
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(4, 4);
+            return tex;
+        }
+        const proceduralWoodBumpTex = createProceduralWoodBumpTexture();
+
+        function createProceduralWoodRoughnessTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#7a7a7a';
+            ctx.fillRect(0, 0, 512, 512);
+
+            const rowH = 32;
+            const plankW = 128;
+            let rowIdx = 0;
+            for (let y = 0; y < 512; y += rowH) {
+                const shift = ((rowIdx * 137) % plankW);
+                for (let x = -plankW + shift; x < 512 + plankW; x += plankW) {
+                    ctx.fillStyle = '#b0b0b0';
+                    ctx.fillRect(x, y + rowH - 2, plankW, 2);
+                    ctx.fillRect(x + plankW - 2, y, 2, rowH);
+                }
+                rowIdx++;
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(4, 4);
+            return tex;
+        }
+        const proceduralWoodRoughTex = createProceduralWoodRoughnessTexture();
         const proceduralBrickTex = createProceduralBrickTexture();
         const proceduralTileTex = createProceduralTileTexture();
         const proceduralRugTex = createProceduralRugTexture();
@@ -2557,16 +2671,39 @@
             return tex;
         }
 
-        // Environment Map HDRI Neutro de Estudio para Iluminación Global (IBL) sin teñir pisos de marrón
+        // Environment Map HDRI para Iluminación Global (IBL) y Reflejos Especulares Fotorrealistas
         let pmremGen = null;
         let studioDayEnvTexture = null;
         try {
             pmremGen = new THREE.PMREMGenerator(renderer);
             pmremGen.compileEquirectangularShader();
 
+            // 1. Entorno procedural neutral inmediato (sin latencia de red)
             const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
             studioDayEnvTexture = studioEnvTarget.texture;
             scene.environment = studioDayEnvTexture;
+
+            // 2. Carga asíncrona del mapa HDRI fotográfico de estudio (ferndale_studio_04_1k.hdr)
+            if (typeof THREE.RGBELoader !== 'undefined') {
+                new THREE.RGBELoader()
+                    .setDataType(THREE.UnsignedByteType)
+                    .load('textures/hdr/ferndale_studio_04_1k.hdr', (hdrTexture) => {
+                        try {
+                            const hdrTarget = pmremGen.fromEquirectangular(hdrTexture);
+                            studioDayEnvTexture = hdrTarget.texture;
+                            const preset = (typeof SOLAR_PRESETS !== 'undefined' && typeof currentSolarTime !== 'undefined' && SOLAR_PRESETS[currentSolarTime]) ? SOLAR_PRESETS[currentSolarTime] : null;
+                            if ((!preset || !preset.isNight) && (typeof activeCamera === 'undefined' || activeCamera !== orthoCam)) {
+                                scene.environment = studioDayEnvTexture;
+                            }
+                            hdrTexture.dispose();
+                            wakeRenderer();
+                        } catch (hdrConvErr) {
+                            console.warn('Error al procesar PMREM de ferndale_studio_04_1k.hdr:', hdrConvErr);
+                        }
+                    }, undefined, (err) => {
+                        console.warn('RGBELoader no pudo cargar textures/hdr/ferndale_studio_04_1k.hdr, conservando entorno procedural:', err);
+                    });
+            }
         } catch (pmremErr) {
             console.warn('PMREM fallback a luces de seguridad activado:', pmremErr);
         }
@@ -3636,9 +3773,12 @@
             return createRealisticCeramic33Texture(repeatX, repeatY);
         }
 
-        // Material PBR Pisos de Madera (seda satinada suave, roughness: 0.42, metalness: 0.08 para reflejos orgánicos)
+        // Material PBR Pisos de Madera (seda satinada suave, micro-bisel táctil y veta)
         const pbrWoodFloorMat = new THREE.MeshStandardMaterial({
             map: proceduralWoodTex,
+            bumpMap: proceduralWoodBumpTex,
+            bumpScale: 0.0022,
+            roughnessMap: proceduralWoodRoughTex,
             color: 0xfcf8f2,
             roughness: 0.42,
             metalness: 0.08
@@ -3727,11 +3867,14 @@
             metalness: 1.0,  // Cromo pulido 100% reflectivo
             roughness: 0.06
         });
-        // Machimbre PBR del techo inclinado (Digital Twin exacto con ranuras en V y veta de pino)
+        // Machimbre PBR del techo inclinado (Digital Twin exacto con ranuras en V, relieve y veta de pino)
         const woodRoofMat = new THREE.MeshStandardMaterial({
             color: 0x8d5524, // Pino barnizado cálido
             map: machimbreRoofTex,
-            roughness: 0.60,
+            bumpMap: machimbreRoofBumpTex,
+            bumpScale: 0.0035,
+            roughnessMap: machimbreRoofRoughTex,
+            roughness: 0.58,
             metalness: 0.02,
             side: THREE.DoubleSide
         });
@@ -15826,7 +15969,7 @@
          ========================================================================== -->
     <script>
         (function registerGemeloPWA() {
-            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.0';
+            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.1';
             if ('serviceWorker' in navigator) {
                 // Si el navegador tenía cacheado un build viejo en Service Worker, limpiar cachés antiguos y recargar 1 sola vez automáticamente
                 try {
