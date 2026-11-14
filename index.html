@@ -2080,6 +2080,21 @@
         renderer.outputEncoding = THREE.sRGBEncoding;
         container.appendChild(renderer.domElement);
 
+        // Protección anti-pantalla negra ante pérdida y restauración de contexto WebGL (móviles, suspensión, ahorro de energía)
+        renderer.domElement.addEventListener('webglcontextlost', function(event) {
+            event.preventDefault();
+            console.warn('[WebGL] Contexto WebGL suspendido/perdido temporalmente. Prevenido fallo definitivo.');
+        }, false);
+        renderer.domElement.addEventListener('webglcontextrestored', function() {
+            console.log('[WebGL] Contexto WebGL restaurado exitosamente.');
+            renderer.setClearColor(0xf8fafc, 1.0);
+            if (typeof requestShadowMapUpdate === 'function') requestShadowMapUpdate();
+            if (typeof wakeRenderer === 'function') wakeRenderer();
+            if (typeof renderer !== 'undefined' && renderer && typeof scene !== 'undefined' && scene && typeof activeCamera !== 'undefined' && activeCamera) {
+                renderer.render(scene, activeCamera);
+            }
+        }, false);
+
         const controlsPersp = new THREE.OrbitControls(perspCam, renderer.domElement);
         controlsPersp.target.set(3.15, 0.3, 4.00);
         controlsPersp.enableDamping = true;
@@ -5507,8 +5522,8 @@
         createCompoundAssembly('Bañera y Ducha Cromada', () => {
             const bathGroup = new THREE.Group();
             
-            // Faldón exterior y estructura de bañera con medidas reales relevadas: 1.18 m de largo (Z = 3.30 a 4.48 m) x 0.69 m de ancho (X = 0.06 a 0.75 m)
-            const faldon = new THREE.Mesh(createRoundedBoxGeo(0.69, 0.48, 1.18, 0.025, 3), porcelainMat);
+            // Faldón exterior revestido en azulejos cerámicos blancos (sec_086) y estructura de bañera (1.18 m x 0.69 m)
+            const faldon = new THREE.Mesh(createRoundedBoxGeo(0.69, 0.48, 1.18, 0.015, 2), tileBathWallMat);
             faldon.position.set(0.405, 0.24, 3.89);
             faldon.castShadow = true; faldon.receiveShadow = true;
             bathGroup.add(faldon);
@@ -5587,16 +5602,16 @@
             bathGroup.add(tileBackBelow, tileBackNorth, tileBackSouth, tileNorth, tileSouth);
             window.showerTilePanels = { tileBackBelow, tileBackNorth, tileBackSouth, tileNorth, tileSouth };
 
-            // Desagüe click-clack cromado
+            // Desagüe click-clack cromado en la cabecera Norte bajo la grifería (Z = 3.52 m, según fotos reales sec_086, sec_088)
             const drain = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.008, 18), chromePolishMat);
-            drain.position.set(0.38, 0.485, 4.25);
+            drain.position.set(0.38, 0.485, 3.52);
             bathGroup.add(drain);
 
-            // Esquinero cromado de 3 pisos con botellas de shampoo/acondicionador + jabonera blanca a la izquierda de la ventana 50×50 cm (Video 3:02)
+            // Esquinero cromado de 3 pisos en la esquina Noroeste (X = 0.14, Z = 3.44) con botellas de shampoo y acondicionador
             const caddyGroup = new THREE.Group();
-            caddyGroup.position.set(0.16, 1.28, 3.44);
+            caddyGroup.position.set(0.14, 1.25, 3.44);
             [0.0, 0.22, 0.44].forEach((cy, idx) => {
-                const shelfWire = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.018, 16), chromePolishMat);
+                const shelfWire = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.016, 16), chromePolishMat);
                 shelfWire.position.set(0, cy, 0);
                 caddyGroup.add(shelfWire);
                 const bottleColors = [
@@ -5610,41 +5625,77 @@
                     caddyGroup.add(bMesh);
                 });
             });
-            // Jabonera esquinera blanca debajo del organizador (Video 3:02)
-            const soapDish = new THREE.Mesh(createRoundedBoxGeo(0.14, 0.025, 0.14, 0.01, 2), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
-            soapDish.position.set(0, -0.22, 0);
-            caddyGroup.add(soapDish);
             bathGroup.add(caddyGroup);
 
-            // Columna de ducha cromada con florón cuadrado/redondo + duchador de mano + grifería bimando sobre pared Oeste a la derecha de la ventana 50×50 cm (Video 3:07, 3:12)
-            const showerWall = new THREE.Group();
-            showerWall.position.set(0.09, 0, 4.30);
+            // =========================================================================
+            // DISTRIBUCIÓN REAL DE DUCHA (Fotos reales sec_086, sec_087, sec_088, sec_089):
+            // La grifería y el florón de ducha están montados sobre el MURO NORTE (Z = 3.325),
+            // en la cabecera de la bañera, apuntando hacia el Sur hacia el interior de la tina.
+            // =========================================================================
+            const showerNorthWall = new THREE.Group();
+            showerNorthWall.position.set(0.38, 0, 3.33);
 
-            // Dos llaves cruz cromadas + transferencia y pico de llenado de bañera (Video 3:12)
-            [-0.10, 0, 0.10].forEach((vz, idx) => {
-                const valve = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.026, 0.045, 14), chromePolishMat);
-                valve.rotation.z = Math.PI / 2;
-                valve.position.set(0.02, 1.02, vz);
-                showerWall.add(valve);
-            });
-            const bathSpout = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.14, 14), chromePolishMat);
-            bathSpout.rotation.z = Math.PI / 2;
-            bathSpout.position.set(0.06, 0.68, 0);
-            showerWall.add(bathSpout);
+            // Florón de ducha y brazo de lluvia curvado en cuello de cisne (sec_088, sec_089)
+            const showerEscutcheon = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 0.010, 16), chromePolishMat);
+            showerEscutcheon.rotation.x = Math.PI / 2;
+            showerEscutcheon.position.set(0, 2.08, 0.006);
 
-            // Barral vertical cromado, brazo superior y florón de lluvia (Rainfall Shower) + duchador de mano con manguera (Video 3:07)
-            const pipeVert = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1.05, 14), chromePolishMat);
-            pipeVert.position.set(0.02, 1.62, 0);
-            const pipeArm = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.34, 14), chromePolishMat);
-            pipeArm.rotation.z = Math.PI / 2;
-            pipeArm.position.set(0.18, 2.14, 0);
-            const showerHead = new THREE.Mesh(createRoundedBoxGeo(0.20, 0.018, 0.20, 0.02, 2), chromePolishMat);
-            showerHead.position.set(0.32, 2.12, 0);
-            showerHead.castShadow = true;
-            const handSprayer = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.024, 0.18, 14), chromePolishMat);
-            handSprayer.position.set(0.06, 1.38, -0.08);
-            showerWall.add(pipeVert, pipeArm, showerHead, handSprayer);
-            bathGroup.add(showerWall);
+            const armStraight = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.16, 12), chromePolishMat);
+            armStraight.rotation.x = Math.PI / 2;
+            armStraight.position.set(0, 2.08, 0.08);
+
+            const armBend = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.12, 12), chromePolishMat);
+            armBend.rotation.x = Math.PI / 4;
+            armBend.position.set(0, 2.02, 0.18);
+
+            const bellHead = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.050, 0.065, 16), chromePolishMat);
+            bellHead.rotation.x = Math.PI / 3;
+            bellHead.position.set(0, 1.95, 0.23);
+            bellHead.castShadow = true;
+
+            const showerFace = new THREE.Mesh(new THREE.CylinderGeometry(0.050, 0.050, 0.006, 16), new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.3, metalness: 0.8 }));
+            showerFace.rotation.x = Math.PI / 3;
+            showerFace.position.set(0, 1.93, 0.24);
+
+            // Grifería bimando de embutir en Muro Norte (sec_087, sec_088): volante caliente, volante frío y perilla de transferencia
+            const valveHot = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.035, 12), chromePolishMat);
+            valveHot.rotation.x = Math.PI / 2;
+            valveHot.position.set(-0.10, 0.96, 0.02);
+
+            const valveCold = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.035, 12), chromePolishMat);
+            valveCold.rotation.x = Math.PI / 2;
+            valveCold.position.set(0.10, 0.96, 0.02);
+
+            const diverterKnob = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.036, 12), chromePolishMat);
+            diverterKnob.rotation.x = Math.PI / 2;
+            diverterKnob.position.set(0.0, 1.01, 0.02);
+
+            // Pico de llenado de bañera con salida curva hacia abajo (sec_088)
+            const bathSpout = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.14, 14), chromePolishMat);
+            bathSpout.rotation.x = Math.PI / 2;
+            bathSpout.position.set(0, 0.68, 0.07);
+
+            const spoutTip = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.04, 14), chromePolishMat);
+            spoutTip.position.set(0, 0.66, 0.14);
+
+            showerNorthWall.add(showerEscutcheon, armStraight, armBend, bellHead, showerFace, valveHot, valveCold, diverterKnob, bathSpout, spoutTip);
+            bathGroup.add(showerNorthWall);
+
+            // Jabonera de embutir de loza blanca en Muro Norte (sec_087, sec_088: entre la grifería de ducha y el vanitory)
+            const soapDishNorth = new THREE.Mesh(createRoundedBoxGeo(0.16, 0.09, 0.06, 0.015, 2), porcelainMat);
+            soapDishNorth.position.set(0.60, 0.92, 3.35);
+            bathGroup.add(soapDishNorth);
+
+            // Jabonera de embutir de loza blanca con estrías en Muro Oeste bajo el ventiluz (sec_090)
+            const soapDishWest = new THREE.Mesh(createRoundedBoxGeo(0.06, 0.09, 0.16, 0.015, 2), porcelainMat);
+            soapDishWest.position.set(0.08, 0.88, 3.89);
+            bathGroup.add(soapDishWest);
+
+            // Perchero de pared blanco en columna Sur junto a la bañera (sec_086)
+            const robeHook = new THREE.Mesh(new THREE.CylinderGeometry(0.010, 0.014, 0.05, 10), porcelainMat);
+            robeHook.rotation.x = Math.PI / 2;
+            robeHook.position.set(0.40, 1.55, 4.46);
+            bathGroup.add(robeHook);
 
             // Barral cromado superior (Y = 2.02 m) y Cortina de Baño blanca con textura floral sutil recogida (Video 2:52, 3:00, 3:07)
             const curtainRod = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1.16, 14), chromePolishMat);
@@ -13303,6 +13354,11 @@
 
         function initPostProcessing() {
             try {
+                if (isMobileOrLowEnd) {
+                    console.log("[PostProcessing] Dispositivo móvil detectado: omitiendo EffectComposer/SSAO para garantizar máximo rendimiento y estabilidad de VRAM.");
+                    composer = null;
+                    return;
+                }
                 if (typeof THREE.EffectComposer === 'undefined' || typeof THREE.SSAOPass === 'undefined') {
                     console.warn("EffectComposer o SSAOPass no disponibles, usando render nativo.");
                     composer = null;
@@ -15987,9 +16043,8 @@
          ========================================================================== -->
     <script>
         (function registerGemeloPWA() {
-            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.1';
+            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.3';
             if ('serviceWorker' in navigator) {
-                // Si el navegador tenía cacheado un build viejo en Service Worker, limpiar cachés antiguos y recargar 1 sola vez automáticamente
                 try {
                     const prevBuild = localStorage.getItem('gemelo_sw_build_ver');
                     if (prevBuild !== CURRENT_APP_BUILD && 'caches' in window) {
@@ -16006,16 +16061,9 @@
                     }
                 } catch (e) {}
 
-                let refreshing = false;
-                navigator.serviceWorker.addEventListener('controllerchange', function () {
-                    if (refreshing) return;
-                    refreshing = true;
-                    window.location.reload();
-                });
-
                 window.addEventListener('load', function () {
                     navigator.serviceWorker
-                        .register('./sw.js?v=1.9', { scope: './', updateViaCache: 'none' })
+                        .register('./sw.js?v=2.3', { scope: './', updateViaCache: 'none' })
                         .then(function (reg) {
                             console.log('[PWA] Service Worker registrado con éxito en scope:', reg.scope);
                             reg.update().catch(function () {});
