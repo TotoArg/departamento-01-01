@@ -4,7 +4,7 @@
 // librerías Three.js, modelos .glb y mapas de iluminación HDRI (.hdr).
 // ============================================================================
 
-const CACHE_VERSION = 'gemelo-3d-pwa-v1.8';
+const CACHE_VERSION = 'gemelo-3d-pwa-v1.9';
 const STATIC_CACHE_NAME = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE_NAME = `${CACHE_VERSION}-runtime`;
 
@@ -116,22 +116,29 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Estrategia principal PWA: "Cache First, falling back to Network"
-    // Ideal para index.html, librerías Three.js, modelos .glb, texturas .hdr, CSS e íconos
+    // Para documentos HTML (navegación principal): Network First con fallback a Caché
+    // Esto garantiza que cualquier actualización del visor 3D (o corrección de bugs) se vea al instante
+    // en el celular y PC al recargar, mientras que si no hay internet usa la copia offline guardada.
+    if (request.mode === 'navigate' || (request.headers.get('accept') || '').includes('text/html') || url.pathname.endsWith('/index.html') || url.pathname === '/') {
+        event.respondWith(
+            fetch(request, { cache: 'no-store' })
+                .then((freshRes) => {
+                    if (freshRes && freshRes.ok) {
+                        const clone = freshRes.clone();
+                        caches.open(STATIC_CACHE_NAME).then((c) => c.put('./index.html', clone));
+                    }
+                    return freshRes;
+                })
+                .catch(() => caches.match('./index.html') || caches.match(request, { ignoreSearch: true }))
+        );
+        return;
+    }
+
+    // Estrategia principal PWA para recursos pesados 3D: "Cache First, falling back to Network"
+    // Ideal para librerías Three.js, modelos .glb, texturas .hdr, CSS e íconos
     event.respondWith(
-        caches.match(request, { ignoreSearch: request.mode === 'navigate' }).then((cachedResponse) => {
+        caches.match(request).then((cachedResponse) => {
             if (cachedResponse) {
-                // En documentos HTML, actualizar la caché en segundo plano (Stale-While-Revalidate silencioso)
-                // para mantener paridad Zero Data Loss sin penalizar la velocidad de arranque instantánea
-                if (request.mode === 'navigate' || (request.headers.get('accept') || '').includes('text/html')) {
-                    fetch(request)
-                        .then((freshRes) => {
-                            if (freshRes && freshRes.ok) {
-                                caches.open(STATIC_CACHE_NAME).then((c) => c.put('./index.html', freshRes));
-                            }
-                        })
-                        .catch(() => {});
-                }
                 return cachedResponse;
             }
 

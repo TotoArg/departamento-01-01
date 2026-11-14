@@ -1394,6 +1394,7 @@
                 <div class="header-actions">
                     <button class="icon-btn" id="btn-toggle-metrics" title="Ver medidas oficiales" style="padding: 2px 6px;">ℹ️ Medidas</button>
                     <button class="icon-btn" id="btn-clean-screen" title="Pantalla completa / Ocultar controles" style="padding: 2px 6px; background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #38bdf8;">👁️</button>
+                    <button class="icon-btn" id="btn-force-update-pwa" title="Actualizar aplicación y limpiar caché offline" style="padding: 2px 6px; background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #34d399;" onclick="(async function(){ try { if ('serviceWorker' in navigator) { const regs = await navigator.serviceWorker.getRegistrations(); for (const r of regs) await r.unregister(); } if ('caches' in window) { const keys = await caches.keys(); for (const k of keys) await caches.delete(k); } } catch(e){} window.location.href = window.location.pathname + '?v=' + Date.now(); })()">🔄</button>
                     <a href="plano_arquitectonico_2d.png" download="Plano_2D_63x80.png" class="icon-btn">⬇️ PNG</a>
                     <button class="icon-btn" id="btn-toggle-layers">⚙️</button>
                 </div>
@@ -15194,12 +15195,38 @@
          ========================================================================== -->
     <script>
         (function registerGemeloPWA() {
+            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v1.9';
             if ('serviceWorker' in navigator) {
+                // Si el navegador tenía cacheado un build viejo en Service Worker, limpiar cachés antiguos y recargar 1 sola vez automáticamente
+                try {
+                    const prevBuild = localStorage.getItem('gemelo_sw_build_ver');
+                    if (prevBuild !== CURRENT_APP_BUILD && 'caches' in window) {
+                        caches.keys().then(function (keys) {
+                            const oldKeys = keys.filter(function (k) { return !k.startsWith(CURRENT_APP_BUILD); });
+                            if (oldKeys.length > 0) {
+                                Promise.all(oldKeys.map(function (k) { return caches.delete(k); })).then(function () {
+                                    localStorage.setItem('gemelo_sw_build_ver', CURRENT_APP_BUILD);
+                                });
+                            } else {
+                                localStorage.setItem('gemelo_sw_build_ver', CURRENT_APP_BUILD);
+                            }
+                        });
+                    }
+                } catch (e) {}
+
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', function () {
+                    if (refreshing) return;
+                    refreshing = true;
+                    window.location.reload();
+                });
+
                 window.addEventListener('load', function () {
                     navigator.serviceWorker
-                        .register('./sw.js', { scope: './' })
+                        .register('./sw.js?v=1.9', { scope: './', updateViaCache: 'none' })
                         .then(function (reg) {
                             console.log('[PWA] Service Worker registrado con éxito en scope:', reg.scope);
+                            reg.update().catch(function () {});
                             if (reg.waiting) {
                                 reg.waiting.postMessage({ type: 'SKIP_WAITING' });
                             }
