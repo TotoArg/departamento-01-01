@@ -2447,12 +2447,14 @@
 
         // Environment Map HDRI Neutro de Estudio para Iluminación Global (IBL) sin teñir pisos de marrón
         let pmremGen = null;
+        let studioDayEnvTexture = null;
         try {
             pmremGen = new THREE.PMREMGenerator(renderer);
             pmremGen.compileEquirectangularShader();
 
             const studioEnvTarget = pmremGen.fromEquirectangular(createStudioEquirectangularEnvironment());
-            scene.environment = studioEnvTarget.texture;
+            studioDayEnvTexture = studioEnvTarget.texture;
+            scene.environment = studioDayEnvTexture;
         } catch (pmremErr) {
             console.warn('PMREM fallback a luces de seguridad activado:', pmremErr);
         }
@@ -2623,19 +2625,19 @@
             night: {
                 name: 'Noche Domótica WiZ (22:30)',
                 sunPos: [0.0, -10.0, 0.0],
-                sunColor: 0x1e293b,
-                sunIntensity: 0.04,
+                sunColor: 0x0f172a,
+                sunIntensity: 0.0,
                 hemiSky: 0x0f172a,
                 hemiGround: 0x020617,
-                hemiIntensity: 0.08,
-                ambIntensity: 0.04,
+                hemiIntensity: 0.14,
+                ambIntensity: 0.12,
                 fillIntensity: 0.0,
-                bgColor: 0x070b14,
-                wizLiving: 2.2,
-                wizDining: 2.0,
-                wizBedroom: 1.8,
-                wizStudy: 2.4,
-                wizBath: 2.0,
+                bgColor: 0x030712,
+                wizLiving: 2.6,
+                wizDining: 2.3,
+                wizBedroom: 2.2,
+                wizStudy: 2.6,
+                wizBath: 2.2,
                 gamingBlue: 3.6,
                 gamingMagenta: 2.8,
                 isNight: true
@@ -2654,11 +2656,36 @@
             hemiLight.color.setHex(preset.hemiSky);
             hemiLight.groundColor.setHex(preset.hemiGround);
             hemiLight.intensity = preset.hemiIntensity;
+            ambLight.color.setHex(preset.isNight ? 0x1e293b : 0xffffff);
             ambLight.intensity = preset.ambIntensity;
             fillLight.intensity = preset.fillIntensity;
 
             renderer.setClearColor(preset.bgColor, 1.0);
-            scene.background = null;
+            scene.background = new THREE.Color(preset.bgColor);
+            if (document && document.body) {
+                document.body.style.backgroundColor = preset.isNight ? '#030712' : '#f8fafc';
+            }
+
+            // En modo Noche apagar el mapa IBL diurno de estudio para que el exterior y los bordes de muros no brillen como de día,
+            // permitiendo que las luminarias interiores del departamento sean las verdaderas protagonistas
+            if (typeof studioDayEnvTexture !== 'undefined' && studioDayEnvTexture) {
+                scene.environment = preset.isNight ? null : studioDayEnvTexture;
+            }
+
+            // Oscurecer el suelo exterior perimetral (studioGround y dioramaGround) y el palier cuando es de noche afuera
+            if (typeof floorGroup !== 'undefined' && floorGroup) {
+                const stGround = floorGroup.getObjectByName('studioGround');
+                if (stGround && stGround.material) {
+                    stGround.material.color.setHex(preset.isNight ? 0x030712 : (presetKey === 'golden' ? 0xf5f0e6 : 0xffffff));
+                }
+                const dioGround = floorGroup.getObjectByName('dioramaGround');
+                if (dioGround && dioGround.material) {
+                    dioGround.material.color.setHex(preset.isNight ? 0x070d19 : 0xd4b896);
+                }
+            }
+            if (typeof palierMat !== 'undefined' && palierMat) {
+                palierMat.color.setHex(preset.isNight ? 0x334155 : 0xdbe4ee);
+            }
 
             wizLivingLight.intensity = preset.wizLiving;
             wizDiningLight.intensity = preset.wizDining;
@@ -2669,10 +2696,10 @@
             gamingBlueLight.intensity = preset.gamingBlue;
             gamingMagentaLight.intensity = preset.gamingMagenta;
 
-            if (typeof kitchenLed !== 'undefined') kitchenLed.intensity = preset.isNight ? 1.6 : (presetKey === 'golden' ? 0.4 : 0.0);
-            if (typeof bedsideLampLeft !== 'undefined') bedsideLampLeft.intensity = preset.isNight ? 1.4 : 0.0;
-            if (typeof bedsideLampRight !== 'undefined') bedsideLampRight.intensity = preset.isNight ? 1.4 : 0.0;
-            if (typeof cyanLedLiving !== 'undefined') cyanLedLiving.intensity = preset.isNight ? 1.5 : (presetKey === 'golden' ? 0.5 : 0.0);
+            if (typeof kitchenLed !== 'undefined') kitchenLed.intensity = preset.isNight ? 2.1 : (presetKey === 'golden' ? 0.5 : 0.0);
+            if (typeof bedsideLampLeft !== 'undefined') bedsideLampLeft.intensity = preset.isNight ? 1.8 : (presetKey === 'golden' ? 0.35 : 0.0);
+            if (typeof bedsideLampRight !== 'undefined') bedsideLampRight.intensity = preset.isNight ? 1.8 : (presetKey === 'golden' ? 0.35 : 0.0);
+            if (typeof cyanLedLiving !== 'undefined') cyanLedLiving.intensity = preset.isNight ? 1.6 : (presetKey === 'golden' ? 0.5 : 0.0);
 
             // Optimización Chrome WebGL: apagar (.visible = false) los PointLights con intensidad 0 para aligerar el fragment shader PBR
             [
@@ -2709,16 +2736,22 @@
 
             wizFixturesList.forEach(wf => {
                 if (preset.isNight) {
-                    wf.lensMat.emissiveIntensity = 1.8;
+                    wf.lensMat.emissiveIntensity = 2.2;
                 } else if (presetKey === 'golden') {
-                    wf.lensMat.emissiveIntensity = 0.5;
+                    wf.lensMat.emissiveIntensity = 0.65;
                 } else {
-                    wf.lensMat.emissiveIntensity = 0.2;
+                    wf.lensMat.emissiveIntensity = 0.08;
+                }
+                if (wf.haloMesh) {
+                    wf.haloMesh.visible = !!(preset.isNight || presetKey === 'golden');
+                    if (wf.haloMesh.material) {
+                        wf.haloMesh.material.opacity = preset.isNight ? 0.34 : 0.14;
+                    }
                 }
             });
 
             if (notify) {
-                showToast(`☀️ ${preset.name}`);
+                showToast(`${preset.isNight ? '🌙' : '☀️'} ${preset.name}`);
             }
             wakeRenderer();
         }
@@ -3160,14 +3193,67 @@
         scene.add(apartmentGroup);
 
         // ============================================================================
-        // LUMINARIAS (Sin apliques negros antiguos: se quitaron los spots negros anteriores a la mudanza)
+        // LUMINARIAS RELEVADAS DEL DEPARTAMENTO (Apliques cálidos/neutros y plafones que se encienden de noche)
         // ============================================================================
         const wizFixturesList = [];
+        const simsWalls = [];
+        const WALL_CUT_H = 1.35; // Altura de corte arquitectónico de maqueta (Foto Referencia: 1.35 m)
+        const pendingWallMounts = [];
+        let currentMountWallSpec = null;
 
-        function createRealWallSpotlight(x, y, z, rotY = 0, tiltDown = 0.52, isWarm = true, roomLabel = '') {
-            // Desactivado: los apliques negros eran previos a la mudanza
-            return null;
+        function createInteriorWallSconceFixture(x, y, z, rotY = 0, isWarm = true, roomLabel = '') {
+            const fg = new THREE.Group();
+            fg.position.set(x, y, z);
+            fg.rotation.y = rotY;
+            fg.userData.name = roomLabel || 'Luminaria Interior WiZ';
+            fg.userData.isDecor = true;
+
+            // Base metálica satinada de montaje en muro
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.35, metalness: 0.5 });
+            const baseMesh = new THREE.Mesh(UNIT_BOX_GEO, baseMat);
+            baseMesh.scale.set(0.18, 0.09, 0.025);
+            baseMesh.position.set(0, 0, 0.012);
+            fg.add(baseMesh);
+
+            // Difusor acrílico opalino que se ilumina intensamente en modo Noche / Atardecer
+            const lensColor = isWarm ? 0xffdfa8 : 0xf0f7ff;
+            const emissiveColor = isWarm ? 0xffb74d : 0xbae6fd;
+            const lensMat = new THREE.MeshStandardMaterial({
+                color: lensColor,
+                emissive: emissiveColor,
+                emissiveIntensity: 0.08,
+                roughness: 0.18,
+                metalness: 0.05
+            });
+            const lensMesh = new THREE.Mesh(createRoundedBoxGeo(0.20, 0.10, 0.055, 0.015, 2), lensMat);
+            lensMesh.position.set(0, 0, 0.038);
+            fg.add(lensMesh);
+
+            // Halo volumétrico suave alrededor de la luminaria (visible de noche)
+            const haloMat = new THREE.MeshBasicMaterial({
+                color: emissiveColor,
+                transparent: true,
+                opacity: 0.34,
+                depthWrite: false
+            });
+            const haloMesh = new THREE.Mesh(new THREE.SphereGeometry(0.14, 14, 12), haloMat);
+            haloMesh.scale.set(1.35, 0.85, 0.65);
+            haloMesh.position.set(0, 0, 0.05);
+            haloMesh.visible = false;
+            fg.add(haloMesh);
+
+            fixturesGroup.add(fg);
+            attachWallMount(fg, x, z, null);
+            wizFixturesList.push({ g: fg, lensMat, haloMesh, isWarm });
+            return fg;
         }
+
+        // Instanciar las luminarias físicas en las coordenadas exactas de los PointLights de cada ambiente:
+        createInteriorWallSconceFixture(4.60, 2.05, 0.12, 0, true, 'Luminaria Pared Comedor (WiZ 2700K)');
+        createInteriorWallSconceFixture(0.12, 2.05, 6.00, Math.PI / 2, true, 'Luminaria Pared Dormitorio (WiZ 2700K)');
+        createInteriorWallSconceFixture(2.94, 1.92, 1.15, -Math.PI / 2, false, 'Luminaria Focal Estudio (WiZ 4000K)');
+        createInteriorWallSconceFixture(1.15, 2.05, 3.36, 0, false, 'Luminaria Espejo Baño (WiZ 4000K)');
+        createInteriorWallSconceFixture(5.78, 2.12, 5.26, 0, true, 'Luminaria Hall de Entrada (WiZ 2700K)');
 
         // ============================================================================
         // SISTEMA DE CARGA GLTF/GLB PARA MOBILIARIO EXTERNO DETALLADO
@@ -3374,11 +3460,6 @@
         palierMesh.receiveShadow = true;
         palierMesh.name = 'palierMesh';
         floorGroup.add(palierMesh);
-
-        const simsWalls = [];
-        const WALL_CUT_H = 1.35; // Altura de corte arquitectónico de maqueta (Foto Referencia: 1.35 m)
-        const pendingWallMounts = [];
-        let currentMountWallSpec = null;
 
         function getWallNormals(x1, z1, x2, z2, isExterior) {
             const dx = x2 - x1;
@@ -4689,11 +4770,12 @@
             mirrorFront.castShadow = true;
             mirGroup.add(mirrorFront);
 
-            // Tira LED cálida perimetral oculta que ilumina la pared
-            const ledHaloMat = new THREE.MeshBasicMaterial({ color: 0xffe8b5 });
+            // Tira LED cálida perimetral oculta que ilumina la pared (se enciende en Tarde/Noche con las luminarias)
+            const ledHaloMat = new THREE.MeshStandardMaterial({ color: 0xffe8b5, emissive: 0xffd28a, emissiveIntensity: 0.05, roughness: 0.2 });
             const ledStrip = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.74, 0.008), ledHaloMat);
             ledStrip.position.set(0, 0, 0.005);
             mirGroup.add(ledStrip);
+            wizFixturesList.push({ g: ledStrip, lensMat: ledHaloMat, isWarm: true });
 
             // Luz puntual cálida difusa para iluminación indirecta sobre la bacha (solo activa en Tarde/Noche para optimizar shaders Chrome)
             const mirrorLedLight = new THREE.PointLight(0xffe6a3, 0.65, 1.8);
@@ -6924,11 +7006,12 @@
                 (currentAssemblyGroup || decorVideoGroup).add(runner);
 
                 // Aplique de pared blanco cálido encendido a la derecha del TV
-                const wallLightMat = new THREE.MeshStandardMaterial({ color: 0xffedd5, emissive: 0xffedd5, emissiveIntensity: 0.6, roughness: 0.2 });
+                const wallLightMat = new THREE.MeshStandardMaterial({ color: 0xffedd5, emissive: 0xffc878, emissiveIntensity: 0.1, roughness: 0.2 });
                 const wallLight = new THREE.Mesh(UNIT_BOX_GEO, wallLightMat);
                 wallLight.scale.set(0.08, 0.12, 0.12);
                 wallLight.position.set(6.25, 1.88, rackZ + 0.68);
                 (currentAssemblyGroup || decorVideoGroup).add(wallLight);
+                wizFixturesList.push({ g: wallLight, lensMat: wallLightMat, isWarm: true });
             });
 
             // - Calefactor a gas metálico gris a la izquierda del rack con caño vertical de escape (en Z=1.85, medidas relevadas: 35 cm de ancho x 17 cm de profundidad)
@@ -7119,8 +7202,19 @@
                 addDecorCyl(3.28, 0.015, 1.84, 0.16, 0.16, 0.03, 0xd1d5db, 0.2); // Base circular cromada
                 addDecorCyl(3.28, 0.82, 1.84, 0.014, 0.014, 1.60, 0xd1d5db, 0.2); // Caño metálico vertical
                 addDecorCyl(3.38, 1.65, 1.90, 0.012, 0.012, 0.45, 0xd1d5db, 0.2); // Brazo curvado/inclinado
-                // Pantalla cónica blanca translúcida encendida
-                addDecorCyl(3.46, 1.58, 1.94, 0.08, 0.18, 0.22, 0xffffff, 0.3);
+                // Pantalla cónica blanca translúcida que se enciende en modo Noche / Atardecer
+                const arcShadeMat = new THREE.MeshStandardMaterial({ color: 0xfff7ed, emissive: 0xffb84d, emissiveIntensity: 0.05, roughness: 0.28 });
+                const arcShade = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.18, 0.22, 18), arcShadeMat);
+                arcShade.position.set(3.46, 1.58, 1.94);
+                arcShade.userData.name = 'Pantalla Lámpara de Pie de Arco';
+                arcShade.userData.isDecor = true;
+                (currentAssemblyGroup || decorVideoGroup).add(arcShade);
+                const arcBulbMat = new THREE.MeshStandardMaterial({ color: 0xfffbeb, emissive: 0xffd166, emissiveIntensity: 0.05, roughness: 0.1 });
+                const arcBulb = new THREE.Mesh(new THREE.SphereGeometry(0.042, 12, 12), arcBulbMat);
+                arcBulb.position.set(3.46, 1.54, 1.94);
+                (currentAssemblyGroup || decorVideoGroup).add(arcBulb);
+                wizFixturesList.push({ g: arcShade, lensMat: arcShadeMat, isWarm: true });
+                wizFixturesList.push({ g: arcBulb, lensMat: arcBulbMat, isWarm: true });
             });
 
             // - Planta de interior en maceta cerámica cónica con follaje botánico realista (100% procedural, cero .glb)
@@ -7598,7 +7692,15 @@
             addDecorBox(3.08, 0.36, 6.68, 0.08, 0.22, 0.20, 0xf8fafc, 0.4, 0, 'Pala de Basura');  // Pala blanca colgada en la escoba
             setMountWall(3.00, 6.00, false);
             addDecorBox(3.06, 1.42, 5.50, 0.05, 0.22, 0.10, 0xfef3c7, 0.4, 0, 'Portero Eléctrico Intercom');  // Teléfono portero eléctrico beige
-            addDecorBox(3.06, 2.15, 5.75, 0.06, 0.16, 0.24, 0xffffff, 0.3, 0, 'Aplique de Pared Cocina');  // Aplique de pared medialuna blanco
+            const kitchenSconceMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe4b5, emissiveIntensity: 0.05, roughness: 0.22 });
+            const kitchenSconceMesh = new THREE.Mesh(UNIT_BOX_GEO, kitchenSconceMat);
+            kitchenSconceMesh.scale.set(0.06, 0.16, 0.24);
+            kitchenSconceMesh.position.set(3.06, 2.15, 5.75);
+            kitchenSconceMesh.userData.name = 'Aplique de Pared Cocina';
+            kitchenSconceMesh.userData.isDecor = true;
+            (currentAssemblyGroup || decorVideoGroup).add(kitchenSconceMesh);
+            attachWallMount(kitchenSconceMesh, 3.00, 6.00, false);
+            wizFixturesList.push({ g: kitchenSconceMesh, lensMat: kitchenSconceMat, isWarm: true });
             setMountWall(null);
 
             // ------------------------------------------------------------------------
@@ -7789,7 +7891,7 @@
                 addDecorBox(xCenter + nsD / 2 + 0.004, 0.11, zCenter, 0.015, 0.16, nsW - 0.02, 0x362013, 0.5);
 
                 if (withHumidifier) {
-                    // Mesa de luz lado placard (Norte, foto #4): humidificador blanco + envase crema + sandalias al costado
+                    // Mesa de luz lado placard (Norte, foto #4): humidificador blanco + envase crema + velador cálido
                     addDecorCyl(xCenter, nsH + 0.09, zCenter + 0.08, 0.055, 0.055, 0.18, 0xf8fafc, 0.2);
                     addDecorCyl(xCenter - 0.04, nsH + 0.055, zCenter - 0.09, 0.024, 0.024, 0.11, 0xffffff, 0.3);
                 } else {
@@ -7797,6 +7899,17 @@
                     addDecorCyl(xCenter - 0.04, nsH + 0.06, zCenter - 0.08, 0.025, 0.028, 0.12, 0xf8fafc, 0.25);
                     addDecorBox(xCenter + 0.02, nsH + 0.025, zCenter - 0.02, 0.04, 0.05, 0.08, 0xf8fafc, 0.3);
                 }
+                // Velador cálido sobre la mesa de luz (se enciende automáticamente en modo Noche / Atardecer)
+                const lampZ = withHumidifier ? (zCenter - 0.11) : (zCenter + 0.10);
+                addDecorCyl(xCenter + 0.02, nsH + 0.015, lampZ, 0.05, 0.055, 0.03, 0xd4af37, 0.3, 'Base Velador');
+                addDecorCyl(xCenter + 0.02, nsH + 0.09, lampZ, 0.010, 0.010, 0.12, 0xd4af37, 0.3, 'Pie Velador');
+                const shadeMat = new THREE.MeshStandardMaterial({ color: 0xfff7ed, emissive: 0xffb347, emissiveIntensity: 0.05, roughness: 0.35 });
+                const shadeMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.085, 0.13, 16), shadeMat);
+                shadeMesh.position.set(xCenter + 0.02, nsH + 0.17, lampZ);
+                shadeMesh.userData.name = withHumidifier ? 'Velador Mesa de Luz Norte' : 'Velador Mesa de Luz Sur';
+                shadeMesh.userData.isDecor = true;
+                (currentAssemblyGroup || decorVideoGroup).add(shadeMesh);
+                wizFixturesList.push({ g: shadeMesh, lensMat: shadeMat, isWarm: true });
             }
 
             // - Mesa de luz Norte (lado placard: de Z = 5.52 a 5.94 m, centrada en Z = 5.73 m, dejando 32 cm libres al placard)

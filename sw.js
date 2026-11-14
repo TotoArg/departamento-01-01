@@ -4,7 +4,7 @@
 // librerías Three.js, modelos .glb y mapas de iluminación HDRI (.hdr).
 // ============================================================================
 
-const CACHE_VERSION = 'gemelo-3d-pwa-v1.3';
+const CACHE_VERSION = 'gemelo-3d-pwa-v1.4';
 const STATIC_CACHE_NAME = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE_NAME = `${CACHE_VERSION}-runtime`;
 
