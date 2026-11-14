@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.12.v3",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794513485046,
+  "updatedAt": 1794535833716,
   "decorOverrides": {
     "deleted": [
       "accentLivingWall",
@@ -41,6 +41,36 @@
         "x": 4.52,
         "y": 0.05,
         "z": 5.02,
+        "rot": 0
+      },
+      "Gabinete PC Gamer Thermaltake": {
+        "x": 2.62,
+        "y": 0.24,
+        "z": 1.96,
+        "rot": 4.712
+      },
+      "Estantes Flotantes Estudio (1.80×0.20 m)": {
+        "x": 2.85,
+        "y": 1.67,
+        "z": 1.05,
+        "rot": 0
+      },
+      "Mesita Auxiliar (Miniaturas)": {
+        "x": 0.28,
+        "y": 0.36,
+        "z": 2.39,
+        "rot": 0
+      },
+      "Set de Pintura de Miniaturas y Pinceles": {
+        "x": 0.28,
+        "y": 0.74,
+        "z": 2.4,
+        "rot": 0
+      },
+      "Biblioteca Alta con Libros y Coleccionables": {
+        "x": 0.22,
+        "y": 1.05,
+        "z": 1.25,
         "rot": 0
       }
     }
