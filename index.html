@@ -1446,6 +1446,18 @@
                     <option value="toggle_roof">🏠 Mostrar / Ocultar Techo de Madera</option>
                     <option value="toggle_decor">🛋️ Mostrar / Ocultar Muebles</option>
                     <option value="toggle_labels">🏷️ Mostrar / Ocultar Etiquetas</option>
+                    <option value="toggle_solar_compass">🧭 Mostrar / Ocultar Brújula Solar 3D</option>
+                </optgroup>
+                <optgroup label="💡 Luminarias WiZ Individuales por Ambiente">
+                    <option value="wiz_all_auto">🤖 WiZ Todas: Modo Automático Solar</option>
+                    <option value="wiz_all_warm">🔥 WiZ Todas: Cálida 2700K Encendidas</option>
+                    <option value="wiz_all_rgb">🌈 WiZ Todas: Escena RGB Sunset &amp; Cyan</option>
+                    <option value="wiz_toggle_living">🛋️ WiZ Living (Aplique TV + LED Cyan): Alternar Modo</option>
+                    <option value="wiz_toggle_dining">🍽️ WiZ Comedor (Luz Norte): Alternar Modo</option>
+                    <option value="wiz_toggle_study">💻 WiZ Estudio (Lightbar + RGB Gamer): Alternar Modo</option>
+                    <option value="wiz_toggle_bedroom">🛏️ WiZ Dormitorio (Veladores + Cálida): Alternar Modo</option>
+                    <option value="wiz_toggle_bath">🚿 WiZ Baño (Espejo Retroiluminado): Alternar Modo</option>
+                    <option value="wiz_toggle_kitchen">🍳 WiZ Cocina (Aplique + Bajo Alacena): Alternar Modo</option>
                 </optgroup>
             </select>
 
@@ -1468,6 +1480,13 @@
                 <option value="noon" selected>☀️ Mediodía (13:30 — Sol Norte: Comedor y Living)</option>
                 <option value="golden">🌇 Atardecer (18:00 — Sol Oeste: Calle G. Plüschow)</option>
                 <option value="night">🌙 Noche WiZ (22:30 — Luminarias Interiores)</option>
+            </select>
+
+            <!-- 6. Desplegable de Estación Solar Patagónica (Latitud -50.336° S — El Calafate) -->
+            <select id="select-solar-season" class="toolbar-select" title="Simulador Estacional Patagónico (Latitud -50.336° S, El Calafate): compara Sol Alto de Verano (63°) vs. Sol Rasante de Invierno (16°)">
+                <option value="equinox" selected>🍂 Equinoccio (Mar/Sep — Sol 40° · 12h luz)</option>
+                <option value="summer">🏖️ Verano Austral (Dic — Sol 63° alto · 16.5h luz)</option>
+                <option value="winter">❄️ Invierno Patagónico (Jun — Sol 16° rasante · 8h luz)</option>
             </select>
 
             <!-- Badges de estado y controles de zoom compactos -->
@@ -1532,6 +1551,17 @@
             <button class="action-btn solar-btn-sb" data-time="golden" title="Sol se pone al Oeste sobre Calle G. Plüschow (Z=0): sol directo en Estudio y Living; enciende Cocina y Cuarto" style="padding:5px 8px; font-size:10.5px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#f8fafc;">🌇 Tarde (Sol Oeste)</button>
             <button class="action-btn solar-btn-sb" data-time="night" title="Noche cerrada exterior: activación completa de luminarias WiZ 2700K/4000K, cocina y veladores" style="padding:5px 8px; font-size:10.5px; text-align:left; border-radius:6px; cursor:pointer; background:rgba(56,189,248,0.15); border:1px solid #0284c7; color:#bae6fd;">🌙 Noche WiZ</button>
         </div>
+        <div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">Estación Astronómica en El Calafate (-50.336° S)</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; margin-bottom:8px;">
+            <button class="action-btn season-btn-sb" data-season="summer" title="Solsticio de Verano (21 Dic): Sol a 63.1° de elevación y 16.5 hs de luz" style="padding:4px 5px; font-size:10px; text-align:center; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#fde68a;">🏖️ Verano 63°</button>
+            <button class="action-btn season-btn-sb active" data-season="equinox" title="Equinoccio (21 Mar / 21 Sep): Sol a 39.7° de elevación y 12 hs de luz" style="padding:4px 5px; font-size:10px; text-align:center; border-radius:6px; cursor:pointer; background:rgba(245,158,11,0.22); border:1px solid #f59e0b; color:#fbbf24; font-weight:700;">🍂 Equinoccio 40°</button>
+            <button class="action-btn season-btn-sb" data-season="winter" title="Solsticio de Invierno (21 Jun): Sol rasante a 16.2° del Norte y 8 hs de luz (requiere más apoyo WiZ)" style="padding:4px 5px; font-size:10px; text-align:center; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#bae6fd;">❄️ Invierno 16°</button>
+        </div>
+        <label class="toggle-row" style="background: rgba(245, 158, 11, 0.14); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 6px; padding: 4px 8px; margin-bottom: 8px;">
+            <span style="font-weight: 700; color: #fbbf24; font-size: 11px;">🧭 Rosa de los Vientos &amp; Arco Solar 3D</span>
+            <input type="checkbox" id="chk-solar-compass" checked>
+            <div class="toggle-switch"></div>
+        </label>
         <div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">Balance de Blancos Fotográfico (Sin Sombras Marrones)</div>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; margin-bottom:10px;">
             <button class="action-btn wb-btn" data-wb="5500k" style="padding:4px 5px; font-size:10px; text-align:center; border-radius:6px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#bae6fd;">❄️ 5500K</button>
@@ -2637,6 +2667,62 @@
         //   • Lado X = 0.00 (8.00 m, Mocheta Baño 50×50)--> SUR-SUROESTE (Azimut 187°, Retiro lateral Aire y Luz): Luz difusa austral (sin sol directo)
         // ============================================================================
         let currentSolarTime = 'noon';
+        var currentSolarSeason = 'equinox';
+
+        // Modificadores astronómicos estacionales reales para El Calafate (-50.3362° Lat Sur, -72.2484° Lon Oeste):
+        // • Verano Austral (Solsticio 21 Dic, Declinación -23.44°): Elevación solar máxima 63.1° al Norte, ~16.5 hs de luz diurna, arco amplio SE -> N -> SO
+        // • Equinoccio (21 Mar / 21 Sep, Declinación 0°): Elevación solar máxima 39.7° al Norte, 12.0 hs de luz diurna, salida Este franco y puesta Oeste franco
+        // • Invierno Patagónico (Solsticio 21 Jun, Declinación +23.44°): Elevación solar máxima rasante 16.2° al Norte, ~8.0 hs de luz, salida NE y puesta NO (mayor apoyo WiZ)
+        const SEASON_SOLAR_MODIFIERS = {
+            equinox: {
+                key: 'equinox',
+                label: '🍂 Equinoccio (Primavera / Otoño — Sol 40° · 12h luz)',
+                shortLabel: 'Equinoccio 40°',
+                elevScale: 1.00,
+                northShiftX: 0.0,
+                azimuthSpreadZ: 1.00,
+                sunIntensityMult: 1.00,
+                hemiIntensityMult: 1.00,
+                indoorWizBoost: 0.0
+            },
+            summer: {
+                key: 'summer',
+                label: '🏖️ Verano Austral (Diciembre — Sol 63° alto · 16.5h luz)',
+                shortLabel: 'Verano 63°',
+                elevScale: 1.48,
+                northShiftX: -3.5,
+                azimuthSpreadZ: 1.22,
+                sunIntensityMult: 1.14,
+                hemiIntensityMult: 1.10,
+                indoorWizBoost: -0.25
+            },
+            winter: {
+                key: 'winter',
+                label: '❄️ Invierno Patagónico (Junio — Sol 16° rasante al Norte · 8h luz)',
+                shortLabel: 'Invierno 16°',
+                elevScale: 0.44,
+                northShiftX: 8.5,
+                azimuthSpreadZ: 0.68,
+                sunIntensityMult: 0.76,
+                hemiIntensityMult: 0.80,
+                indoorWizBoost: 0.65
+            }
+        };
+
+        // Control individual de luminarias WiZ por ambiente (permite clic directo 3D o selección por menú)
+        var wizRoomOverrides = {
+            living: 'auto',
+            dining: 'auto',
+            study: 'auto',
+            bedroom: 'auto',
+            bath: 'auto',
+            kitchen: 'auto'
+        };
+        var wizClickCandidates = [];
+        var solarCompassGroup = null;
+        var solarCompassSunOrb = null;
+        var solarCompassSunRayLine = null;
+        var solarCompassArcLine = null;
 
         const SOLAR_PRESETS = {
             morning: {
@@ -2746,23 +2832,33 @@
         function setSolarTime(presetKey, notify = true) {
             const preset = SOLAR_PRESETS[presetKey] || SOLAR_PRESETS.golden;
             currentSolarTime = presetKey;
+            const seasonMod = SEASON_SOLAR_MODIFIERS[currentSolarSeason] || SEASON_SOLAR_MODIFIERS.equinox;
 
-            dirLight.position.set(preset.sunPos[0], preset.sunPos[1], preset.sunPos[2]);
+            // Posición solar modulada astronómicamente según la estación en El Calafate (-50.336° S)
+            const sx = preset.isNight ? preset.sunPos[0] : (preset.sunPos[0] + seasonMod.northShiftX);
+            const sy = preset.isNight ? preset.sunPos[1] : Math.max(4.5, preset.sunPos[1] * seasonMod.elevScale);
+            const sz = preset.isNight ? preset.sunPos[2] : (preset.sunPos[2] * seasonMod.azimuthSpreadZ);
+            const effSunIntensity = preset.isNight ? 0.0 : (preset.sunIntensity * seasonMod.sunIntensityMult);
+            const effHemiIntensity = preset.isNight ? preset.hemiIntensity : (preset.hemiIntensity * seasonMod.hemiIntensityMult);
+
+            dirLight.position.set(sx, sy, sz);
             dirLight.color.setHex(preset.sunColor);
-            dirLight.intensity = preset.sunIntensity;
-            dirLight.castShadow = (preset.sunIntensity > 0.1);
+            dirLight.intensity = effSunIntensity;
+            dirLight.castShadow = (effSunIntensity > 0.1);
 
             hemiLight.color.setHex(preset.hemiSky);
             hemiLight.groundColor.setHex(preset.hemiGround);
-            hemiLight.intensity = preset.hemiIntensity;
+            hemiLight.intensity = effHemiIntensity;
             ambLight.color.setHex(preset.isNight ? 0x1e293b : 0xffffff);
             ambLight.intensity = preset.ambIntensity;
             fillLight.intensity = preset.fillIntensity;
 
-            renderer.setClearColor(preset.bgColor, 1.0);
-            scene.background = new THREE.Color(preset.bgColor);
-            if (document && document.body) {
-                document.body.style.backgroundColor = preset.isNight ? '#030712' : '#f8fafc';
+            if (typeof activeCamera === 'undefined' || activeCamera !== orthoCam) {
+                renderer.setClearColor(preset.bgColor, 1.0);
+                scene.background = new THREE.Color(preset.bgColor);
+                if (document && document.body) {
+                    document.body.style.backgroundColor = preset.isNight ? '#030712' : '#f8fafc';
+                }
             }
 
             // En modo Noche apagar el mapa IBL diurno de estudio para que el exterior y los bordes de muros no brillen como de día,
@@ -2786,39 +2882,10 @@
                 palierMat.color.setHex(preset.isNight ? 0x334155 : 0xdbe4ee);
             }
 
-            wizLivingLight.intensity = preset.wizLiving;
-            wizDiningLight.intensity = preset.wizDining;
-            wizBedroomLight.intensity = preset.wizBedroom;
-            wizStudyLight.intensity = preset.wizStudy;
-            wizBathLight.intensity = preset.wizBath;
-
-            gamingBlueLight.intensity = preset.gamingBlue;
-            gamingMagentaLight.intensity = preset.gamingMagenta;
-
-            if (typeof kitchenLed !== 'undefined') kitchenLed.intensity = (preset.kitchenLed !== undefined) ? preset.kitchenLed : (preset.isNight ? 2.1 : 0.0);
-            if (typeof bedsideLampLeft !== 'undefined') bedsideLampLeft.intensity = (preset.bedsideLamps !== undefined) ? preset.bedsideLamps : (preset.isNight ? 1.8 : 0.0);
-            if (typeof bedsideLampRight !== 'undefined') bedsideLampRight.intensity = (preset.bedsideLamps !== undefined) ? preset.bedsideLamps : (preset.isNight ? 1.8 : 0.0);
-            if (typeof cyanLedLiving !== 'undefined') cyanLedLiving.intensity = (preset.cyanLed !== undefined) ? preset.cyanLed : (preset.isNight ? 1.6 : 0.0);
-
             const selSolar = document.getElementById('select-solar-time');
             if (selSolar && selSolar.value !== presetKey) {
                 selSolar.value = presetKey;
             }
-
-            // Optimización Chrome WebGL: apagar (.visible = false) los PointLights con intensidad 0 para aligerar el fragment shader PBR
-            [
-                wizLivingLight, wizDiningLight, wizBedroomLight, wizStudyLight, wizBathLight,
-                gamingBlueLight, gamingMagentaLight, kitchenLed, bedsideLampLeft, bedsideLampRight, cyanLedLiving
-            ].forEach(pl => {
-                if (pl) pl.visible = (pl.intensity > 0.01);
-            });
-            if (typeof dynamicAccentLights !== 'undefined' && Array.isArray(dynamicAccentLights)) {
-                const showAccents = (preset.isNight || presetKey === 'golden');
-                dynamicAccentLights.forEach(al => {
-                    if (al) al.visible = showAccents;
-                });
-            }
-            if (typeof requestShadowMapUpdate === 'function') requestShadowMapUpdate();
 
             document.querySelectorAll('.solar-btn, .solar-btn-sb').forEach(btn => {
                 if (btn.dataset.time === presetKey) {
@@ -2838,27 +2905,199 @@
                 }
             });
 
-            wizFixturesList.forEach(wf => {
-                if (preset.isNight) {
-                    wf.lensMat.emissiveIntensity = 2.2;
-                } else if (presetKey === 'golden') {
-                    wf.lensMat.emissiveIntensity = 0.65;
-                } else {
-                    wf.lensMat.emissiveIntensity = 0.08;
-                }
-                if (wf.haloMesh) {
-                    wf.haloMesh.visible = !!(preset.isNight || presetKey === 'golden');
-                    if (wf.haloMesh.material) {
-                        wf.haloMesh.material.opacity = preset.isNight ? 0.34 : 0.14;
-                    }
-                }
-            });
-
             if (typeof updateCurtainLightBlocking === 'function') {
                 updateCurtainLightBlocking();
             }
+            if (typeof applyWizLightsAndFixturesState === 'function') {
+                applyWizLightsAndFixturesState();
+            }
+            if (typeof updateSolarCompassRose3D === 'function') {
+                updateSolarCompassRose3D();
+            }
+            if (typeof requestShadowMapUpdate === 'function') requestShadowMapUpdate();
+
             if (notify) {
-                showToast(`${preset.isNight ? '🌙' : '☀️'} ${preset.name}`);
+                showToast(`${preset.isNight ? '🌙' : '☀️'} ${preset.name} · ${seasonMod.shortLabel}`);
+            }
+            wakeRenderer();
+        }
+
+        function setSolarSeason(seasonKey, notify = true) {
+            if (!SEASON_SOLAR_MODIFIERS[seasonKey]) seasonKey = 'equinox';
+            currentSolarSeason = seasonKey;
+            const mod = SEASON_SOLAR_MODIFIERS[seasonKey];
+            const selSeason = document.getElementById('select-solar-season');
+            if (selSeason && selSeason.value !== seasonKey) {
+                selSeason.value = seasonKey;
+            }
+            document.querySelectorAll('.season-btn-sb').forEach(btn => {
+                const isAct = (btn.dataset.season === seasonKey);
+                btn.classList.toggle('active', isAct);
+                if (isAct) {
+                    btn.style.background = 'rgba(245,158,11,0.24)';
+                    btn.style.borderColor = '#f59e0b';
+                    btn.style.color = '#fbbf24';
+                    btn.style.fontWeight = '700';
+                } else {
+                    btn.style.background = 'rgba(255,255,255,0.06)';
+                    btn.style.borderColor = 'rgba(255,255,255,0.15)';
+                    btn.style.color = '#e2e8f0';
+                    btn.style.fontWeight = '400';
+                }
+            });
+            setSolarTime(currentSolarTime, false);
+            if (notify) {
+                showToast(`${mod.label}`);
+            }
+            wakeRenderer();
+        }
+
+        // Controlador unificado de Luminarias Domóticas WiZ (combina horario solar, estación patagónica, cortinas blackout y overrides manuales por ambiente)
+        const WIZ_ROOM_LABELS = {
+            living: '🛋️ Living (Aplique TV + Tira LED)',
+            dining: '🍽️ Comedor (Ventanal Norte)',
+            study: '💻 Estudio (Lightbar + RGB Gamer)',
+            bedroom: '🛏️ Dormitorio (Veladores + Cálida)',
+            bath: '🚿 Baño (Espejo Retroiluminado)',
+            kitchen: '🍳 Cocina (Aplique + Bajo Alacena)'
+        };
+        const WIZ_MODE_CYCLE = ['auto', 'warm', 'neutral', 'rgb', 'off'];
+        const WIZ_MODE_LABELS = {
+            auto: '🤖 Automático Solar',
+            warm: '🔥 Cálida 2700K Encendida',
+            neutral: '⚪ Neutra 4000K Focal',
+            rgb: '🌈 Escena WiZ RGB (Sunset/Cyan)',
+            off: '🌑 Apagada Manualmente'
+        };
+
+        function applyWizLightsAndFixturesState(curtainAvgTrans = 1.0) {
+            const preset = SOLAR_PRESETS[currentSolarTime] || SOLAR_PRESETS.noon;
+            const seasonMod = SEASON_SOLAR_MODIFIERS[currentSolarSeason] || SEASON_SOLAR_MODIFIERS.equinox;
+            const winterBoost = (!preset.isNight && seasonMod.indoorWizBoost) ? seasonMod.indoorWizBoost : 0.0;
+            const blackoutBoost = (!preset.isNight && curtainAvgTrans < 0.25) ? (1.8 * (1.0 - curtainAvgTrans / 0.25)) : 0.0;
+
+            const resolveRoomLight = (roomKey, baseVal, defaultHex, rgbHex) => {
+                const mode = wizRoomOverrides[roomKey] || 'auto';
+                if (mode === 'off') {
+                    return { intensity: 0.0, colorHex: defaultHex, emissiveInt: 0.02, mode };
+                }
+                if (mode === 'warm') {
+                    return { intensity: 2.5, colorHex: 0xffd7a0, emissiveInt: 2.1, mode };
+                }
+                if (mode === 'neutral') {
+                    return { intensity: 2.5, colorHex: 0xf4f8ff, emissiveInt: 2.1, mode };
+                }
+                if (mode === 'rgb') {
+                    return { intensity: 2.7, colorHex: rgbHex || 0x38bdf8, emissiveInt: 2.4, mode };
+                }
+                // Modo 'auto'
+                const effInt = Math.max(0.0, Math.max(baseVal + (baseVal > 0 || seasonMod.key === 'winter' ? winterBoost : 0), blackoutBoost));
+                const emInt = preset.isNight ? 2.2 : (effInt > 0.5 ? 1.15 : (currentSolarTime === 'golden' ? 0.65 : 0.08));
+                return { intensity: effInt, colorHex: defaultHex, emissiveInt: emInt, mode: 'auto' };
+            };
+
+            const stLiving = resolveRoomLight('living', preset.wizLiving || 0, 0xffd7a0, 0xff7b00);
+            const stDining = resolveRoomLight('dining', preset.wizDining || 0, 0xffd7a0, 0xa855f7);
+            const stBedroom = resolveRoomLight('bedroom', preset.wizBedroom || 0, 0xffd7a0, 0xf43f5e);
+            const stStudy = resolveRoomLight('study', preset.wizStudy || 0, 0xf4f8ff, 0x00e5ff);
+            const stBath = resolveRoomLight('bath', preset.wizBath || 0, 0xf4f8ff, 0x38bdf8);
+            const stKitchen = resolveRoomLight('kitchen', preset.kitchenLed || 0, 0xfff4db, 0x10b981);
+
+            wizLivingLight.intensity = stLiving.intensity;
+            wizLivingLight.color.setHex(stLiving.colorHex);
+
+            wizDiningLight.intensity = stDining.intensity;
+            wizDiningLight.color.setHex(stDining.colorHex);
+
+            wizBedroomLight.intensity = stBedroom.intensity;
+            wizBedroomLight.color.setHex(stBedroom.colorHex);
+
+            wizStudyLight.intensity = stStudy.intensity;
+            wizStudyLight.color.setHex(stStudy.colorHex);
+
+            wizBathLight.intensity = stBath.intensity;
+            wizBathLight.color.setHex(stBath.colorHex);
+
+            if (typeof kitchenLed !== 'undefined') {
+                kitchenLed.intensity = stKitchen.intensity;
+                kitchenLed.color.setHex(stKitchen.colorHex);
+            }
+            if (typeof bedsideLampLeft !== 'undefined') {
+                bedsideLampLeft.intensity = (wizRoomOverrides.bedroom === 'off') ? 0.0 : (wizRoomOverrides.bedroom !== 'auto' ? 1.9 : Math.max(0, (preset.bedsideLamps || 0) + (winterBoost * 0.5)));
+                bedsideLampLeft.color.setHex(wizRoomOverrides.bedroom === 'rgb' ? 0xf43f5e : 0xffa834);
+            }
+            if (typeof bedsideLampRight !== 'undefined') {
+                bedsideLampRight.intensity = (wizRoomOverrides.bedroom === 'off') ? 0.0 : (wizRoomOverrides.bedroom !== 'auto' ? 1.9 : Math.max(0, (preset.bedsideLamps || 0) + (winterBoost * 0.5)));
+                bedsideLampRight.color.setHex(wizRoomOverrides.bedroom === 'rgb' ? 0xf43f5e : 0xffa834);
+            }
+            if (typeof cyanLedLiving !== 'undefined') {
+                cyanLedLiving.intensity = (wizRoomOverrides.living === 'off') ? 0.0 : (wizRoomOverrides.living === 'rgb' ? 2.4 : (preset.cyanLed || 0));
+            }
+            gamingBlueLight.intensity = (wizRoomOverrides.study === 'off') ? 0.0 : (wizRoomOverrides.study === 'rgb' ? 3.8 : (preset.gamingBlue || 0));
+            gamingMagentaLight.intensity = (wizRoomOverrides.study === 'off') ? 0.0 : (wizRoomOverrides.study === 'rgb' ? 3.0 : (preset.gamingMagenta || 0));
+
+            [
+                wizLivingLight, wizDiningLight, wizBedroomLight, wizStudyLight, wizBathLight,
+                gamingBlueLight, gamingMagentaLight, kitchenLed, bedsideLampLeft, bedsideLampRight, cyanLedLiving
+            ].forEach(pl => {
+                if (pl) pl.visible = (pl.intensity > 0.01);
+            });
+
+            if (typeof dynamicAccentLights !== 'undefined' && Array.isArray(dynamicAccentLights)) {
+                const anyManualOn = Object.values(wizRoomOverrides).some(m => m === 'warm' || m === 'neutral' || m === 'rgb');
+                const showAccents = (preset.isNight || currentSolarTime === 'golden' || anyManualOn);
+                dynamicAccentLights.forEach(al => {
+                    if (al) al.visible = showAccents;
+                });
+            }
+
+            const roomStates = { living: stLiving, dining: stDining, bedroom: stBedroom, study: stStudy, bath: stBath, kitchen: stKitchen };
+            wizFixturesList.forEach(wf => {
+                const rKey = wf.roomKey || 'living';
+                const rState = roomStates[rKey] || stLiving;
+                if (wf.lensMat) {
+                    wf.lensMat.emissiveIntensity = rState.emissiveInt;
+                    if (rState.mode === 'rgb') {
+                        wf.lensMat.emissive.setHex(rState.colorHex);
+                    } else if (rState.mode === 'neutral') {
+                        wf.lensMat.emissive.setHex(0xf4f8ff);
+                    } else if (rState.mode === 'warm') {
+                        wf.lensMat.emissive.setHex(0xffc878);
+                    } else if (wf.defaultEmissiveHex !== undefined) {
+                        wf.lensMat.emissive.setHex(wf.defaultEmissiveHex);
+                    }
+                }
+                if (wf.haloMesh) {
+                    wf.haloMesh.visible = (rState.intensity > 0.25);
+                    if (wf.haloMesh.material) {
+                        wf.haloMesh.material.opacity = rState.intensity > 1.5 ? 0.34 : 0.16;
+                    }
+                }
+            });
+        }
+
+        function cycleWizRoomMode(roomKey, notify = true) {
+            if (!wizRoomOverrides[roomKey]) wizRoomOverrides[roomKey] = 'auto';
+            const curIdx = WIZ_MODE_CYCLE.indexOf(wizRoomOverrides[roomKey]);
+            const nextMode = WIZ_MODE_CYCLE[(curIdx + 1) % WIZ_MODE_CYCLE.length];
+            wizRoomOverrides[roomKey] = nextMode;
+            applyWizLightsAndFixturesState();
+            if (notify) {
+                const rLabel = WIZ_ROOM_LABELS[roomKey] || roomKey;
+                const mLabel = WIZ_MODE_LABELS[nextMode] || nextMode;
+                showToast(`💡 ${rLabel}: ${mLabel}`);
+            }
+            wakeRenderer();
+            return nextMode;
+        }
+
+        function setAllWizRoomsMode(mode, notify = true) {
+            Object.keys(wizRoomOverrides).forEach(k => {
+                wizRoomOverrides[k] = mode;
+            });
+            applyWizLightsAndFixturesState();
+            if (notify) {
+                showToast(`💡 Luminarias WiZ de todo el depto: ${WIZ_MODE_LABELS[mode] || mode}`);
             }
             wakeRenderer();
         }
@@ -2867,7 +3106,11 @@
         // ponderado por la orientación cardinal real de cada ventana según la posición del sol (Este en Mañana, Norte al Mediodía, Oeste en Tarde)
         function updateCurtainLightBlocking() {
             const preset = SOLAR_PRESETS[currentSolarTime] || SOLAR_PRESETS.noon;
-            if (preset.isNight || !Array.isArray(animCurtains) || animCurtains.length === 0) return;
+            const seasonMod = SEASON_SOLAR_MODIFIERS[currentSolarSeason] || SEASON_SOLAR_MODIFIERS.equinox;
+            if (preset.isNight || !Array.isArray(animCurtains) || animCurtains.length === 0) {
+                if (typeof applyWizLightsAndFixturesState === 'function') applyWizLightsAndFixturesState(1.0);
+                return;
+            }
 
             const weights = preset.facadeWeights || { west: 0.40, north: 0.30, east: 0.30 };
             let weightedSum = 0;
@@ -2890,12 +3133,13 @@
             const avgTrans = totalTrans / animCurtains.length;
             const sunDirectionalTrans = weightTotal > 0 ? (weightedSum / weightTotal) : avgTrans;
 
-            // El haz de sol directo (dirLight) responde a las cortinas de la fachada por donde entra el sol en ese horario,
-            // mientras que la luz difusa ambiental responde al promedio de todas las ventanas
-            dirLight.intensity = preset.sunIntensity * Math.pow(sunDirectionalTrans, 1.25);
-            hemiLight.intensity = preset.hemiIntensity * (0.08 + 0.92 * avgTrans);
-            ambLight.intensity = preset.ambIntensity * (0.10 + 0.90 * avgTrans);
-            fillLight.intensity = preset.fillIntensity * avgTrans;
+            // El haz de sol directo (dirLight) responde a las cortinas de la fachada por donde entra el sol en ese horario y estación
+            if (typeof activeCamera === 'undefined' || activeCamera !== orthoCam) {
+                dirLight.intensity = (preset.sunIntensity * seasonMod.sunIntensityMult) * Math.pow(sunDirectionalTrans, 1.25);
+                hemiLight.intensity = (preset.hemiIntensity * seasonMod.hemiIntensityMult) * (0.08 + 0.92 * avgTrans);
+                ambLight.intensity = preset.ambIntensity * (0.10 + 0.90 * avgTrans);
+                fillLight.intensity = preset.fillIntensity * avgTrans;
+            }
 
             if (typeof roomLights !== 'undefined' && Array.isArray(roomLights)) {
                 roomLights.forEach(rl => {
@@ -2907,28 +3151,172 @@
                 });
             }
 
-            // Si los blackouts están cerrados de día (< 18% transmisión), activar automáticamente las luminarias interiores para no dejar el ambiente a oscuras
-            if (avgTrans < 0.25) {
-                const autoBoost = (1.0 - avgTrans / 0.25);
-                wizLivingLight.intensity = Math.max(preset.wizLiving || 0, 1.8 * autoBoost);
-                wizDiningLight.intensity = Math.max(preset.wizDining || 0, 1.6 * autoBoost);
-                wizStudyLight.intensity = Math.max(preset.wizStudy || 0, 1.8 * autoBoost);
-                wizBedroomLight.intensity = Math.max(preset.wizBedroom || 0, 1.6 * autoBoost);
-                [wizLivingLight, wizDiningLight, wizStudyLight, wizBedroomLight].forEach(pl => {
-                    if (pl) pl.visible = (pl.intensity > 0.01);
-                });
-            } else {
-                wizLivingLight.intensity = preset.wizLiving || 0;
-                wizDiningLight.intensity = preset.wizDining || 0;
-                wizStudyLight.intensity = preset.wizStudy || 0;
-                wizBedroomLight.intensity = preset.wizBedroom || 0;
-                [wizLivingLight, wizDiningLight, wizStudyLight, wizBedroomLight].forEach(pl => {
-                    if (pl) pl.visible = (pl.intensity > 0.01);
-                });
+            if (typeof applyWizLightsAndFixturesState === 'function') {
+                applyWizLightsAndFixturesState(avgTrans);
             }
 
-            if (typeof studioDayEnvTexture !== 'undefined' && studioDayEnvTexture) {
+            if (typeof studioDayEnvTexture !== 'undefined' && studioDayEnvTexture && (typeof activeCamera === 'undefined' || activeCamera !== orthoCam)) {
                 scene.environment = (avgTrans < 0.18) ? null : studioDayEnvTexture;
+            }
+        }
+
+        // ============================================================================
+        // ROSA DE LOS VIENTOS 3D Y ARCO DE TRAYECTORIA SOLAR (ESTE -> NORTE -> OESTE)
+        // Representa en el suelo exterior del modelo los 4 puntos cardinales reales
+        // según el Plano de Mensura (Calle Günther Plüschow 235 al Oeste, Sol Mediodía al Norte)
+        // ============================================================================
+        function makeCardinalBadgeSprite(titleText, subText, accentColor = '#f59e0b') {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 144;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+            ctx.beginPath();
+            ctx.roundRect(8, 8, 496, 128, 22);
+            ctx.fill();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = accentColor;
+            ctx.stroke();
+
+            ctx.font = 'bold 34px Inter, Segoe UI, sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.fillText(titleText, 256, 58);
+
+            ctx.font = '600 23px Inter, Segoe UI, sans-serif';
+            ctx.fillStyle = accentColor;
+            ctx.fillText(subText, 256, 102);
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.needsUpdate = true;
+            const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+            const sp = new THREE.Sprite(mat);
+            sp.scale.set(2.35, 0.66, 1);
+            sp.renderOrder = 25;
+            return sp;
+        }
+
+        function buildSolarCompassRose3D() {
+            if (solarCompassGroup) return solarCompassGroup;
+            solarCompassGroup = new THREE.Group();
+            solarCompassGroup.name = 'solarCompassGroup';
+
+            const centerX = 3.15;
+            const centerZ = 4.00;
+            const ringRadius = 6.25;
+
+            // Anillo perimetral graduado en el piso exterior
+            const ringGeo = new THREE.RingGeometry(ringRadius - 0.06, ringRadius, 72);
+            ringGeo.rotateX(-Math.PI / 2);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide, transparent: true, opacity: 0.45 });
+            const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+            ringMesh.position.set(centerX, 0.02, centerZ);
+            solarCompassGroup.add(ringMesh);
+
+            // 4 Etiquetas Cardinales Reales según Plano de Mensura (Calle Günther Plüschow 235)
+            // • Z = 0.00 -> OESTE (Frente Calle G. Plüschow 235 — Sol de Tarde)
+            const spWest = makeCardinalBadgeSprite('🌇 OESTE · Calle G. Plüschow 235', 'Fachada Frente (Sol de Tarde 18:00)', '#fb923c');
+            spWest.position.set(centerX, 0.48, -1.35);
+            solarCompassGroup.add(spWest);
+
+            // • X = 6.30 -> NORTE (Culminación Solar de Mediodía — Ventana Comedor)
+            const spNorth = makeCardinalBadgeSprite('☀️ NORTE FRANCO · Sol Mediodía', 'Lateral Comedor / Living (13:30 hs)', '#facc15');
+            spNorth.position.set(8.15, 0.48, centerZ);
+            solarCompassGroup.add(spNorth);
+
+            // • Z = 8.00 -> ESTE (Contrafrente Dormitorio y Cocina — Salida del Sol)
+            const spEast = makeCardinalBadgeSprite('🌅 ESTE · Salida del Sol (09:00)', 'Contrafrente Cuarto y Cocina', '#38bdf8');
+            spEast.position.set(centerX, 0.48, 9.45);
+            solarCompassGroup.add(spEast);
+
+            // • X = 0.00 -> SUR (Retiro Aire y Luz — Ventiluz Baño 50×50)
+            const spSouth = makeCardinalBadgeSprite('❄️ SUR AUSTRAL · Luz Difusa', 'Mocheta Baño 50×50 cm (Sin sol directo)', '#94a3b8');
+            spSouth.position.set(-1.65, 0.48, centerZ);
+            solarCompassGroup.add(spSouth);
+
+            // Esfera del Sol 3D + Halo luminoso sobre el arco solar
+            const sunOrbGroup = new THREE.Group();
+            const orbGeo = new THREE.SphereGeometry(0.28, 20, 20);
+            const orbMat = new THREE.MeshBasicMaterial({ color: 0xfde047 });
+            const orbMesh = new THREE.Mesh(orbGeo, orbMat);
+            sunOrbGroup.add(orbMesh);
+
+            const haloGeo = new THREE.SphereGeometry(0.46, 16, 16);
+            const haloMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.32 });
+            const haloMesh = new THREE.Mesh(haloGeo, haloMat);
+            sunOrbGroup.add(haloMesh);
+
+            solarCompassSunOrb = sunOrbGroup;
+            solarCompassGroup.add(solarCompassSunOrb);
+
+            scene.add(solarCompassGroup);
+            updateSolarCompassRose3D();
+            return solarCompassGroup;
+        }
+
+        function updateSolarCompassRose3D() {
+            if (!solarCompassGroup) return;
+            const centerX = 3.15;
+            const centerZ = 4.00;
+            const seasonMod = SEASON_SOLAR_MODIFIERS[currentSolarSeason] || SEASON_SOLAR_MODIFIERS.equinox;
+            const preset = SOLAR_PRESETS[currentSolarTime] || SOLAR_PRESETS.noon;
+
+            // Reconstruir arco de trayectoria solar (Este -> Norte -> Oeste) según la estación seleccionada
+            if (solarCompassArcLine) {
+                solarCompassGroup.remove(solarCompassArcLine);
+                if (solarCompassArcLine.geometry) solarCompassArcLine.geometry.dispose();
+            }
+            if (solarCompassSunRayLine) {
+                solarCompassGroup.remove(solarCompassSunRayLine);
+                if (solarCompassSunRayLine.geometry) solarCompassSunRayLine.geometry.dispose();
+            }
+
+            const pMorning = SOLAR_PRESETS.morning.sunPos;
+            const pNoon = SOLAR_PRESETS.noon.sunPos;
+            const pGolden = SOLAR_PRESETS.golden.sunPos;
+
+            const scaleArc = 0.23;
+            const ptEast = new THREE.Vector3(
+                centerX + (pMorning[0] + seasonMod.northShiftX) * scaleArc,
+                Math.max(1.2, pMorning[1] * seasonMod.elevScale * scaleArc),
+                centerZ + (pMorning[2] * seasonMod.azimuthSpreadZ) * scaleArc
+            );
+            const ptNorth = new THREE.Vector3(
+                centerX + (pNoon[0] + seasonMod.northShiftX) * scaleArc,
+                Math.max(1.6, pNoon[1] * seasonMod.elevScale * scaleArc),
+                centerZ + (pNoon[2] * seasonMod.azimuthSpreadZ) * scaleArc
+            );
+            const ptWest = new THREE.Vector3(
+                centerX + (pGolden[0] + seasonMod.northShiftX) * scaleArc,
+                Math.max(1.0, pGolden[1] * seasonMod.elevScale * scaleArc),
+                centerZ + (pGolden[2] * seasonMod.azimuthSpreadZ) * scaleArc
+            );
+
+            const curve = new THREE.CatmullRomCurve3([ptEast, ptNorth, ptWest]);
+            const arcPoints = curve.getPoints(44);
+            const arcGeo = new THREE.BufferGeometry().setFromPoints(arcPoints);
+            const arcColor = currentSolarSeason === 'summer' ? 0xfacc15 : (currentSolarSeason === 'winter' ? 0x38bdf8 : 0xf59e0b);
+            const arcMat = new THREE.LineBasicMaterial({ color: arcColor, transparent: true, opacity: preset.isNight ? 0.25 : 0.80 });
+            solarCompassArcLine = new THREE.Line(arcGeo, arcMat);
+            solarCompassGroup.add(solarCompassArcLine);
+
+            if (solarCompassSunOrb) {
+                if (preset.isNight) {
+                    solarCompassSunOrb.visible = false;
+                } else {
+                    solarCompassSunOrb.visible = true;
+                    const activePos = currentSolarTime === 'morning' ? ptEast : (currentSolarTime === 'noon' ? ptNorth : ptWest);
+                    solarCompassSunOrb.position.copy(activePos);
+
+                    const rayGeo = new THREE.BufferGeometry().setFromPoints([
+                        activePos,
+                        new THREE.Vector3(centerX, 0.80, centerZ)
+                    ]);
+                    const rayMat = new THREE.LineDashedMaterial({ color: 0xfde047, dashSize: 0.25, gapSize: 0.15, transparent: true, opacity: 0.65 });
+                    solarCompassSunRayLine = new THREE.Line(rayGeo, rayMat);
+                    solarCompassSunRayLine.computeLineDistances();
+                    solarCompassGroup.add(solarCompassSunRayLine);
+                }
             }
         }
 
@@ -5093,12 +5481,14 @@
             mirrorFront.castShadow = true;
             mirGroup.add(mirrorFront);
 
-            // Tira LED cálida perimetral oculta que ilumina la pared (se enciende en Tarde/Noche con las luminarias)
+            // Tira LED cálida perimetral oculta que ilumina la pared (se enciende en Tarde/Noche con las luminarias o al tocar el espejo)
             const ledHaloMat = new THREE.MeshStandardMaterial({ color: 0xffe8b5, emissive: 0xffd28a, emissiveIntensity: 0.05, roughness: 0.2 });
             const ledStrip = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.74, 0.008), ledHaloMat);
             ledStrip.position.set(0, 0, 0.005);
+            ledStrip.userData.wizRoomKey = 'bath';
             mirGroup.add(ledStrip);
-            wizFixturesList.push({ g: ledStrip, lensMat: ledHaloMat, isWarm: true });
+            wizFixturesList.push({ g: ledStrip, lensMat: ledHaloMat, isWarm: true, roomKey: 'bath', defaultEmissiveHex: 0xffd28a });
+            wizClickCandidates.push(ledStrip);
 
             // Luz puntual cálida difusa para iluminación indirecta sobre la bacha (solo activa en Tarde/Noche para optimizar shaders Chrome)
             const mirrorLedLight = new THREE.PointLight(0xffe6a3, 0.65, 1.8);
@@ -6528,7 +6918,7 @@
                 const pos = leafGeo.attributes.position;
                 for (let v = 0; v < pos.count; v++) {
                     const yVal = pos.getY(v);
-                    const prog = (yVal + bladeH / 2) / bladeH;
+                    const prog = Math.max(0, Math.min(1, (yVal + bladeH / 2) / bladeH));
                     const xVal = pos.getX(v);
                     const taper = Math.sin((1 - prog) * Math.PI * 0.5);
                     pos.setX(v, xVal * (0.3 + 0.7 * taper));
@@ -7417,8 +7807,11 @@
                 const wallLight = new THREE.Mesh(UNIT_BOX_GEO, wallLightMat);
                 wallLight.scale.set(0.08, 0.12, 0.12);
                 wallLight.position.set(6.25, 1.88, rackZ + 0.68);
+                wallLight.userData.wizRoomKey = 'living';
+                wallLight.userData.name = 'Luminaria WiZ Living (Aplique Pared TV)';
                 (currentAssemblyGroup || decorVideoGroup).add(wallLight);
-                wizFixturesList.push({ g: wallLight, lensMat: wallLightMat, isWarm: true });
+                wizFixturesList.push({ g: wallLight, lensMat: wallLightMat, isWarm: true, roomKey: 'living', defaultEmissiveHex: 0xffc878 });
+                wizClickCandidates.push(wallLight);
             });
 
             // - Calefactor a gas metálico gris a la izquierda del rack con caño vertical de escape (en Z=1.85, medidas relevadas: 35 cm de ancho x 17 cm de profundidad)
@@ -8101,11 +8494,13 @@
             const kitchenSconceMesh = new THREE.Mesh(UNIT_BOX_GEO, kitchenSconceMat);
             kitchenSconceMesh.scale.set(0.06, 0.16, 0.24);
             kitchenSconceMesh.position.set(3.06, 2.15, 5.75);
-            kitchenSconceMesh.userData.name = 'Aplique de Pared Cocina';
+            kitchenSconceMesh.userData.name = 'Aplique de Pared Cocina WiZ';
+            kitchenSconceMesh.userData.wizRoomKey = 'kitchen';
             kitchenSconceMesh.userData.isDecor = true;
             (currentAssemblyGroup || decorVideoGroup).add(kitchenSconceMesh);
             attachWallMount(kitchenSconceMesh, 3.00, 6.00, false);
-            wizFixturesList.push({ g: kitchenSconceMesh, lensMat: kitchenSconceMat, isWarm: true });
+            wizFixturesList.push({ g: kitchenSconceMesh, lensMat: kitchenSconceMat, isWarm: true, roomKey: 'kitchen', defaultEmissiveHex: 0xffe4b5 });
+            wizClickCandidates.push(kitchenSconceMesh);
             setMountWall(null);
 
             // ------------------------------------------------------------------------
@@ -8311,10 +8706,12 @@
                 const shadeMat = new THREE.MeshStandardMaterial({ color: 0xfff7ed, emissive: 0xffb347, emissiveIntensity: 0.05, roughness: 0.35 });
                 const shadeMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.085, 0.13, 16), shadeMat);
                 shadeMesh.position.set(xCenter + 0.02, nsH + 0.17, lampZ);
-                shadeMesh.userData.name = withHumidifier ? 'Velador Mesa de Luz Norte' : 'Velador Mesa de Luz Sur';
+                shadeMesh.userData.name = withHumidifier ? 'Velador WiZ Mesa de Luz Norte' : 'Velador WiZ Mesa de Luz Sur';
+                shadeMesh.userData.wizRoomKey = 'bedroom';
                 shadeMesh.userData.isDecor = true;
                 (currentAssemblyGroup || decorVideoGroup).add(shadeMesh);
-                wizFixturesList.push({ g: shadeMesh, lensMat: shadeMat, isWarm: true });
+                wizFixturesList.push({ g: shadeMesh, lensMat: shadeMat, isWarm: true, roomKey: 'bedroom', defaultEmissiveHex: 0xffb347 });
+                wizClickCandidates.push(shadeMesh);
             }
 
             // - Mesa de luz Norte (lado placard: de Z = 5.52 a 5.94 m, centrada en Z = 5.73 m, dejando 32 cm libres al placard)
@@ -8545,8 +8942,11 @@
                 const lightBarLens = new THREE.Mesh(UNIT_BOX_GEO, lightBarLedMat);
                 lightBarLens.scale.set(0.022, 0.005, 0.43);
                 lightBarLens.position.set(-0.012, monH / 2 + 0.011, 0);
+                lightBar.userData.wizRoomKey = 'study';
+                lightBarLens.userData.wizRoomKey = 'study';
                 monGroup.add(lightBarLens);
-                wizFixturesList.push({ g: lightBar, lensMat: lightBarLedMat, isWarm: false });
+                wizFixturesList.push({ g: lightBar, lensMat: lightBarLedMat, isWarm: false, roomKey: 'study', defaultEmissiveHex: 0xfff6ea });
+                wizClickCandidates.push(lightBar, lightBarLens);
 
                 // Luz ambiental trasera de rebote LED suave (RGB / Cyan tenue contra la pared este, solo Tarde/Noche)
                 const backLed = new THREE.PointLight(0x00e5ff, 0.90, 2.5, 1.8);
@@ -11036,6 +11436,21 @@
                         return;
                     }
                 }
+                // 0C-bis. Raycast sobre Luminarias Domóticas WiZ (Apliques, Veladores, Espejo LED y Lightbar): clic directo en 3D alterna su modo
+                if (typeof wizClickCandidates !== 'undefined' && wizClickCandidates.length > 0) {
+                    const wizHits = raycaster.intersectObjects(wizClickCandidates, false);
+                    if (wizHits.length > 0) {
+                        const hitLamp = wizHits[0].object;
+                        const rKey = hitLamp.userData.wizRoomKey || 'living';
+                        if (typeof cycleWizRoomMode === 'function') {
+                            cycleWizRoomMode(rKey, true);
+                        }
+                        clearSelection();
+                        if (isBIMPlanningMode && typeof selectBIMObject === 'function') selectBIMObject(hitLamp, e.clientX, e.clientY);
+                        wakeRenderer();
+                        return;
+                    }
+                }
             }
 
             // 0D. Raycast sobre la Mesa de Comedor Extensible (permite abrir/cerrar sus 3 tandas ovaladas con un clic/toque en 3D o 2D cuando no está en modo edición)
@@ -11699,8 +12114,28 @@
             updateComposerCamera();
             controlsPersp.enabled = false;
             controlsOrtho.enabled = true;
+            // Garantizar iluminación cenital CAD clara y fondo claro en Plano 2D Exacto (nunca pantalla negra aunque venga de Noche WiZ o Blackout cerrado)
             dirLight.castShadow = false;
+            dirLight.color.setHex(0xffffff);
+            dirLight.intensity = 1.15;
+            dirLight.position.set(10, 35, 10);
+            ambLight.color.setHex(0xffffff);
             ambLight.intensity = 0.96;
+            hemiLight.color.setHex(0xffffff);
+            hemiLight.groundColor.setHex(0xe2e8f0);
+            hemiLight.intensity = 0.88;
+            fillLight.intensity = 0.40;
+            renderer.setClearColor(0xf8fafc, 1.0);
+            scene.background = new THREE.Color(0xf8fafc);
+            if (document && document.body) {
+                document.body.style.backgroundColor = '#f8fafc';
+            }
+            if (typeof studioDayEnvTexture !== 'undefined' && studioDayEnvTexture) {
+                scene.environment = studioDayEnvTexture;
+            }
+            if (typeof solarCompassGroup !== 'undefined' && solarCompassGroup) {
+                solarCompassGroup.visible = false;
+            }
             doors3DGroup.visible = false;
             roofGroup.visible = false;
             document.getElementById('chk-roof').checked = false;
@@ -11737,7 +12172,12 @@
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.shadowMap.needsUpdate = true;
             if (typeof setSolarTime === 'function' && typeof currentSolarTime !== 'undefined') {
-                setSolarTime(currentSolarTime);
+                setSolarTime(currentSolarTime, false);
+            }
+            if (typeof buildSolarCompassRose3D === 'function') {
+                buildSolarCompassRose3D();
+                const chkComp = document.getElementById('chk-solar-compass');
+                if (solarCompassGroup) solarCompassGroup.visible = chkComp ? !!chkComp.checked : true;
             }
             applyShadowsRecursively(apartmentGroup);
             updateComposerCamera();
@@ -11883,7 +12323,7 @@
             _hoverPointerVec.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             _hoverPointerVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             _hoverRaycaster.setFromCamera(_hoverPointerVec, activeCamera);
-            const allInteractives = [...doorClickCandidates, ...windowClickCandidates, ...curtainClickCandidates];
+            const allInteractives = [...doorClickCandidates, ...windowClickCandidates, ...curtainClickCandidates, ...(typeof wizClickCandidates !== 'undefined' ? wizClickCandidates : [])];
             const dHits = _hoverRaycaster.intersectObjects(allInteractives, false);
             renderer.domElement.style.cursor = dHits.length > 0 ? 'pointer' : '';
         }, { passive: true });
@@ -12850,8 +13290,8 @@
             };
         }
 
-        let _bimUserDataEnriched = false;
-        const logicalWallsRegistry = new Map(); // wallId -> { id, nombre, categoria: 'muro', dimensiones, meshes: [] }
+        var _bimUserDataEnriched = false;
+        var logicalWallsRegistry = logicalWallsRegistry || new Map(); // wallId -> { id, nombre, categoria: 'muro', dimensiones, meshes: [] }
 
         function classifyLogicalWall(child, isExteriorGroup) {
             const wBox = new THREE.Box3().setFromObject(child);
@@ -13096,6 +13536,15 @@
                     if (!fDims || (fDims.ancho === 0.50 && fDims.alto === 0.50 && fDims.profundidad === 0.50)) {
                         fDims = computeWorldDimensions(topChild);
                     }
+                    // Forzar actualización recursiva de nombre y dimensiones en ensamblajes compuestos (como Mesa de Comedor Redonda)
+                    topChild.userData.nombre = fName || 'Mobiliario / Equipamiento';
+                    topChild.userData.dimensiones = { ...fDims };
+                    topChild.traverse(ch => {
+                        if (ch === topChild) return;
+                        if (ch.userData && ch.userData.dimensiones && ch.userData.dimensiones.ancho === 0.50 && ch.userData.dimensiones.alto === 0.50) {
+                            ch.userData.dimensiones = { ...fDims };
+                        }
+                    });
                     assignBIMUserData(topChild, {
                         id: topChild.userData?.id || fName,
                         nombre: fName || 'Mobiliario / Equipamiento',
@@ -13221,9 +13670,15 @@
             let targetForBox = resolveBIMAssemblyRoot(hitMesh) || hitMesh;
             let metaSource = hitMesh;
 
-            // Si el usuario seleccionó un MURO, seleccionar la PARED COMPLETA (y no un fragmento)
-            if (hitMesh.userData && hitMesh.userData.categoria === 'muro') {
-                const wallId = hitMesh.userData.logicalWallId || hitMesh.userData.id;
+            // Si el usuario seleccionó un MURO, seleccionar SIEMPRE la PARED COMPLETA (y no un fragmento individual)
+            const isWallHit = (hitMesh.userData && (hitMesh.userData.categoria === 'muro' || hitMesh.userData.isExtWall || hitMesh.userData.isIntWall)) ||
+                              (targetForBox && targetForBox.userData && targetForBox.userData.categoria === 'muro');
+            if (isWallHit) {
+                let wallId = hitMesh.userData?.logicalWallId || targetForBox?.userData?.logicalWallId;
+                if (!wallId || !logicalWallsRegistry.has(wallId)) {
+                    const spec = classifyLogicalWall(hitMesh, !!hitMesh.userData?.isExtWall);
+                    wallId = spec ? spec.id : null;
+                }
                 const wallEntry = wallId ? logicalWallsRegistry.get(wallId) : null;
                 if (wallEntry && wallEntry.meshes.length > 0) {
                     const proxyObj = {
@@ -13494,33 +13949,33 @@
         // ============================================================================
 
         // --- Variables de Estado de Herramientas BIM ---
-        let isMeasureToolMode = false;
-        let measurePoints = [];
-        const bimMeasureGroup = new THREE.Group();
+        var isMeasureToolMode = false;
+        var measurePoints = [];
+        var bimMeasureGroup = new THREE.Group();
         bimMeasureGroup.name = 'bimMeasureGroup';
         scene.add(bimMeasureGroup);
 
-        let isWallHangMode = false;
-        let currentWallHangPreset = 'cuadro';
-        const wallHangGroup = new THREE.Group();
+        var isWallHangMode = false;
+        var currentWallHangPreset = 'cuadro';
+        var wallHangGroup = new THREE.Group();
         wallHangGroup.name = 'wallHangGroup';
         scene.add(wallHangGroup);
 
-        const bimClashDetectionGroup = new THREE.Group();
+        var bimClashDetectionGroup = new THREE.Group();
         bimClashDetectionGroup.name = 'bimClashDetectionGroup';
         bimClashDetectionGroup.visible = false;
         scene.add(bimClashDetectionGroup);
 
-        const zocalosAndThresholdsGroup = new THREE.Group();
+        var zocalosAndThresholdsGroup = new THREE.Group();
         zocalosAndThresholdsGroup.name = 'zocalosAndThresholdsGroup';
         scene.add(zocalosAndThresholdsGroup);
 
-        const instancedBooksGroup = new THREE.Group();
+        var instancedBooksGroup = new THREE.Group();
         instancedBooksGroup.name = 'instancedBooksGroup';
         scene.add(instancedBooksGroup);
 
-        let currentWhiteBalanceKey = '4500k';
-        const bimOriginalMaterialCache = new WeakMap();
+        var currentWhiteBalanceKey = '4500k';
+        var bimOriginalMaterialCache = new WeakMap();
 
         // ----------------------------------------------------------------------------
         // 1. CINTA MÉTRICA INTERACTIVA PUNTO A PUNTO (📏 Medir A↔B)
@@ -13642,7 +14097,7 @@
         // ----------------------------------------------------------------------------
         // 2. CATÁLOGO DE VARIANTES DE MATERIALES EN TIEMPO REAL (#bim-card-swatches)
         // ----------------------------------------------------------------------------
-        const bimFloorVariantMaterials = {};
+        var bimFloorVariantMaterials = {};
         function getOrCreateFloorVariantMaterial(variantKey) {
             if (variantKey === 'ceramico_orig') return pbrCeramicFloorMat;
             if (bimFloorVariantMaterials[variantKey]) return bimFloorVariantMaterials[variantKey];
@@ -13713,7 +14168,7 @@
             return bimFloorVariantMaterials[variantKey];
         }
 
-        const BIM_MATERIAL_CATALOG = {
+        var BIM_MATERIAL_CATALOG = {
             piso: [
                 { key: 'ceramico_orig', label: 'Cerámico 33×33 Original', css: 'linear-gradient(135deg, #f3efe8, #e5dfd5)' },
                 { key: 'porcelanato_gris', label: 'Porcelanato Gris 60×60', css: 'linear-gradient(135deg, #e2e8f0, #cbd5e1)' },
@@ -13872,7 +14327,7 @@
         // ----------------------------------------------------------------------------
         // 3. OPTIMIZACIÓN WEBGL MOBILE: THREE.InstancedMesh PARA LIBROS Y OBJETOS REPETITIVOS
         // ----------------------------------------------------------------------------
-        let instancedBooksMesh = null;
+        var instancedBooksMesh = null;
         function buildInstancedBookClustersAndOptimize() {
             while (instancedBooksGroup.children.length > 0) {
                 const c = instancedBooksGroup.children[0];
@@ -13940,7 +14395,7 @@
         // ----------------------------------------------------------------------------
         // 4. SIMULADOR DE BARRIDO DE PUERTAS Y CAJONES (BIM CLASH DETECTION)
         // ----------------------------------------------------------------------------
-        const BIM_DOOR_SWING_SPECS = [
+        var BIM_DOOR_SWING_SPECS = [
             { id: 'swing_entrada', label: 'Barrido Puerta Entrada (89×204 cm)', x: 6.20, z: 6.30, radius: 0.89, startAngle: Math.PI, endAngle: Math.PI * 1.5 },
             { id: 'swing_estudio', label: 'Barrido Puerta Estudio (70×204 cm)', x: 2.96, z: 2.80, radius: 0.70, startAngle: Math.PI, endAngle: Math.PI * 1.5 },
             { id: 'swing_bano', label: 'Barrido Puerta Baño (67×204 cm)', x: 2.30, z: 4.31, radius: 0.67, startAngle: Math.PI * 0.5, endAngle: Math.PI },
@@ -14041,7 +14496,7 @@
         // ----------------------------------------------------------------------------
         // 5. MODO "COLGAR CUADROS, ESPEJOS Y ESTANTES" SOBRE MUROS (🖼️ Cuadros)
         // ----------------------------------------------------------------------------
-        const WALL_HANG_PRESETS = {
+        var WALL_HANG_PRESETS = {
             cuadro: { nombre: 'Cuadro Enmarcado Roble (65×50 cm)', w: 0.65, h: 0.50, d: 0.035, defaultY: 1.60 },
             espejo: { nombre: 'Espejo Biselado Vertical (55×85 cm)', w: 0.55, h: 0.85, d: 0.028, defaultY: 1.55 },
             estante: { nombre: 'Estante Flotante Roble (80×20 cm)', w: 0.80, h: 0.045, d: 0.20, defaultY: 1.50 }
@@ -14316,7 +14771,7 @@
         // ----------------------------------------------------------------------------
         // 7. VISTAS AXONOMÉTRICAS PREDEFINIDAS DE 1 CLIC (NO / NE / SE / SO) EN ISOMÉTRICA
         // ----------------------------------------------------------------------------
-        const ISO_CORNER_VECTORS = {
+        var ISO_CORNER_VECTORS = {
             SE: { dx: 11.5, dz: 11.5, label: 'Sureste (SE 45°)' },
             SO: { dx: -11.5, dz: 11.5, label: 'Suroeste (SO 45°)' },
             NE: { dx: 11.5, dz: -11.5, label: 'Noreste (NE 45°)' },
@@ -14355,7 +14810,7 @@
         // ----------------------------------------------------------------------------
         // 8. BALANCE DE BLANCOS AJUSTABLE (5500K FRÍA / 4500K NEUTRA / 3200K CÁLIDA)
         // ----------------------------------------------------------------------------
-        const WHITE_BALANCE_PRESETS = {
+        var WHITE_BALANCE_PRESETS = {
             '5500k': {
                 label: '5500K Luz Día Fría',
                 sunHex: 0xf4f9ff,
@@ -14613,9 +15068,50 @@
                     else if (act === 'roof' || act === 'toggle_roof') document.getElementById('btn-toggle-roof')?.click();
                     else if (act === 'labels' || act === 'toggle_labels') document.getElementById('btn-toggle-labels')?.click();
                     else if (act === 'decor' || act === 'toggle_decor') document.getElementById('btn-toggle-video-decor')?.click();
+                    else if (act === 'toggle_solar_compass') {
+                        if (!solarCompassGroup) buildSolarCompassRose3D();
+                        solarCompassGroup.visible = !solarCompassGroup.visible;
+                        const chkComp = document.getElementById('chk-solar-compass');
+                        if (chkComp) chkComp.checked = solarCompassGroup.visible;
+                        showToast(solarCompassGroup.visible ? '🧭 Rosa de los Vientos y Arco Solar 3D activados' : '🧭 Rosa de los Vientos 3D oculta');
+                        wakeRenderer();
+                    } else if (act === 'wiz_all_auto') setAllWizRoomsMode('auto', true);
+                    else if (act === 'wiz_all_warm') setAllWizRoomsMode('warm', true);
+                    else if (act === 'wiz_all_rgb') setAllWizRoomsMode('rgb', true);
+                    else if (act === 'wiz_toggle_living') cycleWizRoomMode('living', true);
+                    else if (act === 'wiz_toggle_dining') cycleWizRoomMode('dining', true);
+                    else if (act === 'wiz_toggle_study') cycleWizRoomMode('study', true);
+                    else if (act === 'wiz_toggle_bedroom') cycleWizRoomMode('bedroom', true);
+                    else if (act === 'wiz_toggle_bath') cycleWizRoomMode('bath', true);
+                    else if (act === 'wiz_toggle_kitchen') cycleWizRoomMode('kitchen', true);
                     e.target.value = '';
                 });
             }
+
+            const chkSolarCompass = document.getElementById('chk-solar-compass');
+            if (chkSolarCompass) {
+                chkSolarCompass.addEventListener('change', (e) => {
+                    if (!solarCompassGroup) buildSolarCompassRose3D();
+                    solarCompassGroup.visible = !!e.target.checked;
+                    showToast(solarCompassGroup.visible ? '🧭 Rosa de los Vientos y Arco Solar 3D visibles' : '🧭 Rosa de los Vientos 3D oculta');
+                    wakeRenderer();
+                });
+            }
+
+            const selSolarSeason = document.getElementById('select-solar-season');
+            if (selSolarSeason) {
+                selSolarSeason.addEventListener('change', (e) => {
+                    setSolarSeason(e.target.value, true);
+                });
+            }
+
+            document.querySelectorAll('.season-btn-sb').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const sKey = btn.getAttribute('data-season') || 'equinox';
+                    setSolarSeason(sKey, true);
+                });
+            });
 
             const selToolsMode = document.getElementById('select-tools-mode');
             if (selToolsMode) {
