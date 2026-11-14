@@ -5282,23 +5282,19 @@
         addBoxFixture(4.73, 1.08, 6.04, 0.024, 0.22, 0.024, 0xe2e8f0, fixturesGroup, 0.3, 'Flexible Agua Calefón'); // Flexible agua blanco
         setMountWall(null);
 
-        // - Cocina a gas blanca de 4 hornallas con plancha inox, bifera de hierro fundido, tostadora carlitera de aluminio y repasador gris en manija del horno (Video 1:51, 1:53)
-        (function buildGasStoveMorphology() {
+        // - Cocina a gas blanca de 4 hornallas con plancha inox, bifera de hierro fundido, tostadora carlitera de aluminio y campana extractora slim (Video 1:51, 1:53)
+        createCompoundAssembly('Cocina a Gas 4 Hornallas (Con Bifera y Carlitera)', () => {
+            const stoveGroup = new THREE.Group();
             const stX = 4.51, stZ = 6.41, stD = 0.58, stH = 0.86, stW = 0.50;
             const stoveBody = new THREE.Mesh(createRoundedBoxGeo(stD, stH, stW, 0.015, 2), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.22, metalness: 0.12 }));
             stoveBody.position.set(stX, 0.43, stZ);
             stoveBody.castShadow = true; stoveBody.receiveShadow = true;
-            assignBIMUserData(stoveBody, {
-                nombre: 'Cocina a Gas 4 Hornallas (Con Bifera y Carlitera)',
-                categoria: 'mueble',
-                dimensiones: { ancho: 0.50, alto: 0.86, profundidad: 0.58, elevacion: 0 }
-            });
-            fixturesGroup.add(stoveBody);
+            stoveGroup.add(stoveBody);
 
             // Plancha superior de acero inoxidable cepillado
             const cooktop = new THREE.Mesh(createRoundedBoxGeo(0.55, 0.022, 0.48, 0.008, 2), inoxApplianceMat);
             cooktop.position.set(stX, 0.865, stZ);
-            fixturesGroup.add(cooktop);
+            stoveGroup.add(cooktop);
 
             // 4 Quemadores circulares (coronas de aluminio + tapas negras esmaltadas) y rejillas de hierro fundido
             const burnerOffsets = [[-0.13, -0.12], [0.11, -0.12], [-0.13, 0.12], [0.11, 0.12]];
@@ -5317,13 +5313,13 @@
                 const grateFrame = new THREE.Mesh(new THREE.TorusGeometry(0.085, 0.006, 6, 16), castIronMat);
                 grateFrame.rotation.x = Math.PI / 2;
                 grateFrame.position.set(stX + ox, 0.894, stZ + oz);
-                fixturesGroup.add(crown, cap, grate1, grate2, grateFrame);
+                stoveGroup.add(crown, cap, grate1, grate2, grateFrame);
             });
 
             // Plancha bifera rectangular de hierro fundido negro sobre las 2 hornallas Norte (Video 1:51, 1:53)
             const griddlePlate = new THREE.Mesh(createRoundedBoxGeo(0.42, 0.016, 0.22, 0.008, 2), castIronMat);
             griddlePlate.position.set(stX - 0.01, 0.910, stZ - 0.12);
-            fixturesGroup.add(griddlePlate);
+            stoveGroup.add(griddlePlate);
 
             // Tostadora / Carlitera de aluminio plateado con mangos negros sobre la hornalla Sur (Video 1:51, 1:53)
             const toasterPan = new THREE.Mesh(createRoundedBoxGeo(0.20, 0.024, 0.20, 0.008, 2), inoxApplianceMat);
@@ -5331,14 +5327,14 @@
             const toasterHandle = new THREE.Mesh(UNIT_BOX_GEO, castIronMat);
             toasterHandle.scale.set(0.14, 0.014, 0.028);
             toasterHandle.position.set(stX - 0.24, 0.915, stZ + 0.12);
-            fixturesGroup.add(toasterPan, toasterHandle);
+            stoveGroup.add(toasterPan, toasterHandle);
 
             // Frente de perillas (5 perillas giratorias en el frente Oeste X = stX - stD/2)
             for (let k = -2; k <= 2; k++) {
                 const knob = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.015, 0.018, 12), castIronMat);
                 knob.rotation.z = Math.PI / 2;
                 knob.position.set(stX - stD / 2 - 0.008, 0.79, stZ + k * 0.085);
-                fixturesGroup.add(knob);
+                stoveGroup.add(knob);
             }
 
             // Puerta del horno con visor de vidrio templado negro + manijón cromado + repasador gris oscuro colgado (Video 1:51)
@@ -5349,8 +5345,26 @@
             ovenHandle.position.set(stX - stD / 2 - 0.032, 0.60, stZ);
             const ovenTowel = new THREE.Mesh(createRoundedBoxGeo(0.022, 0.28, 0.18, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.92 }));
             ovenTowel.position.set(stX - stD / 2 - 0.036, 0.47, stZ + 0.02);
-            fixturesGroup.add(ovenGlass, ovenHandle, ovenTowel);
-        })();
+            stoveGroup.add(ovenGlass, ovenHandle, ovenTowel);
+
+            // Campana extractora / purificador slim de acero inoxidable bajo la alacena (Y=1.48, Z=6.41)
+            const hoodBody = new THREE.Mesh(createRoundedBoxGeo(0.48, 0.07, 0.50, 0.008, 2), inoxApplianceMat);
+            hoodBody.position.set(stX + 0.03, 1.48, stZ);
+            hoodBody.castShadow = true;
+            const filter1 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4, metalness: 0.7 }));
+            filter1.scale.set(0.36, 0.01, 0.20);
+            filter1.position.set(stX + 0.03, 1.44, stZ - 0.11);
+            const filter2 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4, metalness: 0.7 }));
+            filter2.scale.set(0.36, 0.01, 0.20);
+            filter2.position.set(stX + 0.03, 1.44, stZ + 0.11);
+            const hoodLight1 = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.005, 12), new THREE.MeshBasicMaterial({ color: 0xfffbeb }));
+            hoodLight1.position.set(stX - 0.08, 1.442, stZ - 0.14);
+            const hoodLight2 = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.005, 12), new THREE.MeshBasicMaterial({ color: 0xfffbeb }));
+            hoodLight2.position.set(stX - 0.08, 1.442, stZ + 0.14);
+            stoveGroup.add(hoodBody, filter1, filter2, hoodLight1, hoodLight2);
+
+            (currentAssemblyGroup || decorVideoGroup).add(stoveGroup);
+        });
 
         // - 2° tramo de bajo mesada y mesada en "L" de granito gris/rosado (Muro Este Z=6.66..7.96 + retorno Sur X=3.65..4.50 pegado directo al lavarropas X=3.05..3.65 sin brecha)
         const bmEast = new THREE.Mesh(createRoundedBoxGeo(0.56, 0.84, 1.30, 0.012, 2), kitchenWoodCabinetMat);
@@ -5384,8 +5398,10 @@
         assignBIMUserData(granSouth, { nombre: 'Mesada de Granito en L (Retorno Sur)', categoria: 'mueble', dimensiones: { ancho: 0.85, alto: 0.04, profundidad: 0.58, elevacion: 0.84 } });
         fixturesGroup.add(granEast, granSouth);
 
-        // - Bacha doble esquinera de acero inoxidable + grifería monocomando pico cisne + tabla de picar de madera + rejilla verde flúo + purificador negro (Video 1:33, 1:43)
-        (function buildKitchenSinkAndFaucetMorphology() {
+        // - Bacha doble esquinera de acero inoxidable + grifería monocomando pico cisne + tabla de picar de madera + paño verde flúo (Video 1:33, 1:43)
+        createCompoundAssembly('Bacha Doble Inox con Grifería Monocomando', () => {
+            const sinkGroup = new THREE.Group();
+
             const sinkRim1 = new THREE.Mesh(createRoundedBoxGeo(0.40, 0.018, 0.44, 0.012, 2), inoxApplianceMat);
             sinkRim1.position.set(4.47, 0.878, 7.46);
             const sinkBowl1 = new THREE.Mesh(createRoundedBoxGeo(0.32, 0.016, 0.36, 0.025, 2), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.30, metalness: 0.85 }));
@@ -5410,15 +5426,6 @@
             tapLever.rotation.z = 0.45;
             tapLever.position.set(4.56, 0.96, 7.52);
 
-            [sinkRim1, sinkBowl1, sinkRim2, sinkBowl2, tapBase, tapArch].forEach(m => {
-                assignBIMUserData(m, {
-                    nombre: 'Bacha Doble de Acero Inoxidable y Grifería',
-                    categoria: 'mueble',
-                    dimensiones: { ancho: 0.62, alto: 0.32, profundidad: 0.48, elevacion: 0.86 }
-                });
-            });
-            fixturesGroup.add(sinkRim1, sinkBowl1, sinkDrain1, sinkRim2, sinkBowl2, sinkDrain2, tapBase, tapArch, tapLever);
-
             // Tabla de picar de madera apoyada contra el azulejo Este y paño verde flúo en la esquina (Video 1:33, 1:43)
             const cuttingBoard = new THREE.Mesh(createRoundedBoxGeo(0.02, 0.28, 0.36, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xb47b48, roughness: 0.55 }));
             cuttingBoard.position.set(4.74, 1.02, 7.22);
@@ -5426,9 +5433,14 @@
             const greenCloth = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x4ade80, roughness: 0.9 }));
             greenCloth.scale.set(0.16, 0.008, 0.18);
             greenCloth.position.set(4.32, 0.884, 7.22);
-            fixturesGroup.add(cuttingBoard, greenCloth);
 
-            // Purificador de agua PSA negro cilíndrico con base y pico vertedor cromado
+            sinkGroup.add(sinkRim1, sinkBowl1, sinkDrain1, sinkRim2, sinkBowl2, sinkDrain2, tapBase, tapArch, tapLever, cuttingBoard, greenCloth);
+            (currentAssemblyGroup || decorVideoGroup).add(sinkGroup);
+        });
+
+        // Purificador de agua PSA negro cilíndrico con base y pico vertedor cromado
+        createCompoundAssembly('Purificador de Agua PSA sobre Mesada', () => {
+            const psaGroup = new THREE.Group();
             const psaBody = new THREE.Mesh(new THREE.CylinderGeometry(0.044, 0.046, 0.24, 18), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.18, metalness: 0.35 }));
             psaBody.position.set(4.53, 1.00, 7.68);
             const psaRing = new THREE.Mesh(new THREE.CylinderGeometry(0.047, 0.047, 0.02, 18), chromePolishMat);
@@ -5436,13 +5448,9 @@
             const psaSpout = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.11, 10), chromePolishMat);
             psaSpout.rotation.z = Math.PI / 3;
             psaSpout.position.set(4.48, 1.11, 7.65);
-            assignBIMUserData(psaBody, {
-                nombre: 'Purificador de Agua PSA',
-                categoria: 'mueble',
-                dimensiones: { ancho: 0.10, alto: 0.25, profundidad: 0.10, elevacion: 0.88 }
-            });
-            fixturesGroup.add(psaBody, psaRing, psaSpout);
-        })();
+            psaGroup.add(psaBody, psaRing, psaSpout);
+            (currentAssemblyGroup || decorVideoGroup).add(psaGroup);
+        });
 
         // ============================================================================
         // 3) BAÑO HIPERREALISTA PBR (Video 2:47 – 3:34):
@@ -5849,18 +5857,28 @@
             const handleRight = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.035, 14), chromePolishMat);
             handleRight.position.set(0.08, 0.42, 0.12);
 
-            // Balde centrífugo naranja y gris con mopa entre el bidet y la columna de la ducha (Video 3:22)
-            const mopBucket = new THREE.Mesh(createRoundedBoxGeo(0.26, 0.26, 0.38, 0.05, 2), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.45 }));
-            mopBucket.position.set(-0.32, 0.13, -0.02);
-            const mopSpinner = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.09, 0.08, 16), new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.35 }));
-            mopSpinner.position.set(-0.32, 0.25, -0.08);
-            const mopPole = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 1.25, 10), chromePolishMat);
-            mopPole.position.set(-0.32, 0.72, -0.08);
-            const mopGrip = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.22, 10), new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.4 }));
-            mopGrip.position.set(-0.32, 1.24, -0.08);
-            bidGroup.add(spout, handleLeft, handleRight, mopBucket, mopSpinner, mopPole, mopGrip);
+            bidGroup.add(spout, handleLeft, handleRight);
 
             (currentAssemblyGroup || decorVideoGroup).add(bidGroup);
+        });
+
+        // Balde centrífugo naranja y gris con mopa entre el bidet y la columna de la ducha (Video 3:22)
+        createCompoundAssembly('Balde Centrífugo con Mopa Giratoria', () => {
+            const mopGroup = new THREE.Group();
+            mopGroup.position.set(0.88, 0, 4.44);
+
+            const mopBucket = new THREE.Mesh(createRoundedBoxGeo(0.26, 0.26, 0.38, 0.05, 2), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.45 }));
+            mopBucket.position.set(0, 0.13, 0);
+            mopBucket.castShadow = true;
+            const mopSpinner = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.09, 0.08, 16), new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.35 }));
+            mopSpinner.position.set(0, 0.25, -0.06);
+            const mopPole = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 1.25, 10), chromePolishMat);
+            mopPole.position.set(0, 0.72, -0.06);
+            const mopGrip = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.22, 10), new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.4 }));
+            mopGrip.position.set(0, 1.24, -0.06);
+            mopGroup.add(mopBucket, mopSpinner, mopPole, mopGrip);
+
+            (currentAssemblyGroup || decorVideoGroup).add(mopGroup);
         });
 
         // E) ALACENA COLGANTE DE BAÑO CON 2 ESTANTES ABIERTOS (TOALLAS AZUL MARINO/GRISES Y ROLLOS DE PAPEL) + 1 PUERTA DERECHA (Video 3:17, 3:27)
