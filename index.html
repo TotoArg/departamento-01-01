@@ -4323,10 +4323,10 @@
         addSlopedWallSegment(4.35, 8.00, 4.85, 8.00, 4.63, 4.41, EXT_T, exteriorWallsGroup, true);
 
         // Muro Izquierdo (Oeste, X = 0.00): sube de [0.00, 0.00] a [0.00, 8.00] a cota exterior 3.20 m
-        // - Ventiluz Baño V7 sobre bañera (Z = 3.55 a 4.25, centrado en bañera de 1.18 m Z = 3.30..4.48 m)
-        addWallSegment(0.00, 0.00, 0.00, 3.55, EXT_T, exteriorWallsGroup, true, 3.20);
-        addWindowSegment(0.00, 3.55, 0.00, 4.25, 1.35, 0.65, 3.20);
-        addWallSegment(0.00, 4.25, 0.00, 8.00, EXT_T, exteriorWallsGroup, true, 3.20);
+        // - Ventiluz Baño V7 de 50x50 cm sobre bañera (Z = 3.64 a 4.14, centrado en bañera de 1.18 m Z = 3.30..4.48 m)
+        addWallSegment(0.00, 0.00, 0.00, 3.64, EXT_T, exteriorWallsGroup, true, 3.20);
+        addWindowSegment(0.00, 3.64, 0.00, 4.14, 1.45, 0.50, 3.20);
+        addWallSegment(0.00, 4.14, 0.00, 8.00, EXT_T, exteriorWallsGroup, true, 3.20);
 
         // ============================================================================
         // 3B. EQUIPAMIENTO FIJO, CALEFACTORES Y TECHO DE MADERA EXTRAÍDOS DEL VIDEO
@@ -4616,28 +4616,63 @@
             cavity.position.set(0.405, 0.47, 3.89);
             bathGroup.add(cavity);
 
-            // Columna / Mocheta estructural Sur del Baño junto a la bañera (medida relevada: 31 cm x 69 cm en esquina Suroeste)
-            const bathCol = new THREE.Mesh(new THREE.BoxGeometry(0.69, 3.20, 0.31), intWallMat);
-            bathCol.position.set(0.405, 1.60, 4.635);
+            // Columna / Mocheta estructural Sur del Baño junto a la bañera (medida relevada: 31 cm x 69 cm en esquina Suroeste, Z = 4.48 a 4.79 m)
+            // Registrada en simsWalls para que se corte dinámicamente con los muros interiores y no flote en 3D
+            const bathColHolder = new THREE.Group();
+            bathColHolder.position.set(0.405, 0, 4.635);
+            const bathCol = new THREE.Mesh(UNIT_BOX_GEO, intWallMat);
+            bathCol.scale.set(0.69, 3.20, 0.31);
+            bathCol.position.set(0, 1.60, 0);
             bathCol.castShadow = true; bathCol.receiveShadow = true;
-            assignBIMUserData(bathCol, {
+            bathCol.userData.isIntWall = true;
+            bathColHolder.add(bathCol);
+            const bathColCap = new THREE.Mesh(UNIT_BOX_GEO, topCapMat);
+            bathColCap.scale.set(0.70, 0.02, 0.32);
+            bathColCap.position.set(0, 3.21, 0);
+            bathColCap.userData.isCap = true;
+            bathColHolder.add(bathColCap);
+            assignBIMUserData(bathColHolder, {
                 nombre: 'Columna Estructural Baño (31×69 cm)',
                 categoria: 'muro',
-                dimensiones: { ancho: 0.69, alto: 3.20, profundidad: 0.31, elevacion: 0 }
+                ancho: 0.69,
+                alto: 3.20,
+                profundidad: 0.31,
+                elevacion: 0
             });
-            interiorWallsGroup.add(bathCol);
+            interiorWallsGroup.add(bathColHolder);
+            simsWalls.push({
+                type: 'wall',
+                holder: bathColHolder,
+                bodyMesh: bathCol,
+                capMesh: bathColCap,
+                isExterior: false,
+                maxH: 3.20,
+                currentH: 3.20,
+                targetH: 3.20,
+                linkedObjs: [],
+                ...getWallNormals(0.06, 4.48, 0.75, 4.79, false)
+            });
 
-            // Revestimiento de azulejos cerámicos con juntas en muros interiores de la ducha
-            const tileBack = new THREE.Mesh(UNIT_BOX_GEO, tileBathWallMat);
-            tileBack.scale.set(0.015, 1.60, 1.18);
-            tileBack.position.set(0.055, 1.28, 3.89);
+            // Revestimiento de azulejos cerámicos en muros interiores de la ducha:
+            // - En la pared Oeste (X = 0.055), el revestimiento rodea el vano del ventiluz de 50×50 cm (Z = 3.64 a 4.14, Y = 1.45 a 1.95 m)
+            //   y la altura se adapta dinámicamente al corte de paredes (Sims / Bajas) para nunca tapar la ventana ni quedar flotando.
+            const tileBackBelow = new THREE.Mesh(UNIT_BOX_GEO, tileBathWallMat);
+            tileBackBelow.scale.set(0.015, 0.97, 1.18); // De borde bañera Y=0.48 hasta alféizar ventana Y=1.45
+            tileBackBelow.position.set(0.055, 0.965, 3.89);
+            const tileBackNorth = new THREE.Mesh(UNIT_BOX_GEO, tileBathWallMat);
+            tileBackNorth.scale.set(0.015, 0.63, 0.34); // Jamba Norte de ventana (Z=3.30 a 3.64, Y=1.45 a 2.08)
+            tileBackNorth.position.set(0.055, 1.765, 3.47);
+            const tileBackSouth = new THREE.Mesh(UNIT_BOX_GEO, tileBathWallMat);
+            tileBackSouth.scale.set(0.015, 0.63, 0.34); // Jamba Sur de ventana (Z=4.14 a 4.48, Y=1.45 a 2.08)
+            tileBackSouth.position.set(0.055, 1.765, 4.31);
             const tileNorth = new THREE.Mesh(UNIT_BOX_GEO, tileBathWallMat);
             tileNorth.scale.set(0.69, 1.60, 0.015);
             tileNorth.position.set(0.405, 1.28, 3.325);
             const tileSouth = new THREE.Mesh(UNIT_BOX_GEO, tileBathWallMat);
             tileSouth.scale.set(0.69, 1.60, 0.015);
             tileSouth.position.set(0.405, 1.28, 4.475);
-            bathGroup.add(tileBack, tileNorth, tileSouth);
+            bathGroup.add(tileBackBelow, tileBackNorth, tileBackSouth, tileNorth, tileSouth);
+            window.showerTilePanels = { tileBackBelow, tileBackNorth, tileBackSouth, tileNorth, tileSouth };
 
             // Desagüe click-clack y rebosadero ranurado cromados
             const drain = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.008, 18), chromePolishMat);
@@ -10825,6 +10860,30 @@
                     if (w.capGroup) {
                         w.capGroup.visible = false;
                     }
+                }
+            }
+            // Sincronizar los paneles de azulejos de la ducha con la altura actual de las paredes para que nunca floten ni tapen el ventiluz
+            if (window.showerTilePanels) {
+                const sp = window.showerTilePanels;
+                if (w.actsAsExterior && Math.abs(w.mx) < 0.15 && w.z1 <= 3.70 && w.z2 >= 4.05) {
+                    const extCut = !exteriorWallsGroup.visible || (h < (w.maxH || WALL_H) - 0.25);
+                    const backTop = extCut ? Math.min(1.45, Math.max(0.48, h)) : 1.45;
+                    const backH = Math.max(0.01, backTop - 0.48);
+                    sp.tileBackBelow.visible = exteriorWallsGroup.visible && (h > 0.50);
+                    sp.tileBackBelow.scale.y = backH;
+                    sp.tileBackBelow.position.y = 0.48 + backH / 2;
+                    sp.tileBackNorth.visible = !extCut;
+                    sp.tileBackSouth.visible = !extCut;
+                } else if (!w.actsAsExterior && w.isHoriz && (Math.abs(w.mz - 3.30) < 0.12 || Math.abs(w.mz - 4.70) < 0.12)) {
+                    const intTop = !interiorWallsGroup.visible ? 0.48 : Math.min(2.08, Math.max(0.48, h));
+                    const intH = Math.max(0.01, intTop - 0.48);
+                    const showSide = interiorWallsGroup.visible && (h > 0.50);
+                    sp.tileNorth.visible = showSide;
+                    sp.tileNorth.scale.y = intH;
+                    sp.tileNorth.position.y = 0.48 + intH / 2;
+                    sp.tileSouth.visible = showSide;
+                    sp.tileSouth.scale.y = intH;
+                    sp.tileSouth.position.y = 0.48 + intH / 2;
                 }
             }
             // En The Sims el equipamiento y muebles de pared (como Smart TV, consolas, alacenas, cuadros y estantes)
