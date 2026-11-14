@@ -744,23 +744,26 @@
                 border: 1px solid rgba(255, 255, 255, 0.16);
             }
 
-            /* Barra superior de herramientas con scroll suave táctil */
+            /* Barra superior con menús desplegables (sin desplazamiento horizontal) */
             #top-toolbar {
                 width: 100%;
-                flex-wrap: nowrap !important;
-                overflow-x: auto !important;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
+                flex-wrap: wrap !important;
+                overflow-x: visible !important;
                 padding: 5px 6px;
                 border-radius: 12px;
                 gap: 4px;
                 justify-content: flex-start;
-                background: rgba(15, 23, 42, 0.82);
+                background: rgba(15, 23, 42, 0.88);
                 backdrop-filter: blur(16px);
                 -webkit-backdrop-filter: blur(16px);
                 border: 1px solid rgba(255, 255, 255, 0.14);
             }
-            #top-toolbar::-webkit-scrollbar { display: none; }
+            .toolbar-select {
+                flex: 1 1 calc(50% - 4px);
+                min-width: 125px;
+                font-size: 10.5px !important;
+                padding: 5px 7px !important;
+            }
             .mode-btn {
                 padding: 5px 9px;
                 font-size: 10.5px;
@@ -816,20 +819,8 @@
             }
 
             #bottom-bar {
-                bottom: 3px;
-                left: 4px;
-                right: 4px;
-                transform: none;
-                max-width: none;
-                padding: 3px 6px;
-                border-radius: 20px;
-                gap: 3px;
-                overflow-x: auto;
-                flex-wrap: nowrap;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
+                display: none !important;
             }
-            #bottom-bar::-webkit-scrollbar { display: none; }
             .view-chip {
                 padding: 3px 7px;
                 font-size: 9px;
@@ -1269,6 +1260,35 @@
             flex-wrap: wrap;
             max-width: 94vw;
         }
+        /* Menús desplegables (<select>) compactos para eliminar barras desplazables */
+        .toolbar-select {
+            background: rgba(15, 23, 42, 0.90);
+            color: #f8fafc;
+            border: 1px solid rgba(56, 189, 248, 0.42);
+            border-radius: 9px;
+            padding: 5px 9px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.15s ease, background 0.15s ease;
+            max-width: 100%;
+        }
+        .toolbar-select:hover, .toolbar-select:focus {
+            border-color: #38bdf8;
+            background: rgba(30, 41, 59, 0.96);
+        }
+        .toolbar-select option, .toolbar-select optgroup {
+            background: #0f172a;
+            color: #f8fafc;
+            font-weight: 600;
+        }
+        .legacy-scroll-btns {
+            display: none !important;
+        }
+        #bottom-bar {
+            display: none !important;
+        }
         @media (max-width: 800px) {
             #bim-context-card {
                 left: 50% !important;
@@ -1387,67 +1407,114 @@
             </div>
         </div>
 
-        <!-- Top Mode Switcher -->
+        <!-- Top Mode Switcher (Menús Desplegables sin desplazamiento horizontal) -->
         <div id="top-toolbar" class="glass-panel">
-            <button class="mode-btn" id="btn-toggle-cam-proj" onclick="toggleCameraProjection()" title="Alternar entre Perspectiva Teleobjetivo (24°) e Isométrica Pura (Ortho)">
-                <span id="cam-proj-icon">📐</span> <span id="cam-proj-label">Isométrica</span>
-            </button>
-            <button class="mode-btn" id="btn-mode-2d" title="Plano 2D Técnico Ortogonal"><span>📐</span> 2D</button>
-            <button class="mode-btn" id="btn-mode-3d" title="3D Normal con muros completos"><span>🏢</span> 3D Muros</button>
-            <button class="mode-btn active" id="btn-mode-sims" title="3D Maqueta con corte dinámico estilo Los Sims"><span>✂️</span> 3D Sims</button>
-            <button class="mode-btn" id="btn-mode-walk" style="background:rgba(14,165,233,0.22); border:1px solid #38bdf8; color:#bae6fd; font-weight:700;" title="Caminar por adentro en 1° Persona (Joystick / WASD / Toque en el piso)"><span>🚶</span> Caminar 3D</button>
-            <button class="mode-btn" id="btn-mode-tour" style="background:rgba(168,85,247,0.24); border:1px solid #c084fc; color:#e9d5ff; font-weight:700;" title="Recorrido 3D Guiado Automático (Estilo Reel / Walkthrough)"><span>🎬</span> Tour 3D</button>
-            <button class="mode-btn" id="btn-bim-mode" style="background:rgba(56,189,248,0.16); border:1px solid rgba(56,189,248,0.55); color:#7dd3fc; font-weight:700;" title="Modo Planificación Técnica (BIM View): Estilo translúcido/wireframe con cajas delimitadoras y arcos de barrido de puertas con detección de colisiones">
-                <span>📏</span> <span id="lbl-bim-mode">Modo Planificación</span>
-            </button>
-            <button class="mode-btn" id="btn-measure-tape" style="background:rgba(16,185,129,0.18); border:1px solid rgba(16,185,129,0.55); color:#6ee7b7; font-weight:700;" title="Cinta Métrica Interactiva Punto a Punto (Tocá 2 puntos en el modelo para medir distancia libre ΔX, ΔZ y diagonal)">
-                <span>📐</span> <span id="lbl-measure-tape">Medir A↔B</span>
-            </button>
-            <button class="mode-btn" id="btn-wall-hang" style="background:rgba(244,114,182,0.18); border:1px solid rgba(244,114,182,0.55); color:#f9a8d4; font-weight:700;" title="Modo Colgar Cuadros, Espejos y Estantes directamente sobre las paredes con altura al ojo (1.60m)">
-                <span>🖼️</span> <span id="lbl-wall-hang">Cuadros</span>
-            </button>
+            <!-- 1. Desplegable de Modo de Vista y Cámara -->
+            <select id="select-view-mode" class="toolbar-select" title="Seleccionar modo de vista 3D / 2D / Recorrido">
+                <option value="sims" selected>✂️ Vista: 3D Sims (Corte Dinámico)</option>
+                <option value="3d">🏢 Vista: 3D Muros Completos</option>
+                <option value="2d">📐 Vista: Plano 2D Exacto</option>
+                <option value="iso">📐 Vista: Proyección Isométrica / Perspectiva</option>
+                <option value="walk">🚶 Vista: Caminar 1° Persona</option>
+                <option value="tour">🎬 Vista: Auto-Tour 3D Guiado</option>
+            </select>
 
-            <button class="mode-btn" id="btn-share-readonly" style="background:rgba(14,165,233,0.24); border:1.5px solid #38bdf8; color:#e0f2fe; font-weight:700;" title="Compartir enlace de solo lectura para que otros vean e interactúen con el modelo sin poder editarlo">
-                <span>🔗</span> <span id="btn-share-text">Compartir (Solo Lectura)</span>
-            </button>
+            <!-- 2. Desplegable de Ambiente / Cámara Rápida -->
+            <select id="select-room-jump" class="toolbar-select" title="Ir directamente a un ambiente">
+                <option value="isom" selected>🏠 Ambiente: Maqueta General</option>
+                <option value="living">🛋️ Ambiente: Living y Entrada</option>
+                <option value="cocina">🍳 Ambiente: Cocina</option>
+                <option value="cuarto">🛏️ Ambiente: Dormitorio Principal</option>
+                <option value="bano">🚿 Ambiente: Baño y Pasillo</option>
+                <option value="estudio">💻 Ambiente: Estudio / Escritorio</option>
+            </select>
+
+            <!-- 3. Desplegable de Cortinas (Visillo / Blackout), Aberturas y Escena -->
+            <select id="select-scene-action" class="toolbar-select" title="Controlar cortinas (Visillo difuminador y Blackout), puertas, ventanas y capas">
+                <option value="" selected>🪟 Interactuar / Cortinas...</option>
+                <optgroup label="🎋 Doble Cortina (Visillo + Blackout)">
+                    <option value="curtains_sheer">🌤️ Cortinas: Visillo Difuminador (Luz Suave)</option>
+                    <option value="curtains_blackout">🌑 Cortinas: Cerrar Blackout Total (Corta Luz Exterior)</option>
+                    <option value="curtains_open">☀️ Cortinas: Abrir Todas (100% Luz Exterior)</option>
+                </optgroup>
+                <optgroup label="🚪 Aberturas y Mesa Extensible">
+                    <option value="toggle_doors">🚪 Abrir / Cerrar Puertas y Placards</option>
+                    <option value="toggle_windows">🪟 Abrir / Cerrar Ventanas</option>
+                    <option value="cycle_table">🍽️ Ampliar / Cerrar Mesa Comedor (1.00m ↔ 1.70m)</option>
+                </optgroup>
+                <optgroup label="👁️ Capas Visibles">
+                    <option value="toggle_roof">🏠 Mostrar / Ocultar Techo de Madera</option>
+                    <option value="toggle_decor">🛋️ Mostrar / Ocultar Muebles</option>
+                    <option value="toggle_labels">🏷️ Mostrar / Ocultar Etiquetas</option>
+                </optgroup>
+            </select>
+
+            <!-- 4. Desplegable de Herramientas, Inspección y Edición (Oculta opciones de edición en modo invitado) -->
+            <select id="select-tools-mode" class="toolbar-select" title="Herramientas de inspección, medición y edición">
+                <option value="nav" selected>👆 Modo: Navegación Limpia (Sin Popups)</option>
+                <option value="inspect">🔍 Modo: Inspeccionar Medidas y Materiales</option>
+                <option value="measure">📏 Herramienta: Medir Distancia (A↔B)</option>
+                <option value="edit" class="owner-only-opt">✏️ Modo: Editar y Mover Muebles</option>
+                <option value="wallhang" class="owner-only-opt">🖼️ Modo: Colgar Cuadros / Espejos</option>
+                <option value="save" class="owner-only-opt">💾 Acción: Guardar y Sincronizar Ahora</option>
+                <option value="backup" class="owner-only-opt">📦 Acción: Respaldo JSON</option>
+                <option value="share" class="owner-only-opt">🔗 Acción: Compartir (Solo Lectura)</option>
+                <option value="reset" class="owner-only-opt">↺ Acción: Restablecer Original</option>
+            </select>
+
+            <!-- 5. Desplegable de Hora Solar y Domótica WiZ -->
+            <select id="select-solar-time" class="toolbar-select" title="Hora solar y luces interiores WiZ">
+                <option value="morning">🌅 Luz: Mañana (09:30)</option>
+                <option value="noon" selected>☀️ Luz: Mediodía (13:30)</option>
+                <option value="golden">🌇 Luz: Atardecer (17:30)</option>
+                <option value="night">🌙 Luz: Noche Domótica WiZ (22:30)</option>
+            </select>
+
+            <!-- Badges de estado y controles de zoom compactos -->
             <button class="mode-btn" id="btn-global-undo" style="display:none; background:rgba(239,68,68,0.22); border:1px solid #ef4444; color:#fca5a5;" title="Deshacer último cambio (Ctrl+Z)">
                 <span>↩️</span> <span id="btn-undo-text">Deshacer</span>
-            </button>
-            <button class="mode-btn" id="btn-toggle-edit-mode" style="background:rgba(245,158,11,0.20); border:1px solid #f59e0b; color:#fde68a;" title="Activar/Desactivar modo de edición de muebles">
-                <span id="btn-edit-mode-icon">🔒</span> <span id="btn-edit-mode-text">Editar muebles</span>
-            </button>
-            <button class="mode-btn" id="btn-save-layout" style="background:rgba(16,185,129,0.24); border:1.5px solid #10b981; color:#6ee7b7; font-weight:700;" title="Guardar modificaciones de muebles permanentemente y sincronizar (Ctrl+S)">
-                <span>💾</span> <span id="btn-save-text">Guardar</span>
             </button>
             <div id="sync-status-badge" class="sync-badge" title="Estado de sincronización en tiempo real (Nube y Local)">
                 <span style="color:#34d399;">🟢</span> <span class="badge-txt">Sincronizado</span>
             </div>
-            <div id="viewer-readonly-badge" class="sync-badge" style="display:none; background:rgba(14,165,233,0.18); border:1px solid rgba(56,189,248,0.45); color:#bae6fd;" title="Modo Visor Interactivo (Solo Lectura): podés recorrer en 3D y abrir puertas/ventanas/mesa sin modificar el plano">
-                <span>👁️</span> <span class="badge-txt">Visor Interactivo</span>
+            <div id="viewer-readonly-badge" class="sync-badge" style="display:none; background:rgba(14,165,233,0.18); border:1px solid rgba(56,189,248,0.45); color:#bae6fd;" title="Modo Visor Interactivo (Solo Lectura): sin edición">
+                <span>👁️</span> <span class="badge-txt">Modo Invitado (Solo Lectura)</span>
             </div>
-            <button class="mode-btn" id="btn-backup-menu" style="background:rgba(56,189,248,0.18); border:1px solid #0284c7; color:#bae6fd;" title="Opciones de respaldo (Descargar/Cargar archivo)">
-                <span>📦</span> <span id="btn-backup-text">Respaldo</span>
-            </button>
-            <button class="mode-btn" id="btn-reset-layout" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#cbd5e1;" title="Restablecer posiciones originales del video">
-                <span>↺</span> Restablecer
-            </button>
-            <button class="mode-btn active" id="btn-toggle-labels" title="Mostrar/Ocultar Nombres de los Ambientes"><span>🏷️</span> Etiquetas</button>
-            <button class="mode-btn active" id="btn-toggle-video-decor" title="Mostrar/Ocultar Muebles, Electrodomésticos y Decoración Real"><span>🛋️</span> Muebles</button>
-            <button class="mode-btn" id="btn-toggle-roof" title="Mostrar/Ocultar Techo de Madera y Vigas"><span>🏠</span> Techo</button>
-            <button class="mode-btn" id="btn-toggle-doors" title="Abrir / Cerrar todas las puertas y placards del departamento"><span>🚪</span> Puertas</button>
-            <button class="mode-btn" id="btn-toggle-windows" title="Abrir / Cerrar todas las ventanas corredizas y ventiluz del departamento (Entra brisa patagónica)"><span>🪟</span> Ventanas</button>
-            <button class="mode-btn" id="btn-toggle-curtains" title="Abrir / Cerrar todas las cortinas recogibles del departamento"><span>🎋</span> Cortinas</button>
-            <button class="mode-btn" id="btn-toggle-dining-table" style="background:rgba(234,88,12,0.22); border:1px solid #f97316; color:#fdba74; font-weight:700;" title="Ampliar / Cerrar Mesa de Comedor Ovalada en 3 tandas (Ø 1.00m → 1.23m → 1.47m → 1.70m) [Tecla M]"><span>🍽️</span> <span id="lbl-dining-table-btn">Mesa 1.00m</span></button>
-            <div id="solar-time-group" style="display:flex; gap:2px; border-left:1px solid rgba(255,255,255,0.18); padding-left:4px;">
-                <button class="mode-btn solar-btn" data-time="morning" title="09:30 - Mañana Fresca (El Calafate)" style="padding:4px 6px;">🌅</button>
-                <button class="mode-btn solar-btn active" data-time="noon" title="13:30 - Mediodía Patagónico (Luz Día Natural)" style="padding:4px 6px; background:#f59e0b; border-color:#fbbf24; color:#0f172a;">☀️</button>
-                <button class="mode-btn solar-btn" data-time="golden" title="17:30 - Tarde Cálida" style="padding:4px 6px;">🌇</button>
-                <button class="mode-btn solar-btn" data-time="night" title="22:30 - Noche Domótica WiZ (2700K/4000K + Gaming RGB)" style="padding:4px 6px;">🌙</button>
-            </div>
-            <div style="display:flex; gap:3px; margin-left:2px; border-left:1px solid rgba(255,255,255,0.15); padding-left:4px;">
+            <div style="display:flex; gap:3px; margin-left:auto; align-items:center;">
                 <button class="icon-btn" id="btn-zoom-in" title="Acercar plano" style="padding:4px 6px; font-size:12px;">➕</button>
                 <button class="icon-btn" id="btn-zoom-out" title="Alejar plano" style="padding:4px 6px; font-size:12px;">➖</button>
                 <button class="icon-btn" id="btn-zoom-reset" title="Restablecer vista" style="padding:4px 6px; font-size:12px;">🎯</button>
+            </div>
+
+            <!-- Botones internos ocultos para mantener compatibilidad total con eventos y atajos -->
+            <div class="legacy-scroll-btns" aria-hidden="true">
+                <button class="mode-btn" id="btn-toggle-cam-proj" onclick="toggleCameraProjection()"><span id="cam-proj-icon">📐</span> <span id="cam-proj-label">Isométrica</span></button>
+                <button class="mode-btn" id="btn-mode-2d">2D</button>
+                <button class="mode-btn" id="btn-mode-3d">3D Muros</button>
+                <button class="mode-btn active" id="btn-mode-sims">3D Sims</button>
+                <button class="mode-btn" id="btn-mode-walk">Caminar 3D</button>
+                <button class="mode-btn" id="btn-mode-tour">Tour 3D</button>
+                <button class="mode-btn" id="btn-bim-mode"><span id="lbl-bim-mode">Modo Planificación</span></button>
+                <button class="mode-btn" id="btn-measure-tape"><span id="lbl-measure-tape">Medir A↔B</span></button>
+                <button class="mode-btn" id="btn-wall-hang"><span id="lbl-wall-hang">Cuadros</span></button>
+                <button class="mode-btn" id="btn-share-readonly"><span id="btn-share-text">Compartir</span></button>
+                <button class="mode-btn" id="btn-toggle-edit-mode"><span id="btn-edit-mode-icon">🔒</span> <span id="btn-edit-mode-text">Editar muebles</span></button>
+                <button class="mode-btn" id="btn-save-layout"><span id="btn-save-text">Guardar</span></button>
+                <button class="mode-btn" id="btn-backup-menu"><span id="btn-backup-text">Respaldo</span></button>
+                <button class="mode-btn" id="btn-reset-layout">Restablecer</button>
+                <button class="mode-btn active" id="btn-toggle-labels">Etiquetas</button>
+                <button class="mode-btn active" id="btn-toggle-video-decor">Muebles</button>
+                <button class="mode-btn" id="btn-toggle-roof">Techo</button>
+                <button class="mode-btn" id="btn-toggle-doors">Puertas</button>
+                <button class="mode-btn" id="btn-toggle-windows">Ventanas</button>
+                <button class="mode-btn" id="btn-toggle-curtains">Cortinas</button>
+                <button class="mode-btn" id="btn-toggle-dining-table"><span id="lbl-dining-table-btn">Mesa 1.00m</span></button>
+                <div id="solar-time-group">
+                    <button class="mode-btn solar-btn" data-time="morning">🌅</button>
+                    <button class="mode-btn solar-btn active" data-time="noon">☀️</button>
+                    <button class="mode-btn solar-btn" data-time="golden">🌇</button>
+                    <button class="mode-btn solar-btn" data-time="night">🌙</button>
+                </div>
             </div>
         </div>
     </div>
@@ -2750,10 +2817,57 @@
                 }
             });
 
+            if (typeof updateCurtainLightBlocking === 'function') {
+                updateCurtainLightBlocking();
+            }
             if (notify) {
                 showToast(`${preset.isNight ? '🌙' : '☀️'} ${preset.name}`);
             }
             wakeRenderer();
+        }
+
+        // Atenuador físico en tiempo real de luz solar exterior según el estado de las dos cortinas (Visillo Difuminador vs. Blackout Total)
+        function updateCurtainLightBlocking() {
+            const preset = SOLAR_PRESETS[currentSolarTime] || SOLAR_PRESETS.noon;
+            if (preset.isNight || !Array.isArray(animCurtains) || animCurtains.length === 0) return;
+
+            // Calcular factor medio de transmisión de luz exterior por ventana:
+            // - Ambas abiertas (sheerOpen=1, blackoutOpen=1) => transmisión = 1.00 (100% luz solar)
+            // - Visillo difuminador cerrado (sheerOpen=0, blackoutOpen=1) => transmisión = 0.78 (difumina y suaviza el sol directo)
+            // - Blackout cerrado (blackoutOpen=0) => transmisión = 0.00 (corta el 100% de la luz exterior de esa ventana)
+            let totalTrans = 0;
+            let blackoutCount = 0;
+            for (let i = 0; i < animCurtains.length; i++) {
+                const c = animCurtains[i];
+                const bOpen = (typeof c.currentBlackoutOpen === 'number') ? c.currentBlackoutOpen : 1.0;
+                const sOpen = (typeof c.currentSheerOpen === 'number') ? c.currentSheerOpen : 0.0;
+                if (bOpen < 0.15) blackoutCount++;
+                const sheerFactor = 0.78 + 0.22 * sOpen;
+                const winTransmission = bOpen * sheerFactor;
+                totalTrans += winTransmission;
+            }
+            const avgTrans = totalTrans / animCurtains.length; // 0.0 (todas blackout cerradas) .. 1.0 (todas abiertas)
+
+            // Ajustar luces exteriores e interiores diurnas proporcionalmente al bloqueo de cortinas Blackout
+            dirLight.intensity = preset.sunIntensity * Math.pow(avgTrans, 1.25);
+            hemiLight.intensity = preset.hemiIntensity * (0.08 + 0.92 * avgTrans);
+            ambLight.intensity = preset.ambIntensity * (0.10 + 0.90 * avgTrans);
+            fillLight.intensity = preset.fillIntensity * avgTrans;
+
+            if (typeof roomLights !== 'undefined' && Array.isArray(roomLights)) {
+                roomLights.forEach(rl => {
+                    if (!rl) return;
+                    if (rl.userData._baseDayIntensity === undefined) {
+                        rl.userData._baseDayIntensity = rl.intensity;
+                    }
+                    rl.intensity = rl.userData._baseDayIntensity * (0.06 + 0.94 * avgTrans);
+                });
+            }
+
+            // Si la mayoría de los blackouts están cerrados de día, apagar reflejos IBL diurnos para oscuridad real interior
+            if (typeof studioDayEnvTexture !== 'undefined' && studioDayEnvTexture) {
+                scene.environment = (avgTrans < 0.18) ? null : studioDayEnvTexture;
+            }
         }
 
         const UNIT_BOX_GEO = new THREE.BoxGeometry(1, 1, 1);
@@ -3388,14 +3502,23 @@
             // Calcular bounding box para centrar el origen del grupo en el centro geométrico
             const box = new THREE.Box3().setFromObject(tempGroup);
             const center = new THREE.Vector3();
+            const size = new THREE.Vector3();
             box.getCenter(center);
+            box.getSize(size);
 
             // Crear el grupo definitivo ubicado en center
             const assemblyGroup = new THREE.Group();
             assemblyGroup.name = name;
             assemblyGroup.userData.name = name;
+            assemblyGroup.userData.nombre = name;
             assemblyGroup.userData.isAssembly = true;
             assemblyGroup.userData.isDecor = true;
+            assemblyGroup.userData.dimensiones = {
+                ancho: +(Math.max(size.x, size.z)).toFixed(2),
+                alto: +(size.y).toFixed(2),
+                profundidad: +(Math.min(size.x, size.z)).toFixed(2),
+                elevacion: +(Math.max(0, box.min.y)).toFixed(2)
+            };
             assemblyGroup.position.copy(center);
 
             // Reparentar hijos con offset relativo al centro
@@ -3427,39 +3550,140 @@
         const INT_T = 0.08;
 
         // ============================================================================
-        // 2. PISO CERÁMICO 33×33 cm EN "L" (6.30 m × 8.00 m) + BAÑO + PALIER EXTERIOR
+        // 2. SOLADOS INDIVIDUALES POR AMBIENTE (PISO CERÁMICO 33×33 cm + BAÑO + PALIER)
+        //    Cada ambiente tiene su propia malla y material independiente para poder
+        //    seleccionarse y personalizarse por separado sin afectar el resto del depto.
         // ============================================================================
-        // Bloque superior (Estudio, Living y Entrada) [0.00, 0.00] a [6.30, 6.30]
-        const floorMainGeo = new THREE.BoxGeometry(6.30, 0.06, 6.30);
-        const floorMainMesh = new THREE.Mesh(floorMainGeo, floorMatMain);
-        floorMainMesh.position.set(3.15, -0.03, 3.15);
-        floorMainMesh.receiveShadow = true;
-        floorMainMesh.name = 'floorMainMesh';
-        floorGroup.add(floorMainMesh);
+        const roomFloorMeshes = [];
+        function createRoomFloorPatch(name, roomId, roomTitle, boxesSpec, baseMat, customDims) {
+            const mat = baseMat.clone();
+            if (boxesSpec.length === 1) {
+                const b = boxesSpec[0];
+                const geo = new THREE.BoxGeometry(b.w, b.h || 0.06, b.d);
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.set(b.x, b.y ?? -0.03, b.z);
+                mesh.receiveShadow = true;
+                mesh.name = name;
+                mesh.userData.roomId = roomId;
+                mesh.userData.nombre = roomTitle;
+                mesh.userData.categoria = 'piso';
+                mesh.userData.dimensiones = customDims;
+                mesh.userData.floorPeerMeshes = [mesh];
+                floorGroup.add(mesh);
+                roomFloorMeshes.push(mesh);
+                return mesh;
+            } else {
+                const peerMeshes = [];
+                boxesSpec.forEach((b, idx) => {
+                    const geo = new THREE.BoxGeometry(b.w, b.h || 0.06, b.d);
+                    const mesh = new THREE.Mesh(geo, mat);
+                    mesh.position.set(b.x, b.y ?? -0.03, b.z);
+                    mesh.receiveShadow = true;
+                    mesh.name = idx === 0 ? name : `${name}_sub${idx}`;
+                    mesh.userData.roomId = roomId;
+                    mesh.userData.nombre = roomTitle;
+                    mesh.userData.categoria = 'piso';
+                    mesh.userData.dimensiones = customDims;
+                    floorGroup.add(mesh);
+                    peerMeshes.push(mesh);
+                    roomFloorMeshes.push(mesh);
+                });
+                peerMeshes.forEach(pm => { pm.userData.floorPeerMeshes = peerMeshes; });
+                return peerMeshes[0];
+            }
+        }
 
-        // Bloque inferior (Cuarto + Cocina) [0.00, 6.30] a [4.85, 8.00] (1.70 m de profundidad)
-        const floorSouthGeo = new THREE.BoxGeometry(4.85, 0.06, 1.70);
-        const floorSouthMesh = new THREE.Mesh(floorSouthGeo, floorMatSouth);
-        floorSouthMesh.position.set(2.425, -0.03, 7.15);
-        floorSouthMesh.receiveShadow = true;
-        floorSouthMesh.name = 'floorSouthMesh';
-        floorGroup.add(floorSouthMesh);
+        // 1. Living-Comedor: [3.00..6.30, 0.00..5.20] (Ancho interior relevado 2.90 m × Largo 5.10 m)
+        const floorLivingMesh = createRoomFloorPatch(
+            'floorLivingMesh',
+            'piso_living',
+            'Piso Living-Comedor (Cerámico 33×33 — 2.90 × 5.10 m)',
+            [{ x: 4.65, z: 2.60, w: 3.30, d: 5.20 }],
+            floorMatMain,
+            { ancho: 5.10, alto: 0.02, profundidad: 2.90, elevacion: 0.00 }
+        );
 
-        // Piso cerámico 33.33×33.33 cm del Baño [0.00, 3.30] a [2.30, 4.70] (centrado en Z = 4.00 m)
+        // 2. Hall de Entrada: [4.85..6.30, 5.20..6.30] (Frente puerta 1.20 m × Mocheta 0.97 m)
+        const floorEntradaMesh = createRoomFloorPatch(
+            'floorEntradaMesh',
+            'piso_entrada',
+            'Piso Hall de Entrada (Cerámico 33×33 — 1.20 × 0.97 m)',
+            [{ x: 5.575, z: 5.75, w: 1.45, d: 1.10 }],
+            floorMatMain,
+            { ancho: 1.20, alto: 0.02, profundidad: 0.97, elevacion: 0.00 }
+        );
+
+        // 3. Estudio y Placard Norte: [0.00..3.00, 0.00..2.80] + [0.00..2.30, 2.80..3.30]
+        const floorEstudioMesh = createRoomFloorPatch(
+            'floorEstudioMesh',
+            'piso_estudio',
+            'Piso Estudio / Escritorio (Cerámico 33×33 — 3.00 × 2.80 m)',
+            [
+                { x: 1.50, z: 1.40, w: 3.00, d: 2.80 },
+                { x: 1.15, z: 3.05, w: 2.30, d: 0.50 }
+            ],
+            floorMatMain,
+            { ancho: 3.00, alto: 0.02, profundidad: 2.80, elevacion: 0.00 }
+        );
+
+        // 4. Pasillo Distribuidor: [2.30..3.00, 2.80..5.20] (Paso 0.70 × 2.40 m)
+        const floorPasilloMesh = createRoomFloorPatch(
+            'floorPasilloMesh',
+            'piso_pasillo',
+            'Piso Pasillo Distribuidor (Cerámico 33×33 — 2.40 × 0.70 m)',
+            [{ x: 2.65, z: 4.00, w: 0.70, d: 2.40 }],
+            floorMatMain,
+            { ancho: 2.40, alto: 0.02, profundidad: 0.70, elevacion: 0.00 }
+        );
+
+        // 5. Dormitorio Principal y Placard Sur: [0.00..3.00, 5.20..8.00] + [0.00..2.30, 4.70..5.20] (2.95 × 3.28 m)
+        const floorCuartoMesh = createRoomFloorPatch(
+            'floorCuartoMesh',
+            'piso_cuarto',
+            'Piso Dormitorio Principal (Cerámico 33×33 — 3.28 × 2.95 m)',
+            [
+                { x: 1.50, z: 6.60, w: 3.00, d: 2.80 },
+                { x: 1.15, z: 4.95, w: 2.30, d: 0.50 }
+            ],
+            floorMatSouth,
+            { ancho: 3.28, alto: 0.02, profundidad: 2.95, elevacion: 0.00 }
+        );
+
+        // 6. Cocina: [3.00..4.85, 5.20..8.00] (Ancho Sur 1.55 m × Largo 2.80 m)
+        const floorCocinaMesh = createRoomFloorPatch(
+            'floorCocinaMesh',
+            'piso_cocina',
+            'Piso Cocina Equipada (Cerámico 33×33 — 2.80 × 1.55 m)',
+            [{ x: 3.925, z: 6.60, w: 1.85, d: 2.80 }],
+            floorMatSouth,
+            { ancho: 2.80, alto: 0.02, profundidad: 1.55, elevacion: 0.00 }
+        );
+
+        // Compatibilidad con referencias existentes (floorMainMesh / floorSouthMesh)
+        const floorMainMesh = floorLivingMesh;
+        const floorSouthMesh = floorCocinaMesh;
+
+        // 7. Piso cerámico 33.33×33.33 cm del Baño [0.00, 3.30] a [2.30, 4.70] (Largo interior 2.02 m × 1.40 m)
         const bathFloorGeo = new THREE.BoxGeometry(2.30, 0.0604, 1.40);
         const bathFloorMesh = new THREE.Mesh(bathFloorGeo, bathFloorMat);
         bathFloorMesh.position.set(1.15, -0.0298, 4.00);
         bathFloorMesh.receiveShadow = true;
         bathFloorMesh.name = 'bathFloorMesh';
+        bathFloorMesh.userData.roomId = 'piso_bano';
+        bathFloorMesh.userData.floorPeerMeshes = [bathFloorMesh];
         floorGroup.add(bathFloorMesh);
+        roomFloorMeshes.push(bathFloorMesh);
 
-        // Palier Edificio Exterior [4.85, 6.30] a [6.30, 8.00] (1.45 m de ancho x 1.70 m de profundidad)
+        // 8. Palier Edificio Exterior [4.85, 6.30] a [6.30, 8.00] (Frente 1.20 m × 1.70 m)
         const palierGeo = new THREE.BoxGeometry(1.45, 0.06, 1.70);
         const palierMesh = new THREE.Mesh(palierGeo, palierMat);
         palierMesh.position.set(5.575, -0.03, 7.15);
         palierMesh.receiveShadow = true;
         palierMesh.name = 'palierMesh';
+        palierMesh.userData.roomId = 'piso_palier';
+        palierMesh.userData.floorPeerMeshes = [palierMesh];
         floorGroup.add(palierMesh);
+        roomFloorMeshes.push(palierMesh);
 
         function getWallNormals(x1, z1, x2, z2, isExterior) {
             const dx = x2 - x1;
@@ -3534,14 +3758,16 @@
         let bimAutoIdSeq = 1;
         function assignBIMUserData(targetObj, meta = {}) {
             if (!targetObj) return;
-            const id = meta.id || `bim_${meta.categoria || 'obj'}_${bimAutoIdSeq++}`;
-            const nombre = meta.nombre || targetObj.userData?.name || targetObj.name || 'Elemento Arquitectónico';
-            const categoria = meta.categoria || 'mueble'; // 'mueble' | 'abertura' | 'muro'
+            const id = meta.id || targetObj.userData?.id || `bim_${meta.categoria || 'obj'}_${bimAutoIdSeq++}`;
+            const nombre = meta.nombre || targetObj.userData?.nombre || targetObj.userData?.name || targetObj.name || 'Elemento Arquitectónico';
+            const categoria = meta.categoria || targetObj.userData?.categoria || 'mueble'; // 'mueble' | 'abertura' | 'muro' | 'piso'
+            const dSrc = meta.dimensiones || meta;
+            const existingDims = targetObj.userData?.dimensiones;
             const dims = {
-                ancho: Number((meta.ancho ?? 0.50).toFixed(2)),
-                alto: Number((meta.alto ?? 0.50).toFixed(2)),
-                profundidad: Number((meta.profundidad ?? 0.50).toFixed(2)),
-                elevacion: Number((meta.elevacion ?? 0.00).toFixed(2))
+                ancho: Number((dSrc.ancho ?? existingDims?.ancho ?? 0.50).toFixed(2)),
+                alto: Number((dSrc.alto ?? existingDims?.alto ?? 0.50).toFixed(2)),
+                profundidad: Number((dSrc.profundidad ?? existingDims?.profundidad ?? 0.50).toFixed(2)),
+                elevacion: Number((dSrc.elevacion ?? existingDims?.elevacion ?? 0.00).toFixed(2))
             };
             const applyToNode = (node) => {
                 if (!node.userData) node.userData = {};
@@ -6617,7 +6843,21 @@
         }
 
         const sheerCurtainMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, transparent: true, opacity: 0.65, roughness: 0.90, metalness: 0.0 });
-        // Constructor de Cortinas PBR Interactivas Animadas (Recogibles con Brisa Patagónica)
+        const blackoutCurtainMatCache = new Map();
+        function getBlackoutMat(drapeColor = 0xc8beb4) {
+            if (!blackoutCurtainMatCache.has(drapeColor)) {
+                blackoutCurtainMatCache.set(drapeColor, new THREE.MeshStandardMaterial({
+                    color: drapeColor,
+                    roughness: 0.92,
+                    metalness: 0.0,
+                    transparent: false,
+                    opacity: 1.0
+                }));
+            }
+            return blackoutCurtainMatCache.get(drapeColor);
+        }
+
+        // Constructor de Sistema de Doble Cortina PBR Interactivo (1° Visillo Difuminador + 2° Blackout Total que bloquea luz exterior)
         function addCurtainAssembly(x1, z1, x2, z2, offsetInwardX, offsetInwardZ, drapeColor = 0xc8beb4) {
             const dx = x2 - x1;
             const dz = z2 - z1;
@@ -6630,124 +6870,178 @@
             g.rotation.y = -angle;
 
             // Identificación unívoca del ambiente
-            let curtainTitle = "Cortina";
-            if (Math.abs(z1) < 0.1 && cMidX < 2.5) curtainTitle = "Cortina Estudio (Norte)";
-            else if (Math.abs(z1) < 0.1 && cMidX < 5.0) curtainTitle = "Cortina Living V1 (Norte)";
-            else if (Math.abs(z1) < 0.1 && cMidX >= 5.0) curtainTitle = "Cortina Living V2 (Norte)";
-            else if (Math.abs(x1 - 7.00) < 0.1 || Math.abs(x1 - 6.30) < 0.1) curtainTitle = "Cortina Living V3 (Lateral Este)";
-            else if (Math.abs(z1 - 8.00) < 0.1) curtainTitle = "Cortina Dormitorio (Sur)";
+            let curtainTitle = "Cortina Doble (Visillo + Blackout)";
+            if (Math.abs(z1) < 0.1 && cMidX < 2.5) curtainTitle = "Cortina Doble Estudio (Visillo + Blackout)";
+            else if (Math.abs(z1) < 0.1 && cMidX < 5.0) curtainTitle = "Cortina Doble Living V1 (Visillo + Blackout)";
+            else if (Math.abs(z1) < 0.1 && cMidX >= 5.0) curtainTitle = "Cortina Doble Living V2 (Visillo + Blackout)";
+            else if (Math.abs(x1 - 7.00) < 0.1 || Math.abs(x1 - 6.30) < 0.1) curtainTitle = "Cortina Doble Living V3 Este (Visillo + Blackout)";
+            else if (Math.abs(z1 - 8.00) < 0.1) curtainTitle = "Cortina Doble Dormitorio (Visillo + Blackout)";
 
-            // 1. BARRAL DE MADERA MACIZA Y TERMINALES TORNEADOS A Y = 2.12 m
+            // 1. DOBLE BARRAL DE MADERA MACIZA Y TERMINALES TORNEADOS A Y = 2.12 m (Riel interior Visillo + Riel exterior Blackout)
             const rodMat = getStdMat(0x6c2e12, 0.45);
             const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, len, 16), rodMat);
             rod.rotation.z = Math.PI / 2;
-            rod.position.set(0, 2.12, 0);
+            rod.position.set(0, 2.12, 0.020);
             rod.castShadow = true;
-            g.add(rod);
+            const innerRod = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, len - 0.04, 12), rodMat);
+            innerRod.rotation.z = Math.PI / 2;
+            innerRod.position.set(0, 2.11, -0.008);
+            g.add(rod, innerRod);
 
             // Terminales esféricos torneados en los extremos
             [-1, 1].forEach(side => {
                 const finial = new THREE.Mesh(new THREE.SphereGeometry(0.026, 12, 12), rodMat);
-                finial.position.set(side * (len / 2 + 0.015), 2.12, 0);
+                finial.position.set(side * (len / 2 + 0.015), 2.12, 0.020);
                 const bracket = new THREE.Mesh(UNIT_BOX_GEO, rodMat);
-                bracket.scale.set(0.024, 0.045, 0.06);
-                bracket.position.set(side * (len / 2 - 0.05), 2.12, -0.03);
+                bracket.scale.set(0.024, 0.045, 0.075);
+                bracket.position.set(side * (len / 2 - 0.05), 2.12, -0.015);
                 g.add(finial, bracket);
             });
 
             // Argollas de madera deslizantes
             for (let rx = -len / 2 + 0.08; rx <= len / 2 - 0.08; rx += 0.14) {
                 const ring = new THREE.Mesh(new THREE.TorusGeometry(0.019, 0.0035, 8, 16), rodMat);
-                ring.position.set(rx, 2.12, 0);
+                ring.position.set(rx, 2.12, 0.020);
                 g.add(ring);
             }
 
-            // 2. VISILLOS BLANCOS TRANSLÚCIDOS (DIVIDIDOS EN 2 HOJAS PARA CORRERSE DEL CENTRO)
-            const sheerHalfW = (len - 0.08) / 2;
+            // 2. CORTINA 1: VISILLO BLANCO TRANSLÚCIDO DIFUMINADOR (Cubre 100% del vano para tamizar la luz solar)
+            const sheerHalfW = (len - 0.06) / 2;
             const sheerLeftGroup = new THREE.Group();
-            sheerLeftGroup.position.set(-sheerHalfW / 2, 1.48, 0.006);
+            sheerLeftGroup.position.set(-sheerHalfW / 2, 1.48, -0.006);
             const sheerLMesh = new THREE.Mesh(UNIT_BOX_GEO, sheerCurtainMat);
-            sheerLMesh.scale.set(sheerHalfW, 1.22, 0.012);
+            sheerLMesh.scale.set(sheerHalfW, 1.24, 0.012);
             sheerLeftGroup.add(sheerLMesh);
 
             const sheerRightGroup = new THREE.Group();
-            sheerRightGroup.position.set(sheerHalfW / 2, 1.48, 0.006);
+            sheerRightGroup.position.set(sheerHalfW / 2, 1.48, -0.006);
             const sheerRMesh = new THREE.Mesh(UNIT_BOX_GEO, sheerCurtainMat);
-            sheerRMesh.scale.set(sheerHalfW, 1.22, 0.012);
+            sheerRMesh.scale.set(sheerHalfW, 1.24, 0.012);
             sheerRightGroup.add(sheerRMesh);
 
             g.add(sheerLeftGroup, sheerRightGroup);
 
-            // 3. PAÑOS DE CORTINA LATERALES PESADOS (TELA CON CAÍDA Y ALZAPAÑOS)
-            const panelMat = getStdMat(drapeColor, 0.76);
-            const drapeW = 0.32;
-            const drapeH = 1.34;
+            // 3. CORTINA 2: PAÑOS BLACKOUT PESADOS OPACOS (Al cerrarse se unen al centro X=0 cubriendo el 100% de la ventana y cortando toda la luz exterior)
+            const panelMat = getBlackoutMat(drapeColor);
+            const blackoutHalfW = (len - 0.04) / 2;
+            const drapeH = 1.36;
 
-            // Paño izquierdo
+            // Paño Blackout izquierdo (ancho base = blackoutHalfW para cubrir media ventana exacta cuando scale.x = 1.0)
             const drapeLeftGroup = new THREE.Group();
-            drapeLeftGroup.position.set(-len / 2 + 0.17, 1.43, 0.022);
-            const dLeftMesh = new THREE.Mesh(createRoundedBoxGeo(drapeW, drapeH, 0.04, 0.012, 2), panelMat);
+            drapeLeftGroup.position.set(-len / 2 + 0.17, 1.43, 0.024);
+            const dLeftMesh = new THREE.Mesh(createRoundedBoxGeo(blackoutHalfW, drapeH, 0.042, 0.012, 2), panelMat);
             dLeftMesh.castShadow = true;
-            // Alzapaños izquierdo
+            dLeftMesh.receiveShadow = true;
+            // Alzapaños izquierdo (visible cuando el blackout está recogido)
             const tieLeft = new THREE.Mesh(createRoundedBoxGeo(0.04, 0.05, 0.065, 0.008, 2), rodMat);
-            tieLeft.position.set(drapeW / 2 - 0.01, -0.06, 0);
+            tieLeft.position.set(blackoutHalfW / 2 - 0.02, -0.06, 0);
             drapeLeftGroup.add(dLeftMesh, tieLeft);
 
-            // Paño derecho
+            // Paño Blackout derecho
             const drapeRightGroup = new THREE.Group();
-            drapeRightGroup.position.set(len / 2 - 0.17, 1.43, 0.022);
-            const dRightMesh = new THREE.Mesh(createRoundedBoxGeo(drapeW, drapeH, 0.04, 0.012, 2), panelMat);
+            drapeRightGroup.position.set(len / 2 - 0.17, 1.43, 0.024);
+            const dRightMesh = new THREE.Mesh(createRoundedBoxGeo(blackoutHalfW, drapeH, 0.042, 0.012, 2), panelMat);
             dRightMesh.castShadow = true;
+            dRightMesh.receiveShadow = true;
             // Alzapaños derecho
             const tieRight = new THREE.Mesh(createRoundedBoxGeo(0.04, 0.05, 0.065, 0.008, 2), rodMat);
-            tieRight.position.set(-drapeW / 2 + 0.01, -0.06, 0);
+            tieRight.position.set(-blackoutHalfW / 2 + 0.02, -0.06, 0);
             drapeRightGroup.add(dRightMesh, tieRight);
 
             g.add(drapeLeftGroup, drapeRightGroup);
+            g.userData.nombre = curtainTitle;
+            g.userData.categoria = 'abertura';
+            g.userData.dimensiones = { ancho: +(len).toFixed(2), alto: 1.36, profundidad: 0.09, elevacion: 0.78 };
             decorVideoGroup.add(g);
             attachWallMount(g, (x1 + x2) / 2, (z1 + z2) / 2, Math.abs(dx) >= Math.abs(dz));
 
             // Vincular con la ventana correspondiente para sincronización de brisa
             const linkedWindow = animWindows.find(w => Math.hypot(w.midX - cMidX, w.midZ - cMidZ) < 0.75) || null;
 
-            // Función de interpolación de recogida de cortinas
-            function applyProgress(p) {
-                // p: 0.0 (Cerrada / corrida cubriendo el vano) -> 1.0 (Abierta / recogida a los laterales)
-                sheerLeftGroup.scale.x = (1 - p) * 1.0 + p * 0.16;
-                sheerLeftGroup.position.x = (1 - p) * (-sheerHalfW / 2) + p * (-len / 2 + 0.10);
+            // Función de interpolación independiente para las 2 cortinas:
+            // sheerOpenP: 0.0 (Visillo cerrado difuminando luz) -> 1.0 (Visillo abierto a los lados)
+            // blackoutOpenP: 0.0 (Blackout cerrado al 100% cortando toda luz exterior) -> 1.0 (Blackout recogido a los lados)
+            function applyDualLayers(sheerOpenP, blackoutOpenP) {
+                sheerLeftGroup.scale.x = (1 - sheerOpenP) * 1.0 + sheerOpenP * 0.18;
+                sheerLeftGroup.position.x = (1 - sheerOpenP) * (-sheerHalfW / 2) + sheerOpenP * (-len / 2 + 0.10);
 
-                sheerRightGroup.scale.x = (1 - p) * 1.0 + p * 0.16;
-                sheerRightGroup.position.x = (1 - p) * (sheerHalfW / 2) + p * (len / 2 - 0.10);
+                sheerRightGroup.scale.x = (1 - sheerOpenP) * 1.0 + sheerOpenP * 0.18;
+                sheerRightGroup.position.x = (1 - sheerOpenP) * (sheerHalfW / 2) + sheerOpenP * (len / 2 - 0.10);
 
-                drapeLeftGroup.scale.x = (1 - p) * 1.0 + p * 0.62;
-                drapeLeftGroup.position.x = (1 - p) * (-len / 2 + 0.19) + p * (-len / 2 + 0.12);
+                // Cuando blackoutOpenP === 0 (Blackout cerrado), scale.x = 1.02 y las dos hojas se tocan y solapan en X = 0 sin dejar pasar luz
+                drapeLeftGroup.scale.x = (1 - blackoutOpenP) * 1.02 + blackoutOpenP * 0.42;
+                drapeLeftGroup.position.x = (1 - blackoutOpenP) * (-blackoutHalfW / 2 + 0.008) + blackoutOpenP * (-len / 2 + 0.16);
+                tieLeft.visible = blackoutOpenP > 0.55;
 
-                drapeRightGroup.scale.x = (1 - p) * 1.0 + p * 0.62;
-                drapeRightGroup.position.x = (1 - p) * (len / 2 - 0.19) + p * (len / 2 - 0.12);
+                drapeRightGroup.scale.x = (1 - blackoutOpenP) * 1.02 + blackoutOpenP * 0.42;
+                drapeRightGroup.position.x = (1 - blackoutOpenP) * (blackoutHalfW / 2 - 0.008) + blackoutOpenP * (len / 2 - 0.16);
+                tieRight.visible = blackoutOpenP > 0.55;
             }
+
+            // Estado inicial por defecto: mode = 'sheer' (Visillo difuminador cerrado, Blackout abierto a los lados como en el video)
+            applyDualLayers(0.0, 1.0);
 
             const curtainEntry = {
                 name: curtainTitle,
+                mode: 'sheer', // 'open' (Abiertas) | 'sheer' (Visillo Difuminador) | 'blackout' (Blackout Total Cerrado)
                 isOpen: false,
+                currentSheerOpen: 0.0,
+                targetSheerOpen: 0.0,
+                currentBlackoutOpen: 1.0,
+                targetBlackoutOpen: 1.0,
                 currentProgress: 0.0,
                 targetProgress: 0.0,
-                applyProgress: applyProgress,
+                applyDualLayers: applyDualLayers,
+                applyProgress(p) {
+                    applyDualLayers(this.currentSheerOpen, this.currentBlackoutOpen);
+                },
+                setMode(newMode) {
+                    this.mode = newMode;
+                    if (newMode === 'open') {
+                        // Ambas cortinas abiertas a los costados (100% luz exterior directa)
+                        this.isOpen = true;
+                        this.targetSheerOpen = 1.0;
+                        this.targetBlackoutOpen = 1.0;
+                        this.targetProgress = 1.0;
+                    } else if (newMode === 'sheer') {
+                        // Cortina 1 (Visillo) cerrada difuminando luz, Cortina 2 (Blackout) abierta
+                        this.isOpen = false;
+                        this.targetSheerOpen = 0.0;
+                        this.targetBlackoutOpen = 1.0;
+                        this.targetProgress = 0.0;
+                    } else if (newMode === 'blackout') {
+                        // Cortina 2 (Blackout) cerrada de lado a lado cortando toda la luz exterior
+                        this.isOpen = false;
+                        this.targetSheerOpen = 0.0;
+                        this.targetBlackoutOpen = 0.0;
+                        this.targetProgress = -1.0;
+                    }
+                    if (typeof updateCurtainLightBlocking === 'function') {
+                        updateCurtainLightBlocking();
+                    }
+                    wakeRenderer();
+                    return this.mode;
+                },
+                toggle() {
+                    // Cicla: Visillo Difuminador -> Blackout Total (Corta Luz) -> Abiertas -> Visillo Difuminador
+                    const nextMode = this.mode === 'sheer' ? 'blackout' : (this.mode === 'blackout' ? 'open' : 'sheer');
+                    return this.setMode(nextMode);
+                },
+                getStateLabel() {
+                    if (this.mode === 'blackout') return '🌑 Blackout Cerrado (Corta toda la luz exterior)';
+                    if (this.mode === 'sheer') return '🌤️ Visillo Difuminador (Luz suave tamizada)';
+                    return '☀️ Abiertas (Entra 100% luz exterior)';
+                },
                 phase: Math.random() * 6.28,
                 windAmp: 0.35,
                 linkedWindow: linkedWindow,
                 leftDrape: drapeLeftGroup,
                 rightDrape: drapeRightGroup,
                 leftSheer: sheerLeftGroup,
-                rightSheer: sheerRightGroup,
-                toggle() {
-                    this.isOpen = !this.isOpen;
-                    this.targetProgress = this.isOpen ? 1.0 : 0.0;
-                    wakeRenderer();
-                    return this.isOpen;
-                }
+                rightSheer: sheerRightGroup
             };
 
-            [dLeftMesh, dRightMesh, sheerLMesh, sheerRMesh, rod].forEach(m => {
+            [dLeftMesh, dRightMesh, sheerLMesh, sheerRMesh, rod, innerRod].forEach(m => {
                 m.userData.animCurtain = curtainEntry;
                 curtainClickCandidates.push(m);
             });
@@ -7644,10 +7938,8 @@
             addDecorCyl(4.37, 0.98, 6.06, 0.045, 0.045, 0.24, 0x475569, 0.3, 'Termo Acero Inox');  // Termo acero
             addDecorBox(4.39, 0.92, 6.95, 0.18, 0.09, 0.22, 0x0284c7, 0.3, 0, 'Tupper Celeste Mesada');    // Recipiente celeste sobre mesada
             // 3. Sector bajo Ventana Sur (Y=8.00):
-            // - Cortina roller blanca en ventana Sur (X=3.25..4.35, Z=7.94)
-            setMountWall(3.80, 8.00, true);
-            addDecorBox(3.80, 1.82, 7.94, 1.08, 0.36, 0.03, 0xf8fafc, 0.3, 0, 'Cortina Roller Ventana');
-            setMountWall(null);
+            // - Cortina doble (Sunscreen difuminador + Blackout roller) en ventana Sur de Cocina (X=3.25..4.35, Z=7.94)
+            addCurtainAssembly(3.25, 8.00, 4.35, 8.00, 0, -0.08, 0xd6d3cd);
             // - Escurridor de platos negro sobre el retorno Sur de la mesada (pegado al lavarropas bajo la ventana: X=3.88, Z=7.68)
             addDecorBox(3.88, 0.93, 7.68, 0.38, 0.10, 0.36, 0x1e293b, 0.4, 0, 'Escurridor de Platos Negro');
             // - Lavarropas automático blanco de carga frontal bajo la ventana Sur (X=3.05..3.65, Z=7.67, mirando al Norte) apoyado contra la pared Oeste X=3.00
@@ -8696,14 +8988,16 @@
             localStorage.removeItem('depto_layout_updated_at');
             localStorage.setItem('depto_schema_version', CURRENT_SCHEMA_VERSION);
         }
-        let decorOverrides = { deleted: [], transforms: {} };
+        let decorOverrides = { deleted: [], transforms: {}, materials: {}, wallItems: [] };
         try {
             const savedDecor = localStorage.getItem(DECOR_OVERRIDES_KEY);
             if (savedDecor) decorOverrides = JSON.parse(savedDecor);
             if (!Array.isArray(decorOverrides.deleted)) decorOverrides.deleted = [];
             if (typeof decorOverrides.transforms !== 'object' || !decorOverrides.transforms) decorOverrides.transforms = {};
+            if (typeof decorOverrides.materials !== 'object' || !decorOverrides.materials) decorOverrides.materials = {};
+            if (!Array.isArray(decorOverrides.wallItems)) decorOverrides.wallItems = [];
         } catch (e) {
-            decorOverrides = { deleted: [], transforms: {} };
+            decorOverrides = { deleted: [], transforms: {}, materials: {}, wallItems: [] };
         }
 
         // Función central y unificada de guardado y persistencia
@@ -8760,7 +9054,7 @@
                     if (obj.parent) obj.parent.remove(obj);
                 });
             }
-            // 2. Aplicar posiciones y rotaciones guardadas
+            // 2. Aplicar posiciones, rotaciones y escalas guardadas
             const transformedRoots = new Set();
             if (decorOverrides.transforms) {
                 apartmentGroup.traverse(child => {
@@ -8780,6 +9074,49 @@
                             root.scale.set(t.sx || 1, t.sy || 1, t.sz || 1);
                         }
                     }
+                });
+            }
+            // 3. Restaurar variantes de material guardadas en pisos por ambiente, muros completos y muebles
+            if (decorOverrides.materials && typeof applyBIMMaterialVariant === 'function' && typeof BIM_MATERIAL_CATALOG !== 'undefined') {
+                if (typeof enrichAllSceneBIMUserData === 'function') enrichAllSceneBIMUserData();
+                Object.entries(decorOverrides.materials).forEach(([targetKey, mSpec]) => {
+                    if (!mSpec || !mSpec.categoria || !mSpec.variantKey) return;
+                    const catList = BIM_MATERIAL_CATALOG[mSpec.categoria];
+                    const variant = catList ? catList.find(v => v.key === mSpec.variantKey) : null;
+                    if (!variant) return;
+
+                    if (mSpec.categoria === 'piso') {
+                        const fm = roomFloorMeshes.find(m => m.userData?.roomId === targetKey || m.name === targetKey);
+                        if (fm) applyBIMMaterialVariant(fm, 'piso', variant, true);
+                    } else if (mSpec.categoria === 'muro') {
+                        const wallEntry = logicalWallsRegistry.get(targetKey);
+                        if (wallEntry) {
+                            applyBIMMaterialVariant({ userData: { logicalWallEntry: wallEntry } }, 'muro', variant, true);
+                        }
+                    } else if (mSpec.categoria === 'mueble') {
+                        let foundObj = null;
+                        [furnitureGroup, decorVideoGroup, fixturesGroup].forEach(grp => {
+                            if (!grp || foundObj) return;
+                            grp.children.forEach(c => {
+                                if (foundObj) return;
+                                const cKey = c.userData?.id || c.userData?.name || c.userData?.nombre || c.name;
+                                if (cKey === targetKey) foundObj = c;
+                            });
+                        });
+                        if (foundObj) applyBIMMaterialVariant(foundObj, 'mueble', variant, true);
+                    }
+                });
+            }
+            // 4. Restaurar cuadros, espejos y estantes colgados en muros
+            if (Array.isArray(decorOverrides.wallItems) && typeof wallHangGroup !== 'undefined' && wallHangGroup && typeof createWallHungItem === 'function') {
+                while (wallHangGroup.children.length > 0) {
+                    wallHangGroup.remove(wallHangGroup.children[0]);
+                }
+                decorOverrides.wallItems.forEach(wi => {
+                    if (!wi || typeof wi.x !== 'number') return;
+                    const pt = new THREE.Vector3(wi.x, wi.y ?? 1.60, wi.z);
+                    const n = new THREE.Vector3(wi.nx ?? 0, 0, wi.nz ?? 1);
+                    createWallHungItem(wi.presetKey || 'cuadro', pt, n, null, true, wi.id);
                 });
             }
         }
@@ -10334,17 +10671,23 @@
             isReadOnlyShareMode = !!enableReadOnly;
             if (isReadOnlyShareMode) {
                 isFurnitureEditMode = false;
+                if (typeof isWallHangMode !== 'undefined' && isWallHangMode && typeof setWallHangMode === 'function') {
+                    setWallHangMode(false);
+                }
                 clearSelection();
             }
             const editIdsToHide = [
                 'btn-toggle-edit-mode',
+                'btn-wall-hang',
                 'btn-save-layout',
                 'btn-backup-menu',
                 'btn-reset-layout',
                 'btn-global-undo',
                 'sync-status-badge',
                 'furniture-editor',
-                'selected-object-bar'
+                'selected-object-bar',
+                'bim-card-mat-section',
+                'bim-card-wallitem-actions'
             ];
             editIdsToHide.forEach(id => {
                 const el = document.getElementById(id);
@@ -10353,11 +10696,22 @@
                         el.style.display = 'none';
                     } else if (id === 'sync-status-badge') {
                         el.style.display = '';
-                    } else if (id === 'btn-toggle-edit-mode' || id === 'btn-save-layout' || id === 'btn-backup-menu' || id === 'btn-reset-layout') {
+                    } else if (id === 'btn-toggle-edit-mode' || id === 'btn-wall-hang' || id === 'btn-save-layout' || id === 'btn-backup-menu' || id === 'btn-reset-layout') {
                         el.style.display = '';
                     }
                 }
             });
+            // Ocultar opciones de edición en el desplegable de herramientas para invitados
+            const selectTools = document.getElementById('select-tools-mode');
+            if (selectTools) {
+                selectTools.querySelectorAll('.owner-only-opt').forEach(opt => {
+                    opt.hidden = isReadOnlyShareMode;
+                    opt.disabled = isReadOnlyShareMode;
+                });
+                if (isReadOnlyShareMode && (selectTools.value === 'edit' || selectTools.value === 'wallhang')) {
+                    selectTools.value = 'nav';
+                }
+            }
             const roBadge = document.getElementById('viewer-readonly-badge');
             if (roBadge) roBadge.style.display = isReadOnlyShareMode ? 'inline-flex' : 'none';
             const chkFurnRow = document.getElementById('chk-furniture')?.closest('label');
@@ -10566,7 +10920,7 @@
                         const nextState = hitDoor.toggle();
                         showToast(`🚪 ${hitDoor.name}: ${nextState ? 'Abierta' : 'Cerrada'}`);
                         clearSelection();
-                        if (typeof selectBIMObject === 'function') selectBIMObject(hitMesh, e.clientX, e.clientY);
+                        if (isBIMPlanningMode && typeof selectBIMObject === 'function') selectBIMObject(hitMesh, e.clientX, e.clientY);
                         wakeRenderer();
                         return;
                     }
@@ -10581,22 +10935,25 @@
                         const nextState = hitWin.toggle();
                         showToast(`🪟 ${hitWin.name}: ${nextState ? 'Abierta (Entra brisa patagónica)' : 'Cerrada'}`);
                         clearSelection();
-                        if (typeof selectBIMObject === 'function') selectBIMObject(hitMesh, e.clientX, e.clientY);
+                        if (isBIMPlanningMode && typeof selectBIMObject === 'function') selectBIMObject(hitMesh, e.clientX, e.clientY);
                         wakeRenderer();
                         return;
                     }
                 }
 
-                // 0C. Raycast sobre cortinas animadas (recogibles con caída y brisa)
+                // 0C. Raycast sobre cortinas dobles animadas (1° Visillo Difuminador / 2° Blackout Total / Abiertas)
                 const curtainHits = raycaster.intersectObjects(curtainClickCandidates, false);
                 if (curtainHits.length > 0) {
                     const hitMesh = curtainHits[0].object;
                     const hitCurtain = hitMesh.userData.animCurtain;
                     if (hitCurtain) {
-                        const nextState = hitCurtain.toggle();
-                        showToast(`🎋 ${hitCurtain.name}: ${nextState ? 'Recogida (Abierta)' : 'Corrida (Cerrada)'}`);
+                        hitCurtain.toggle();
+                        const label = typeof hitCurtain.getStateLabel === 'function'
+                            ? hitCurtain.getStateLabel()
+                            : (hitCurtain.isOpen ? 'Recogida (Abierta)' : 'Corrida (Cerrada)');
+                        showToast(`🎋 ${hitCurtain.name}: ${label}`);
                         clearSelection();
-                        if (typeof selectBIMObject === 'function') selectBIMObject(hitMesh, e.clientX, e.clientY);
+                        if (isBIMPlanningMode && typeof selectBIMObject === 'function') selectBIMObject(hitMesh, e.clientX, e.clientY);
                         wakeRenderer();
                         return;
                     }
@@ -10609,7 +10966,7 @@
                 if (tableHits.length > 0) {
                     window.diningTableAnimState.cycleStage();
                     clearSelection();
-                    if (typeof selectBIMObject === 'function') selectBIMObject(tableHits[0].object, e.clientX, e.clientY);
+                    if (isBIMPlanningMode && typeof selectBIMObject === 'function') selectBIMObject(tableHits[0].object, e.clientX, e.clientY);
                     wakeRenderer();
                     return;
                 }
@@ -10617,10 +10974,10 @@
 
             // 0E. En modo Recorrido 1° Persona (Walkthrough): tocar un punto del piso te lleva caminando suavemente hasta allí (estilo Matterport)
             if (walkthroughState.active) {
-                if (typeof handleBIMRaycastSelection === 'function' && handleBIMRaycastSelection(e, true)) {
+                if (isBIMPlanningMode && typeof handleBIMRaycastSelection === 'function' && handleBIMRaycastSelection(e, true)) {
                     return;
                 }
-                const floorHits = raycaster.intersectObjects([floorMainMesh, floorSouthMesh, bathFloorMesh, palierMesh], false);
+                const floorHits = raycaster.intersectObjects(roomFloorMeshes.length > 0 ? roomFloorMeshes : [floorMainMesh, floorSouthMesh, bathFloorMesh, palierMesh], false);
                 if (floorHits.length > 0) {
                     const pt = floorHits[0].point;
                     const clamped = clampWalkthroughPosition(pt.x, pt.z);
@@ -10639,12 +10996,13 @@
                 return;
             }
 
-            // SISTEMA BIM DE INSPECCIÓN (Raycaster + BoxHelper + Tarjeta Contextual W×H×D):
-            // Si el modo "Editar muebles" NO está activo, cualquier clic/toque inspecciona muebles, aberturas o muros con metadatos BIM
+            // SISTEMA BIM DE INSPECCIÓN (No invasivo: SOLO se abre si el usuario activó el Modo Inspección / Planificación o Edición):
             if (!isFurnitureEditMode) {
                 clearSelection();
-                if (typeof handleBIMRaycastSelection === 'function') {
+                if (isBIMPlanningMode && typeof handleBIMRaycastSelection === 'function') {
                     handleBIMRaycastSelection(e, false);
+                } else if (typeof clearBIMSelection === 'function') {
+                    clearBIMSelection();
                 }
                 return;
             }
@@ -11116,15 +11474,25 @@
         });
 
         document.getElementById('btn-toggle-curtains').addEventListener('click', () => {
-            const anyClosed = animCurtains.some(c => !c.isOpen);
-            const nextState = anyClosed;
+            const firstMode = animCurtains.length > 0 ? (animCurtains[0].mode || 'sheer') : 'sheer';
+            const nextMode = firstMode === 'sheer' ? 'blackout' : (firstMode === 'blackout' ? 'open' : 'sheer');
             animCurtains.forEach(c => {
-                c.isOpen = nextState;
-                c.targetProgress = c.isOpen ? 1.0 : 0.0;
+                if (typeof c.setMode === 'function') {
+                    c.setMode(nextMode);
+                } else {
+                    c.isOpen = (nextMode === 'open');
+                    c.targetProgress = c.isOpen ? 1.0 : 0.0;
+                }
             });
             const btn = document.getElementById('btn-toggle-curtains');
-            if (btn) btn.classList.toggle('active', nextState);
-            showToast(nextState ? '🎋 Todas las cortinas recogidas (Abiertas)' : '🎋 Todas las cortinas corridas (Cerradas)');
+            if (btn) btn.classList.toggle('active', nextMode === 'blackout');
+            if (nextMode === 'sheer') {
+                showToast('🌤️ Todas las cortinas: Visillo Difuminador cerrado (Luz suave)');
+            } else if (nextMode === 'blackout') {
+                showToast('🌑 Todas las cortinas: Blackout Total cerrado (Corta toda la luz exterior)');
+            } else {
+                showToast('☀️ Todas las cortinas abiertas (100% luz exterior)');
+            }
             wakeRenderer();
         });
 
@@ -11546,16 +11914,38 @@
             return moving;
         }
 
-        // Actualizador de cortinas: apertura suave y ondulación orgánica por brisa patagónica (solo cuando la ventana está abierta o la cortina está en transición)
+        // Actualizador de cortinas: interpolación suave de doble cortina (Visillo + Blackout) y ondulación por brisa patagónica
         let curtainWindClock = 0;
         function updateAnimCurtains() {
             let moving = false;
+            let lightChanged = false;
             const anyWinOpen = animWindows.some(w => w.isOpen);
             if (anyWinOpen) curtainWindClock += 0.016;
             for (let i = 0; i < animCurtains.length; i++) {
                 const c = animCurtains[i];
-                // 1. Interpolación de apertura / recogida
-                if (Math.abs(c.currentProgress - c.targetProgress) > 0.002) {
+                // 1. Interpolación independiente de Visillo Difuminador y Blackout Total
+                let cMoved = false;
+                if (typeof c.targetSheerOpen === 'number') {
+                    if (Math.abs(c.currentSheerOpen - c.targetSheerOpen) > 0.002) {
+                        c.currentSheerOpen += (c.targetSheerOpen - c.currentSheerOpen) * 0.15;
+                        cMoved = true;
+                    } else if (c.currentSheerOpen !== c.targetSheerOpen) {
+                        c.currentSheerOpen = c.targetSheerOpen;
+                        cMoved = true;
+                    }
+                    if (Math.abs(c.currentBlackoutOpen - c.targetBlackoutOpen) > 0.002) {
+                        c.currentBlackoutOpen += (c.targetBlackoutOpen - c.currentBlackoutOpen) * 0.15;
+                        cMoved = true;
+                    } else if (c.currentBlackoutOpen !== c.targetBlackoutOpen) {
+                        c.currentBlackoutOpen = c.targetBlackoutOpen;
+                        cMoved = true;
+                    }
+                    if (cMoved && typeof c.applyDualLayers === 'function') {
+                        c.applyDualLayers(c.currentSheerOpen, c.currentBlackoutOpen);
+                        moving = true;
+                        lightChanged = true;
+                    }
+                } else if (Math.abs(c.currentProgress - c.targetProgress) > 0.002) {
                     c.currentProgress += (c.targetProgress - c.currentProgress) * 0.14;
                     c.applyProgress(c.currentProgress);
                     moving = true;
@@ -11591,6 +11981,9 @@
                     c.rightSheer.rotation.x = wave * 1.15;
                     c.rightSheer.position.z = Math.cos(t * 1.9) * 0.014 * c.windAmp;
                 }
+            }
+            if (lightChanged && typeof updateCurtainLightBlocking === 'function') {
+                updateCurtainLightBlocking();
             }
             if (anyWinOpen || moving) {
                 moving = true;
@@ -12380,83 +12773,168 @@
         }
 
         let _bimUserDataEnriched = false;
+        const logicalWallsRegistry = new Map(); // wallId -> { id, nombre, categoria: 'muro', dimensiones, meshes: [] }
+
+        function classifyLogicalWall(child, isExteriorGroup) {
+            const wBox = new THREE.Box3().setFromObject(child);
+            const cx = (wBox.min.x + wBox.max.x) * 0.5;
+            const cz = (wBox.min.z + wBox.max.z) * 0.5;
+            if (isExteriorGroup) {
+                if (cx < 0.25) {
+                    return {
+                        id: 'muro_ext_oeste',
+                        nombre: 'Muro Exterior Oeste Completo (Medianera — 8.00 m)',
+                        dimensiones: { ancho: 8.00, alto: 3.20, profundidad: 0.12, elevacion: 0.00 }
+                    };
+                }
+                if (cz < 0.25 && cx <= 3.00) {
+                    return {
+                        id: 'muro_ext_norte_estudio',
+                        nombre: 'Muro Exterior Norte Estudio (3.00 m)',
+                        dimensiones: { ancho: 3.00, alto: 5.20, profundidad: 0.12, elevacion: 0.00 }
+                    };
+                }
+                if (cz < 0.25 && cx > 3.00) {
+                    return {
+                        id: 'muro_ext_norte_living',
+                        nombre: 'Muro Exterior Norte Living-Comedor (Ancho int. 2.90 m)',
+                        dimensiones: { ancho: 2.90, alto: 5.20, profundidad: 0.12, elevacion: 0.00 }
+                    };
+                }
+                if (cx > 6.10) {
+                    return {
+                        id: 'muro_ext_este_living',
+                        nombre: 'Muro Exterior Este Living y Entrada (Largo 6.90 m)',
+                        dimensiones: { ancho: 6.90, alto: 3.80, profundidad: 0.12, elevacion: 0.00 }
+                    };
+                }
+                if (cz > 6.10 && cz < 6.50 && cx > 4.80) {
+                    return {
+                        id: 'muro_ext_sur_entrada',
+                        nombre: 'Muro Frente Entrada / Palier (Frente 1.20 m)',
+                        dimensiones: { ancho: 1.20, alto: 4.41, profundidad: 0.12, elevacion: 0.00 }
+                    };
+                }
+                if (cx > 4.70 && cx < 5.00 && cz > 6.20) {
+                    return {
+                        id: 'muro_ext_este_cocina',
+                        nombre: 'Muro Exterior Este Cocina / Palier (1.70 m)',
+                        dimensiones: { ancho: 1.70, alto: 4.41, profundidad: 0.12, elevacion: 0.00 }
+                    };
+                }
+                if (cz > 7.80 && cx >= 3.00) {
+                    return {
+                        id: 'muro_ext_sur_cocina',
+                        nombre: 'Muro Exterior Sur Cocina (Ancho int. 1.55 m)',
+                        dimensiones: { ancho: 1.55, alto: 5.20, profundidad: 0.12, elevacion: 0.00 }
+                    };
+                }
+                if (cz > 7.80 && cx < 3.00) {
+                    return {
+                        id: 'muro_ext_sur_cuarto',
+                        nombre: 'Muro Exterior Sur Dormitorio (Ancho int. 2.95 m)',
+                        dimensiones: { ancho: 2.95, alto: 5.20, profundidad: 0.12, elevacion: 0.00 }
+                    };
+                }
+                return {
+                    id: 'muro_ext_perimetral',
+                    nombre: 'Muro Perimetral Exterior',
+                    dimensiones: { ancho: 3.00, alto: 3.20, profundidad: 0.12, elevacion: 0.00 }
+                };
+            } else {
+                if (Math.abs(cx - 3.00) < 0.20 && cz < 4.60) {
+                    return {
+                        id: 'muro_int_central_norte',
+                        nombre: 'Tabique Divisor Central Living / Estudio-Pasillo (5.10 m)',
+                        dimensiones: { ancho: 5.10, alto: 5.20, profundidad: 0.08, elevacion: 0.00 }
+                    };
+                }
+                if (Math.abs(cx - 3.00) < 0.20 && cz > 5.00) {
+                    return {
+                        id: 'muro_int_central_sur',
+                        nombre: 'Tabique Divisor Central Dormitorio / Cocina (3.28 m)',
+                        dimensiones: { ancho: 3.28, alto: 5.20, profundidad: 0.08, elevacion: 0.00 }
+                    };
+                }
+                if (Math.abs(cx - 4.85) < 0.20 && cz > 5.10 && cz < 6.40) {
+                    return {
+                        id: 'muro_int_cocina_entrada',
+                        nombre: 'Tabique Divisor Entrada / Cocina (0.97 m)',
+                        dimensiones: { ancho: 0.97, alto: 4.41, profundidad: 0.08, elevacion: 0.00 }
+                    };
+                }
+                if (Math.abs(cz - 5.20) < 0.20 && cx > 3.80) {
+                    return {
+                        id: 'muro_int_cocina_norte',
+                        nombre: 'Muro Acceso Norte Cocina (0.90 m — Paso 0.84 m)',
+                        dimensiones: { ancho: 0.90, alto: 4.79, profundidad: 0.08, elevacion: 0.00 }
+                    };
+                }
+                if (Math.abs(cz - 3.30) < 0.20 && cx < 2.40) {
+                    return {
+                        id: 'muro_int_bano_norte',
+                        nombre: 'Muro Norte Baño / Placard Estudio (2.02 m)',
+                        dimensiones: { ancho: 2.02, alto: 5.20, profundidad: 0.08, elevacion: 0.00 }
+                    };
+                }
+                if (Math.abs(cz - 4.70) < 0.20 && cx < 2.40) {
+                    return {
+                        id: 'muro_int_bano_sur',
+                        nombre: 'Muro Sur Baño / Placard Dormitorio (2.02 m)',
+                        dimensiones: { ancho: 2.02, alto: 5.20, profundidad: 0.08, elevacion: 0.00 }
+                    };
+                }
+                if (Math.abs(cx - 2.30) < 0.20) {
+                    return {
+                        id: 'muro_int_bano_este',
+                        nombre: 'Tabique Divisor Baño / Pasillo Completo (2.40 m)',
+                        dimensiones: { ancho: 2.40, alto: 5.20, profundidad: 0.08, elevacion: 0.00 }
+                    };
+                }
+                return {
+                    id: 'muro_int_divisor',
+                    nombre: 'Tabique Divisorio Interior',
+                    dimensiones: { ancho: 2.30, alto: 3.20, profundidad: 0.08, elevacion: 0.00 }
+                };
+            }
+        }
+
         function enrichAllSceneBIMUserData(force = false) {
             if (_bimUserDataEnriched && !force) return;
             _bimUserDataEnriched = true;
             scene.updateMatrixWorld(true);
+            logicalWallsRegistry.clear();
 
-            // 1. Muros Exteriores e Interiores (con etiquetado arquitectónico exacto del relevamiento)
+            // 1. Muros Exteriores e Interiores agrupados como PAREDES COMPLETAS (y no fragmentos)
             [exteriorWallsGroup, interiorWallsGroup].forEach((grp, idx) => {
                 if (!grp) return;
+                const isExt = (idx === 0);
                 grp.traverse(child => {
                     if (!child.isMesh || child.userData.isCap) return;
-                    if (!child.userData.categoria || !child.userData.dimensiones) {
-                        const dims = computeWorldDimensions(child);
-                        const wBox = new THREE.Box3().setFromObject(child);
-                        const cx = (wBox.min.x + wBox.max.x) * 0.5;
-                        const cz = (wBox.min.z + wBox.max.z) * 0.5;
-                        let wallName = child.userData.nombre;
-                        if (!wallName) {
-                            if (idx === 0) {
-                                if (cz < 0.25 && cx > 3.00) {
-                                    wallName = 'Muro Norte Living (Ancho interior 2.90 m)';
-                                    dims.ancho = 2.90;
-                                } else if (cz < 0.25 && cx <= 3.00) {
-                                    wallName = 'Muro Norte Estudio';
-                                } else if (cx > 6.10) {
-                                    wallName = 'Muro Exterior Este Living/Entrada (Largo 6.90 m)';
-                                    dims.ancho = 6.90;
-                                } else if (cz > 6.10 && cz < 6.50 && cx > 4.80) {
-                                    wallName = 'Frente Entrada / Palier (1.20 m — Mocheta 30 cm + Puerta 89×204 cm)';
-                                } else if (cz > 7.80 && cx >= 3.00) {
-                                    wallName = 'Muro Sur Cocina (Ancho 1.55 m)';
-                                    dims.ancho = 1.55;
-                                } else if (cz > 7.80 && cx < 3.00) {
-                                    wallName = 'Muro Sur Cuarto (Ancho 2.95 m)';
-                                    dims.ancho = 2.95;
-                                } else if (cx > 4.70 && cx < 5.00 && cz > 6.20) {
-                                    wallName = 'Muro Exterior Este Cocina';
-                                } else if (cx < 0.25) {
-                                    wallName = 'Muro Medianero Oeste';
-                                } else {
-                                    wallName = 'Muro Perimetral Exterior';
-                                }
-                            } else {
-                                if (Math.abs(cx - 3.00) < 0.20 && cz < 4.60) {
-                                    wallName = 'Tabique Divisorio Living (Largo 5.10 m / Mocheta Sur 89 cm)';
-                                    dims.ancho = 5.10;
-                                } else if (Math.abs(cx - 3.00) < 0.20 && cz > 5.10) {
-                                    wallName = 'Tabique Divisorio Cuarto / Cocina (Largo 3.28 m)';
-                                    dims.ancho = 3.28;
-                                } else if (Math.abs(cx - 4.85) < 0.20 && cz > 5.10 && cz < 6.40) {
-                                    wallName = 'Tabique Divisorio Entrada / Cocina (97 cm)';
-                                    dims.ancho = 0.97;
-                                } else if (Math.abs(cz - 5.20) < 0.20 && cx > 3.80) {
-                                    wallName = 'Mocheta Norte Cocina (90 cm — Vano Libre 84 cm)';
-                                    dims.ancho = 0.90;
-                                } else if (Math.abs(cz - 3.30) < 0.20 && cx < 2.40) {
-                                    wallName = 'Muro Norte Baño (Largo interior 2.02 m)';
-                                    dims.ancho = 2.02;
-                                } else if (Math.abs(cz - 4.70) < 0.20 && cx < 2.40) {
-                                    wallName = 'Muro Sur Baño (Largo interior 2.02 m)';
-                                    dims.ancho = 2.02;
-                                } else if (Math.abs(cx - 2.30) < 0.20 && cz < 3.70) {
-                                    wallName = 'Mocheta Norte Puerta Baño / Pasillo (65 cm)';
-                                    dims.ancho = 0.65;
-                                } else if (Math.abs(cx - 2.30) < 0.20 && cz > 4.30) {
-                                    wallName = 'Mocheta Sur Puerta Baño / Pasillo (83 cm — Paso 1.48 m)';
-                                    dims.ancho = 0.83;
-                                } else {
-                                    wallName = 'Tabique Divisorio Interior';
-                                }
-                            }
-                        }
-                        assignBIMUserData(child, {
-                            nombre: wallName,
+                    // No sobreescribir hojas/marcos de ventana que están dentro de exteriorWallsGroup
+                    if (child.userData && child.userData.categoria === 'abertura') return;
+
+                    const spec = classifyLogicalWall(child, isExt);
+                    let entry = logicalWallsRegistry.get(spec.id);
+                    if (!entry) {
+                        entry = {
+                            id: spec.id,
+                            nombre: spec.nombre,
                             categoria: 'muro',
-                            dimensiones: dims
-                        });
+                            dimensiones: { ...spec.dimensiones },
+                            meshes: []
+                        };
+                        logicalWallsRegistry.set(spec.id, entry);
                     }
+                    if (!entry.meshes.includes(child)) {
+                        entry.meshes.push(child);
+                    }
+                    child.userData.id = spec.id;
+                    child.userData.logicalWallId = spec.id;
+                    child.userData.nombre = spec.nombre;
+                    child.userData.name = spec.nombre;
+                    child.userData.categoria = 'muro';
+                    child.userData.dimensiones = { ...spec.dimensiones };
                 });
             });
 
@@ -12514,7 +12992,6 @@
                         });
                     }
                     let fDims = topChild.userData?.dimensiones;
-                    // Dimensiones canónicas exactas del relevamiento para conjuntos principales
                     const lower = (fName || '').toLowerCase();
                     if (lower.includes('escritorio en l') || lower.includes('escritorio gamer')) {
                         fName = 'Escritorio en L Estudio (2.13×0.60m + Ala 1.32×0.52m)';
@@ -12528,6 +13005,9 @@
                     } else if (lower.includes('mesa ratona')) {
                         fName = 'Mesa Ratona de Living (90×50 cm)';
                         fDims = { ancho: 0.90, alto: 0.42, profundidad: 0.50, elevacion: 0.00 };
+                    } else if (lower.includes('mesa de comedor')) {
+                        fName = 'Mesa de Comedor Extensible (Ø 1.00m → 1.70m) + 4 Sillas';
+                        fDims = { ancho: 1.00, alto: 0.76, profundidad: 1.00, elevacion: 0.00 };
                     } else if (lower.includes('estantes flotantes estudio')) {
                         fName = 'Estantes Flotantes Estudio (×3 — 1.80×0.20 m)';
                         fDims = { ancho: 1.80, alto: 0.75, profundidad: 0.20, elevacion: 1.35 };
@@ -12535,12 +13015,13 @@
                         fName = 'Bañera de Loza (1.18×0.69 m) y Ducha';
                         fDims = { ancho: 1.18, alto: 0.48, profundidad: 0.69, elevacion: 0.00 };
                     }
-                    if (!fDims) {
+                    if (!fDims || (fDims.ancho === 0.50 && fDims.alto === 0.50 && fDims.profundidad === 0.50)) {
                         fDims = computeWorldDimensions(topChild);
                     }
                     assignBIMUserData(topChild, {
+                        id: topChild.userData?.id || fName,
                         nombre: fName || 'Mobiliario / Equipamiento',
-                        categoria: 'mueble',
+                        categoria: topChild.userData?.categoria || 'mueble',
                         dimensiones: fDims
                     });
                 });
@@ -12562,27 +13043,11 @@
                 });
             }
 
-            // 6. Pisos y Solados (floorMainMesh, floorSouthMesh, bathFloorMesh, palierMesh)
-            if (typeof floorMainMesh !== 'undefined' && floorMainMesh) {
-                assignBIMUserData(floorMainMesh, {
-                    id: 'piso_principal',
-                    nombre: 'Piso Cerámico 33×33 (Living 2.90×5.10m / Estudio / Cuarto 2.95×3.28m)',
-                    categoria: 'piso',
-                    dimensiones: { ancho: 6.30, alto: 0.02, profundidad: 6.30, elevacion: 0.00 }
-                });
-            }
-            if (typeof floorSouthMesh !== 'undefined' && floorSouthMesh) {
-                assignBIMUserData(floorSouthMesh, {
-                    id: 'piso_sur_cocina',
-                    nombre: 'Piso Cerámico 33×33 (Cocina 1.55m Sur / Entrada)',
-                    categoria: 'piso',
-                    dimensiones: { ancho: 4.85, alto: 0.02, profundidad: 1.70, elevacion: 0.00 }
-                });
-            }
+            // 6. Pisos y Solados por Ambiente individual (roomFloorMeshes)
             if (typeof bathFloorMesh !== 'undefined' && bathFloorMesh) {
                 assignBIMUserData(bathFloorMesh, {
                     id: 'piso_bano',
-                    nombre: 'Piso Cerámico 33×33 (Baño — Largo interior 2.02 m)',
+                    nombre: 'Piso Baño (Cerámico 33×33 — 2.02 × 1.40 m)',
                     categoria: 'piso',
                     dimensiones: { ancho: 2.02, alto: 0.02, profundidad: 1.40, elevacion: 0.00 }
                 });
@@ -12590,9 +13055,20 @@
             if (typeof palierMesh !== 'undefined' && palierMesh) {
                 assignBIMUserData(palierMesh, {
                     id: 'piso_palier',
-                    nombre: 'Solado Palier Común Edificio (Frente 1.20 m)',
+                    nombre: 'Solado Palier Común Edificio (1.70 × 1.20 m)',
                     categoria: 'piso',
-                    dimensiones: { ancho: 1.20, alto: 0.02, profundidad: 1.70, elevacion: 0.00 }
+                    dimensiones: { ancho: 1.70, alto: 0.02, profundidad: 1.20, elevacion: 0.00 }
+                });
+            }
+            if (typeof roomFloorMeshes !== 'undefined' && Array.isArray(roomFloorMeshes)) {
+                roomFloorMeshes.forEach(fm => {
+                    if (!fm) return;
+                    assignBIMUserData(fm, {
+                        id: fm.userData?.roomId || fm.name,
+                        nombre: fm.userData?.nombre || 'Piso del Ambiente',
+                        categoria: 'piso',
+                        dimensiones: fm.userData?.dimensiones || computeWorldDimensions(fm)
+                    });
                 });
             }
         }
@@ -12616,8 +13092,8 @@
         function applyBIMSelectedEmissive(targetObj) {
             restoreBIMSelectedEmissive();
             if (!targetObj || isBIMPlanningMode) return;
-            targetObj.traverse(child => {
-                if (child.isMesh && child.material && child.material.emissive) {
+            const highlightMesh = (child) => {
+                if (child && child.isMesh && child.material && child.material.emissive) {
                     const origMat = child.material;
                     const clonedMat = origMat.clone();
                     clonedMat.emissive.setHex(0x0ea5e9);
@@ -12631,7 +13107,14 @@
                     });
                     child.material = clonedMat;
                 }
-            });
+            };
+            if (targetObj.userData?.logicalWallEntry && Array.isArray(targetObj.userData.logicalWallEntry.meshes)) {
+                targetObj.userData.logicalWallEntry.meshes.forEach(highlightMesh);
+            } else if (targetObj.userData?.floorPeerMeshes && Array.isArray(targetObj.userData.floorPeerMeshes)) {
+                targetObj.userData.floorPeerMeshes.forEach(highlightMesh);
+            } else if (targetObj.traverse) {
+                targetObj.traverse(highlightMesh);
+            }
         }
 
         function clearBIMSelection() {
@@ -12657,14 +13140,39 @@
             }
             enrichAllSceneBIMUserData();
 
-            // Si el mesh tiene su propio userData específico (ej: Smart TV 50", Calefactor, Ventana, Puerta), priorizarlo o usar el assembly raíz
             let targetForBox = resolveBIMAssemblyRoot(hitMesh) || hitMesh;
             let metaSource = hitMesh;
-            if (
+
+            // Si el usuario seleccionó un MURO, seleccionar la PARED COMPLETA (y no un fragmento)
+            if (hitMesh.userData && hitMesh.userData.categoria === 'muro') {
+                const wallId = hitMesh.userData.logicalWallId || hitMesh.userData.id;
+                const wallEntry = wallId ? logicalWallsRegistry.get(wallId) : null;
+                if (wallEntry && wallEntry.meshes.length > 0) {
+                    const proxyObj = {
+                        isLogicalWallProxy: true,
+                        userData: {
+                            id: wallEntry.id,
+                            logicalWallId: wallEntry.id,
+                            logicalWallEntry: wallEntry,
+                            nombre: wallEntry.nombre,
+                            categoria: 'muro',
+                            dimensiones: wallEntry.dimensiones,
+                            activeVariantKey: wallEntry.activeVariantKey || hitMesh.userData.activeVariantKey
+                        }
+                    };
+                    targetForBox = proxyObj;
+                    metaSource = proxyObj;
+                } else {
+                    targetForBox = hitMesh;
+                    metaSource = hitMesh;
+                }
+            } else if (hitMesh.userData && hitMesh.userData.categoria === 'piso') {
+                targetForBox = hitMesh;
+                metaSource = hitMesh;
+            } else if (
                 hitMesh.userData &&
                 hitMesh.userData.nombre &&
                 (hitMesh.userData.nombre.includes('Smart TV 50') ||
-                 hitMesh.userData.categoria === 'muro' ||
                  hitMesh.userData.categoria === 'abertura')
             ) {
                 targetForBox = hitMesh;
@@ -12679,7 +13187,7 @@
 
             const nombre = uData.nombre || uData.name || 'Elemento Constructivo';
             const categoria = uData.categoria || 'mueble';
-            const dims = uData.dimensiones || computeWorldDimensions(targetForBox);
+            const dims = uData.dimensiones || computeWorldDimensions(targetForBox.isLogicalWallProxy ? hitMesh : targetForBox);
 
             // Limpiar selección previa sin ocultar inmediatamente la tarjeta
             restoreBIMSelectedEmissive();
@@ -12692,12 +13200,28 @@
 
             bimSelectedTarget = targetForBox;
 
-            // Efecto visual de selección: BoxHelper temporal + leve emisividad
+            // Efecto visual de selección: BoxHelper sobre la pared entera, el piso del ambiente o el mueble completo + leve emisividad
             const boxColor = categoria === 'abertura' ? 0x38bdf8 : (categoria === 'muro' ? 0x94a3b8 : 0x10b981);
-            bimSelectionBoxHelper = new THREE.BoxHelper(targetForBox, boxColor);
-            bimSelectionBoxHelper.material.depthTest = false;
-            bimSelectionBoxHelper.material.transparent = true;
-            bimSelectionBoxHelper.material.opacity = 0.92;
+            if (targetForBox.isLogicalWallProxy && targetForBox.userData?.logicalWallEntry) {
+                const unionBox = new THREE.Box3();
+                targetForBox.userData.logicalWallEntry.meshes.forEach(m => {
+                    if (m && m.visible) unionBox.expandByObject(m);
+                });
+                bimSelectionBoxHelper = new THREE.Box3Helper(unionBox, boxColor);
+            } else if (targetForBox.userData?.floorPeerMeshes && targetForBox.userData.floorPeerMeshes.length > 1) {
+                const unionBox = new THREE.Box3();
+                targetForBox.userData.floorPeerMeshes.forEach(m => {
+                    if (m && m.visible) unionBox.expandByObject(m);
+                });
+                bimSelectionBoxHelper = new THREE.Box3Helper(unionBox, boxColor);
+            } else {
+                bimSelectionBoxHelper = new THREE.BoxHelper(targetForBox, boxColor);
+            }
+            if (bimSelectionBoxHelper && bimSelectionBoxHelper.material) {
+                bimSelectionBoxHelper.material.depthTest = false;
+                bimSelectionBoxHelper.material.transparent = true;
+                bimSelectionBoxHelper.material.opacity = 0.92;
+            }
             bimSelectionBoxHelper.renderOrder = 999;
             scene.add(bimSelectionBoxHelper);
 
@@ -12810,9 +13334,11 @@
                 return true;
             }
 
-            // Si no tocó mueble/muro y no estamos restringidos a solo no-pisos, permitir inspeccionar el Piso Cerámico para ver medidas o probar materiales
+            // Si no tocó mueble/muro y no estamos restringidos a solo no-pisos, permitir inspeccionar el Piso del Ambiente tocado (y no todo el departamento)
             if (!onlyNonFloor) {
-                const floorCandidates = [floorMainMesh, floorSouthMesh, bathFloorMesh, palierMesh].filter(Boolean);
+                const floorCandidates = roomFloorMeshes.length > 0
+                    ? roomFloorMeshes
+                    : [floorMainMesh, floorSouthMesh, bathFloorMesh, palierMesh].filter(Boolean);
                 const floorHits = raycaster.intersectObjects(floorCandidates, false);
                 if (floorHits.length > 0) {
                     selectBIMObject(floorHits[0].object, e.clientX, e.clientY);
@@ -12832,6 +13358,14 @@
                 btnBim.classList.toggle('bim-active', isBIMPlanningMode);
                 btnBim.classList.toggle('active', isBIMPlanningMode);
             }
+            const selTools = document.getElementById('select-tools-mode');
+            if (selTools) {
+                if (isBIMPlanningMode && selTools.value !== 'inspect') {
+                    selTools.value = 'inspect';
+                } else if (!isBIMPlanningMode && selTools.value === 'inspect') {
+                    selTools.value = 'nav';
+                }
+            }
 
             // Limpiar BoxHelpers previos del Modo Planificación
             while (bimPlanningBoxHelpers.length > 0) {
@@ -12841,102 +13375,17 @@
                 if (bh.material) bh.material.dispose();
             }
 
-            const targetGroups = [
-                exteriorWallsGroup,
-                interiorWallsGroup,
-                windows3DGroup,
-                doors3DGroup,
-                fixturesGroup,
-                decorVideoGroup,
-                furnitureGroup
-            ];
-
             if (isBIMPlanningMode) {
-                restoreBIMSelectedEmissive();
-
-                const wallWireMat = new THREE.MeshBasicMaterial({
-                    color: 0x64748b,
-                    wireframe: true,
-                    transparent: true,
-                    opacity: 0.28
-                });
-                const openingTechMat = new THREE.MeshBasicMaterial({
-                    color: 0x38bdf8,
-                    wireframe: true,
-                    transparent: true,
-                    opacity: 0.55
-                });
-                const furnitureTechMat = new THREE.MeshStandardMaterial({
-                    color: 0x0ea5e9,
-                    emissive: 0x0284c7,
-                    emissiveIntensity: 0.18,
-                    roughness: 0.35,
-                    metalness: 0.1,
-                    transparent: true,
-                    opacity: 0.34,
-                    wireframe: false
-                });
-
-                targetGroups.forEach(grp => {
-                    if (!grp) return;
-                    grp.traverse(child => {
-                        if (!child.isMesh || child.name === 'contactShadow') return;
-                        if (!bimSavedMaterialsMap.has(child)) {
-                            bimSavedMaterialsMap.set(child, child.material);
-                        }
-                        const cat = child.userData?.categoria || 'mueble';
-                        if (cat === 'muro') {
-                            child.material = wallWireMat;
-                        } else if (cat === 'abertura') {
-                            child.material = openingTechMat;
-                        } else {
-                            child.material = furnitureTechMat;
-                        }
-                    });
-                });
-
-                // Activar BoxHelper de todos los muebles y aberturas para visualizar volúmenes y áreas de circulación
-                const helperTargets = new Set();
-                [windows3DGroup, doors3DGroup, fixturesGroup, decorVideoGroup, furnitureGroup].forEach(grp => {
-                    if (!grp) return;
-                    grp.children.forEach(topObj => {
-                        if (!topObj.visible || topObj.name === 'contactShadow') return;
-                        const cat = topObj.userData?.categoria || 'mueble';
-                        if (cat === 'mueble' || cat === 'abertura') {
-                            helperTargets.add(topObj);
-                        }
-                    });
-                });
-
-                helperTargets.forEach(obj => {
-                    const cat = obj.userData?.categoria || 'mueble';
-                    const color = cat === 'abertura' ? 0x38bdf8 : 0x10b981;
-                    const bh = new THREE.BoxHelper(obj, color);
-                    bh.material.transparent = true;
-                    bh.material.opacity = cat === 'abertura' ? 0.88 : 0.72;
-                    scene.add(bh);
-                    bimPlanningBoxHelpers.push(bh);
-                });
-
                 if (typeof updateBIMClashDetectionArcs === 'function') {
                     updateBIMClashDetectionArcs(true);
                 }
-
-                showToast('📐 Modo Planificación BIM activo: Volúmenes, barrido de puertas (Clash Detection) y áreas de circulación visibles', false, 3200);
+                showToast('🔍 Modo Inspeccionar activo: Tocá cualquier pared entera, piso de ambiente o mueble para ver medidas y probar materiales', false, 3000);
             } else {
-                targetGroups.forEach(grp => {
-                    if (!grp) return;
-                    grp.traverse(child => {
-                        if (!child.isMesh) return;
-                        if (bimSavedMaterialsMap.has(child)) {
-                            child.material = bimSavedMaterialsMap.get(child);
-                        }
-                    });
-                });
+                clearBIMSelection();
                 if (typeof updateBIMClashDetectionArcs === 'function') {
                     updateBIMClashDetectionArcs(false);
                 }
-                showToast('🎨 Vista fotorrealista PBR restaurada', false, 2200);
+                showToast('👆 Modo Navegar libre activo (Sin carteles invasivos al tocar)', false, 2000);
             }
 
             wakeRenderer();
@@ -12944,11 +13393,20 @@
 
         function updateBIMHelpersInAnimate() {
             if (bimSelectionBoxHelper && bimSelectedTarget) {
-                bimSelectionBoxHelper.update();
+                if (typeof bimSelectionBoxHelper.update === 'function') {
+                    bimSelectionBoxHelper.update();
+                } else if (bimSelectionBoxHelper.box && bimSelectedTarget.isLogicalWallProxy && bimSelectedTarget.userData?.logicalWallEntry) {
+                    bimSelectionBoxHelper.box.makeEmpty();
+                    bimSelectedTarget.userData.logicalWallEntry.meshes.forEach(m => {
+                        if (m && m.visible) bimSelectionBoxHelper.box.expandByObject(m);
+                    });
+                }
             }
             if (isBIMPlanningMode && bimPlanningBoxHelpers.length > 0) {
                 for (let i = 0; i < bimPlanningBoxHelpers.length; i++) {
-                    bimPlanningBoxHelpers[i].update();
+                    if (typeof bimPlanningBoxHelpers[i].update === 'function') {
+                        bimPlanningBoxHelpers[i].update();
+                    }
                 }
             }
         }
@@ -13200,20 +13658,33 @@
             ]
         };
 
-        function applyBIMMaterialVariant(targetObj, categoria, variant) {
+        function applyBIMMaterialVariant(targetObj, categoria, variant, silent = false) {
             if (!targetObj || !variant) return;
+            if (!silent && typeof isReadOnlyShareMode !== 'undefined' && isReadOnlyShareMode) return;
             restoreBIMSelectedEmissive();
 
+            let persistKey = null;
             if (categoria === 'piso') {
+                // Aplicar material ÚNICAMENTE al piso del ambiente seleccionado (y no a todo el departamento)
                 const newFloorMat = getOrCreateFloorVariantMaterial(variant.key);
-                [floorMainMesh, floorSouthMesh].forEach(fm => {
-                    if (fm && newFloorMat) fm.material = newFloorMat;
+                const peerMeshes = (targetObj.userData && Array.isArray(targetObj.userData.floorPeerMeshes))
+                    ? targetObj.userData.floorPeerMeshes
+                    : [targetObj];
+                peerMeshes.forEach(fm => {
+                    if (fm && newFloorMat) {
+                        fm.material = newFloorMat;
+                        if (!fm.userData) fm.userData = {};
+                        fm.userData.activeVariantKey = variant.key;
+                    }
                 });
                 targetObj.userData.activeVariantKey = variant.key;
-                showToast(`⬜ Solado actualizado: ${variant.label}`, false, 2200);
+                persistKey = targetObj.userData?.roomId || targetObj.userData?.id || targetObj.name;
+                if (!silent) showToast(`⬜ Solado de ambiente actualizado: ${variant.label}`, false, 2200);
             } else if (categoria === 'muro') {
-                targetObj.traverse(child => {
-                    if (!child.isMesh) return;
+                // Aplicar pintura a la PARED COMPLETA (todos los segmentos del muro lógico)
+                const wallEntry = targetObj.userData?.logicalWallEntry || logicalWallsRegistry.get(targetObj.userData?.logicalWallId || targetObj.userData?.id);
+                const paintMesh = (child) => {
+                    if (!child || !child.isMesh) return;
                     if (!bimOriginalMaterialCache.has(child)) {
                         bimOriginalMaterialCache.set(child, child.material);
                     }
@@ -13224,29 +13695,47 @@
                         mat.color.setHex(variant.hex);
                         child.material = mat;
                     }
-                });
-                targetObj.userData.activeVariantKey = variant.key;
-                showToast(`🧱 Pintura de muro aplicada: ${variant.label}`, false, 2200);
+                    child.userData.activeVariantKey = variant.key;
+                };
+                if (wallEntry && Array.isArray(wallEntry.meshes)) {
+                    wallEntry.meshes.forEach(paintMesh);
+                    wallEntry.activeVariantKey = variant.key;
+                    persistKey = wallEntry.id;
+                } else if (targetObj.traverse) {
+                    targetObj.traverse(paintMesh);
+                    persistKey = targetObj.userData?.id || targetObj.userData?.nombre;
+                }
+                if (targetObj.userData) targetObj.userData.activeVariantKey = variant.key;
+                if (!silent) showToast(`🧱 Pintura aplicada a toda la pared: ${variant.label}`, false, 2200);
             } else if (categoria === 'mueble') {
-                targetObj.traverse(child => {
-                    if (!child.isMesh || child.name === 'contactShadow') return;
-                    if (!bimOriginalMaterialCache.has(child)) {
-                        bimOriginalMaterialCache.set(child, child.material);
-                    }
-                    if (variant.key === 'mueble_orig') {
-                        child.material = bimOriginalMaterialCache.get(child);
-                    } else {
-                        const baseMat = bimOriginalMaterialCache.get(child);
-                        const mat = baseMat.clone();
-                        mat.color.setHex(variant.hex);
-                        if (variant.rough !== undefined && mat.roughness !== undefined) {
-                            mat.roughness = variant.rough;
+                if (targetObj.traverse) {
+                    targetObj.traverse(child => {
+                        if (!child.isMesh || child.name === 'contactShadow') return;
+                        if (!bimOriginalMaterialCache.has(child)) {
+                            bimOriginalMaterialCache.set(child, child.material);
                         }
-                        child.material = mat;
-                    }
-                });
-                targetObj.userData.activeVariantKey = variant.key;
-                showToast(`🪑 Acabado aplicado: ${variant.label}`, false, 2200);
+                        if (variant.key === 'mueble_orig') {
+                            child.material = bimOriginalMaterialCache.get(child);
+                        } else {
+                            const baseMat = bimOriginalMaterialCache.get(child);
+                            const mat = baseMat.clone();
+                            mat.color.setHex(variant.hex);
+                            if (variant.rough !== undefined && mat.roughness !== undefined) {
+                                mat.roughness = variant.rough;
+                            }
+                            child.material = mat;
+                        }
+                    });
+                }
+                if (targetObj.userData) targetObj.userData.activeVariantKey = variant.key;
+                persistKey = targetObj.userData?.id || targetObj.userData?.name || targetObj.userData?.nombre || targetObj.name;
+                if (!silent) showToast(`🪑 Acabado aplicado y guardado: ${variant.label}`, false, 2200);
+            }
+
+            if (!silent && persistKey) {
+                if (!decorOverrides.materials) decorOverrides.materials = {};
+                decorOverrides.materials[persistKey] = { categoria, variantKey: variant.key };
+                commitLayoutState('changeMaterialVariant', false, false);
             }
             wakeRenderer();
         }
@@ -13276,19 +13765,27 @@
                 matSectionEl.style.display = 'block';
                 swatchesEl.innerHTML = '';
                 const activeKey = targetObj?.userData?.activeVariantKey || variants[0].key;
+
+                // Menú desplegable (<select>) limpio y compacto para selección de acabado/material
+                const sel = document.createElement('select');
+                sel.id = 'bim-card-mat-select';
+                sel.className = 'bim-mat-select';
+                sel.style.cssText = 'width:100%; background:rgba(15,23,42,0.92); color:#f8fafc; border:1px solid rgba(56,189,248,0.45); border-radius:8px; padding:6px 10px; font-size:11.5px; font-weight:600; cursor:pointer; outline:none;';
                 variants.forEach(v => {
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'bim-swatch-btn' + (v.key === activeKey ? ' active' : '');
-                    btn.innerHTML = `<span class="bim-swatch-dot" style="background:${v.css};"></span><span>${v.label}</span>`;
-                    btn.addEventListener('click', (ev) => {
-                        ev.stopPropagation();
-                        applyBIMMaterialVariant(targetObj, categoria, v);
-                        swatchesEl.querySelectorAll('.bim-swatch-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                    });
-                    swatchesEl.appendChild(btn);
+                    const opt = document.createElement('option');
+                    opt.value = v.key;
+                    opt.textContent = `🎨 ${v.label}`;
+                    if (v.key === activeKey) opt.selected = true;
+                    sel.appendChild(opt);
                 });
+                sel.addEventListener('change', (ev) => {
+                    ev.stopPropagation();
+                    const chosen = variants.find(v => v.key === sel.value);
+                    if (chosen) {
+                        applyBIMMaterialVariant(targetObj, categoria, chosen);
+                    }
+                });
+                swatchesEl.appendChild(sel);
             } else if (matSectionEl) {
                 matSectionEl.style.display = 'none';
             }
@@ -13473,6 +13970,7 @@
         };
 
         function setWallHangMode(enabled) {
+            if (typeof isReadOnlyShareMode !== 'undefined' && isReadOnlyShareMode && enabled) return;
             isWallHangMode = !!enabled;
             if (isWallHangMode && isMeasureToolMode) {
                 setMeasureToolMode(false);
@@ -13492,7 +13990,8 @@
             wakeRenderer();
         }
 
-        function createWallHungItem(presetKey, hitPoint, worldNormal, hitWallMesh) {
+        function createWallHungItem(presetKey, hitPoint, worldNormal, hitWallMesh, silent = false, existingId = null) {
+            if (!silent && typeof isReadOnlyShareMode !== 'undefined' && isReadOnlyShareMode) return null;
             const spec = WALL_HANG_PRESETS[presetKey] || WALL_HANG_PRESETS.cuadro;
             const grp = new THREE.Group();
 
@@ -13562,9 +14061,10 @@
                 }
             }
 
+            const itemId = existingId || `wall_item_${Date.now()}`;
             const elevFromFloor = +(centerY - spec.h * 0.5).toFixed(2);
             assignBIMUserData(grp, {
-                id: `wall_item_${Date.now()}`,
+                id: itemId,
                 nombre: spec.nombre,
                 categoria: 'cuadro',
                 dimensiones: {
@@ -13575,14 +14075,25 @@
                 }
             });
             grp.userData.wallPlacementInfo = {
+                id: itemId,
                 centerY: +centerY.toFixed(2),
                 distLeft: +distLeft.toFixed(2),
                 distRight: +distRight.toFixed(2),
-                presetKey
+                presetKey,
+                x: +hitPoint.x.toFixed(3),
+                y: +centerY.toFixed(3),
+                z: +hitPoint.z.toFixed(3),
+                nx: +n.x.toFixed(3),
+                nz: +n.z.toFixed(3)
             };
 
             wallHangGroup.add(grp);
-            showToast(`🖼️ ${spec.nombre} colgado a ${centerY.toFixed(2)} m de altura (al eje)`, false, 2800);
+            if (!silent) {
+                if (!Array.isArray(decorOverrides.wallItems)) decorOverrides.wallItems = [];
+                decorOverrides.wallItems.push({ ...grp.userData.wallPlacementInfo });
+                commitLayoutState('addWallHungItem', false, false);
+                showToast(`🖼️ ${spec.nombre} colgado y guardado a ${centerY.toFixed(2)} m de altura`, false, 2800);
+            }
             wakeRenderer();
             return grp;
         }
@@ -13896,10 +14407,18 @@
             const btnDown = document.getElementById('btn-bim-wallitem-down');
             const btnDel = document.getElementById('btn-bim-wallitem-del');
             function adjustSelectedWallItemHeight(deltaY) {
+                if (typeof isReadOnlyShareMode !== 'undefined' && isReadOnlyShareMode) return;
                 if (!bimSelectedTarget || bimSelectedTarget.userData?.categoria !== 'cuadro') return;
                 bimSelectedTarget.position.y = Math.max(0.40, Math.min(2.45, bimSelectedTarget.position.y + deltaY));
+                const newY = +bimSelectedTarget.position.y.toFixed(2);
                 if (bimSelectedTarget.userData.wallPlacementInfo) {
-                    bimSelectedTarget.userData.wallPlacementInfo.centerY = +bimSelectedTarget.position.y.toFixed(2);
+                    bimSelectedTarget.userData.wallPlacementInfo.centerY = newY;
+                    bimSelectedTarget.userData.wallPlacementInfo.y = newY;
+                    if (Array.isArray(decorOverrides.wallItems)) {
+                        const wi = decorOverrides.wallItems.find(w => w.id === bimSelectedTarget.userData.id);
+                        if (wi) { wi.centerY = newY; wi.y = newY; }
+                    }
+                    commitLayoutState('adjustWallItemHeight', false, false);
                 }
                 if (bimSelectedTarget.userData.dimensiones) {
                     const h = bimSelectedTarget.userData.dimensiones.alto || 0.50;
@@ -13913,10 +14432,16 @@
             if (btnDel) {
                 btnDel.addEventListener('click', (e) => {
                     e.stopPropagation();
+                    if (typeof isReadOnlyShareMode !== 'undefined' && isReadOnlyShareMode) return;
                     if (bimSelectedTarget && bimSelectedTarget.userData?.categoria === 'cuadro') {
+                        const delId = bimSelectedTarget.userData.id;
+                        if (Array.isArray(decorOverrides.wallItems)) {
+                            decorOverrides.wallItems = decorOverrides.wallItems.filter(w => w.id !== delId);
+                        }
                         wallHangGroup.remove(bimSelectedTarget);
                         clearBIMSelection();
-                        showToast('🗑️ Elemento retirado del muro', false, 1800);
+                        commitLayoutState('deleteWallHungItem', false, false);
+                        showToast('🗑️ Elemento retirado del muro y guardado', false, 1800);
                         wakeRenderer();
                     }
                 });
@@ -13939,6 +14464,121 @@
                     setWhiteBalanceTemp(wb);
                 });
             });
+
+            // =========================================================================
+            // CONEXIÓN DE LOS 5 MENÚS DESPLEGABLES (<select>) DE LA BARRA SUPERIOR
+            // =========================================================================
+            const selViewMode = document.getElementById('select-view-mode');
+            if (selViewMode) {
+                selViewMode.addEventListener('change', (e) => {
+                    const val = e.target.value;
+                    if (val === '2d') {
+                        document.getElementById('btn-mode-2d')?.click();
+                    } else if (val === '3d') {
+                        if (typeof isIsoOrthoMode !== 'undefined' && isIsoOrthoMode) toggleCameraProjection();
+                        document.getElementById('btn-mode-3d')?.click();
+                    } else if (val === 'sims') {
+                        if (typeof isIsoOrthoMode !== 'undefined' && isIsoOrthoMode) toggleCameraProjection();
+                        document.getElementById('btn-mode-sims')?.click();
+                    } else if (val === 'iso') {
+                        if (activeCamera === orthoCam) switchTo3D('isom', wallMode || 'sims', true);
+                        if (typeof isIsoOrthoMode !== 'undefined' && !isIsoOrthoMode) toggleCameraProjection();
+                    } else if (val === 'cut') {
+                        document.getElementById('btn-mode-cut')?.click();
+                    } else if (val === 'zocalo') {
+                        document.getElementById('btn-mode-zocalo')?.click();
+                    } else if (val === 'nowalls') {
+                        document.getElementById('btn-mode-nowalls')?.click();
+                    } else if (val === 'walk') {
+                        document.getElementById('btn-walk-mode')?.click();
+                    } else if (val === 'tour') {
+                        document.getElementById('btn-auto-tour')?.click();
+                    }
+                });
+            }
+
+            const selRoomJump = document.getElementById('select-room-jump');
+            if (selRoomJump) {
+                selRoomJump.addEventListener('change', (e) => {
+                    const v = e.target.value;
+                    if (v === 'top2d') {
+                        switchTo2D();
+                        if (selViewMode) selViewMode.value = '2d';
+                    } else {
+                        switchTo3D(v, wallMode, true);
+                        if (selViewMode && selViewMode.value === '2d') selViewMode.value = wallMode || 'sims';
+                    }
+                });
+            }
+
+            const selSceneAction = document.getElementById('select-scene-action');
+            if (selSceneAction) {
+                selSceneAction.addEventListener('change', (e) => {
+                    const act = e.target.value;
+                    if (!act) return;
+                    if (act === 'curtains') document.getElementById('btn-toggle-curtains')?.click();
+                    else if (act === 'windows') document.getElementById('btn-toggle-windows')?.click();
+                    else if (act === 'doors') document.getElementById('btn-toggle-doors')?.click();
+                    else if (act === 'dining') document.getElementById('btn-toggle-dining-table')?.click();
+                    else if (act === 'roof') document.getElementById('btn-toggle-roof')?.click();
+                    else if (act === 'labels') document.getElementById('btn-toggle-labels')?.click();
+                    else if (act === 'decor') document.getElementById('btn-toggle-video-decor')?.click();
+                    e.target.value = '';
+                });
+            }
+
+            const selToolsMode = document.getElementById('select-tools-mode');
+            if (selToolsMode) {
+                selToolsMode.addEventListener('change', (e) => {
+                    const mode = e.target.value;
+                    if (mode === 'nav') {
+                        if (isBIMPlanningMode) setBIMPlanningMode(false);
+                        if (isFurnitureEditMode) setFurnitureEditMode(false);
+                        if (isMeasureToolMode) setMeasureToolMode(false);
+                        if (isWallHangMode) setWallHangMode(false);
+                        clearSelection();
+                    } else if (mode === 'inspect') {
+                        if (isFurnitureEditMode) setFurnitureEditMode(false, true);
+                        if (isMeasureToolMode) setMeasureToolMode(false);
+                        if (isWallHangMode) setWallHangMode(false);
+                        setBIMPlanningMode(true);
+                    } else if (mode === 'measure') {
+                        if (isBIMPlanningMode) setBIMPlanningMode(false);
+                        if (isFurnitureEditMode) setFurnitureEditMode(false, true);
+                        setMeasureToolMode(true);
+                    } else if (mode === 'edit') {
+                        if (isReadOnlyShareMode) { e.target.value = 'nav'; return; }
+                        if (isBIMPlanningMode) setBIMPlanningMode(false);
+                        if (isMeasureToolMode) setMeasureToolMode(false);
+                        if (isWallHangMode) setWallHangMode(false);
+                        setFurnitureEditMode(true);
+                    } else if (mode === 'wallhang') {
+                        if (isReadOnlyShareMode) { e.target.value = 'nav'; return; }
+                        if (isBIMPlanningMode) setBIMPlanningMode(false);
+                        if (isFurnitureEditMode) setFurnitureEditMode(false, true);
+                        setWallHangMode(true);
+                    } else if (mode === 'save') {
+                        document.getElementById('btn-save-layout')?.click();
+                        e.target.value = isFurnitureEditMode ? 'edit' : (isBIMPlanningMode ? 'inspect' : 'nav');
+                    } else if (mode === 'share') {
+                        document.getElementById('btn-share-link')?.click();
+                        e.target.value = isFurnitureEditMode ? 'edit' : (isBIMPlanningMode ? 'inspect' : 'nav');
+                    } else if (mode === 'backup') {
+                        document.getElementById('btn-backup-menu')?.click();
+                        e.target.value = isFurnitureEditMode ? 'edit' : (isBIMPlanningMode ? 'inspect' : 'nav');
+                    } else if (mode === 'reset') {
+                        document.getElementById('btn-reset-layout')?.click();
+                        e.target.value = isFurnitureEditMode ? 'edit' : (isBIMPlanningMode ? 'inspect' : 'nav');
+                    }
+                });
+            }
+
+            const selSolarTime = document.getElementById('select-solar-time');
+            if (selSolarTime) {
+                selSolarTime.addEventListener('change', (e) => {
+                    setSolarTime(e.target.value);
+                });
+            }
         })();
 
         // Inicializar en 3D Maqueta Realista al cargar con edición protegida y sincronización de distribución
@@ -13951,6 +14591,9 @@
             enrichAllSceneBIMUserData();
             if (typeof initLayoutSync === 'function') {
                 initLayoutSync();
+            }
+            if (typeof applyDecorOverrides === 'function') {
+                applyDecorOverrides();
             }
             wakeRenderer();
         }, 120);
