@@ -86,7 +86,20 @@ function getJson(url) {
 
         await sendCmd('Runtime.enable');
         await sendCmd('Page.enable');
-        await new Promise(r => setTimeout(r, 4500));
+
+        // Esperar activamente a que la escena WebGL y el registro hoisted estén listos
+        for (let waitIdx = 0; waitIdx < 30; waitIdx++) {
+            await new Promise(r => setTimeout(r, 400));
+            try {
+                const checkRes = await sendCmd('Runtime.evaluate', {
+                    returnByValue: true,
+                    expression: `(typeof scene !== 'undefined' && typeof renderer !== 'undefined' && typeof logicalWallsRegistry !== 'undefined')`
+                });
+                const isReady = checkRes?.result?.value ?? checkRes?.result?.result?.value;
+                if (isReady) break;
+            } catch (_) {}
+        }
+        await new Promise(r => setTimeout(r, 1000));
 
         let evalRes = await sendCmd('Runtime.evaluate', {
             returnByValue: true,

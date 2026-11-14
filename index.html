@@ -5607,9 +5607,9 @@
             drain.position.set(0.38, 0.485, 3.52);
             bathGroup.add(drain);
 
-            // Esquinero cromado de 3 pisos en la esquina Noroeste (X = 0.14, Z = 3.44) con botellas de shampoo y acondicionador
+            // Esquinero cromado colgante de 3 pisos en la esquina Sudoeste de la bañera (X = 0.14, Z = 4.34) con botellas de shampoo y acondicionador (al otro lado de la grifería, pie de bañera)
             const caddyGroup = new THREE.Group();
-            caddyGroup.position.set(0.14, 1.25, 3.44);
+            caddyGroup.position.set(0.14, 1.25, 4.34);
             [0.0, 0.22, 0.44].forEach((cy, idx) => {
                 const shelfWire = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.016, 16), chromePolishMat);
                 shelfWire.position.set(0, cy, 0);
@@ -9694,6 +9694,117 @@
                 setMountWall(null);
             });
 
+            // =========================================================================
+            // HELPERS: GUITARRAS REALISTAS EN FUNDAS (GIG BAGS) Y MESAS PLEGABLES EN TIJERA:
+            // Basado en el último video relevado (sec_027, sec_028, sec_098)
+            // =========================================================================
+            function createGuitarGigBag(colorHex, accentHex, height = 1.05, width = 0.38, depth = 0.15) {
+                const bagGroup = new THREE.Group();
+                const bagMat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.85, metalness: 0.05 });
+                const accentMat = new THREE.MeshStandardMaterial({ color: accentHex, roughness: 0.6, metalness: 0.1 });
+                const zipMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.3, metalness: 0.8 });
+
+                // 1. Lower Bout (Cuerpo inferior acolchado)
+                const lowerH = height * 0.42;
+                const lowerBout = new THREE.Mesh(createRoundedBoxGeo(depth, lowerH, width, 0.03, 3), bagMat);
+                lowerBout.position.set(0, lowerH / 2, 0);
+                lowerBout.castShadow = true;
+
+                // 2. Waist (Cintura intermedia)
+                const waistH = height * 0.18;
+                const waist = new THREE.Mesh(createRoundedBoxGeo(depth * 0.94, waistH, width * 0.80, 0.025, 2), bagMat);
+                waist.position.set(0, lowerH + waistH / 2 - 0.01, 0);
+                waist.castShadow = true;
+
+                // 3. Upper Bout (Cuerpo superior)
+                const upperH = height * 0.20;
+                const upperBout = new THREE.Mesh(createRoundedBoxGeo(depth * 0.90, upperH, width * 0.86, 0.025, 2), bagMat);
+                upperBout.position.set(0, lowerH + waistH + upperH / 2 - 0.02, 0);
+                upperBout.castShadow = true;
+
+                // 4. Neck Sleeve (Manga del mástil acolchada)
+                const neckH = height * 0.28;
+                const neckSleeve = new THREE.Mesh(createRoundedBoxGeo(depth * 0.72, neckH, width * 0.36, 0.02, 2), bagMat);
+                neckSleeve.position.set(0, lowerH + waistH + upperH + neckH / 2 - 0.03, 0);
+                neckSleeve.castShadow = true;
+
+                // 5. Headstock (Pala superior)
+                const headH = height * 0.14;
+                const headstock = new THREE.Mesh(createRoundedBoxGeo(depth * 0.68, headH, width * 0.42, 0.02, 2), bagMat);
+                headstock.position.set(0, lowerH + waistH + upperH + neckH + headH / 2 - 0.04, 0);
+                headstock.castShadow = true;
+
+                // 6. Bolsillo frontal porta-partituras y accesorios
+                const pocket = new THREE.Mesh(createRoundedBoxGeo(0.045, lowerH * 0.65, width * 0.68, 0.015, 2), accentMat);
+                pocket.position.set(depth / 2 + 0.02, lowerH * 0.48, 0);
+                pocket.castShadow = true;
+                const zipLine = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, width * 0.64, 8), zipMat);
+                zipLine.rotation.x = Math.PI / 2;
+                zipLine.position.set(depth / 2 + 0.044, lowerH * 0.76, 0);
+
+                // 7. Manija lateral reforzada
+                const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.010, 0.010, 0.16, 8), accentMat);
+                handle.rotation.z = Math.PI / 2;
+                handle.position.set(0, lowerH * 0.95, width / 2 + 0.02);
+
+                bagGroup.add(lowerBout, waist, upperBout, neckSleeve, headstock, pocket, zipLine, handle);
+                return bagGroup;
+            }
+
+            function createScissorTable(x, z, shape = 'square', size = 0.48, height = 0.68) {
+                const tableGroup = new THREE.Group();
+                tableGroup.position.set(x, 0, z);
+                const pineMat = new THREE.MeshStandardMaterial({ color: 0xd4a373, roughness: 0.65 });
+                const metalMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.4, metalness: 0.6 });
+
+                let topMesh;
+                if (shape === 'round') {
+                    topMesh = new THREE.Mesh(new THREE.CylinderGeometry(size / 2, size / 2, 0.022, 24), pineMat);
+                } else {
+                    topMesh = new THREE.Mesh(createRoundedBoxGeo(size, 0.022, size, 0.012, 2), pineMat);
+                }
+                topMesh.position.set(0, height, 0);
+                topMesh.castShadow = true; topMesh.receiveShadow = true;
+                tableGroup.add(topMesh);
+
+                const legThick = 0.018;
+                const legWidth = 0.038;
+                const legLen = Math.hypot(height - 0.02, size * 0.68);
+                const legAngle = Math.atan2(height - 0.02, size * 0.68);
+
+                [-size * 0.36, size * 0.36].forEach((sideZ) => {
+                    const legA = new THREE.Mesh(UNIT_BOX_GEO, pineMat);
+                    legA.scale.set(legLen, legThick, legWidth);
+                    legA.rotation.z = legAngle;
+                    legA.position.set(0, height / 2, sideZ);
+                    legA.castShadow = true;
+
+                    const legB = new THREE.Mesh(UNIT_BOX_GEO, pineMat);
+                    legB.scale.set(legLen, legThick, legWidth);
+                    legB.rotation.z = -legAngle;
+                    legB.position.set(0, height / 2, sideZ);
+                    legB.castShadow = true;
+
+                    const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, legWidth * 1.3, 10), metalMat);
+                    pin.rotation.x = Math.PI / 2;
+                    pin.position.set(0, height / 2, sideZ);
+                    tableGroup.add(legA, legB, pin);
+                });
+
+                [-0.14, 0.14].forEach((tx) => {
+                    const rTop = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, size * 0.74, 12), pineMat);
+                    rTop.rotation.x = Math.PI / 2;
+                    rTop.position.set(tx, height - 0.025, 0);
+
+                    const rBot = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, size * 0.74, 12), pineMat);
+                    rBot.rotation.x = Math.PI / 2;
+                    rBot.position.set(tx, 0.08, 0);
+                    tableGroup.add(rTop, rBot);
+                });
+
+                return tableGroup;
+            }
+
             // 4. BIBLIOTECA DEL ESTUDIO HIPERREALISTA (Muro Oeste X = 0.00 m, PBR y Clutter Realista)
             createCompoundAssembly('Biblioteca Alta con Libros y Coleccionables', () => {
                 setMountWall(0.00, 1.00, false);
@@ -10001,131 +10112,284 @@
                     bibGroup.add(bMesh);
                 });
 
-                // --- SUELO (Y = 0): 2 Fundas de guitarra y planta en maceta terracota ---
-                const guitarBagMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.85, metalness: 0.05 });
-                const guitarBag1 = new THREE.Mesh(UNIT_BOX_GEO, guitarBagMat);
-                guitarBag1.scale.set(0.14, 0.95, 0.36);
-                guitarBag1.position.set(0.04, 0.46, -bibL / 2 - 0.12);
-                guitarBag1.rotation.x = -0.12;
-                guitarBag1.castShadow = true;
+                // --- SUELO (Y = 0): 2 Guitarras en fundas acolchadas y planta en maceta terracota ---
+                // Guitarra 1: Funda azul marino/negra acolchada apoyada en el rincón Norte junto a la mesa del ajedrez (sec_027)
+                const guitar1 = createGuitarGigBag(0x1e293b, 0x0284c7, 1.05, 0.38, 0.15);
+                guitar1.position.set(0.04, 0, -bibL / 2 - 0.12);
+                guitar1.rotation.y = 0.08;
+                guitar1.rotation.x = -0.06;
 
-                const guitarBag2 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.85 }));
-                guitarBag2.scale.set(0.13, 0.98, 0.34);
-                guitarBag2.position.set(0.04, 0.48, bibL / 2 + 0.11);
-                guitarBag2.rotation.x = 0.06;
-                guitarBag2.castShadow = true;
+                // Guitarra 2: Funda acolchada negra con acolchado diamante apoyada junto a la mesa del Consejo Jedi (sec_098)
+                const guitar2 = createGuitarGigBag(0x0f172a, 0xdc2626, 1.02, 0.36, 0.14);
+                guitar2.position.set(0.04, 0, bibL / 2 + 0.12);
+                guitar2.rotation.y = -0.08;
+                guitar2.rotation.x = 0.06;
 
+                // Planta de interior en maceta de terracota en el suelo frente a la guitarra 2 (sec_098)
                 const floorPlantPot = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.14, 16), new THREE.MeshStandardMaterial({ color: 0xc2410c, roughness: 0.8 }));
-                floorPlantPot.position.set(0.04, 0.07, bibL / 2 + 0.32);
+                floorPlantPot.position.set(0.04, 0.07, bibL / 2 + 0.26);
                 const floorPlantFoliage = new THREE.Mesh(new THREE.DodecahedronGeometry(0.09), new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.7 }));
-                floorPlantFoliage.position.set(0.04, 0.18, bibL / 2 + 0.32);
-                bibGroup.add(guitarBag1, guitarBag2, floorPlantPot, floorPlantFoliage);
+                floorPlantFoliage.position.set(0.04, 0.18, bibL / 2 + 0.26);
+                bibGroup.add(guitar1, guitar2, floorPlantPot, floorPlantFoliage);
 
                 setMountWall(null);
                 (currentAssemblyGroup || decorVideoGroup).add(bibGroup);
             });
 
-            // 5. MESITAS OCTOGONALES:
-            // - Mesita Ajedrez: en esquina superior izquierda [0.25, 0.25] (entre biblioteca y pared Norte):
-            createCompoundAssembly('Mesita Auxiliar (Ajedrez)', () => {
-                addOctagonalTable(0.25, 0.25, 0.22, 0.72, 0xb47b48, 0x2b3036);
-            });
+            // 5. AJEDREZ DE COLECCIÓN: "EL SEÑOR DE LOS ANILLOS" (The Noble Collection Collector's Chess Set)
+            // Ubicación real: En esquina Noroeste del Estudio [0.28, 0.28] sobre mesita plegable de madera en tijera (sec_027, sec_028)
+            createCompoundAssembly('Mesa Ajedrez El Señor de los Anillos', () => {
+                const chessAssembly = new THREE.Group();
+                const table = createScissorTable(0.28, 0.28, 'square', 0.48, 0.68);
+                chessAssembly.add(table);
 
-            createCompoundAssembly('Tablero y Piezas de Ajedrez (32 Piezas)', () => {
                 const boardGroup = new THREE.Group();
-                boardGroup.position.set(0.25, 0.73, 0.25);
+                boardGroup.position.set(0.28, 0.69, 0.28);
 
-                const boardFrame = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.6 }));
-                boardFrame.scale.set(0.32, 0.016, 0.32);
-                boardFrame.position.set(0, 0, 0);
+                // Marco ornamental esculpido de piedra y peltre antiguo con inscripciones rúnicas élficas (Noble Collection)
+                const frameMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.55, metalness: 0.35 });
+                const boardFrame = new THREE.Mesh(createRoundedBoxGeo(0.42, 0.026, 0.42, 0.015, 2), frameMat);
+                boardFrame.position.set(0, 0.013, 0);
+                boardFrame.castShadow = true;
                 boardGroup.add(boardFrame);
 
-                const sqSize = 0.28 / 8;
-                const whiteSqMat = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.4 });
-                const blackSqMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.5 });
-                const whitePieceMat = new THREE.MeshStandardMaterial({ color: 0xfffbeb, roughness: 0.3, metalness: 0.1 });
-                const blackPieceMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35, metalness: 0.1 });
+                // 4 Esquineros esculpidos en sobre-relieve
+                const cornerMat = new THREE.MeshStandardMaterial({ color: 0x3f3f46, roughness: 0.4, metalness: 0.5 });
+                [-0.19, 0.19].forEach(cx => {
+                    [-0.19, 0.19].forEach(cz => {
+                        const cornerPiece = new THREE.Mesh(createRoundedBoxGeo(0.045, 0.032, 0.045, 0.008, 2), cornerMat);
+                        cornerPiece.position.set(cx, 0.016, cz);
+                        boardGroup.add(cornerPiece);
+                    });
+                });
 
-                const pawnGeo = new THREE.CylinderGeometry(0.007, 0.009, 0.022, 10);
-                const majorGeo = new THREE.CylinderGeometry(0.008, 0.011, 0.034, 10);
+                // Placa dorada frontal con el título "The Lord of the Rings"
+                const plaque = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.25, metalness: 0.85 }));
+                plaque.scale.set(0.008, 0.012, 0.14);
+                plaque.position.set(0.21, 0.016, 0);
+                boardGroup.add(plaque);
+
+                // Tablero de juego 8x8 con baldosas de pergamino marfil y pizarra oscura con mapa de la Tierra Media
+                const sqSize = 0.34 / 8;
+                const ivorySqMat = new THREE.MeshStandardMaterial({ color: 0xfef9c3, roughness: 0.45, metalness: 0.05 });
+                const slateSqMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.55, metalness: 0.15 });
 
                 for (let r = 0; r < 8; r++) {
                     for (let c = 0; c < 8; c++) {
-                        const sx = -0.14 + c * sqSize + sqSize / 2;
-                        const sz = -0.14 + r * sqSize + sqSize / 2;
-                        const isWhiteSq = (r + c) % 2 === 0;
-                        const sqMesh = new THREE.Mesh(UNIT_BOX_GEO, isWhiteSq ? whiteSqMat : blackSqMat);
-                        sqMesh.scale.set(sqSize, 0.002, sqSize);
-                        sqMesh.position.set(sx, 0.009, sz);
+                        const sx = -0.17 + c * sqSize + sqSize / 2;
+                        const sz = -0.17 + r * sqSize + sqSize / 2;
+                        const isLight = (r + c) % 2 === 0;
+                        const sqMesh = new THREE.Mesh(UNIT_BOX_GEO, isLight ? ivorySqMat : slateSqMat);
+                        sqMesh.scale.set(sqSize, 0.003, sqSize);
+                        sqMesh.position.set(sx, 0.026, sz);
+                        sqMesh.receiveShadow = true;
                         boardGroup.add(sqMesh);
-
-                        if (r === 1) {
-                            const p = new THREE.Mesh(pawnGeo, whitePieceMat);
-                            p.position.set(sx, 0.021, sz);
-                            boardGroup.add(p);
-                        } else if (r === 0) {
-                            const p = new THREE.Mesh(majorGeo, whitePieceMat);
-                            p.position.set(sx, 0.027, sz);
-                            boardGroup.add(p);
-                        } else if (r === 6) {
-                            const p = new THREE.Mesh(pawnGeo, blackPieceMat);
-                            p.position.set(sx, 0.021, sz);
-                            boardGroup.add(p);
-                        } else if (r === 7) {
-                            const p = new THREE.Mesh(majorGeo, blackPieceMat);
-                            p.position.set(sx, 0.027, sz);
-                            boardGroup.add(p);
-                        }
                     }
                 }
-                (currentAssemblyGroup || decorVideoGroup).add(boardGroup);
-            });
 
-            // - Mesita Miniaturas: reubicada en [1.95, 2.32] frente a jamba derecha del placard (Video 5:20, 5:45)
-            createCompoundAssembly('Mesita Auxiliar (Miniaturas)', () => {
-                addOctagonalTable(1.95, 2.32, 0.22, 0.72, 0xd4a373, 0x2b3036);
-            });
+                // --- 32 PIEZAS ESCULPIDAS LOTR (Lado de la Luz / Comunidad vs Lado de la Oscuridad / Mordor) ---
+                const lightMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35, metalness: 0.25 });
+                const darkMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45, metalness: 0.4 });
+                const goldAccMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.3, metalness: 0.8 });
 
-            createCompoundAssembly('Diorama de Batalla de Miniaturas y Pintura', () => {
-                const dioGroup = new THREE.Group();
-                dioGroup.position.set(1.95, 0.73, 2.32);
+                // Fila 0 (Mayores Luz: Argonath, Legolas, Gandalf el Blanco, Aragorn Rey Elessar, Arwen, Elrond, Gimli, Argonath)
+                const lightMajors = [
+                    { h: 0.040, r: 0.010, type: 'tower' },      // Torre Argonath
+                    { h: 0.044, r: 0.009, type: 'knight' },     // Legolas con arco
+                    { h: 0.050, r: 0.009, type: 'bishop' },     // Gandalf el Blanco con báculo
+                    { h: 0.056, r: 0.011, type: 'king' },       // Aragorn coronado con espada
+                    { h: 0.052, r: 0.010, type: 'queen' },      // Arwen Estrella de la Tarde
+                    { h: 0.048, r: 0.009, type: 'bishop' },     // Elrond
+                    { h: 0.042, r: 0.010, type: 'knight' },     // Gimli con hacha doble
+                    { h: 0.040, r: 0.010, type: 'tower' }       // Torre Argonath
+                ];
 
-                const baseGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.016, 24);
-                const baseMat = new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 0.95 });
-                const baseMesh = new THREE.Mesh(baseGeo, baseMat);
-                baseMesh.position.set(0, 0.008, 0);
-                dioGroup.add(baseMesh);
-
-                const rockMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.9 });
-                const r1 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.025), rockMat);
-                r1.position.set(-0.04, 0.02, 0.03);
-                const r2 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.018), rockMat);
-                r2.position.set(0.05, 0.018, -0.02);
-                dioGroup.add(r1, r2);
-
-                const minColors = [0xdc2626, 0x2563eb, 0xca8a04];
-                [[-0.03, -0.03], [0.03, 0.03], [0.0, 0.05]].forEach(([mx, mz], idx) => {
-                    const minBase = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.006, 12), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 }));
-                    minBase.position.set(mx, 0.018, mz);
-                    const minFig = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: minColors[idx], roughness: 0.4 }));
-                    minFig.scale.set(0.015, 0.036, 0.012);
-                    minFig.position.set(mx, 0.038, mz);
-                    minFig.castShadow = true;
-                    dioGroup.add(minBase, minFig);
+                lightMajors.forEach((pc, c) => {
+                    const sx = -0.17 + c * sqSize + sqSize / 2;
+                    const sz = -0.17 + 0 * sqSize + sqSize / 2;
+                    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.016, 0.008, 12), lightMat);
+                    base.position.set(sx, 0.030, sz);
+                    const body = new THREE.Mesh(new THREE.CylinderGeometry(pc.r * 0.7, pc.r, pc.h, 10), lightMat);
+                    body.position.set(sx, 0.034 + pc.h / 2, sz);
+                    body.castShadow = true;
+                    boardGroup.add(base, body);
+                    if (pc.type === 'king') {
+                        const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.005, 0.008, 8), goldAccMat);
+                        crown.position.set(sx, 0.034 + pc.h + 0.004, sz);
+                        boardGroup.add(crown);
+                    }
                 });
 
-                const paintColors = [0xdc2626, 0x2563eb, 0x16a34a, 0xfacc15];
-                paintColors.forEach((col, idx) => {
-                    const px = -0.08 + idx * 0.03;
-                    const pz = -0.07;
-                    const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.02, 10), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
-                    pot.position.set(px, 0.02, pz);
-                    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.008, 6), new THREE.MeshStandardMaterial({ color: col, roughness: 0.4 }));
-                    cap.position.set(px, 0.032, pz);
-                    dioGroup.add(pot, cap);
+                // Fila 1 (8 Peones Luz: Hobbits con capas de Lothlórien y hojas verdes élficas)
+                for (let c = 0; c < 8; c++) {
+                    const sx = -0.17 + c * sqSize + sqSize / 2;
+                    const sz = -0.17 + 1 * sqSize + sqSize / 2;
+                    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.014, 0.006, 10), lightMat);
+                    base.position.set(sx, 0.029, sz);
+                    const hobbit = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.009, 0.028, 8), lightMat);
+                    hobbit.position.set(sx, 0.032 + 0.014, sz);
+                    hobbit.castShadow = true;
+                    boardGroup.add(base, hobbit);
+                }
+
+                // Fila 6 (8 Peones Mordor: Orcos acorazados con cimitarras)
+                for (let c = 0; c < 8; c++) {
+                    const sx = -0.17 + c * sqSize + sqSize / 2;
+                    const sz = -0.17 + 6 * sqSize + sqSize / 2;
+                    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.014, 0.006, 10), darkMat);
+                    base.position.set(sx, 0.029, sz);
+                    const orc = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.010, 0.030, 8), darkMat);
+                    orc.position.set(sx, 0.032 + 0.015, sz);
+                    orc.castShadow = true;
+                    boardGroup.add(base, orc);
+                }
+
+                // Fila 7 (Mayores Mordor: Barad-dûr, Nazgûl, Saruman, Señor Oscuro Sauron con maza, Rey Brujo de Angmar, Troll de las Cavernas, Barad-dûr)
+                const darkMajors = [
+                    { h: 0.042, r: 0.010, type: 'tower' },      // Torre Barad-dûr
+                    { h: 0.046, r: 0.009, type: 'knight' },     // Nazgûl / Espectro del Anillo
+                    { h: 0.050, r: 0.009, type: 'bishop' },     // Saruman con báculo negro
+                    { h: 0.060, r: 0.012, type: 'sauron' },     // Señor Oscuro Sauron con yelmo de púas
+                    { h: 0.052, r: 0.011, type: 'witchking' },  // Rey Brujo de Angmar
+                    { h: 0.048, r: 0.009, type: 'bishop' },     // Boca de Sauron
+                    { h: 0.044, r: 0.010, type: 'knight' },     // Troll de las Cavernas
+                    { h: 0.042, r: 0.010, type: 'tower' }       // Torre Orthanc
+                ];
+
+                darkMajors.forEach((pc, c) => {
+                    const sx = -0.17 + c * sqSize + sqSize / 2;
+                    const sz = -0.17 + 7 * sqSize + sqSize / 2;
+                    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.016, 0.008, 12), darkMat);
+                    base.position.set(sx, 0.030, sz);
+                    const body = new THREE.Mesh(new THREE.CylinderGeometry(pc.r * 0.7, pc.r, pc.h, 10), darkMat);
+                    body.position.set(sx, 0.034 + pc.h / 2, sz);
+                    body.castShadow = true;
+                    boardGroup.add(base, body);
+                    if (pc.type === 'sauron') {
+                        const helmSpikes = new THREE.Mesh(new THREE.ConeGeometry(0.008, 0.014, 6), darkMat);
+                        helmSpikes.position.set(sx, 0.034 + pc.h + 0.007, sz);
+                        boardGroup.add(helmSpikes);
+                    }
                 });
 
-                (currentAssemblyGroup || decorVideoGroup).add(dioGroup);
+                chessAssembly.add(boardGroup);
+                (currentAssemblyGroup || decorVideoGroup).add(chessAssembly);
+            });
+
+            // 6. DIORAMA DE STAR WARS: EL CONSEJO JEDI (Star Wars Jedi High Council Chamber Diorama)
+            // Ubicación real: En sector Sudoeste del Estudio [0.26, 1.76] a la izquierda de la biblioteca sobre mesita redonda en tijera (sec_098)
+            createCompoundAssembly('Diorama Consejo Jedi Star Wars', () => {
+                const jediAssembly = new THREE.Group();
+                const table = createScissorTable(0.26, 1.76, 'round', 0.48, 0.68);
+                jediAssembly.add(table);
+
+                const councilGroup = new THREE.Group();
+                councilGroup.position.set(0.26, 0.69, 1.76);
+
+                // Base circular de la Cámara del Templo Jedi de Coruscant (mármol beige y ámbar pulido)
+                const floorGeo = new THREE.CylinderGeometry(0.19, 0.20, 0.020, 32);
+                const floorMat = new THREE.MeshStandardMaterial({ color: 0xdfb88a, roughness: 0.35, metalness: 0.1 });
+                const councilFloor = new THREE.Mesh(floorGeo, floorMat);
+                councilFloor.position.set(0, 0.010, 0);
+                councilFloor.receiveShadow = true;
+                councilGroup.add(councilFloor);
+
+                // Medallón central de mosaico concéntrico característico de la Cámara del Consejo
+                const centerTile = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.022, 24), new THREE.MeshStandardMaterial({ color: 0x9a3412, roughness: 0.4 }));
+                centerTile.position.set(0, 0.011, 0);
+                const innerRing = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.095, 0.021, 24), new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.3 }));
+                innerRing.position.set(0, 0.0105, 0);
+                councilGroup.add(centerTile, innerRing);
+
+                // --- 12 SILLONES DEL CONSEJO JEDI EN CÍRCULO (Iconic Jedi Council high-backed chairs) ---
+                const chairMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.65 });
+                const cushionMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.55 });
+                const yodaMat = new THREE.MeshStandardMaterial({ color: 0x4ade80, roughness: 0.6 });
+
+                const jediMasters = [
+                    { name: 'Yoda', isYoda: true, tunic: 0x854d0e, headColor: 0x4ade80 },
+                    { name: 'Mace Windu', tunic: 0x271a10, saber: 0x9333ea },
+                    { name: 'Obi-Wan Kenobi', tunic: 0xd4a373, cloak: 0x78350f },
+                    { name: 'Ki-Adi-Mundi', tunic: 0xe2e8f0, tallHead: true },
+                    { name: 'Plo Koon', tunic: 0x9a3412, mask: 0x475569 },
+                    { name: 'Shaak Ti', tunic: 0xb91c1c, lekku: true },
+                    { name: 'Kit Fisto', tunic: 0x15803d, greenHead: true },
+                    { name: 'Saesee Tiin', tunic: 0x78350f, horns: true },
+                    { name: 'Even Piell', tunic: 0xa16207, small: true },
+                    { name: 'Depa Billaba', tunic: 0x451a03 },
+                    { name: 'Oppo Rancisis', tunic: 0x57534e, beard: true },
+                    { name: 'Adi Gallia', tunic: 0x312e81 }
+                ];
+
+                const councilRadius = 0.145;
+                for (let i = 0; i < 12; i++) {
+                    const angle = (i / 12) * Math.PI * 2;
+                    const cx = Math.cos(angle) * councilRadius;
+                    const cz = Math.sin(angle) * councilRadius;
+                    const chairAngle = angle + Math.PI; // Orientados hacia el centro del consejo
+
+                    const chairGroup = new THREE.Group();
+                    chairGroup.position.set(cx, 0.020, cz);
+                    chairGroup.rotation.y = -chairAngle + Math.PI / 2;
+
+                    const m = jediMasters[i];
+                    const isYoda = m.isYoda;
+
+                    // Sillón futurista con respaldo curvo alto
+                    const seatBase = new THREE.Mesh(createRoundedBoxGeo(0.038, 0.016, 0.034, 0.005, 2), chairMat);
+                    seatBase.position.set(0, 0.008, 0);
+                    const seatBackH = isYoda ? 0.032 : 0.052;
+                    const seatBack = new THREE.Mesh(createRoundedBoxGeo(0.010, seatBackH, 0.032, 0.004, 2), cushionMat);
+                    seatBack.position.set(-0.012, 0.008 + seatBackH / 2, 0);
+                    chairGroup.add(seatBase, seatBack);
+
+                    // Figura del Maestro Jedi sentado
+                    const figGroup = new THREE.Group();
+                    if (isYoda) {
+                        const yodaBody = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.012, 0.018, 8), new THREE.MeshStandardMaterial({ color: m.tunic, roughness: 0.8 }));
+                        yodaBody.position.set(0.002, 0.020, 0);
+                        const yodaHead = new THREE.Mesh(new THREE.SphereGeometry(0.008, 10, 8), yodaMat);
+                        yodaHead.position.set(0.002, 0.033, 0);
+                        const earL = new THREE.Mesh(new THREE.ConeGeometry(0.003, 0.010, 4), yodaMat);
+                        earL.rotation.z = Math.PI / 2;
+                        earL.position.set(0.002, 0.034, -0.010);
+                        const earR = new THREE.Mesh(new THREE.ConeGeometry(0.003, 0.010, 4), yodaMat);
+                        earR.rotation.z = -Math.PI / 2;
+                        earR.position.set(0.002, 0.034, 0.010);
+                        figGroup.add(yodaBody, yodaHead, earL, earR);
+                    } else {
+                        const masterMat = new THREE.MeshStandardMaterial({ color: m.tunic, roughness: 0.75 });
+                        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.014, 0.028, 8), masterMat);
+                        body.position.set(0.002, 0.024, 0);
+                        const skinColor = m.greenHead ? 0x22c55e : (m.mask ? 0xd97706 : 0xd4a373);
+                        const headH = m.tallHead ? 0.018 : 0.012;
+                        const head = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, headH, 8), new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.6 }));
+                        head.position.set(0.002, 0.038 + headH / 2, 0);
+                        figGroup.add(body, head);
+                        if (m.saber) {
+                            const saber = new THREE.Mesh(new THREE.CylinderGeometry(0.002, 0.002, 0.012, 6), new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9 }));
+                            saber.position.set(0.012, 0.024, 0.010);
+                            figGroup.add(saber);
+                        }
+                    }
+                    figGroup.castShadow = true;
+                    chairGroup.add(figGroup);
+                    councilGroup.add(chairGroup);
+                }
+
+                // 4 Pilares perimetrales que evocan los miradores del Templo sobre Coruscant
+                const pillarMat = new THREE.MeshStandardMaterial({ color: 0xc4b5fd, roughness: 0.45, metalness: 0.2 });
+                [0, Math.PI / 2, Math.PI, Math.PI * 1.5].forEach(pa => {
+                    const px = Math.cos(pa) * 0.185;
+                    const pz = Math.sin(pa) * 0.185;
+                    const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.010, 0.14, 8), pillarMat);
+                    pillar.position.set(px, 0.08, pz);
+                    pillar.castShadow = true;
+                    councilGroup.add(pillar);
+                });
+
+                jediAssembly.add(councilGroup);
+                (currentAssemblyGroup || decorVideoGroup).add(jediAssembly);
             });
 
             // Aspiradora tipo trineo Kärcher amarilla y negra junto al placard del estudio (Video 5:45)
@@ -10465,11 +10729,11 @@
         addLine2DSegment(0.30, 0.44, 0.30, 1.56, 0.018, 0x18181b);
         addLine2DSegment(0.00, 0.44, 0.30, 0.44, 0.018, 0x18181b);
         addLine2DSegment(0.00, 1.56, 0.30, 1.56, 0.018, 0x18181b);
-        // Mesitas Auxiliares Octogonales: Ajedrez [0.25, 0.25] y Miniaturas [0.25, 2.00]
-        addLine2DSegment(0.10, 0.25, 0.40, 0.25, 0.016, 0xb47b48);
-        addLine2DSegment(0.25, 0.10, 0.25, 0.40, 0.016, 0xb47b48);
-        addLine2DSegment(0.10, 2.00, 0.40, 2.00, 0.016, 0xd4a373);
-        addLine2DSegment(0.25, 1.85, 0.25, 2.15, 0.016, 0xd4a373);
+        // Mesitas Auxiliares Plegables en Tijera: Ajedrez El Señor de los Anillos [0.28, 0.28] y Diorama Consejo Jedi Star Wars [0.26, 1.76]
+        addLine2DSegment(0.06, 0.28, 0.50, 0.28, 0.016, 0xb47b48);
+        addLine2DSegment(0.28, 0.06, 0.28, 0.50, 0.016, 0xb47b48);
+        addLine2DSegment(0.06, 1.76, 0.46, 1.76, 0.016, 0xd4a373);
+        addLine2DSegment(0.26, 1.56, 0.26, 1.96, 0.016, 0xd4a373);
         // Silla Gamer [2.15, 1.05]
         addLine2DSegment(2.00, 1.05, 2.30, 1.05, 0.02, 0xdc2626);
 
@@ -12439,7 +12703,8 @@
             { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.28, z: 7.57, y: 0.29, w: 0.36, d: 0.42, h: 0.58, rot: 0, color: 0x3f2719 },
             { id: 'vid_escr_l', name: 'Escritorio en L + PC Gamer', room: 'Estudio', x: 2.74, z: 1.02, y: 0.38, w: 0.52, d: 2.05, h: 0.76, rot: 0, color: 0x8f3818 },
             { id: 'vid_biblio', name: 'Biblioteca 5 Estantes', room: 'Estudio', x: 0.16, z: 1.00, y: 0.92, w: 0.28, d: 1.12, h: 1.95, rot: 0, color: 0x3b2314 },
-            { id: 'vid_ajedrez', name: 'Mesa Ajedrez El Señor de los Anillos', room: 'Estudio', x: 0.25, z: 0.25, y: 0.37, w: 0.44, d: 0.44, h: 0.74, rot: 0, color: 0xd4a373 }
+            { id: 'vid_ajedrez', name: 'Mesa Ajedrez El Señor de los Anillos', room: 'Estudio', x: 0.28, z: 0.28, y: 0.37, w: 0.48, d: 0.48, h: 0.72, rot: 0, color: 0xd4a373 },
+            { id: 'vid_diorama_jedi', name: 'Mesa Diorama Consejo Jedi Star Wars', room: 'Estudio', x: 0.26, z: 1.76, y: 0.37, w: 0.48, d: 0.48, h: 0.72, rot: 0, color: 0xd4a373 }
         ];
 
         document.getElementById('btn-load-video-furniture').addEventListener('click', () => {
@@ -16043,7 +16308,7 @@
          ========================================================================== -->
     <script>
         (function registerGemeloPWA() {
-            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.3';
+            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.4';
             if ('serviceWorker' in navigator) {
                 try {
                     const prevBuild = localStorage.getItem('gemelo_sw_build_ver');
@@ -16063,7 +16328,7 @@
 
                 window.addEventListener('load', function () {
                     navigator.serviceWorker
-                        .register('./sw.js?v=2.3', { scope: './', updateViaCache: 'none' })
+                        .register('./sw.js?v=2.4', { scope: './', updateViaCache: 'none' })
                         .then(function (reg) {
                             console.log('[PWA] Service Worker registrado con éxito en scope:', reg.scope);
                             reg.update().catch(function () {});
