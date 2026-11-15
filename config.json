@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.14.v5",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794725827012,
+  "updatedAt": 1794725832209,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -26,6 +26,15 @@
         "y": 1.14,
         "z": 1.31,
         "rot": 0
+      },
+      "Mesa Ajedrez El Señor de los Anillos": {
+        "x": 0.28,
+        "y": 0.4,
+        "z": 0.28,
+        "rot": 0.785,
+        "sx": 1,
+        "sy": 1,
+        "sz": 1
       }
     },
     "materials": {},
