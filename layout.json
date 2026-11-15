@@ -1,8 +1,8 @@
 {
   "app": "departamento-01-01",
-  "schemaVersion": "2026.11.14.v5",
+  "schemaVersion": "2026.11.15.v6",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794725943725,
+  "updatedAt": 1794730300000,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -10,32 +10,38 @@
       "Felpudo de Entrada (65×42 cm)"
     ],
     "transforms": {
-      "Diorama Consejo Jedi Star Wars": {
-        "x": 0.27,
-        "y": 0.42,
-        "z": 2.49,
-        "rot": 0
-      },
-      "Guitarra en Funda Negra Acolchada (Estudio Sur)": {
-        "x": 0.23,
-        "y": 0.6,
-        "z": 2.06,
-        "rot": 0
-      },
-      "Biblioteca Alta con Libros y Coleccionables": {
-        "x": 0.21,
-        "y": 1.14,
-        "z": 1.31,
-        "rot": 0
-      },
       "Mesa Ajedrez El Señor de los Anillos": {
         "x": 0.28,
         "y": 0.4,
-        "z": 0.28,
+        "z": 0.24,
         "rot": 1.571,
         "sx": 1,
         "sy": 1,
         "sz": 1
+      },
+      "Guitarra en Funda Azul Marino (Estudio Norte)": {
+        "x": 0.18,
+        "y": 0.52,
+        "z": 0.65,
+        "rot": 0
+      },
+      "Biblioteca Alta con Libros y Coleccionables": {
+        "x": 0.18,
+        "y": 1.14,
+        "z": 1.48,
+        "rot": 0
+      },
+      "Guitarra en Funda Negra Acolchada (Estudio Sur)": {
+        "x": 0.18,
+        "y": 0.51,
+        "z": 2.23,
+        "rot": 0
+      },
+      "Diorama Consejo Jedi Star Wars": {
+        "x": 0.28,
+        "y": 0.42,
+        "z": 2.70,
+        "rot": 0
       },
       "Panel Calefactor Cuarto": {
         "x": 2.56,

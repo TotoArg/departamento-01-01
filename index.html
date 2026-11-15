@@ -5710,72 +5710,94 @@
             robeHook.position.set(0.40, 1.55, 4.46);
             bathGroup.add(robeHook);
 
-            // Barral cromado superior (Y = 2.02 m) y Cortina de Baño blanca con textura floral sutil recogida (Video 2:52, 3:00, 3:07)
+            // Barral cromado superior (Y = 2.02 m) y CORTINA DOBLE DE BAÑO (Liner interior impermeable + Cortina textil exterior)
             const curtainRod = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1.16, 14), chromePolishMat);
             curtainRod.rotation.x = Math.PI / 2;
             curtainRod.position.set(0.74, 2.02, 3.89);
-            const showerCurtainMat = new THREE.MeshStandardMaterial({
-                color: 0xf8fafc,
+
+            // Aros dobles cromados a lo largo del barral
+            [-0.38, -0.20, -0.02, 0.16, 0.34].forEach(rz => {
+                const ring = new THREE.Mesh(new THREE.TorusGeometry(0.022, 0.004, 8, 16), chromePolishMat);
+                ring.position.set(0.74, 2.02, 3.89 + rz);
+                bathGroup.add(ring);
+            });
+
+            // 1. Cortina interior impermeable (Liner / protector plástico traslúcido por dentro de la bañera)
+            const showerLinerMat = new THREE.MeshStandardMaterial({
+                color: 0xf1f5f9,
                 transparent: true,
-                opacity: 0.88,
-                roughness: 0.65,
+                opacity: 0.72,
+                roughness: 0.20,
                 side: THREE.DoubleSide
             });
-            const showerCurtainMesh = new THREE.Mesh(createRoundedBoxGeo(0.035, 1.54, 0.44, 0.015, 2), showerCurtainMat);
-            showerCurtainMesh.position.set(0.74, 1.24, 3.56);
-            bathGroup.add(curtainRod, showerCurtainMesh);
+            const showerLinerMesh = new THREE.Mesh(createRoundedBoxGeo(0.020, 1.50, 0.50, 0.010, 2), showerLinerMat);
+            showerLinerMesh.position.set(0.715, 1.25, 3.60);
+
+            // 2. Cortina exterior decorativa (Tela blanca texturada elegante por fuera de la bañera)
+            const showerCurtainOuterMat = new THREE.MeshStandardMaterial({
+                color: 0xfafaf9,
+                transparent: true,
+                opacity: 0.95,
+                roughness: 0.85,
+                side: THREE.DoubleSide
+            });
+            const showerCurtainOuterMesh = new THREE.Mesh(createRoundedBoxGeo(0.025, 1.56, 0.52, 0.012, 2), showerCurtainOuterMat);
+            showerCurtainOuterMesh.position.set(0.755, 1.22, 3.60);
+            showerCurtainOuterMesh.castShadow = true;
+
+            bathGroup.add(curtainRod, showerLinerMesh, showerCurtainOuterMesh);
 
             (currentAssemblyGroup || decorVideoGroup).add(bathGroup);
         });
 
-        // B) LAVATORIO DE PORCELANA BLANCA CON COLUMNA/PEDESTAL + CEPILLO ELÉCTRICO ORAL-B + DISPENSADOR VERDE (Video 2:52, 2:55, 2:57, 3:34)
+        // B) LAVATORIO DE PORCELANA BLANCA CON COLUMNA/PEDESTAL + BACHA CHICA COMPACTA (Video 2:52, 2:55, 2:57, 3:34)
         createCompoundAssembly('Vanitory y Bacha de Baño', () => {
             const vanGroup = new THREE.Group();
             vanGroup.position.set(1.42, 0, 3.48);
 
             // Columna / Pedestal esbelto de porcelana sanitaria blanca desde el piso hasta la bacha (Video 2:52, 3:34)
-            const pedestalCol = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.115, 0.68, 24), porcelainMat);
+            const pedestalCol = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.105, 0.68, 24), porcelainMat);
             pedestalCol.position.set(0, 0.34, -0.02);
             pedestalCol.castShadow = true; pedestalCol.receiveShadow = true;
-            const pedestalBase = new THREE.Mesh(new THREE.CylinderGeometry(0.125, 0.135, 0.04, 24), porcelainMat);
+            const pedestalBase = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.125, 0.04, 24), porcelainMat);
             pedestalBase.position.set(0, 0.02, -0.02);
             vanGroup.add(pedestalCol, pedestalBase);
 
-            // Bacha / Lavatorio semicircular ancho de porcelana blanca con alas laterales (0.58 m ancho x 0.44 m prof)
-            const basinOuter = new THREE.Mesh(createRoundedBoxGeo(0.58, 0.18, 0.44, 0.06, 3), porcelainMat);
-            basinOuter.position.set(0, 0.76, 0.02);
+            // Bacha chica compacta de loza blanca (0.44 m ancho × 0.35 m prof × 0.15 m alto)
+            const basinOuter = new THREE.Mesh(createRoundedBoxGeo(0.44, 0.15, 0.35, 0.05, 3), porcelainMat);
+            basinOuter.position.set(0, 0.765, 0.01);
             basinOuter.castShadow = true; basinOuter.receiveShadow = true;
-            const basinCavity = new THREE.Mesh(createRoundedBoxGeo(0.42, 0.03, 0.28, 0.04, 3), new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.10 }));
-            basinCavity.position.set(0, 0.842, 0.04);
-            const basinDrain = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.008, 18), chromePolishMat);
-            basinDrain.position.set(0, 0.852, 0.04);
+            const basinCavity = new THREE.Mesh(createRoundedBoxGeo(0.32, 0.025, 0.22, 0.035, 3), new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.10 }));
+            basinCavity.position.set(0, 0.835, 0.025);
+            const basinDrain = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.008, 18), chromePolishMat);
+            basinDrain.position.set(0, 0.842, 0.025);
             vanGroup.add(basinOuter, basinCavity, basinDrain);
 
             // Grifería cromada con pico central y llaves laterales
-            const faucetBase = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.022, 0.14, 16), chromePolishMat);
-            faucetBase.position.set(0, 0.90, -0.11);
-            const faucetSpout = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.11, 14), chromePolishMat);
+            const faucetBase = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.020, 0.13, 16), chromePolishMat);
+            faucetBase.position.set(0, 0.89, -0.09);
+            const faucetSpout = new THREE.Mesh(new THREE.CylinderGeometry(0.010, 0.010, 0.10, 14), chromePolishMat);
             faucetSpout.rotation.x = Math.PI / 3;
-            faucetSpout.position.set(0, 0.95, -0.06);
-            const knobL = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.04, 12), chromePolishMat);
-            knobL.position.set(-0.08, 0.87, -0.11);
-            const knobR = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.04, 12), chromePolishMat);
-            knobR.position.set(0.08, 0.87, -0.11);
+            faucetSpout.position.set(0, 0.94, -0.045);
+            const knobL = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.035, 12), chromePolishMat);
+            knobL.position.set(-0.065, 0.865, -0.09);
+            const knobR = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.035, 12), chromePolishMat);
+            knobR.position.set(0.065, 0.865, -0.09);
             vanGroup.add(faucetBase, faucetSpout, knobL, knobR);
 
             // Dispensador de jabón líquido verde oscuro a la izquierda (Video 2:57)
-            const soapDispenser = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.034, 0.12, 14), new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.22 }));
-            soapDispenser.position.set(-0.20, 0.91, -0.08);
-            const dispenserPump = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.035, 10), chromePolishMat);
-            dispenserPump.position.set(-0.20, 0.985, -0.08);
+            const soapDispenser = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.030, 0.11, 14), new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.22 }));
+            soapDispenser.position.set(-0.15, 0.895, -0.06);
+            const dispenserPump = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.030, 10), chromePolishMat);
+            dispenserPump.position.set(-0.15, 0.965, -0.06);
 
-            // Cepillo de dientes eléctrico blanco Oral-B en su base cargadora a la derecha del lavatorio + enchufe (Video 2:52, 2:55, 3:34)
-            const toothCharger = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.026, 0.025, 14), porcelainMat);
-            toothCharger.position.set(0.20, 0.862, -0.08);
-            const toothBrush = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.015, 0.19, 12), porcelainMat);
-            toothBrush.position.set(0.20, 0.965, -0.08);
-            const toothRing = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.012, 12), new THREE.MeshStandardMaterial({ color: 0x38bdf8 }));
-            toothRing.position.set(0.20, 1.01, -0.08);
+            // Cepillo de dientes eléctrico blanco Oral-B en su base cargadora a la derecha del lavatorio (Video 2:52, 2:55, 3:34)
+            const toothCharger = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.024, 0.025, 14), porcelainMat);
+            toothCharger.position.set(0.15, 0.860, -0.06);
+            const toothBrush = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.014, 0.18, 12), porcelainMat);
+            toothBrush.position.set(0.15, 0.955, -0.06);
+            const toothRing = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.012, 12), new THREE.MeshStandardMaterial({ color: 0x38bdf8 }));
+            toothRing.position.set(0.15, 0.995, -0.06);
             vanGroup.add(soapDispenser, dispenserPump, toothCharger, toothBrush, toothRing);
 
             // Toallero con toallón blanco con rayas negras a la izquierda del lavatorio (Video 3:17)
@@ -8006,8 +8028,6 @@
                 addDecorBox(6.06, 0.09, 5.52, 0.22, 0.09, 0.24, 0x94a3b8, 0.8, 0, 'Zapatillas Grises Estante 1');
                 addDecorBox(6.06, 0.25, 5.22, 0.22, 0.09, 0.24, 0x475569, 0.8, 0, 'Zapatillas Cuero Estante 2');
                 addDecorBox(6.06, 0.25, 5.52, 0.22, 0.09, 0.24, 0xf1f5f9, 0.8, 0, 'Zapatillas Blancas Estante 2');
-                // Caja organizadora plástica violeta/rosa junto al zapatero (Video 0:00)
-                addDecorBox(6.06, 0.08, 4.88, 0.22, 0.16, 0.24, 0xa855f7, 0.45, 0, 'Caja Organizadora Plástica');
 
                 // Camperas colgadas en fila: campera negra inflable, abrigo marrón oscuro, buzo blanco con rayas y campera rosa empolvado (Video 0:00, 0:19)
                 addDecorBox(6.04, 1.18, 5.18, 0.26, 0.86, 0.22, 0x18181b, 0.85, 0, 'Campera Inflable Negra');
@@ -8030,19 +8050,23 @@
                 addDecorBox(6.08, 1.86, 5.66, 0.07, 0.14, 0.07, 0x334155, 0.6, 0, 'Escultura / Difusor Perchero');
             });
 
+            // 4B. Caja organizadora plástica violeta/rosa junto al zapatero (independiente, movible y eliminable)
+            createCompoundAssembly('Caja Organizadora de Entrada', () => {
+                addDecorBox(6.06, 0.08, 4.88, 0.22, 0.16, 0.24, 0xa855f7, 0.45, 0, 'Caja Organizadora Plástica');
+            });
+
             // 5. Maceta redonda blanca sobre pie nórdico de madera con Sansevieria (entre el perchero y el rack de TV):
             createCompoundAssembly('Sansevieria en Pie Nórdico', () => {
                 addDecorBox(6.05, 0.14, 4.35, 0.24, 0.28, 0.24, 0xc2844f, 0.6, 0, 'Pie Nórdico Maceta');
                 addDecorPlantCeramic(6.05, 0.28, 4.35, 0.13, 0.10, 0.22, 0.28, 0.55, 0.28, 0.52, 'Sansevieria en Pie Nórdico');
             });
 
-            // 6. Comederos de mascota (verde + rojo) y balde blanco con borde oscuro en la esquina (Video 1:24, 2:30):
-            createCompoundAssembly('Comederos de Mascota', () => {
-                addDecorCyl(4.92, 0.045, 5.12, 0.105, 0.085, 0.09, 0x22c55e, 0.35, 0, 'Comedero Verde Mascota');
-                addDecorCyl(4.62, 0.045, 5.12, 0.10, 0.08, 0.08, 0xef4444, 0.4, 0, 'Bebedero Rojo Mascota');
-                // Balde plástico blanco con borde gris oscuro
-                addDecorCyl(4.88, 0.13, 5.36, 0.12, 0.10, 0.26, 0xf8fafc, 0.3, 'Balde Plástico Mascota');
-                addDecorCyl(4.88, 0.255, 5.36, 0.124, 0.124, 0.02, 0x334155, 0.4, 'Borde Balde Mascota');
+            // 6. Comederos de las perras: EXACTAMENTE DOS (verde y rojo) en el suelo (Video 1:24, 2:30)
+            createCompoundAssembly('Comederos de las Perras (Verde y Rojo)', () => {
+                // Comedero Verde esmaltado para perras
+                addDecorCyl(4.88, 0.045, 5.12, 0.11, 0.09, 0.09, 0x22c55e, 0.35, 'Comedero Verde Perras');
+                // Comedero Rojo esmaltado para perras
+                addDecorCyl(4.62, 0.045, 5.12, 0.11, 0.09, 0.09, 0xef4444, 0.35, 'Comedero Rojo Perras');
             });
 
             // 2. Sector Rack TV (1.77m x 0.44m), Smart TV 50", Torres de Sonido LG y Decoración (Muro Este X=6.30, centrado en Z=3.10)
@@ -8755,7 +8779,8 @@
                 const tableWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.70, metalness: 0.05 });
                 const chairCushionMat = new THREE.MeshStandardMaterial({ color: 0x84cc16, roughness: 1.0, metalness: 0.0 });
 
-                const chairRadius = 0.52;
+                // Sillas metidas debajo de la mesa redonda (radio ajustado a 0.37m para que queden bien adentro)
+                const chairRadius = 0.37;
                 const chairCoords = [
                     { x: tableDiningX, z: tableDiningZ + chairRadius, rot: 0, role: 'south' },
                     { x: tableDiningX, z: tableDiningZ - chairRadius, rot: Math.PI, role: 'north' },
@@ -9892,7 +9917,7 @@
             // HELPERS: GUITARRAS REALISTAS EN FUNDAS (GIG BAGS) Y MESAS PLEGABLES EN TIJERA:
             // Basado en el último video relevado (sec_027, sec_028, sec_098)
             // =========================================================================
-            function createGuitarGigBag(colorHex, accentHex, height = 1.05, width = 0.38, depth = 0.15) {
+            function createGuitarGigBag(colorHex, accentHex, height = 1.05, width = 0.24, depth = 0.14) {
                 const bagGroup = new THREE.Group();
                 const bagMat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.85, metalness: 0.05 });
                 const accentMat = new THREE.MeshStandardMaterial({ color: accentHex, roughness: 0.6, metalness: 0.1 });
@@ -10539,19 +10564,17 @@
 
             // 4B. GUITARRA EN FUNDA AZUL MARINO (Rincón Noroeste Estudio, sec_027)
             createCompoundAssembly('Guitarra en Funda Azul Marino (Estudio Norte)', () => {
-                const guitar1 = createGuitarGigBag(0x1e293b, 0x0284c7, 1.05, 0.38, 0.15);
-                guitar1.position.set(0.18, 0, 0.54);
-                guitar1.rotation.y = 0.08;
-                guitar1.rotation.x = -0.06;
+                const guitar1 = createGuitarGigBag(0x1e293b, 0x0284c7, 1.05, 0.24, 0.14);
+                guitar1.position.set(0.18, 0, 0.65);
+                guitar1.rotation.y = 0;
                 (currentAssemblyGroup || decorVideoGroup).add(guitar1);
             });
 
             // 4C. GUITARRA EN FUNDA NEGRA ACOLCHADA (Costado Sur Biblioteca, sec_098)
             createCompoundAssembly('Guitarra en Funda Negra Acolchada (Estudio Sur)', () => {
-                const guitar2 = createGuitarGigBag(0x0f172a, 0xdc2626, 1.02, 0.36, 0.14);
-                guitar2.position.set(0.18, 0, 1.88);
-                guitar2.rotation.y = -0.08;
-                guitar2.rotation.x = 0.06;
+                const guitar2 = createGuitarGigBag(0x0f172a, 0xdc2626, 1.02, 0.24, 0.14);
+                guitar2.position.set(0.18, 0, 2.23);
+                guitar2.rotation.y = 0;
                 (currentAssemblyGroup || decorVideoGroup).add(guitar2);
             });
 
@@ -11000,17 +11023,18 @@
         // ============================================================================
         // SISTEMA DE PERSISTENCIA DE MODIFICACIONES (CONFIG.JSON + LAYOUT.JSON ZERO DATA LOSS)
         // ============================================================================
-        const CURRENT_SCHEMA_VERSION = '2026.11.14.v5';
-        const DECOR_OVERRIDES_KEY = 'depto_decor_overrides_v5';
+        const CURRENT_SCHEMA_VERSION = '2026.11.15.v6';
+        const DECOR_OVERRIDES_KEY = 'depto_decor_overrides_v6';
         // Purgar automáticamente overrides obsoletos de esquemas previos en cualquier dispositivo
         if (localStorage.getItem('depto_schema_version') !== CURRENT_SCHEMA_VERSION) {
             localStorage.removeItem('depto_decor_overrides_v3');
             localStorage.removeItem('depto_decor_overrides_v4');
+            localStorage.removeItem('depto_decor_overrides_v5');
             localStorage.removeItem(DECOR_OVERRIDES_KEY);
             localStorage.removeItem('depto_layout_updated_at');
             localStorage.setItem('depto_schema_version', CURRENT_SCHEMA_VERSION);
         }
-        // Estado base calibrado desde config.json como fallback inmediato y render sincrónico
+        // Estado base calibrado sin superposiciones (distribución armónica de biblioteca, guitarras, ajedrez y diorama)
         const BASELINE_DECOR_OVERRIDES = {
             deleted: [
                 "Bolsa Alimento para Perros (+RP)",
@@ -11018,10 +11042,11 @@
                 "Felpudo de Entrada (65×42 cm)"
             ],
             transforms: {
-                "Diorama Consejo Jedi Star Wars": { "x": 0.27, "y": 0.42, "z": 2.49, "rot": 0 },
-                "Guitarra en Funda Negra Acolchada (Estudio Sur)": { "x": 0.23, "y": 0.6, "z": 2.06, "rot": 0 },
-                "Biblioteca Alta con Libros y Coleccionables": { "x": 0.21, "y": 1.14, "z": 1.31, "rot": 0 },
-                "Mesa Ajedrez El Señor de los Anillos": { "x": 0.28, "y": 0.4, "z": 0.28, "rot": 1.571, "sx": 1, "sy": 1, "sz": 1 },
+                "Mesa Ajedrez El Señor de los Anillos": { "x": 0.28, "y": 0.40, "z": 0.24, "rot": 1.571, "sx": 1, "sy": 1, "sz": 1 },
+                "Guitarra en Funda Azul Marino (Estudio Norte)": { "x": 0.18, "y": 0.52, "z": 0.65, "rot": 0 },
+                "Biblioteca Alta con Libros y Coleccionables": { "x": 0.18, "y": 1.14, "z": 1.48, "rot": 0 },
+                "Guitarra en Funda Negra Acolchada (Estudio Sur)": { "x": 0.18, "y": 0.51, "z": 2.23, "rot": 0 },
+                "Diorama Consejo Jedi Star Wars": { "x": 0.28, "y": 0.42, "z": 2.70, "rot": 0 },
                 "Panel Calefactor Cuarto": { "x": 2.56, "y": 0.44, "z": 7.83, "rot": 0 },
                 "Perchero y Zapatero Entrada": { "x": 6.07, "y": 1.01, "z": 5.02, "rot": 0 }
             },
@@ -16801,7 +16826,7 @@
          ========================================================================== -->
     <script>
         (function registerGemeloPWA() {
-            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.8';
+            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.9';
             if ('serviceWorker' in navigator) {
                 try {
                     const prevBuild = localStorage.getItem('gemelo_sw_build_ver');
@@ -16821,7 +16846,7 @@
 
                 window.addEventListener('load', function () {
                     navigator.serviceWorker
-                        .register('./sw.js?v=2.8', { scope: './', updateViaCache: 'none' })
+                        .register('./sw.js?v=2.9', { scope: './', updateViaCache: 'none' })
                         .then(function (reg) {
                             console.log('[PWA] Service Worker registrado con éxito en scope:', reg.scope);
                             reg.update().catch(function () {});
