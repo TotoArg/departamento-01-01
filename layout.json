@@ -2,10 +2,11 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.14.v5",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794725779703,
+  "updatedAt": 1794725799384,
   "decorOverrides": {
     "deleted": [
-      "Bolsa Alimento para Perros (+RP)"
+      "Bolsa Alimento para Perros (+RP)",
+      "Aspiradora Trineo Amarilla y Negra"
     ],
     "transforms": {},
     "materials": {},
