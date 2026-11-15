@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.14.v5",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794725815772,
+  "updatedAt": 1794725827012,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -19,6 +19,12 @@
         "x": 0.23,
         "y": 0.6,
         "z": 2.06,
+        "rot": 0
+      },
+      "Biblioteca Alta con Libros y Coleccionables": {
+        "x": 0.21,
+        "y": 1.14,
+        "z": 1.31,
         "rot": 0
       }
     },
