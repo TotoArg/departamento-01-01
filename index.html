@@ -9680,16 +9680,16 @@
 
 
 
-            // 3. ESTANTES FLOTANTES SOBRE ESCRITORIO (Muro Este X = 3.00 m, medidas: 1.80 m de largo x 0.20 m de profundidad):
-            // Relevado exhaustivamente de sec_093 y sec_094 del último video
-            createCompoundAssembly('Estantes Flotantes Estudio (1.80×0.20 m)', () => {
+            // 3. 3 ESTANTES FLOTANTES SOBRE ESCRITORIO (Muro Este X = 3.00 m, medidas: 1.80 m de largo x 0.20 m de profundidad):
+            // Relevado exhaustivamente de sec_093 y sec_094 del último video: 3 niveles flotantes
+            createCompoundAssembly('Estantes Flotantes Estudio (3 Niveles — 1.80×0.20 m)', () => {
                 setMountWall(3.00, 0.93, false);
                 const woodShelfMat = new THREE.MeshStandardMaterial({ color: 0x8a3c1b, roughness: 0.65, metalness: 0.04 });
                 const blackBracketMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.35, metalness: 0.85 });
 
-                // Ménsulas de acero negro tipo L (escuadras de soporte a pared)
+                // Ménsulas de acero negro tipo L (escuadras de soporte a pared para los 3 niveles)
                 [0.22, 0.68, 1.18, 1.68].forEach(bz => {
-                    [1.33, 1.70].forEach(by => {
+                    [1.28, 1.63, 1.98].forEach(by => {
                         // Brazo horizontal bajo el estante
                         addDecorBox(2.845, by, bz, 0.19, 0.016, 0.024, 0x111827, 0.35, 0, 'Ménsula Negra Brazo Horizontal');
                         // Placa vertical fijada al muro
@@ -9697,26 +9697,26 @@
                     });
                 });
 
-                // --- 1° ESTANTE INFERIOR (Y = 1.35 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): CONSOLAS Y ACCESORIOS (sec_093/094) ---
-                addDecorBox(2.845, 1.35, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Inferior (1.80×0.20 m)');
+                // --- 1° ESTANTE INFERIOR (Y = 1.30 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): CONSOLAS Y ACCESORIOS (sec_093/094) ---
+                addDecorBox(2.845, 1.30, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Inferior (1.80×0.20 m)');
 
                 // A) Base de carga Poké Ball Plus con esfera Poké Ball (Z = 0.40 m)
                 const pokeDockBase = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.036, 0.022, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 }));
-                pokeDockBase.position.set(2.84, 1.368 + 0.011, 0.40);
+                pokeDockBase.position.set(2.84, 1.318 + 0.011, 0.40);
                 const pokeSphereTop = new THREE.Mesh(new THREE.SphereGeometry(0.025, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.3 }));
-                pokeSphereTop.position.set(2.84, 1.368 + 0.034, 0.40);
+                pokeSphereTop.position.set(2.84, 1.318 + 0.034, 0.40);
                 const pokeSphereBot = new THREE.Mesh(new THREE.SphereGeometry(0.025, 16, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 }));
-                pokeSphereBot.position.set(2.84, 1.368 + 0.034, 0.40);
+                pokeSphereBot.position.set(2.84, 1.318 + 0.034, 0.40);
                 const pokeBelt = new THREE.Mesh(new THREE.CylinderGeometry(0.0255, 0.0255, 0.005, 16), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 }));
-                pokeBelt.position.set(2.84, 1.368 + 0.034, 0.40);
+                pokeBelt.position.set(2.84, 1.318 + 0.034, 0.40);
                 const pokeBtn = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.004, 12), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.3 }));
                 pokeBtn.rotation.z = Math.PI / 2;
-                pokeBtn.position.set(2.814, 1.368 + 0.034, 0.40);
+                pokeBtn.position.set(2.814, 1.318 + 0.034, 0.40);
                 (currentAssemblyGroup || decorVideoGroup).add(pokeDockBase, pokeSphereTop, pokeSphereBot, pokeBelt, pokeBtn);
 
                 // B) Consola Nintendo Switch Edición Especial Pikachu & Eevee en su Dock (Z = 0.54 m, sec_093 y sec_094)
                 const switchGroup = new THREE.Group();
-                switchGroup.position.set(2.83, 1.368, 0.54);
+                switchGroup.position.set(2.83, 1.318, 0.54);
                 // Dock negro mate oficial
                 const dockMesh = new THREE.Mesh(createRoundedBoxGeo(0.055, 0.104, 0.174, 0.012, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45, metalness: 0.1 }));
                 dockMesh.position.set(0, 0.052, 0);
@@ -9751,7 +9751,7 @@
 
                 // C) Llavero Martillo de Thor (Mjölnir) colgando del borde inferior del estante (sec_094)
                 const mjolnirGroup = new THREE.Group();
-                mjolnirGroup.position.set(2.76, 1.35, 0.61);
+                mjolnirGroup.position.set(2.76, 1.30, 0.61);
                 // Cadena y aro superior plateados
                 const chainLink = new THREE.Mesh(new THREE.CylinderGeometry(0.0015, 0.0015, 0.065, 6), new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9, roughness: 0.2 }));
                 chainLink.position.set(0, -0.032, 0);
@@ -9769,7 +9769,7 @@
 
                 // D) Globo Terráqueo de Escritorio Miniatura en soporte de latón dorado (Z = 0.72 m, sec_094)
                 const globeGroup = new THREE.Group();
-                globeGroup.position.set(2.84, 1.368, 0.72);
+                globeGroup.position.set(2.84, 1.318, 0.72);
                 const globeBase = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.038, 0.015, 16), new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 }));
                 globeBase.position.set(0, 0.0075, 0);
                 const globeArch = new THREE.Mesh(new THREE.TorusGeometry(0.052, 0.004, 8, 16, Math.PI), new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 }));
@@ -9784,18 +9784,18 @@
                 // E) Pila de 3 Estuches Rígidos de Transporte de Consolas con Cierres (Z = 0.90 m, sec_094)
                 // 1. Estuche inferior negro rígido Switch con reborde rojo
                 const case1 = new THREE.Mesh(createRoundedBoxGeo(0.125, 0.052, 0.255, 0.018, 2), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.7, metalness: 0.1 }));
-                case1.position.set(2.84, 1.368 + 0.026, 0.90);
+                case1.position.set(2.84, 1.318 + 0.026, 0.90);
                 const case1Zip = new THREE.Mesh(createRoundedBoxGeo(0.127, 0.008, 0.257, 0.004, 2), new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.5 }));
-                case1Zip.position.set(2.84, 1.368 + 0.026, 0.90);
+                case1Zip.position.set(2.84, 1.318 + 0.026, 0.90);
                 // 2. Estuche medio cuero marrón con doble cierre
                 const case2 = new THREE.Mesh(createRoundedBoxGeo(0.115, 0.045, 0.235, 0.016, 2), new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.75, metalness: 0.05 }));
-                case2.position.set(2.84, 1.368 + 0.052 + 0.023, 0.90);
+                case2.position.set(2.84, 1.318 + 0.052 + 0.023, 0.90);
                 // 3. Estuche superior compacto negro 3DS con etiqueta roja
                 const case3 = new THREE.Mesh(createRoundedBoxGeo(0.105, 0.038, 0.205, 0.014, 2), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.7, metalness: 0.1 }));
-                case3.position.set(2.84, 1.368 + 0.098 + 0.019, 0.90);
+                case3.position.set(2.84, 1.318 + 0.098 + 0.019, 0.90);
                 const tag3 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xef4444 }));
                 tag3.scale.set(0.014, 0.012, 0.02);
-                tag3.position.set(2.78, 1.368 + 0.098 + 0.019, 0.81);
+                tag3.position.set(2.78, 1.318 + 0.098 + 0.019, 0.81);
                 (currentAssemblyGroup || decorVideoGroup).add(case1, case1Zip, case2, case3, tag3);
 
                 // F) Hilera de libros y mangas en el sector Sur del estante inferior (Z = 1.12 a 1.68 m)
@@ -9807,16 +9807,16 @@
                     const bD = 0.15;
                     const bkMesh = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: bkColors[b % bkColors.length], roughness: 0.8 }));
                     bkMesh.scale.set(bD, bH, bTh);
-                    bkMesh.position.set(2.84, 1.368 + bH / 2, bkZ + bTh / 2);
+                    bkMesh.position.set(2.84, 1.318 + bH / 2, bkZ + bTh / 2);
                     (currentAssemblyGroup || decorVideoGroup).add(bkMesh);
                     bkZ += bTh + 0.003;
                 }
 
-                // --- 2° ESTANTE SUPERIOR (Y = 1.72 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): LIBROS TOLKIEN, POTUS Y COLECCIONES ---
-                addDecorBox(2.845, 1.72, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Superior (1.80×0.20 m)');
+                // --- 2° ESTANTE MEDIO (Y = 1.65 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): LIBROS TOLKIEN Y COLECCIONES ---
+                addDecorBox(2.845, 1.65, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Medio (1.80×0.20 m)');
 
                 // Planta Potus en maceta blanca en extremo Norte cerca de la ventana (Z = 0.16 m)
-                addDecorPlantCeramic(2.845, 1.738, 0.16, 0.065, 0.05, 0.11, 0.15, 0.24, 0.15, 0.22, 'Planta Potus Colgante Estante Superior');
+                addDecorPlantCeramic(2.845, 1.668, 0.16, 0.065, 0.05, 0.11, 0.15, 0.24, 0.15, 0.22, 'Planta Potus Colgante Estante Medio');
 
                 // Colección de Tomos Grandes Ilustrados de Tolkien (El Señor de los Anillos, El Silmarillion)
                 // 3 tomos negros de lujo con runas doradas (Z = 0.48 a 0.68 m)
@@ -9826,10 +9826,10 @@
                     const tZ = 0.50 + t * 0.055;
                     const tBook = new THREE.Mesh(UNIT_BOX_GEO, tolkienBlackMat);
                     tBook.scale.set(0.17, 0.25, 0.048);
-                    tBook.position.set(2.84, 1.738 + 0.125, tZ);
+                    tBook.position.set(2.84, 1.668 + 0.125, tZ);
                     const tRune = new THREE.Mesh(UNIT_BOX_GEO, tolkienGoldMat);
                     tRune.scale.set(0.002, 0.06, 0.049);
-                    tRune.position.set(2.754, 1.738 + 0.15, tZ);
+                    tRune.position.set(2.754, 1.668 + 0.15, tZ);
                     (currentAssemblyGroup || decorVideoGroup).add(tBook, tRune);
                 }
                 // 2 tomos ilustrados con sobrecubierta blanca (Z = 0.69 a 0.81 m)
@@ -9838,22 +9838,53 @@
                     const wZ = 0.70 + w * 0.058;
                     const wBook = new THREE.Mesh(UNIT_BOX_GEO, tolkienWhiteMat);
                     wBook.scale.set(0.17, 0.25, 0.052);
-                    wBook.position.set(2.84, 1.738 + 0.125, wZ);
+                    wBook.position.set(2.84, 1.668 + 0.125, wZ);
                     (currentAssemblyGroup || decorVideoGroup).add(wBook);
                 }
 
-                // Libros de ciencia ficción, literatura y coleccionables en el resto del estante superior (Z = 0.88 a 1.68 m)
-                let topZ = 0.88;
+                // Libros de ciencia ficción, literatura y coleccionables en el estante medio (Z = 0.88 a 1.68 m)
+                let midZ = 0.88;
                 for (let b = 0; b < 16; b++) {
                     const bTh = 0.022 + (b % 4) * 0.006;
                     const bH = 0.21 + ((b * 5) % 4) * 0.014;
                     const bD = 0.16;
                     const bkMesh = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: bkColors[(b + 4) % bkColors.length], roughness: 0.8 }));
                     bkMesh.scale.set(bD, bH, bTh);
-                    bkMesh.position.set(2.84, 1.738 + bH / 2, topZ + bTh / 2);
+                    bkMesh.position.set(2.84, 1.668 + bH / 2, midZ + bTh / 2);
                     (currentAssemblyGroup || decorVideoGroup).add(bkMesh);
-                    topZ += bTh + 0.002;
+                    midZ += bTh + 0.002;
                 }
+
+                // --- 3° ESTANTE SUPERIOR (Y = 2.00 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): CAJAS COLECCIÓN, ARTE Y CERÁMICA ---
+                addDecorBox(2.845, 2.00, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Superior (1.80×0.20 m)');
+
+                // Vasija / pieza de cerámica escultórica decorativa al Norte (Z = 0.22 m)
+                const topCeramic = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.035, 0.18, 16), new THREE.MeshStandardMaterial({ color: 0xca8a04, roughness: 0.75 }));
+                topCeramic.position.set(2.84, 2.018 + 0.09, 0.22);
+                (currentAssemblyGroup || decorVideoGroup).add(topCeramic);
+
+                // Cajas de ediciones especiales de juegos y tomos de arte
+                const boxTopMats = [0x1e293b, 0x831843, 0x065f46, 0x78350f, 0x1e3a8a];
+                [-0.30, 0.05, 0.40].forEach((bz, idx) => {
+                    const cBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: boxTopMats[idx % boxTopMats.length], roughness: 0.5 }));
+                    cBox.scale.set(0.16, 0.18, 0.22);
+                    cBox.position.set(2.84, 2.018 + 0.09, 0.93 + bz);
+                    (currentAssemblyGroup || decorVideoGroup).add(cBox);
+                });
+
+                // Fila de libros encuadernados de gran formato en sector Sur (Z = 1.35 a 1.68 m)
+                let topZ = 1.35;
+                for (let b = 0; b < 7; b++) {
+                    const bTh = 0.030;
+                    const bH = 0.24;
+                    const bD = 0.165;
+                    const bkMesh = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: bkColors[(b + 8) % bkColors.length], roughness: 0.75 }));
+                    bkMesh.scale.set(bD, bH, bTh);
+                    bkMesh.position.set(2.84, 2.018 + bH / 2, topZ + bTh / 2);
+                    (currentAssemblyGroup || decorVideoGroup).add(bkMesh);
+                    topZ += bTh + 0.003;
+                }
+
                 setMountWall(null);
             });
 
@@ -9968,20 +9999,20 @@
                 return tableGroup;
             }
 
-            // 4. BIBLIOTECA DEL ESTUDIO HIPERREALISTA (Muro Oeste X = 0.00 m, PBR y Clutter Realista)
+            // 4. BIBLIOTECA DEL ESTUDIO HIPERREALISTA (Muro Oeste X = 0.00 m, PBR Nogal Oscuro y Clutter Relevado)
             createCompoundAssembly('Biblioteca Alta con Libros y Coleccionables', () => {
-                setMountWall(0.00, 1.00, false);
+                setMountWall(0.00, 1.22, false);
                 const bibGroup = new THREE.Group();
-                // Ubicada contra el muro Oeste X = 0.00 m, centrada en Z = 1.00 m
-                const bibX = 0.16; // Profundidad de 30 cm (centro a 15 cm de la pared)
-                const bibZ = 1.00;
+                // Ubicada contra el muro Oeste X = 0.00 m, centrada en Z = 1.22 m (Z = 0.66 a 1.78 m)
+                const bibX = 0.16; // Profundidad de 30 cm (centro a 16 cm de la pared)
+                const bibZ = 1.22;
                 bibGroup.position.set(bibX, 0, bibZ);
 
-                // Material PBR Madera Negra Mate
+                // Material PBR Madera Nogal Oscuro Realista (sec_098 a sec_101)
                 const blackWoodMat = new THREE.MeshStandardMaterial({
-                    color: 0x212529,
-                    roughness: 0.85,
-                    metalness: 0.02
+                    color: 0x2b1d16, // Nogal oscuro
+                    roughness: 0.76,
+                    metalness: 0.04
                 });
 
                 const bibW = 0.28; // Espesor útil de estante
@@ -9999,7 +10030,7 @@
                 sideRight.position.set(0, bibH / 2, bibL / 2 - 0.012);
                 sideRight.castShadow = true; sideRight.receiveShadow = true;
 
-                // Fondo posterior negro mate
+                // Fondo posterior nogal oscuro
                 const backPanel = new THREE.Mesh(UNIT_BOX_GEO, blackWoodMat);
                 backPanel.scale.set(0.015, bibH, bibL);
                 backPanel.position.set(-bibW / 2 + 0.008, bibH / 2, 0);
@@ -10053,13 +10084,11 @@
                 function createSingleBook(thick, h, depth, colorIdx, isRotatedDeg = 0) {
                     const bg = new THREE.Group();
                     const mat = bookMats[colorIdx % bookMats.length];
-                    // Lomo y tapa del libro unificados en 1 malla sin castShadow individual para máxima fluidez Chrome
                     const cover = new THREE.Mesh(UNIT_BOX_GEO, mat);
                     cover.scale.set(depth, h, thick);
                     cover.position.set(0, h / 2, 0);
                     bg.add(cover);
 
-                    // Detalle dorado en el lomo para libros elegantes
                     if (colorIdx % 4 === 0) {
                         const band = new THREE.Mesh(UNIT_BOX_GEO, goldSpineMat);
                         band.scale.set(0.003, h * 0.18, thick + 0.002);
@@ -10073,117 +10102,145 @@
                     return bg;
                 }
 
-                // --- DIVISORES VERTICALES DE ESTANTES (según estructura real relevada en sec_098, sec_099, sec_100) ---
+                // --- DIVISORES VERTICALES DE ESTANTES ---
                 const divMat = blackWoodMat;
-                // Divisor central en Estante 1 (Y = 1.56 a 1.95 m)
                 const div1 = new THREE.Mesh(UNIT_BOX_GEO, divMat);
                 div1.scale.set(bibW - 0.02, 0.37, 0.02);
                 div1.position.set(0, 1.56 + 0.185, 0.00);
-                // Divisor central en Estante 2 (Y = 1.19 a 1.56 m)
                 const div2 = new THREE.Mesh(UNIT_BOX_GEO, divMat);
                 div2.scale.set(bibW - 0.02, 0.35, 0.02);
                 div2.position.set(0, 1.19 + 0.175, 0.00);
-                // 2 Divisores en Estante 3 (Y = 0.82 a 1.19 m, divide en 3 nichos: peluches / pikachu / witcher)
                 const div3L = new THREE.Mesh(UNIT_BOX_GEO, divMat);
                 div3L.scale.set(bibW - 0.02, 0.35, 0.02);
                 div3L.position.set(0, 0.82 + 0.175, -0.16);
                 const div3R = new THREE.Mesh(UNIT_BOX_GEO, divMat);
                 div3R.scale.set(bibW - 0.02, 0.35, 0.02);
                 div3R.position.set(0, 0.82 + 0.175, 0.16);
-                // Divisor en Estante 4 (Y = 0.45 a 0.82 m)
                 const div4 = new THREE.Mesh(UNIT_BOX_GEO, divMat);
                 div4.scale.set(bibW - 0.02, 0.35, 0.02);
                 div4.position.set(0, 0.45 + 0.175, 0.05);
                 bibGroup.add(div1, div2, div3L, div3R, div4);
 
                 // =========================================================================
-                // TAPA SUPERIOR (Y = 1.95 m): CONSOLAS EN CAJA, FUNKO Y TORRE EIFFEL (sec_099, sec_100)
+                // TAPA SUPERIOR (Y = 1.95 m): CONSOLAS EN CAJA, FUNKO Y TORRE EIFFEL (sec_098 a sec_101)
                 // =========================================================================
-                // 1. Florero cerámico beige con perforaciones artísticas al Norte (Z = -0.44 m)
-                const vaseBeige = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.035, 0.22, 16), new THREE.MeshStandardMaterial({ color: 0xd6c7b2, roughness: 0.8 }));
-                vaseBeige.position.set(0, 1.95 + 0.11, -0.44);
-                bibGroup.add(vaseBeige);
-
-                // 2. Caja Amarilla Oficial Nintendo 3DS XL Edición Especial Pikachu (Z = -0.28 m)
-                const pika3dsBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4, metalness: 0.05 }));
-                pika3dsBox.scale.set(0.14, 0.18, 0.18);
-                pika3dsBox.position.set(0, 1.95 + 0.09, -0.28);
-                // Cara de Pikachu y orejas negras impresas
-                const pikaFace = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0x18181b }));
-                pikaFace.scale.set(0.002, 0.06, 0.10);
-                pikaFace.position.set(0.071, 1.95 + 0.10, -0.28);
-                const pikaCheekL = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xef4444 }));
-                pikaCheekL.scale.set(0.002, 0.024, 0.024);
-                pikaCheekL.position.set(0.071, 1.95 + 0.075, -0.34);
-                const pikaCheekR = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xef4444 }));
-                pikaCheekR.scale.set(0.002, 0.024, 0.024);
-                pikaCheekR.position.set(0.071, 1.95 + 0.075, -0.22);
-                bibGroup.add(pika3dsBox, pikaFace, pikaCheekL, pikaCheekR);
-
-                // 3. Caja Nintendo Switch Bundle Let's Go Pikachu & Eevee (Z = -0.12 m)
-                const switchPikaBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.35 }));
-                switchPikaBox.scale.set(0.12, 0.22, 0.24);
-                switchPikaBox.position.set(0, 1.95 + 0.11, -0.12);
-                const pikaEeveeArt = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xd97706 }));
-                pikaEeveeArt.scale.set(0.002, 0.12, 0.16);
-                pikaEeveeArt.position.set(0.061, 1.95 + 0.11, -0.12);
-                bibGroup.add(switchPikaBox, pikaEeveeArt);
-
-                // 4. Caja Star Wars The Black Series (Z = 0.02 m, roja y negra)
-                const swBlackBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 }));
-                swBlackBox.scale.set(0.10, 0.22, 0.12);
-                swBlackBox.position.set(0, 1.95 + 0.11, 0.02);
-                const swRedStripe = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xdc2626 }));
-                swRedStripe.scale.set(0.002, 0.22, 0.035);
-                swRedStripe.position.set(0.051, 1.95 + 0.11, 0.05);
-                bibGroup.add(swBlackBox, swRedStripe);
-
-                // 5. Caja Funko Pop Michael Jordan #75 Chicago Bulls (Z = 0.16 m)
-                const jordanBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
-                jordanBox.scale.set(0.11, 0.16, 0.11);
-                jordanBox.position.set(0, 1.95 + 0.08, 0.16);
-                const jordanRedBand = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xce1141 })); // Rojo Bulls
-                jordanRedBand.scale.set(0.002, 0.045, 0.111);
-                jordanRedBand.position.set(0.056, 1.95 + 0.135, 0.16);
-                const jordanWindow = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.45, roughness: 0.1 }));
-                jordanWindow.scale.set(0.002, 0.09, 0.08);
-                jordanWindow.position.set(0.056, 1.95 + 0.07, 0.16);
-                bibGroup.add(jordanBox, jordanRedBand, jordanWindow);
-
-                // 6. Caja Roja Oficial de Consola Nintendo Switch OLED / V2 (Z = 0.32 m, sec_099)
-                const switchRedBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.35, metalness: 0.05 }));
-                switchRedBox.scale.set(0.12, 0.24, 0.20);
-                switchRedBox.position.set(0, 1.95 + 0.12, 0.32);
-                const switchLogo = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xffffff }));
-                switchLogo.scale.set(0.003, 0.08, 0.08);
-                switchLogo.position.set(0.061, 1.95 + 0.15, 0.32);
-                bibGroup.add(switchRedBox, switchLogo);
-
-                // 7. Caja Roja de Colección El Señor de los Anillos con Árbol de Gondor (Z = 0.44 m, sec_100)
-                const lotrBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.4 }));
-                lotrBox.scale.set(0.12, 0.20, 0.16);
-                lotrBox.position.set(0, 1.95 + 0.10, 0.44);
-                const gondorTree = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xf1f5f9 }));
-                gondorTree.scale.set(0.002, 0.12, 0.09);
-                gondorTree.position.set(0.061, 1.95 + 0.10, 0.44);
-                bibGroup.add(lotrBox, gondorTree);
-
-                // 8. Torre Eiffel calada de madera/bronce en el extremo Sur (Z = 0.50 m, sec_100)
+                // --- Sector Norte (Z < 0, hacia ventana y ajedrez): Torre Eiffel, Gondor, Switch Rojo, Jordan ---
+                // 1. Torre Eiffel calada en extremo Norte (Z = -0.50 m, sec_100)
                 const eiffelBase = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.085, 0.24, 4), new THREE.MeshStandardMaterial({ color: 0xb47b48, roughness: 0.65, metalness: 0.3 }));
-                eiffelBase.position.set(0, 1.95 + 0.12, 0.50);
+                eiffelBase.position.set(0, 1.95 + 0.12, -0.50);
                 eiffelBase.rotation.y = Math.PI / 4;
                 eiffelBase.castShadow = true;
                 const eiffelSpire = new THREE.Mesh(new THREE.CylinderGeometry(0.002, 0.012, 0.09, 4), new THREE.MeshStandardMaterial({ color: 0xb47b48, roughness: 0.65, metalness: 0.3 }));
-                eiffelSpire.position.set(0, 1.95 + 0.28, 0.50);
+                eiffelSpire.position.set(0, 1.95 + 0.28, -0.50);
                 bibGroup.add(eiffelBase, eiffelSpire);
 
+                // 2. Caja Roja de Colección El Señor de los Anillos con Árbol de Gondor (Z = -0.38 m, sec_100)
+                const lotrBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.4 }));
+                lotrBox.scale.set(0.12, 0.20, 0.16);
+                lotrBox.position.set(0, 1.95 + 0.10, -0.38);
+                const gondorTree = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xf1f5f9 }));
+                gondorTree.scale.set(0.002, 0.12, 0.09);
+                gondorTree.position.set(0.061, 1.95 + 0.10, -0.38);
+                bibGroup.add(lotrBox, gondorTree);
+
+                // 3. Caja Roja Oficial Nintendo Switch OLED / V2 (Z = -0.22 m, sec_099)
+                const switchRedBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.35, metalness: 0.05 }));
+                switchRedBox.scale.set(0.12, 0.24, 0.20);
+                switchRedBox.position.set(0, 1.95 + 0.12, -0.22);
+                const switchLogo = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xffffff }));
+                switchLogo.scale.set(0.003, 0.08, 0.08);
+                switchLogo.position.set(0.061, 1.95 + 0.15, -0.22);
+                bibGroup.add(switchRedBox, switchLogo);
+
+                // 4. Caja Funko Pop Michael Jordan #75 Chicago Bulls (Z = -0.06 m)
+                const jordanBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
+                jordanBox.scale.set(0.11, 0.16, 0.11);
+                jordanBox.position.set(0, 1.95 + 0.08, -0.06);
+                const jordanRedBand = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xce1141 }));
+                jordanRedBand.scale.set(0.002, 0.045, 0.111);
+                jordanRedBand.position.set(0.056, 1.95 + 0.135, -0.06);
+                const jordanWindow = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.45, roughness: 0.1 }));
+                jordanWindow.scale.set(0.002, 0.09, 0.08);
+                jordanWindow.position.set(0.056, 1.95 + 0.07, -0.06);
+                bibGroup.add(jordanBox, jordanRedBand, jordanWindow);
+
+                // --- Sector Sur (Z > 0, hacia mesa Consejo Jedi y placard): Star Wars, Pikachu/Eevee, 3DS XL, Florero ---
+                // 5. Caja Star Wars The Black Series (Z = 0.06 m, roja y negra)
+                const swBlackBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 }));
+                swBlackBox.scale.set(0.10, 0.22, 0.12);
+                swBlackBox.position.set(0, 1.95 + 0.11, 0.06);
+                const swRedStripe = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xdc2626 }));
+                swRedStripe.scale.set(0.002, 0.22, 0.035);
+                swRedStripe.position.set(0.051, 1.95 + 0.11, 0.09);
+                bibGroup.add(swBlackBox, swRedStripe);
+
+                // 6. Caja Nintendo Switch Bundle Let's Go Pikachu & Eevee (Z = 0.18 m)
+                const switchPikaBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.35 }));
+                switchPikaBox.scale.set(0.12, 0.22, 0.24);
+                switchPikaBox.position.set(0, 1.95 + 0.11, 0.18);
+                const pikaEeveeArt = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xd97706 }));
+                pikaEeveeArt.scale.set(0.002, 0.12, 0.16);
+                pikaEeveeArt.position.set(0.061, 1.95 + 0.11, 0.18);
+                bibGroup.add(switchPikaBox, pikaEeveeArt);
+
+                // 7. Caja Amarilla Oficial Nintendo 3DS XL Edición Especial Pikachu (Z = 0.32 m)
+                const pika3dsBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4, metalness: 0.05 }));
+                pika3dsBox.scale.set(0.14, 0.18, 0.18);
+                pika3dsBox.position.set(0, 1.95 + 0.09, 0.32);
+                const pikaFace = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0x18181b }));
+                pikaFace.scale.set(0.002, 0.06, 0.10);
+                pikaFace.position.set(0.071, 1.95 + 0.10, 0.32);
+                const pikaCheekL = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+                pikaCheekL.scale.set(0.002, 0.024, 0.024);
+                pikaCheekL.position.set(0.071, 1.95 + 0.075, 0.26);
+                const pikaCheekR = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+                pikaCheekR.scale.set(0.002, 0.024, 0.024);
+                pikaCheekR.position.set(0.071, 1.95 + 0.075, 0.38);
+                bibGroup.add(pika3dsBox, pikaFace, pikaCheekL, pikaCheekR);
+
+                // 8. Florero cerámico beige con perforaciones artísticas al Sur (Z = 0.46 m, sec_098)
+                const vaseBeige = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.035, 0.22, 16), new THREE.MeshStandardMaterial({ color: 0xd6c7b2, roughness: 0.8 }));
+                vaseBeige.position.set(0, 1.95 + 0.11, 0.46);
+                bibGroup.add(vaseBeige);
+
                 // =========================================================================
-                // ESTANTE 1 (Y = 1.56 m): BIBLIOTECA CLÁSICA GREDOS + GOKU + STAR WARS + MEDALLA (sec_099)
+                // ESTANTE 1 (Y = 1.56 m): LITERATURA / MEDALLA (NORTE) + GREDOS / FIGURAS (SUR)
                 // =========================================================================
-                // Lado Norte (Z = -0.52 a 0.00): Colección Gredos Clásicos Griegos en cuero negro/dorado y 3 volúmenes vino
+                // Lado Norte (Z = -0.52 a -0.04): Libros de literatura, portarretrato y medalla de oro
+                let litZ = -bibL / 2 + 0.04;
+                for (let b = 0; b < 12; b++) {
+                    const bTh = 0.024;
+                    const bH = 0.22 + ((b * 3) % 4) * 0.015;
+                    const bBook = createSingleBook(bTh, bH, 0.18, b + 1);
+                    bBook.position.set(-0.01, 1.57, litZ + bTh / 2);
+                    bibGroup.add(bBook);
+                    litZ += bTh + 0.002;
+                }
+                // Portarretrato blanco horizontal con foto (Z = -0.22 m)
+                const photoFrame = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 }));
+                photoFrame.scale.set(0.012, 0.10, 0.14);
+                photoFrame.position.set(0.08, 1.57 + 0.05, -0.22);
+                const photoInner = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+                photoInner.scale.set(0.002, 0.075, 0.115);
+                photoInner.position.set(0.087, 1.57 + 0.05, -0.22);
+                bibGroup.add(photoFrame, photoInner);
+
+                // Gran Medalla Dorada de Torneo con cinta tricolor (Z = -0.04 m)
+                const medalGroup = new THREE.Group();
+                medalGroup.position.set(0.075, 1.57 + 0.08, -0.04);
+                const medalGold = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.006, 24), new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.25, metalness: 0.9 }));
+                medalGold.rotation.z = Math.PI / 2;
+                const medalRibbon = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.7 }));
+                medalRibbon.scale.set(0.004, 0.12, 0.028);
+                medalRibbon.position.set(-0.01, 0.04, 0);
+                medalRibbon.rotation.z = 0.2;
+                medalGroup.add(medalGold, medalRibbon);
+                bibGroup.add(medalGroup);
+
+                // Lado Sur (Z = 0.04 a 0.52): Colección Gredos Clásicos Griegos en cuero negro/dorado y 3 volúmenes vino
                 const gredosMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.45, metalness: 0.1 });
                 const gredosWineMat = new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.45, metalness: 0.1 });
-                let gZ = -bibL / 2 + 0.04;
+                let gZ = 0.04;
                 for (let g = 0; g < 14; g++) {
                     const gThick = 0.028;
                     const gH = 0.27;
@@ -10192,7 +10249,6 @@
                     const gBook = new THREE.Mesh(UNIT_BOX_GEO, mat);
                     gBook.scale.set(gD, gH, gThick);
                     gBook.position.set(-0.02, 1.57 + gH / 2, gZ + gThick / 2);
-                    // Ribetes dorados en el lomo (Platón / Aristóteles)
                     const gFoil1 = new THREE.Mesh(UNIT_BOX_GEO, goldSpineMat);
                     gFoil1.scale.set(0.002, 0.025, gThick - 0.002);
                     gFoil1.position.set(gD / 2 - 0.02 + 0.001, 1.57 + gH * 0.78, gZ + gThick / 2);
@@ -10203,28 +10259,28 @@
                     gZ += gThick + 0.002;
                 }
 
-                // Figuras de acción paradas frente a los libros Gredos (sec_099):
-                // A) Goku Super Saiyan (Dragon Ball Z): pelo erizado rubio, dogi naranja y muñequeras azules
+                // Figuras de acción paradas frente a los libros Gredos en Lado Sur (sec_098, sec_099):
+                // A) Goku Super Saiyan (Dragon Ball Z) al Sur (Z = 0.16 m)
                 const gokuGroup = new THREE.Group();
-                gokuGroup.position.set(0.08, 1.57, -0.42);
-                const gokuLegs = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xea580c, roughness: 0.6 })); // Naranja
+                gokuGroup.position.set(0.08, 1.57, 0.16);
+                const gokuLegs = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xea580c, roughness: 0.6 }));
                 gokuLegs.scale.set(0.028, 0.075, 0.035);
                 gokuLegs.position.set(0, 0.038, 0);
                 const gokuTorso = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xea580c, roughness: 0.6 }));
                 gokuTorso.scale.set(0.032, 0.055, 0.04);
                 gokuTorso.position.set(0, 0.095, 0);
-                const gokuBelt = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x1d4ed8 })); // Azul marino
+                const gokuBelt = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x1d4ed8 }));
                 gokuBelt.scale.set(0.034, 0.016, 0.042);
                 gokuBelt.position.set(0, 0.074, 0);
-                const gokuHair = new THREE.Mesh(new THREE.ConeGeometry(0.028, 0.065, 5), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.3 })); // Pelo rubio erizado
+                const gokuHair = new THREE.Mesh(new THREE.ConeGeometry(0.028, 0.065, 5), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.3 }));
                 gokuHair.position.set(0, 0.155, 0);
                 gokuHair.rotation.y = Math.PI / 5;
                 gokuGroup.add(gokuLegs, gokuTorso, gokuBelt, gokuHair);
                 bibGroup.add(gokuGroup);
 
-                // B) Maestro Jedi Qui-Gon Jinn / Obi-Wan Kenobi en túnica marrón Star Wars
+                // B) Maestro Jedi Qui-Gon Jinn / Obi-Wan Kenobi en túnica marrón Star Wars (Z = 0.28 m)
                 const jediFig = new THREE.Group();
-                jediFig.position.set(0.08, 1.57, -0.28);
+                jediFig.position.set(0.08, 1.57, 0.28);
                 const jediRobe = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.034, 0.13, 10), new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 }));
                 jediRobe.position.set(0, 0.065, 0);
                 const jediHood = new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), new THREE.MeshStandardMaterial({ color: 0x5c2b09, roughness: 0.85 }));
@@ -10232,9 +10288,9 @@
                 jediFig.add(jediRobe, jediHood);
                 bibGroup.add(jediFig);
 
-                // C) Guerrero Sith / Anakin con capa oscura
+                // C) Guerrero Sith / Anakin con capa oscura (Z = 0.42 m)
                 const sithFig = new THREE.Group();
-                sithFig.position.set(0.08, 1.57, -0.16);
+                sithFig.position.set(0.08, 1.57, 0.42);
                 const sithRobe = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.032, 0.13, 10), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.7 }));
                 sithRobe.position.set(0, 0.065, 0);
                 const sithHead = new THREE.Mesh(new THREE.SphereGeometry(0.020, 10, 8), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.7 }));
@@ -10242,94 +10298,19 @@
                 sithFig.add(sithRobe, sithHead);
                 bibGroup.add(sithFig);
 
-                // Lado Sur (Z = 0.02 a 0.50): Libros de literatura, portarretrato y medalla de oro
-                let litZ = 0.02;
-                const litColors = [0x991b1b, 0x1e3a8a, 0x065f46, 0xf8fafc, 0x18181b, 0x15803d, 0x475569, 0x334155];
-                for (let b = 0; b < 12; b++) {
-                    const bTh = 0.024;
-                    const bH = 0.22 + ((b * 3) % 4) * 0.015;
-                    const bBook = createSingleBook(bTh, bH, 0.18, b + 1);
-                    bBook.position.set(-0.01, 1.57, litZ + bTh / 2);
-                    bibGroup.add(bBook);
-                    litZ += bTh + 0.002;
-                }
-                // Portarretrato blanco horizontal con foto de 3 personas (sec_100)
-                const photoFrame = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 }));
-                photoFrame.scale.set(0.012, 0.10, 0.14);
-                photoFrame.position.set(0.08, 1.57 + 0.05, 0.22);
-                const photoInner = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
-                photoInner.scale.set(0.002, 0.075, 0.115);
-                photoInner.position.set(0.087, 1.57 + 0.05, 0.22);
-                bibGroup.add(photoFrame, photoInner);
-
-                // Gran Medalla Dorada de Torneo con cinta tricolor apoyada sobre los lomos (sec_099, sec_100)
-                const medalGroup = new THREE.Group();
-                medalGroup.position.set(0.075, 1.57 + 0.08, 0.03);
-                const medalGold = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.006, 24), new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.25, metalness: 0.9 }));
-                medalGold.rotation.z = Math.PI / 2;
-                const medalRibbon = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.7 }));
-                medalRibbon.scale.set(0.004, 0.12, 0.028);
-                medalRibbon.position.set(-0.01, 0.04, 0);
-                medalRibbon.rotation.z = 0.2;
-                medalGroup.add(medalGold, medalRibbon);
-                bibGroup.add(medalGroup);
-
                 // =========================================================================
-                // ESTANTE 2 (Y = 1.19 m): TOY STORY, FILOSOFÍA, POKÉMON MINIS Y BLASTOISE (sec_099, sec_100)
+                // ESTANTE 2 (Y = 1.19 m): FILOSOFÍA/BLASTOISE (NORTE) + TOY STORY/RUBIK (SUR)
                 // =========================================================================
-                // Lado Norte (Z = -0.52 a 0.00): Figuras Buzz Lightyear, Woody, Marciano Toy Story, Mario y Cubo Rubik
-                // A) Buzz Lightyear con traje espacial blanco/verde y domo transparente
-                const buzzGroup = new THREE.Group();
-                buzzGroup.position.set(0.05, 1.20, -0.36);
-                const buzzBody = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
-                buzzBody.scale.set(0.055, 0.11, 0.05);
-                buzzBody.position.set(0, 0.055, 0);
-                const buzzChest = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.4 }));
-                buzzChest.scale.set(0.058, 0.045, 0.052);
-                buzzChest.position.set(0, 0.09, 0);
-                const buzzVisor = new THREE.Mesh(new THREE.SphereGeometry(0.024, 12, 10), new THREE.MeshStandardMaterial({ color: 0x9333ea, roughness: 0.15, transparent: true, opacity: 0.75 }));
-                buzzVisor.position.set(0, 0.145, 0);
-                buzzGroup.add(buzzBody, buzzChest, buzzVisor);
-                bibGroup.add(buzzGroup);
-
-                // B) Woody muñeco de trapo: camisa a cuadros, chaleco vaquero, jeans y sombrero
-                const woodyGroup = new THREE.Group();
-                woodyGroup.position.set(0.05, 1.20, -0.25);
-                const woodyLegs = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.7 }));
-                woodyLegs.scale.set(0.035, 0.09, 0.035);
-                woodyLegs.position.set(0, 0.045, 0);
-                const woodyShirt = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.6 }));
-                woodyShirt.scale.set(0.042, 0.07, 0.038);
-                woodyShirt.position.set(0, 0.12, 0);
-                const woodyHat = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.044, 0.014, 14), new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 }));
-                woodyHat.position.set(0, 0.18, 0);
-                // Marcianito alienígena verde de Toy Story sentado en la falda de Woody
-                const alienToy = new THREE.Mesh(new THREE.SphereGeometry(0.018, 10, 8), new THREE.MeshStandardMaterial({ color: 0x84cc16, roughness: 0.7 }));
-                alienToy.position.set(0.02, 0.05, 0);
-                woodyGroup.add(woodyLegs, woodyShirt, woodyHat, alienToy);
-                bibGroup.add(woodyGroup);
-
-                // C) Mario Bros miniatura y Cubo Rubik
-                const marioFig = new THREE.Mesh(new THREE.SphereGeometry(0.014, 8, 8), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
-                marioFig.position.set(0.07, 1.20 + 0.014, -0.16);
-                const rubikCube = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.4 }));
-                rubikCube.scale.set(0.032, 0.032, 0.032);
-                rubikCube.position.set(0.07, 1.20 + 0.016, -0.10);
-                bibGroup.add(marioFig, rubikCube);
-
-                // Lado Sur (Z = 0.00 a 0.52): "DIOS" apilado, libros de filosofía, fila Pokémon y Blastoise (sec_099, sec_100)
-                // Libro blanco "DIOS" de John Hick horizontal en la parte superior
+                // Lado Norte (Z = -0.52 a -0.02): "DIOS" apilado, filosofía, Pokémon minis y Blastoise (sec_100)
                 const diosBook = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.6 }));
                 diosBook.scale.set(0.18, 0.038, 0.24);
-                diosBook.position.set(-0.01, 1.20 + 0.27, 0.15);
+                diosBook.position.set(-0.01, 1.20 + 0.27, -0.20);
                 const diosTitle = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0x1d4ed8 }));
                 diosTitle.scale.set(0.002, 0.018, 0.09);
-                diosTitle.position.set(0.081, 1.20 + 0.27, 0.15);
+                diosTitle.position.set(0.081, 1.20 + 0.27, -0.20);
                 bibGroup.add(diosBook, diosTitle);
 
-                // Libros verticales de filosofía y humanidades (Deleuze, etc.)
-                let philZ = 0.02;
-                const philColors = [0xdb2777, 0x0d9488, 0x15803d, 0xfacc15, 0xf8fafc, 0x1e293b, 0x64748b, 0xe11d48];
+                let philZ = -bibL / 2 + 0.04;
                 for (let b = 0; b < 14; b++) {
                     const bTh = 0.022;
                     const bH = 0.22 + ((b * 4) % 3) * 0.012;
@@ -10339,17 +10320,17 @@
                     philZ += bTh + 0.002;
                 }
 
-                // Fila de 8 Figuritas coleccionables Pokémon en el borde del estante (sec_099, sec_100)
+                // Fila de 8 Figuritas coleccionables Pokémon en el borde del estante (Z = -0.42 a -0.08 m)
                 const miniPokeColors = [0xfacc15, 0x38bdf8, 0x10b981, 0xf97316, 0xb45309, 0xf472b6, 0x9333ea, 0xef4444];
                 miniPokeColors.forEach((col, idx) => {
                     const mFig = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 8), new THREE.MeshStandardMaterial({ color: col, roughness: 0.6 }));
-                    mFig.position.set(0.09, 1.20 + 0.012, 0.06 + idx * 0.045);
+                    mFig.position.set(0.09, 1.20 + 0.012, -0.42 + idx * 0.045);
                     bibGroup.add(mFig);
                 });
 
-                // Blastoise con cañones en su caparazón en el extremo Sur (sec_100)
+                // Blastoise con cañones en su caparazón (Z = -0.46 m, sec_100)
                 const blastoiseGroup = new THREE.Group();
-                blastoiseGroup.position.set(0.07, 1.20, 0.44);
+                blastoiseGroup.position.set(0.07, 1.20, -0.46);
                 const blastBody = new THREE.Mesh(new THREE.SphereGeometry(0.034, 12, 10), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.6 }));
                 blastBody.position.set(0, 0.038, 0);
                 const blastShell = new THREE.Mesh(new THREE.SphereGeometry(0.032, 10, 8), new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 }));
@@ -10361,58 +10342,50 @@
                 blastoiseGroup.add(blastBody, blastShell, cannonL, cannonR);
                 bibGroup.add(blastoiseGroup);
 
-                // =========================================================================
-                // ESTANTE 3 (Y = 0.82 m): PELUCHES POKÉMON, MANTA NARANJA, THE WITCHER Y MEWTWO (sec_099, sec_100)
-                // =========================================================================
-                // Nicho 1 Izquierdo (Norte, Z = -0.42 a -0.18): Peluches de Squirtle y Bulbasaur
-                // Squirtle (azul celeste con caparazón)
-                const squirtlePlush = new THREE.Group();
-                squirtlePlush.position.set(0.04, 0.83, -0.34);
-                const sqBody = new THREE.Mesh(new THREE.SphereGeometry(0.042, 14, 12), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.9 }));
-                sqBody.position.set(0, 0.045, 0);
-                const sqShell = new THREE.Mesh(new THREE.SphereGeometry(0.038, 12, 10), new THREE.MeshStandardMaterial({ color: 0x92400e, roughness: 0.95 }));
-                sqShell.position.set(-0.015, 0.045, 0);
-                squirtlePlush.add(sqBody, sqShell);
-                // Bulbasaur (verde turquesa con bulbo verde)
-                const bulbaPlush = new THREE.Group();
-                bulbaPlush.position.set(0.04, 0.83, -0.22);
-                const buBody = new THREE.Mesh(new THREE.SphereGeometry(0.038, 14, 12), new THREE.MeshStandardMaterial({ color: 0x14b8a6, roughness: 0.9 }));
-                buBody.position.set(0, 0.040, 0);
-                const buBulb = new THREE.Mesh(new THREE.ConeGeometry(0.026, 0.045, 8), new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.9 }));
-                buBulb.position.set(-0.01, 0.075, 0);
-                bulbaPlush.add(buBody, buBulb);
-                bibGroup.add(squirtlePlush, bulbaPlush);
+                // Lado Sur (Z = 0.04 a 0.52): Toy Story, Mario y Cubo Rubik (sec_098)
+                // A) Buzz Lightyear con traje espacial blanco/verde y domo transparente (Z = 0.16 m)
+                const buzzGroup = new THREE.Group();
+                buzzGroup.position.set(0.05, 1.20, 0.16);
+                const buzzBody = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
+                buzzBody.scale.set(0.055, 0.11, 0.05);
+                buzzBody.position.set(0, 0.055, 0);
+                const buzzChest = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.4 }));
+                buzzChest.scale.set(0.058, 0.045, 0.052);
+                buzzChest.position.set(0, 0.09, 0);
+                const buzzVisor = new THREE.Mesh(new THREE.SphereGeometry(0.024, 12, 10), new THREE.MeshStandardMaterial({ color: 0x9333ea, roughness: 0.15, transparent: true, opacity: 0.75 }));
+                buzzVisor.position.set(0, 0.145, 0);
+                buzzGroup.add(buzzBody, buzzChest, buzzVisor);
+                bibGroup.add(buzzGroup);
 
-                // Nicho 2 Central (Z = -0.14 a 0.14): Pikachu y Charmander sobre Manta Naranja (sec_099)
-                const orangeBlanket = new THREE.Mesh(createRoundedBoxGeo(0.20, 0.032, 0.26, 0.015, 2), new THREE.MeshStandardMaterial({ color: 0xea580c, roughness: 0.95 }));
-                orangeBlanket.position.set(0, 0.83 + 0.016, 0.00);
-                bibGroup.add(orangeBlanket);
-                // Peluche Pikachu
-                const pikaPlush = new THREE.Group();
-                pikaPlush.position.set(0.02, 0.83 + 0.032, -0.06);
-                const pikBody = new THREE.Mesh(new THREE.SphereGeometry(0.036, 12, 10), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.9 }));
-                pikBody.position.set(0, 0.04, 0);
-                const pikHead = new THREE.Mesh(new THREE.SphereGeometry(0.030, 12, 10), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.9 }));
-                pikHead.position.set(0, 0.09, 0);
-                const pikEarL = new THREE.Mesh(new THREE.ConeGeometry(0.009, 0.045, 6), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.9 }));
-                pikEarL.position.set(-0.015, 0.13, -0.015); pikEarL.rotation.z = -0.3;
-                const pikEarR = new THREE.Mesh(new THREE.ConeGeometry(0.009, 0.045, 6), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.9 }));
-                pikEarR.position.set(-0.015, 0.13, 0.015); pikEarR.rotation.z = 0.3;
-                pikaPlush.add(pikBody, pikHead, pikEarL, pikEarR);
-                // Peluche Charmander
-                const charPlush = new THREE.Group();
-                charPlush.position.set(0.02, 0.83 + 0.032, 0.06);
-                const chBody = new THREE.Mesh(new THREE.SphereGeometry(0.036, 12, 10), new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.9 }));
-                chBody.position.set(0, 0.04, 0);
-                const chHead = new THREE.Mesh(new THREE.SphereGeometry(0.030, 12, 10), new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.9 }));
-                chHead.position.set(0, 0.09, 0);
-                const chTail = new THREE.Mesh(new THREE.ConeGeometry(0.012, 0.038, 6), new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0xf59e0b, emissiveIntensity: 0.4 }));
-                chTail.position.set(-0.035, 0.04, 0.02); chTail.rotation.z = -Math.PI / 3;
-                charPlush.add(chBody, chHead, chTail);
-                bibGroup.add(pikaPlush, charPlush);
+                // B) Woody muñeco de trapo con alien en su regazo (Z = 0.26 m)
+                const woodyGroup = new THREE.Group();
+                woodyGroup.position.set(0.05, 1.20, 0.26);
+                const woodyLegs = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.7 }));
+                woodyLegs.scale.set(0.035, 0.09, 0.035);
+                woodyLegs.position.set(0, 0.045, 0);
+                const woodyShirt = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.6 }));
+                woodyShirt.scale.set(0.042, 0.07, 0.038);
+                woodyShirt.position.set(0, 0.12, 0);
+                const woodyHat = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.044, 0.014, 14), new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 }));
+                woodyHat.position.set(0, 0.18, 0);
+                const alienToy = new THREE.Mesh(new THREE.SphereGeometry(0.018, 10, 8), new THREE.MeshStandardMaterial({ color: 0x84cc16, roughness: 0.7 }));
+                alienToy.position.set(0.02, 0.05, 0);
+                woodyGroup.add(woodyLegs, woodyShirt, woodyHat, alienToy);
+                bibGroup.add(woodyGroup);
 
-                // Nicho 3 Derecho (Sur, Z = 0.18 a 0.52): Saga The Witcher, Jurassic Park, Mew y Mewtwo (sec_099, sec_100)
-                let witchZ = 0.18;
+                // C) Mario Bros miniatura y Cubo Rubik (Z = 0.36 y 0.42 m)
+                const marioFig = new THREE.Mesh(new THREE.SphereGeometry(0.014, 8, 8), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+                marioFig.position.set(0.07, 1.20 + 0.014, 0.36);
+                const rubikCube = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.4 }));
+                rubikCube.scale.set(0.032, 0.032, 0.032);
+                rubikCube.position.set(0.07, 1.20 + 0.016, 0.42);
+                bibGroup.add(marioFig, rubikCube);
+
+                // =========================================================================
+                // ESTANTE 3 (Y = 0.82 m): WITCHER/MEW (NORTE) + PELUCHES/MANTA NARANJA (SUR)
+                // =========================================================================
+                // Lado Norte (Z = -0.52 a -0.18): Saga The Witcher, Mew y Mewtwo (sec_100)
+                let witchZ = -bibL / 2 + 0.04;
                 const witcherMats = [0x18181b, 0x7f1d1d, 0x18181b, 0x7f1d1d, 0x1e293b, 0x991b1b];
                 for (let w = 0; w < 6; w++) {
                     const wTh = 0.026;
@@ -10423,22 +10396,20 @@
                     bibGroup.add(wBook);
                     witchZ += wTh + 0.003;
                 }
-                // Peluches legendarios Mew y Mewtwo sentados juntos (sec_100)
-                // Mew (rosa suave con cola extra larga colgando por el borde del estante)
+                // Peluches Mew y Mewtwo (Z = -0.38 y -0.46 m)
                 const mewPlush = new THREE.Group();
-                mewPlush.position.set(0.04, 0.83, 0.38);
+                mewPlush.position.set(0.04, 0.83, -0.38);
                 const mewBody = new THREE.Mesh(new THREE.SphereGeometry(0.034, 12, 10), new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.9 }));
                 mewBody.position.set(0, 0.04, 0);
                 const mewHead = new THREE.Mesh(new THREE.SphereGeometry(0.028, 12, 10), new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.9 }));
                 mewHead.position.set(0, 0.08, 0);
-                // Cola larga cayendo hacia abajo
                 const mewTail = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.007, 0.14, 8), new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.9 }));
                 mewTail.position.set(0.04, -0.02, 0);
                 mewTail.rotation.x = 0.3;
                 mewPlush.add(mewBody, mewHead, mewTail);
-                // Mewtwo (lila / lavanda con abdomen y cola violeta oscuro)
+
                 const mewtwoPlush = new THREE.Group();
-                mewtwoPlush.position.set(0.04, 0.83, 0.46);
+                mewtwoPlush.position.set(0.04, 0.83, -0.46);
                 const mtBody = new THREE.Mesh(new THREE.SphereGeometry(0.038, 12, 10), new THREE.MeshStandardMaterial({ color: 0xe9d5ff, roughness: 0.9 }));
                 mtBody.position.set(0, 0.045, 0);
                 const mtBelly = new THREE.Mesh(new THREE.SphereGeometry(0.028, 10, 8), new THREE.MeshStandardMaterial({ color: 0x7e22ce, roughness: 0.9 }));
@@ -10448,20 +10419,79 @@
                 mewtwoPlush.add(mtBody, mtBelly, mtHead);
                 bibGroup.add(mewPlush, mewtwoPlush);
 
-                // =========================================================================
-                // ESTANTE 4 (Y = 0.45 m): CARPETA NEGRA, GAUDÍ, VERSALLES Y CAJÓN DE CRISTALES (sec_099, sec_100)
-                // =========================================================================
-                // Carpeta clasificadora negra apilada horizontalmente sobre libros
-                const blackBinder = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.4 }));
-                blackBinder.scale.set(0.22, 0.045, 0.32);
-                blackBinder.position.set(-0.01, 0.46 + 0.24, -0.26);
-                const binderLabel = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xf8fafc }));
-                binderLabel.scale.set(0.002, 0.030, 0.20);
-                binderLabel.position.set(0.101, 0.46 + 0.24, -0.26);
-                bibGroup.add(blackBinder, binderLabel);
+                // Lado Sur (Z = -0.10 a 0.52): Manta Naranja con Pikachu/Charmander, Squirtle y Bulbasaur (sec_098, sec_099)
+                const orangeBlanket = new THREE.Mesh(createRoundedBoxGeo(0.20, 0.032, 0.24, 0.015, 2), new THREE.MeshStandardMaterial({ color: 0xea580c, roughness: 0.95 }));
+                orangeBlanket.position.set(0, 0.83 + 0.016, 0.10);
+                bibGroup.add(orangeBlanket);
 
-                // Libros verticales bajo la carpeta y en el sector central
-                let artZ = -bibL / 2 + 0.04;
+                const pikaPlush = new THREE.Group();
+                pikaPlush.position.set(0.02, 0.83 + 0.032, 0.05);
+                const pikBody = new THREE.Mesh(new THREE.SphereGeometry(0.036, 12, 10), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.9 }));
+                pikBody.position.set(0, 0.04, 0);
+                const pikHead = new THREE.Mesh(new THREE.SphereGeometry(0.030, 12, 10), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.9 }));
+                pikHead.position.set(0, 0.09, 0);
+                const pikEarL = new THREE.Mesh(new THREE.ConeGeometry(0.009, 0.045, 6), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.9 }));
+                pikEarL.position.set(-0.015, 0.13, -0.015); pikEarL.rotation.z = -0.3;
+                const pikEarR = new THREE.Mesh(new THREE.ConeGeometry(0.009, 0.045, 6), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.9 }));
+                pikEarR.position.set(-0.015, 0.13, 0.015); pikEarR.rotation.z = 0.3;
+                pikaPlush.add(pikBody, pikHead, pikEarL, pikEarR);
+
+                const charPlush = new THREE.Group();
+                charPlush.position.set(0.02, 0.83 + 0.032, 0.15);
+                const chBody = new THREE.Mesh(new THREE.SphereGeometry(0.036, 12, 10), new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.9 }));
+                chBody.position.set(0, 0.04, 0);
+                const chHead = new THREE.Mesh(new THREE.SphereGeometry(0.030, 12, 10), new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.9 }));
+                chHead.position.set(0, 0.09, 0);
+                const chTail = new THREE.Mesh(new THREE.ConeGeometry(0.012, 0.038, 6), new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0xf59e0b, emissiveIntensity: 0.4 }));
+                chTail.position.set(-0.035, 0.04, 0.02); chTail.rotation.z = -Math.PI / 3;
+                charPlush.add(chBody, chHead, chTail);
+                bibGroup.add(pikaPlush, charPlush);
+
+                // Peluches Bulbasaur y Squirtle en nicho Sur (Z = 0.32 y 0.44 m)
+                const bulbaPlush = new THREE.Group();
+                bulbaPlush.position.set(0.04, 0.83, 0.32);
+                const buBody = new THREE.Mesh(new THREE.SphereGeometry(0.038, 14, 12), new THREE.MeshStandardMaterial({ color: 0x14b8a6, roughness: 0.9 }));
+                buBody.position.set(0, 0.040, 0);
+                const buBulb = new THREE.Mesh(new THREE.ConeGeometry(0.026, 0.045, 8), new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.9 }));
+                buBulb.position.set(-0.01, 0.075, 0);
+                bulbaPlush.add(buBody, buBulb);
+
+                const squirtlePlush = new THREE.Group();
+                squirtlePlush.position.set(0.04, 0.83, 0.44);
+                const sqBody = new THREE.Mesh(new THREE.SphereGeometry(0.042, 14, 12), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.9 }));
+                sqBody.position.set(0, 0.045, 0);
+                const sqShell = new THREE.Mesh(new THREE.SphereGeometry(0.038, 12, 10), new THREE.MeshStandardMaterial({ color: 0x92400e, roughness: 0.95 }));
+                sqShell.position.set(-0.015, 0.045, 0);
+                squirtlePlush.add(sqBody, sqShell);
+                bibGroup.add(bulbaPlush, squirtlePlush);
+
+                // =========================================================================
+                // ESTANTE 4 (Y = 0.45 m): ARTE/CRISTALES (NORTE) + CARPETA/LIBROS (SUR)
+                // =========================================================================
+                // Lado Norte (Z = -0.52 a -0.05): Gaudí, Versalles y cajoncito rústico de cristales (sec_100)
+                const gaudiBook = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35 }));
+                gaudiBook.scale.set(0.20, 0.28, 0.038);
+                gaudiBook.position.set(0.01, 0.46 + 0.14, -0.24);
+                const versaillesBook = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x7e22ce, roughness: 0.4 }));
+                versaillesBook.scale.set(0.19, 0.27, 0.034);
+                versaillesBook.position.set(0.01, 0.46 + 0.135, -0.28);
+                bibGroup.add(gaudiBook, versaillesBook);
+
+                // Cajoncito rústico de listones con cristales (Z = -0.42 m)
+                const crateGroup = new THREE.Group();
+                crateGroup.position.set(0.04, 0.46, -0.42);
+                const crateBase = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.8 }));
+                crateBase.scale.set(0.14, 0.08, 0.16);
+                crateBase.position.set(0, 0.04, 0);
+                const gem1 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.018), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.15, metalness: 0.3 }));
+                gem1.position.set(-0.02, 0.085, -0.03);
+                const gem2 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.016), new THREE.MeshStandardMaterial({ color: 0xa855f7, roughness: 0.15, metalness: 0.3 }));
+                gem2.position.set(0.02, 0.085, 0.02);
+                crateGroup.add(crateBase, gem1, gem2);
+                bibGroup.add(crateGroup);
+
+                // Lado Sur (Z = 0.04 a 0.52): Libros y carpeta clasificadora negra apilada horizontalmente (sec_098)
+                let artZ = 0.04;
                 for (let b = 0; b < 16; b++) {
                     const bTh = 0.022 + (b % 3) * 0.006;
                     const bH = 0.21;
@@ -10471,49 +10501,19 @@
                     bibGroup.add(bBook);
                     artZ += bTh + 0.002;
                 }
-
-                // Tomos de arte de gran formato:
-                // Gaudí (lomo amarillo cromo brillante con tipografía negra)
-                const gaudiBook = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35 }));
-                gaudiBook.scale.set(0.20, 0.28, 0.038);
-                gaudiBook.position.set(0.01, 0.46 + 0.14, 0.24);
-                // Versalles (lomo púrpura real)
-                const versaillesBook = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x7e22ce, roughness: 0.4 }));
-                versaillesBook.scale.set(0.19, 0.27, 0.034);
-                versaillesBook.position.set(0.01, 0.46 + 0.135, 0.28);
-                bibGroup.add(gaudiBook, versaillesBook);
-
-                // Cajoncito rústico de listones de madera con cristales y geodas (sec_100)
-                const crateGroup = new THREE.Group();
-                crateGroup.position.set(0.04, 0.46, 0.42);
-                const crateBase = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.8 }));
-                crateBase.scale.set(0.14, 0.08, 0.16);
-                crateBase.position.set(0, 0.04, 0);
-                // Piedras preciosas y geodas relucientes dentro del cajoncito
-                const gem1 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.018), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.15, metalness: 0.3 }));
-                gem1.position.set(-0.02, 0.085, -0.03);
-                const gem2 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.016), new THREE.MeshStandardMaterial({ color: 0xa855f7, roughness: 0.15, metalness: 0.3 }));
-                gem2.position.set(0.02, 0.085, 0.02);
-                crateGroup.add(crateBase, gem1, gem2);
-                bibGroup.add(crateGroup);
+                const blackBinder = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.4 }));
+                blackBinder.scale.set(0.22, 0.045, 0.32);
+                blackBinder.position.set(-0.01, 0.46 + 0.24, 0.26);
+                const binderLabel = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xf8fafc }));
+                binderLabel.scale.set(0.002, 0.030, 0.20);
+                binderLabel.position.set(0.101, 0.46 + 0.24, 0.26);
+                bibGroup.add(blackBinder, binderLabel);
 
                 // =========================================================================
-                // ESTANTE 5 (Y = 0.08 m): JUEGOS DE MESA (CATAN), CAJA BATMAN FUNKO Y ARCHIVOS
+                // ESTANTE 5 (Y = 0.08 m): NOTEBOOKS/BATMAN (NORTE) + JUEGO CATAN (SUR)
                 // =========================================================================
-                // Caja de juego de mesa Catan (tonos naranja y amarillo de puesta de sol)
-                const catanBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xc2410c, roughness: 0.5 }));
-                catanBox.scale.set(0.22, 0.075, 0.28);
-                catanBox.position.set(-0.01, 0.09 + 0.038, -0.28);
-                bibGroup.add(catanBox);
-
-                // Caja coleccionable Batman Funko Pop #114
-                const batmanBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 }));
-                batmanBox.scale.set(0.12, 0.16, 0.12);
-                batmanBox.position.set(0.02, 0.09 + 0.08, 0.05);
-                bibGroup.add(batmanBox);
-
-                // Cuadernos de viaje y archivadores
-                let btmZ = 0.22;
+                // Lado Norte (Z = -0.50 a -0.05): Cuadernos y Batman Funko Pop #114 (sec_100)
+                let btmZ = -bibL / 2 + 0.04;
                 for (let b = 0; b < 8; b++) {
                     const bTh = 0.026;
                     const bH = 0.24;
@@ -10522,26 +10522,50 @@
                     bibGroup.add(bBook);
                     btmZ += bTh + 0.003;
                 }
+                const batmanBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 }));
+                batmanBox.scale.set(0.12, 0.16, 0.12);
+                batmanBox.position.set(0.02, 0.09 + 0.08, -0.05);
+                bibGroup.add(batmanBox);
 
-                // --- SUELO (Y = 0): 2 Guitarras en fundas acolchadas y planta en maceta terracota ---
-                // Guitarra 1: Funda azul marino/negra acolchada apoyada en el rincón Norte junto a la mesa del ajedrez (sec_027)
+                // Lado Sur (Z = 0.04 a 0.52): Caja de juego de mesa Catan (sec_098)
+                const catanBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xc2410c, roughness: 0.5 }));
+                catanBox.scale.set(0.22, 0.075, 0.28);
+                catanBox.position.set(-0.01, 0.09 + 0.038, 0.28);
+                bibGroup.add(catanBox);
+
+                // --- SUELO (Y = 0): Guitarras y elementos de los costados relevados del video ---
+                // Guitarra 1: Funda azul marino/negra acolchada en rincón Norte junto a mesa Ajedrez (sec_027)
                 const guitar1 = createGuitarGigBag(0x1e293b, 0x0284c7, 1.05, 0.38, 0.15);
                 guitar1.position.set(0.04, 0, -bibL / 2 - 0.12);
                 guitar1.rotation.y = 0.08;
                 guitar1.rotation.x = -0.06;
 
-                // Guitarra 2: Funda acolchada negra con acolchado diamante apoyada junto a la mesa del Consejo Jedi (sec_098)
+                // Guitarra 2: Funda acolchada negra con costuras diamante junto a mesa Consejo Jedi (sec_098)
                 const guitar2 = createGuitarGigBag(0x0f172a, 0xdc2626, 1.02, 0.36, 0.14);
-                guitar2.position.set(0.04, 0, bibL / 2 + 0.12);
+                guitar2.position.set(0.04, 0, bibL / 2 + 0.10);
                 guitar2.rotation.y = -0.08;
                 guitar2.rotation.x = 0.06;
 
-                // Planta de interior en maceta de terracota en el suelo frente a la guitarra 2 (sec_098)
+                // Planta de interior en maceta de terracota al Sur de la biblioteca (sec_098)
                 const floorPlantPot = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.14, 16), new THREE.MeshStandardMaterial({ color: 0xc2410c, roughness: 0.8 }));
-                floorPlantPot.position.set(0.04, 0.07, bibL / 2 + 0.26);
+                floorPlantPot.position.set(0.04, 0.07, bibL / 2 + 0.22);
                 const floorPlantFoliage = new THREE.Mesh(new THREE.DodecahedronGeometry(0.09), new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.7 }));
-                floorPlantFoliage.position.set(0.04, 0.18, bibL / 2 + 0.26);
-                bibGroup.add(guitar1, guitar2, floorPlantPot, floorPlantFoliage);
+                floorPlantFoliage.position.set(0.04, 0.18, bibL / 2 + 0.22);
+
+                // Bolsa grande de alimento para perros (+RP) en el suelo frente al placard al extremo Sur (sec_098)
+                const dogFoodBag = new THREE.Group();
+                dogFoodBag.position.set(0.18, 0, bibL / 2 + 0.75); // Z = 1.22 + 0.56 + 0.75 = 2.53 m
+                const sackBody = new THREE.Mesh(createRoundedBoxGeo(0.20, 0.50, 0.28, 0.02, 2), new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.65 }));
+                sackBody.position.set(0, 0.25, 0);
+                const sackBanner = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 }));
+                sackBanner.scale.set(0.202, 0.18, 0.22);
+                sackBanner.position.set(0, 0.28, 0);
+                const sackLogo = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xdc2626 }));
+                sackLogo.scale.set(0.205, 0.06, 0.14);
+                sackLogo.position.set(0, 0.28, 0);
+                dogFoodBag.add(sackBody, sackBanner, sackLogo);
+
+                bibGroup.add(guitar1, guitar2, floorPlantPot, floorPlantFoliage, dogFoodBag);
 
                 setMountWall(null);
                 (currentAssemblyGroup || decorVideoGroup).add(bibGroup);
@@ -10688,14 +10712,14 @@
             });
 
             // 6. DIORAMA DE STAR WARS: EL CONSEJO JEDI (Star Wars Jedi High Council Chamber Diorama)
-            // Ubicación real: En sector Sudoeste del Estudio [0.26, 1.76] a la izquierda de la biblioteca sobre mesita redonda en tijera (sec_098)
+            // Ubicación real: En sector Sudoeste del Estudio [0.28, 2.32] al Sur de la biblioteca sobre mesita redonda en tijera frente al placard (sec_098)
             createCompoundAssembly('Diorama Consejo Jedi Star Wars', () => {
                 const jediAssembly = new THREE.Group();
-                const table = createScissorTable(0.26, 1.76, 'round', 0.48, 0.68);
+                const table = createScissorTable(0.28, 2.32, 'round', 0.48, 0.68);
                 jediAssembly.add(table);
 
                 const councilGroup = new THREE.Group();
-                councilGroup.position.set(0.26, 0.69, 1.76);
+                councilGroup.position.set(0.28, 0.69, 2.32);
 
                 // Base circular de la Cámara del Templo Jedi de Coruscant (mármol beige y ámbar pulido)
                 const floorGeo = new THREE.CylinderGeometry(0.19, 0.20, 0.020, 32);
@@ -13113,10 +13137,10 @@
             { id: 'vid_luz_n', name: 'Mesa de Luz Norte', room: 'Cuarto', x: 0.28, z: 5.73, y: 0.29, w: 0.36, d: 0.42, h: 0.58, rot: 0, color: 0x3f2719 },
             { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.28, z: 7.57, y: 0.29, w: 0.36, d: 0.42, h: 0.58, rot: 0, color: 0x3f2719 },
             { id: 'vid_escr_l', name: 'Escritorio en L + PC Gamer', room: 'Estudio', x: 2.74, z: 1.02, y: 0.38, w: 0.52, d: 2.05, h: 0.76, rot: 0, color: 0x8f3818 },
-            { id: 'vid_biblio', name: 'Biblioteca 5 Estantes (Libros y Coleccionables)', room: 'Estudio', x: 0.16, z: 1.00, y: 0.92, w: 0.28, d: 1.12, h: 1.95, rot: 0, color: 0x3b2314 },
-            { id: 'vid_estantes_estudio', name: 'Estantes Flotantes Estudio (Consolas y Libros)', room: 'Estudio', x: 2.85, z: 0.93, y: 1.55, w: 0.20, d: 1.80, h: 0.75, rot: 0, color: 0x8a3c1b },
+            { id: 'vid_biblio', name: 'Biblioteca 5 Estantes (Nogal Oscuro y Coleccionables)', room: 'Estudio', x: 0.16, z: 1.22, y: 0.92, w: 0.28, d: 1.12, h: 1.95, rot: 0, color: 0x2b1d16 },
+            { id: 'vid_estantes_estudio', name: '3 Estantes Flotantes Estudio (Consolas, Libros y Cajas)', room: 'Estudio', x: 2.85, z: 0.93, y: 1.65, w: 0.20, d: 1.80, h: 0.75, rot: 0, color: 0x8a3c1b },
             { id: 'vid_ajedrez', name: 'Mesa Ajedrez El Señor de los Anillos', room: 'Estudio', x: 0.28, z: 0.28, y: 0.37, w: 0.48, d: 0.48, h: 0.72, rot: 0, color: 0xd4a373 },
-            { id: 'vid_diorama_jedi', name: 'Mesa Diorama Consejo Jedi Star Wars', room: 'Estudio', x: 0.26, z: 1.76, y: 0.37, w: 0.48, d: 0.48, h: 0.72, rot: 0, color: 0xd4a373 }
+            { id: 'vid_diorama_jedi', name: 'Mesa Diorama Consejo Jedi Star Wars', room: 'Estudio', x: 0.28, z: 2.32, y: 0.37, w: 0.48, d: 0.48, h: 0.72, rot: 0, color: 0xd4a373 }
         ];
 
         document.getElementById('btn-load-video-furniture').addEventListener('click', () => {
@@ -16720,7 +16744,7 @@
          ========================================================================== -->
     <script>
         (function registerGemeloPWA() {
-            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.5';
+            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.6';
             if ('serviceWorker' in navigator) {
                 try {
                     const prevBuild = localStorage.getItem('gemelo_sw_build_ver');
