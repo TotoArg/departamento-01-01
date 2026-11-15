@@ -10610,11 +10610,12 @@
             // Ubicación real: En esquina Noroeste del Estudio [0.28, 0.28] sobre mesita plegable de madera en tijera (sec_027, sec_028)
             createCompoundAssembly('Mesa Ajedrez El Señor de los Anillos', () => {
                 const chessAssembly = new THREE.Group();
-                const table = createScissorTable(0.28, 0.28, 'square', 0.48, 0.68);
+                const table = createScissorTable(0.28, 0.28, 'square', 0.40, 0.62);
                 chessAssembly.add(table);
 
                 const boardGroup = new THREE.Group();
-                boardGroup.position.set(0.28, 0.69, 0.28);
+                boardGroup.position.set(0.28, 0.63, 0.28);
+                boardGroup.scale.set(0.82, 0.82, 0.82);
 
                 // Marco ornamental esculpido de piedra y peltre antiguo con inscripciones rúnicas élficas (Noble Collection)
                 const frameMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.55, metalness: 0.35 });
@@ -10750,11 +10751,12 @@
             // Ubicación real: En sector Sudoeste del Estudio [0.28, 2.32] al Sur de la biblioteca sobre mesita redonda en tijera frente al placard (sec_098)
             createCompoundAssembly('Diorama Consejo Jedi Star Wars', () => {
                 const jediAssembly = new THREE.Group();
-                const table = createScissorTable(0.28, 2.32, 'round', 0.48, 0.68);
+                const table = createScissorTable(0.28, 2.32, 'round', 0.40, 0.62);
                 jediAssembly.add(table);
 
                 const councilGroup = new THREE.Group();
-                councilGroup.position.set(0.28, 0.69, 2.32);
+                councilGroup.position.set(0.28, 0.63, 2.32);
+                councilGroup.scale.set(0.82, 0.82, 0.82);
 
                 // Base circular de la Cámara del Templo Jedi de Coruscant (mármol beige y ámbar pulido)
                 const floorGeo = new THREE.CylinderGeometry(0.19, 0.20, 0.020, 32);
@@ -11042,11 +11044,11 @@
                 "Felpudo de Entrada (65×42 cm)"
             ],
             transforms: {
-                "Mesa Ajedrez El Señor de los Anillos": { "x": 0.28, "y": 0.40, "z": 0.24, "rot": 1.571, "sx": 1, "sy": 1, "sz": 1 },
+                "Mesa Ajedrez El Señor de los Anillos": { "x": 0.28, "y": 0.35, "z": 0.24, "rot": 1.571, "sx": 1, "sy": 1, "sz": 1 },
                 "Guitarra en Funda Azul Marino (Estudio Norte)": { "x": 0.18, "y": 0.52, "z": 0.65, "rot": 0 },
                 "Biblioteca Alta con Libros y Coleccionables": { "x": 0.18, "y": 1.14, "z": 1.48, "rot": 0 },
                 "Guitarra en Funda Negra Acolchada (Estudio Sur)": { "x": 0.18, "y": 0.51, "z": 2.23, "rot": 0 },
-                "Diorama Consejo Jedi Star Wars": { "x": 0.28, "y": 0.42, "z": 2.70, "rot": 0 },
+                "Diorama Consejo Jedi Star Wars": { "x": 0.28, "y": 0.35, "z": 2.70, "rot": 0, "sx": 1, "sy": 1, "sz": 1 },
                 "Panel Calefactor Cuarto": { "x": 2.56, "y": 0.44, "z": 7.83, "rot": 0 },
                 "Perchero y Zapatero Entrada": { "x": 6.07, "y": 1.01, "z": 5.02, "rot": 0 }
             },
@@ -16826,7 +16828,7 @@
          ========================================================================== -->
     <script>
         (function registerGemeloPWA() {
-            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.9';
+            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v3.0';
             if ('serviceWorker' in navigator) {
                 try {
                     const prevBuild = localStorage.getItem('gemelo_sw_build_ver');
@@ -16846,7 +16848,7 @@
 
                 window.addEventListener('load', function () {
                     navigator.serviceWorker
-                        .register('./sw.js?v=2.9', { scope: './', updateViaCache: 'none' })
+                        .register('./sw.js?v=3.0', { scope: './', updateViaCache: 'none' })
                         .then(function (reg) {
                             console.log('[PWA] Service Worker registrado con éxito en scope:', reg.scope);
                             reg.update().catch(function () {});
