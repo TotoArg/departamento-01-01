@@ -2,13 +2,20 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.14.v5",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794725799384,
+  "updatedAt": 1794725811863,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
       "Aspiradora Trineo Amarilla y Negra"
     ],
-    "transforms": {},
+    "transforms": {
+      "Diorama Consejo Jedi Star Wars": {
+        "x": 0.27,
+        "y": 0.42,
+        "z": 2.49,
+        "rot": 0
+      }
+    },
     "materials": {},
     "wallItems": []
   },
