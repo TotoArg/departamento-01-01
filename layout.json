@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.14.v5",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794725811863,
+  "updatedAt": 1794725815772,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -13,6 +13,12 @@
         "x": 0.27,
         "y": 0.42,
         "z": 2.49,
+        "rot": 0
+      },
+      "Guitarra en Funda Negra Acolchada (Estudio Sur)": {
+        "x": 0.23,
+        "y": 0.6,
+        "z": 2.06,
         "rot": 0
       }
     },
