@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.15.v6",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794780013426,
+  "updatedAt": 1794780051342,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -53,6 +53,12 @@
         "x": 6.07,
         "y": 1.01,
         "z": 5.02,
+        "rot": 0
+      },
+      "Estantes Flotantes Estudio (3 Niveles — 1.80×0.20 m)": {
+        "x": 2.84,
+        "y": 1.72,
+        "z": 1.27,
         "rot": 0
       }
     },
