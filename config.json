@@ -1,79 +1,15 @@
 {
   "app": "departamento-01-01",
-  "schemaVersion": "2026.11.12.v3",
+  "schemaVersion": "2026.11.14.v5",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794535833716,
+  "updatedAt": 1794725779703,
   "decorOverrides": {
     "deleted": [
-      "accentLivingWall",
-      "accentStudyWall",
-      "Elemento Decorativo 3",
-      "Elemento Decorativo 1",
-      "Mochila y Bolso Entrada",
-      "Objeto"
+      "Bolsa Alimento para Perros (+RP)"
     ],
-    "transforms": {
-      "Vanitory y Bacha de Baño": {
-        "x": 1.42,
-        "y": 0.67,
-        "z": 3.48,
-        "rot": 0
-      },
-      "Bañera y Ducha Cromada": {
-        "x": 0.41,
-        "y": 1.12,
-        "z": 3.88,
-        "rot": 0
-      },
-      "Perchero y Zapatero Entrada": {
-        "x": 6.09,
-        "y": 1.01,
-        "z": 4.83,
-        "rot": 0
-      },
-      "Sansevieria en Pie Nórdico": {
-        "x": 5.99,
-        "y": 0.57,
-        "z": 4.24,
-        "rot": 0
-      },
-      "Comederos de Mascota": {
-        "x": 4.52,
-        "y": 0.05,
-        "z": 5.02,
-        "rot": 0
-      },
-      "Gabinete PC Gamer Thermaltake": {
-        "x": 2.62,
-        "y": 0.24,
-        "z": 1.96,
-        "rot": 4.712
-      },
-      "Estantes Flotantes Estudio (1.80×0.20 m)": {
-        "x": 2.85,
-        "y": 1.67,
-        "z": 1.05,
-        "rot": 0
-      },
-      "Mesita Auxiliar (Miniaturas)": {
-        "x": 0.28,
-        "y": 0.36,
-        "z": 2.39,
-        "rot": 0
-      },
-      "Set de Pintura de Miniaturas y Pinceles": {
-        "x": 0.28,
-        "y": 0.74,
-        "z": 2.4,
-        "rot": 0
-      },
-      "Biblioteca Alta con Libros y Coleccionables": {
-        "x": 0.22,
-        "y": 1.05,
-        "z": 1.25,
-        "rot": 0
-      }
-    }
+    "transforms": {},
+    "materials": {},
+    "wallItems": []
   },
   "furnitureList": []
 }
