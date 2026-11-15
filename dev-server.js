@@ -224,44 +224,28 @@ const server = http.createServer((req, res) => {
         const configFilePath = path.join(__dirname, 'config.json');
         const layoutFilePath = path.join(__dirname, 'layout.json');
         if (req.method === 'GET') {
-            (async () => {
-                let localLayout = null;
-                let localTs = 0;
-                try {
-                    if (fs.existsSync(configFilePath)) {
-                        localLayout = JSON.parse(fs.readFileSync(configFilePath, 'utf8'));
-                        localTs = localLayout.updatedAt || 0;
-                    } else if (fs.existsSync(layoutFilePath)) {
-                        localLayout = JSON.parse(fs.readFileSync(layoutFilePath, 'utf8'));
-                        localTs = localLayout.updatedAt || 0;
-                    }
-                } catch (e) {}
-
-                // Consultar GitHub por si hubo modificaciones hechas remotamente
-                try {
-                    const ghRes = await fetchLayoutFromGitHub();
-                    if (ghRes && ghRes.ok && ghRes.layout && ghRes.layout.updatedAt > localTs) {
-                        console.log(`[GitHub Sync] Cambios detectados en GitHub (${new Date(ghRes.layout.updatedAt).toLocaleTimeString()}). Actualizando config.json y layout.json...`);
-                        const jsonOut = JSON.stringify(ghRes.layout, null, 2);
-                        fs.writeFileSync(configFilePath, jsonOut, 'utf8');
-                        fs.writeFileSync(layoutFilePath, jsonOut, 'utf8');
-                        localLayout = ghRes.layout;
-                    }
-                } catch (err) {
-                    // Si GitHub falla o no hay internet, continuamos con la copia local sin bloquear
+            let localLayout = null;
+            try {
+                if (fs.existsSync(configFilePath)) {
+                    localLayout = JSON.parse(fs.readFileSync(configFilePath, 'utf8'));
+                } else if (fs.existsSync(layoutFilePath)) {
+                    localLayout = JSON.parse(fs.readFileSync(layoutFilePath, 'utf8'));
                 }
+            } catch (e) {
+                console.warn('[API] Error leyendo config.json local:', e.message);
+            }
 
-                if (localLayout) {
-                    res.writeHead(200, {
-                        'Content-Type': 'application/json; charset=utf-8',
-                        'Cache-Control': 'no-cache, no-store, must-revalidate'
-                    });
-                    res.end(JSON.stringify(localLayout, null, 2));
-                } else {
-                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-                    res.end(JSON.stringify({ app: 'departamento-01-01', schemaVersion: '2026.11.12.v3', updatedAt: 0, decorOverrides: { deleted: [], transforms: {} }, furnitureList: [] }));
-                }
-            })();
+            if (localLayout) {
+                res.writeHead(200, {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+                    'Pragma': 'no-cache'
+                });
+                res.end(JSON.stringify(localLayout, null, 2));
+            } else {
+                res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                res.end(JSON.stringify({ app: 'departamento-01-01', schemaVersion: '2026.11.14.v5', updatedAt: 0, decorOverrides: { deleted: [], transforms: {} }, furnitureList: [] }));
+            }
             return;
         }
 
