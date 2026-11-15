@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.15.v6",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794780335117,
+  "updatedAt": 1794780347311,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -94,6 +94,12 @@
         "x": 1.92,
         "y": 0.22,
         "z": 6.42,
+        "rot": 0
+      },
+      "Planta Monstera en Pie Nórdico (Comedor NE)": {
+        "x": 4.69,
+        "y": 0.36,
+        "z": 0.23,
         "rot": 0
       }
     },
