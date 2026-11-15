@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.15.v6",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794780300256,
+  "updatedAt": 1794780309129,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -11,7 +11,8 @@
       "Tacho Basura Estudio",
       "Mochila Gris Puerta Estudio",
       "Luminaria Hall de Entrada (WiZ 2700K)",
-      "Luminaria Cabecera Dormitorio (WiZ 2700K)"
+      "Luminaria Cabecera Dormitorio (WiZ 2700K)",
+      "Mochila de Viaje al Pie de Cama"
     ],
     "transforms": {
       "Mesa Ajedrez El Señor de los Anillos": {
