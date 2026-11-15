@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.14.v5",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794725837561,
+  "updatedAt": 1794725865893,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -31,10 +31,16 @@
         "x": 0.28,
         "y": 0.4,
         "z": 0.28,
-        "rot": 0.785,
+        "rot": 1.571,
         "sx": 1,
         "sy": 1,
         "sz": 1
+      },
+      "Panel Calefactor Cuarto": {
+        "x": 2.56,
+        "y": 0.44,
+        "z": 7.72,
+        "rot": 0
       }
     },
     "materials": {},
