@@ -2,14 +2,15 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.15.v6",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794780120949,
+  "updatedAt": 1794780125737,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
       "Aspiradora Trineo Amarilla y Negra",
       "Felpudo de Entrada (65×42 cm)",
       "Tacho Basura Estudio",
-      "Mochila Gris Puerta Estudio"
+      "Mochila Gris Puerta Estudio",
+      "Luminaria Hall de Entrada (WiZ 2700K)"
     ],
     "transforms": {
       "Mesa Ajedrez El Señor de los Anillos": {
