@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.14.v5",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794725834805,
+  "updatedAt": 1794725837561,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -31,7 +31,7 @@
         "x": 0.28,
         "y": 0.4,
         "z": 0.28,
-        "rot": 3.927,
+        "rot": 0.785,
         "sx": 1,
         "sy": 1,
         "sz": 1
