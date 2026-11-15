@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.15.v6",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794780281497,
+  "updatedAt": 1794780300256,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -88,6 +88,12 @@
         "y": 0,
         "z": 0.05,
         "rot": 2.356
+      },
+      "Mochila de Viaje al Pie de Cama": {
+        "x": 1.92,
+        "y": 0.22,
+        "z": 6.42,
+        "rot": 0
       }
     },
     "materials": {},
