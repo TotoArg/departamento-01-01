@@ -10533,28 +10533,44 @@
                 catanBox.position.set(-0.01, 0.09 + 0.038, 0.28);
                 bibGroup.add(catanBox);
 
-                // --- SUELO (Y = 0): Guitarras y elementos de los costados relevados del video ---
-                // Guitarra 1: Funda azul marino/negra acolchada en rincón Norte junto a mesa Ajedrez (sec_027)
+                setMountWall(null);
+                (currentAssemblyGroup || decorVideoGroup).add(bibGroup);
+            });
+
+            // 4B. GUITARRA EN FUNDA AZUL MARINO (Rincón Noroeste Estudio, sec_027)
+            createCompoundAssembly('Guitarra en Funda Azul Marino (Estudio Norte)', () => {
                 const guitar1 = createGuitarGigBag(0x1e293b, 0x0284c7, 1.05, 0.38, 0.15);
-                guitar1.position.set(0.04, 0, -bibL / 2 - 0.12);
+                guitar1.position.set(0.18, 0, 0.54);
                 guitar1.rotation.y = 0.08;
                 guitar1.rotation.x = -0.06;
+                (currentAssemblyGroup || decorVideoGroup).add(guitar1);
+            });
 
-                // Guitarra 2: Funda acolchada negra con costuras diamante junto a mesa Consejo Jedi (sec_098)
+            // 4C. GUITARRA EN FUNDA NEGRA ACOLCHADA (Costado Sur Biblioteca, sec_098)
+            createCompoundAssembly('Guitarra en Funda Negra Acolchada (Estudio Sur)', () => {
                 const guitar2 = createGuitarGigBag(0x0f172a, 0xdc2626, 1.02, 0.36, 0.14);
-                guitar2.position.set(0.04, 0, bibL / 2 + 0.10);
+                guitar2.position.set(0.18, 0, 1.88);
                 guitar2.rotation.y = -0.08;
                 guitar2.rotation.x = 0.06;
+                (currentAssemblyGroup || decorVideoGroup).add(guitar2);
+            });
 
-                // Planta de interior en maceta de terracota al Sur de la biblioteca (sec_098)
+            // 4D. PLANTA DE INTERIOR EN MACETA DE TERRACOTA (Estudio Sur, sec_098)
+            createCompoundAssembly('Planta en Maceta Terracota (Estudio Sur)', () => {
+                const plantGroup = new THREE.Group();
+                plantGroup.position.set(0.20, 0, 1.98);
                 const floorPlantPot = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.14, 16), new THREE.MeshStandardMaterial({ color: 0xc2410c, roughness: 0.8 }));
-                floorPlantPot.position.set(0.04, 0.07, bibL / 2 + 0.22);
+                floorPlantPot.position.set(0, 0.07, 0);
                 const floorPlantFoliage = new THREE.Mesh(new THREE.DodecahedronGeometry(0.09), new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.7 }));
-                floorPlantFoliage.position.set(0.04, 0.18, bibL / 2 + 0.22);
+                floorPlantFoliage.position.set(0, 0.18, 0);
+                plantGroup.add(floorPlantPot, floorPlantFoliage);
+                (currentAssemblyGroup || decorVideoGroup).add(plantGroup);
+            });
 
-                // Bolsa grande de alimento para perros (+RP) en el suelo frente al placard al extremo Sur (sec_098)
+            // 4E. BOLSA DE ALIMENTO PARA PERROS (+RP) (Frente Placard Sur, sec_098)
+            createCompoundAssembly('Bolsa Alimento para Perros (+RP)', () => {
                 const dogFoodBag = new THREE.Group();
-                dogFoodBag.position.set(0.18, 0, bibL / 2 + 0.75); // Z = 1.22 + 0.56 + 0.75 = 2.53 m
+                dogFoodBag.position.set(0.36, 0, 2.65);
                 const sackBody = new THREE.Mesh(createRoundedBoxGeo(0.20, 0.50, 0.28, 0.02, 2), new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.65 }));
                 sackBody.position.set(0, 0.25, 0);
                 const sackBanner = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 }));
@@ -10564,11 +10580,7 @@
                 sackLogo.scale.set(0.205, 0.06, 0.14);
                 sackLogo.position.set(0, 0.28, 0);
                 dogFoodBag.add(sackBody, sackBanner, sackLogo);
-
-                bibGroup.add(guitar1, guitar2, floorPlantPot, floorPlantFoliage, dogFoodBag);
-
-                setMountWall(null);
-                (currentAssemblyGroup || decorVideoGroup).add(bibGroup);
+                (currentAssemblyGroup || decorVideoGroup).add(dogFoodBag);
             });
 
             // 5. AJEDREZ DE COLECCIÓN: "EL SEÑOR DE LOS ANILLOS" (The Noble Collection Collector's Chess Set)
@@ -13138,6 +13150,10 @@
             { id: 'vid_luz_s', name: 'Mesa de Luz Sur', room: 'Cuarto', x: 0.28, z: 7.57, y: 0.29, w: 0.36, d: 0.42, h: 0.58, rot: 0, color: 0x3f2719 },
             { id: 'vid_escr_l', name: 'Escritorio en L + PC Gamer', room: 'Estudio', x: 2.74, z: 1.02, y: 0.38, w: 0.52, d: 2.05, h: 0.76, rot: 0, color: 0x8f3818 },
             { id: 'vid_biblio', name: 'Biblioteca 5 Estantes (Nogal Oscuro y Coleccionables)', room: 'Estudio', x: 0.16, z: 1.22, y: 0.92, w: 0.28, d: 1.12, h: 1.95, rot: 0, color: 0x2b1d16 },
+            { id: 'vid_guitar1', name: 'Guitarra en Funda Azul Marino (Estudio Norte)', room: 'Estudio', x: 0.18, z: 0.54, y: 0.52, w: 0.20, d: 0.38, h: 1.05, rot: 0, color: 0x1e293b },
+            { id: 'vid_guitar2', name: 'Guitarra en Funda Negra Acolchada (Estudio Sur)', room: 'Estudio', x: 0.18, z: 1.88, y: 0.51, w: 0.20, d: 0.36, h: 1.02, rot: 0, color: 0x0f172a },
+            { id: 'vid_planta_biblio', name: 'Planta de Interior en Maceta (Estudio)', room: 'Estudio', x: 0.20, z: 1.98, y: 0.18, w: 0.25, d: 0.25, h: 0.36, rot: 0, color: 0xc2410c },
+            { id: 'vid_alimento_perro', name: 'Bolsa Alimento para Perros (+RP)', room: 'Estudio', x: 0.36, z: 2.65, y: 0.25, w: 0.28, d: 0.24, h: 0.50, rot: 0, color: 0x1e3a8a },
             { id: 'vid_estantes_estudio', name: '3 Estantes Flotantes Estudio (Consolas, Libros y Cajas)', room: 'Estudio', x: 2.85, z: 0.93, y: 1.65, w: 0.20, d: 1.80, h: 0.75, rot: 0, color: 0x8a3c1b },
             { id: 'vid_ajedrez', name: 'Mesa Ajedrez El Señor de los Anillos', room: 'Estudio', x: 0.28, z: 0.28, y: 0.37, w: 0.48, d: 0.48, h: 0.72, rot: 0, color: 0xd4a373 },
             { id: 'vid_diorama_jedi', name: 'Mesa Diorama Consejo Jedi Star Wars', room: 'Estudio', x: 0.28, z: 2.32, y: 0.37, w: 0.48, d: 0.48, h: 0.72, rot: 0, color: 0xd4a373 }
@@ -16744,7 +16760,7 @@
          ========================================================================== -->
     <script>
         (function registerGemeloPWA() {
-            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.6';
+            const CURRENT_APP_BUILD = 'gemelo-3d-pwa-v2.7';
             if ('serviceWorker' in navigator) {
                 try {
                     const prevBuild = localStorage.getItem('gemelo_sw_build_ver');
