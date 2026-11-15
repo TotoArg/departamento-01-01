@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.15.v6",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794780089387,
+  "updatedAt": 1794780112438,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -68,6 +68,12 @@
         "y": 0.24,
         "z": 1.96,
         "rot": 4.712
+      },
+      "Comederos de las Perras (Verde y Rojo)": {
+        "x": 4.5,
+        "y": 0.05,
+        "z": 5.06,
+        "rot": 0
       }
     },
     "materials": {},
