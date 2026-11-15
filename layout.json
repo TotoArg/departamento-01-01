@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.15.v6",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794780162181,
+  "updatedAt": 1794780165301,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -83,9 +83,9 @@
         "rot": 0
       },
       "Aplique Pasillo sobre Puerta Baño (WiZ 2700K — Video 2:37)": {
-        "x": 0.17,
+        "x": 0,
         "y": 0,
-        "z": 0.01,
+        "z": 0.05,
         "rot": 0
       }
     },
