@@ -2,7 +2,7 @@
   "app": "departamento-01-01",
   "schemaVersion": "2026.11.15.v6",
   "renderQuality": "maqueta-arquitectonica-premium",
-  "updatedAt": 1794730300000,
+  "updatedAt": 1794780013426,
   "decorOverrides": {
     "deleted": [
       "Bolsa Alimento para Perros (+RP)",
@@ -38,9 +38,9 @@
         "rot": 0
       },
       "Diorama Consejo Jedi Star Wars": {
-        "x": 0.28,
+        "x": 0.3,
         "y": 0.42,
-        "z": 2.70,
+        "z": 2.55,
         "rot": 0
       },
       "Panel Calefactor Cuarto": {
