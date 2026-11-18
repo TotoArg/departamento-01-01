@@ -8555,93 +8555,110 @@
                 addDecorPlantCeramic(3.25, 0.00, 1.66, 0.14, 0.10, 0.28, 0.28, 0.35, 0.28, 0.48, 'Planta Calathea en Maceta');
             });
 
-            // - Mesa ratona elevable y extensible (90×50 cm, base hierro negro, compartimento revistero interior y tapas articuladas animadas):
+            // - Mesa ratona elevable y extensible (90×50 cm, base blanca, estante inferior oscuro con almohadón, y tapas articuladas con 2 aperturas):
             createCompoundAssembly('Mesa Ratona de Living (90×50 cm)', () => {
                 const tableX = 4.46, tableZ = 3.10, tableW = 0.50, tableL = 0.90, tableH = 0.42;
-                const ironMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.35, metalness: 0.85 });
-                const woodLightMat = new THREE.MeshStandardMaterial({ color: 0xa47148, roughness: 0.55, metalness: 0.05 });
-                const woodDarkMat = new THREE.MeshStandardMaterial({ color: 0x45220c, roughness: 0.65, metalness: 0.05 });
+                const whiteMelaminaMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35, metalness: 0.05 });
+                const darkRusticWoodMat = new THREE.MeshStandardMaterial({ color: 0x4a3728, roughness: 0.65, metalness: 0.05 });
+                const lowerShelfWoodMat = new THREE.MeshStandardMaterial({ color: 0x3e2723, roughness: 0.70, metalness: 0.05 });
+                const ironBlackMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.40, metalness: 0.85 });
 
-                // 1. Estructura de soporte: 2 Patas en marco "U" de caño de hierro negro en los extremos Norte y Sur
-                [-1, 1].forEach(side => {
-                    const legFrameZ = tableZ + side * (tableL / 2 - 0.035);
-                    const baseRail = new THREE.Mesh(createRoundedBoxGeo(tableW, 0.025, 0.025, 0.004, 1), ironMat);
-                    baseRail.position.set(tableX, 0.0125, legFrameZ);
-                    baseRail.castShadow = true;
-                    const legL = new THREE.Mesh(createRoundedBoxGeo(0.025, tableH - 0.05, 0.025, 0.004, 1), ironMat);
-                    legL.position.set(tableX - tableW / 2 + 0.0125, (tableH - 0.05) / 2 + 0.025, legFrameZ);
-                    legL.castShadow = true;
-                    const legR = new THREE.Mesh(createRoundedBoxGeo(0.025, tableH - 0.05, 0.025, 0.004, 1), ironMat);
-                    legR.position.set(tableX + tableW / 2 - 0.0125, (tableH - 0.05) / 2 + 0.025, legFrameZ);
-                    legR.castShadow = true;
-                    const topRail = new THREE.Mesh(createRoundedBoxGeo(tableW, 0.025, 0.025, 0.004, 1), ironMat);
-                    topRail.position.set(tableX, tableH - 0.0375, legFrameZ);
-                    topRail.castShadow = true;
-                    (currentAssemblyGroup || decorVideoGroup).add(baseRail, legL, legR, topRail);
+                // 1. Estructura de soporte: 4 Patas en "L" de melamina blanca en los 4 vértices
+                const legW = 0.055, legThick = 0.018;
+                [-1, 1].forEach(signX => {
+                    [-1, 1].forEach(signZ => {
+                        const px = tableX + signX * (tableW / 2 - legW / 2);
+                        const pz = tableZ + signZ * (tableL / 2 - legW / 2);
+                        // Cara longitudinal de la pata
+                        const legPartA = new THREE.Mesh(createRoundedBoxGeo(legThick, tableH - 0.04, legW, 0.003, 1), whiteMelaminaMat);
+                        legPartA.position.set(px + signX * (legW / 2 - legThick / 2), (tableH - 0.04) / 2, pz);
+                        legPartA.castShadow = true;
+                        // Cara transversal de la pata
+                        const legPartB = new THREE.Mesh(createRoundedBoxGeo(legW - legThick, tableH - 0.04, legThick, 0.003, 1), whiteMelaminaMat);
+                        legPartB.position.set(px - signX * (legThick / 2), (tableH - 0.04) / 2, pz + signZ * (legW / 2 - legThick / 2));
+                        legPartB.castShadow = true;
+                        (currentAssemblyGroup || decorVideoGroup).add(legPartA, legPartB);
+                    });
                 });
 
-                // Travesaños longitudinales inferiores de unión
-                [-1, 1].forEach(side => {
-                    const railX = tableX + side * (tableW / 2 - 0.0125);
-                    const longRail = new THREE.Mesh(createRoundedBoxGeo(0.020, 0.020, tableL - 0.07, 0.004, 1), ironMat);
-                    longRail.position.set(railX, 0.010, tableZ);
-                    longRail.castShadow = true;
-                    (currentAssemblyGroup || decorVideoGroup).add(longRail);
+                // Faldones perimetrales superiores blancos que forman el cajón
+                const apronH = 0.14, apronY = tableH - 0.04 - apronH / 2;
+                // Faldón Oeste (hacia el sillón) y Este (hacia el mueble TV)
+                [-1, 1].forEach(signX => {
+                    const apronX = tableX + signX * (tableW / 2 - 0.009);
+                    const apronMesh = new THREE.Mesh(createRoundedBoxGeo(0.018, apronH, tableL - 0.08, 0.004, 1), whiteMelaminaMat);
+                    apronMesh.position.set(apronX, apronY, tableZ);
+                    apronMesh.castShadow = true;
+                    (currentAssemblyGroup || decorVideoGroup).add(apronMesh);
+                });
+                // Faldones Norte y Sur (cabeceras)
+                [-1, 1].forEach(signZ => {
+                    const apronZ = tableZ + signZ * (tableL / 2 - 0.009);
+                    const apronMesh = new THREE.Mesh(createRoundedBoxGeo(tableW - 0.036, apronH, 0.018, 0.004, 1), whiteMelaminaMat);
+                    apronMesh.position.set(tableX, apronY, apronZ);
+                    apronMesh.castShadow = true;
+                    (currentAssemblyGroup || decorVideoGroup).add(apronMesh);
                 });
 
-                // 2. Compartimento cajón revistero inferior abierto (batea de guardado interior)
-                const trayW = tableW - 0.05, trayL = tableL - 0.07, trayH = 0.16;
-                const trayY = 0.18 + trayH / 2;
-                const trayFloor = new THREE.Mesh(createRoundedBoxGeo(trayW - 0.02, 0.015, trayL - 0.02, 0.004, 1), woodDarkMat);
-                trayFloor.position.set(tableX, 0.18, tableZ);
+                // 2. Estante inferior de madera oscura cerca del piso (a 8 cm del suelo, fotos del usuario)
+                const lowerShelf = new THREE.Mesh(createRoundedBoxGeo(tableW - 0.07, 0.018, tableL - 0.08, 0.004, 1), lowerShelfWoodMat);
+                lowerShelf.position.set(tableX, 0.09, tableZ);
+                lowerShelf.castShadow = true; lowerShelf.receiveShadow = true;
+                (currentAssemblyGroup || decorVideoGroup).add(lowerShelf);
+
+                // Almohadón redondo bordó/rojo sobre el estante inferior (Foto 3 y 4 del usuario)
+                const cushionMat = new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.85, metalness: 0.05 });
+                const redCushion = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.09, 20), cushionMat);
+                redCushion.position.set(tableX, 0.09 + 0.045, tableZ + 0.12);
+                redCushion.castShadow = true;
+                (currentAssemblyGroup || decorVideoGroup).add(redCushion);
+
+                // 3. Compartimento cajón revistero interior (batea interna visible al elevar la tapa)
+                const trayW = tableW - 0.06, trayL = tableL - 0.08, trayH = apronH;
+                const trayFloor = new THREE.Mesh(createRoundedBoxGeo(trayW, 0.014, trayL, 0.004, 1), lowerShelfWoodMat);
+                trayFloor.position.set(tableX, apronY - apronH / 2 + 0.007, tableZ);
                 trayFloor.castShadow = true; trayFloor.receiveShadow = true;
-                const trayWallW = new THREE.Mesh(createRoundedBoxGeo(0.015, trayH, trayL, 0.004, 1), ironMat);
-                trayWallW.position.set(tableX - trayW / 2 + 0.0075, trayY, tableZ);
-                const trayWallE = new THREE.Mesh(createRoundedBoxGeo(0.015, trayH, trayL, 0.004, 1), ironMat);
-                trayWallE.position.set(tableX + trayW / 2 - 0.0075, trayY, tableZ);
-                (currentAssemblyGroup || decorVideoGroup).add(trayFloor, trayWallW, trayWallE);
+                (currentAssemblyGroup || decorVideoGroup).add(trayFloor);
 
-                // Libros y revistas apiladas dentro del compartimento revistero
-                const mag1 = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.03, 0.32, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.8 }));
-                mag1.position.set(tableX - 0.05, 0.20, tableZ - 0.15);
-                mag1.castShadow = true;
-                const mag2 = new THREE.Mesh(createRoundedBoxGeo(0.22, 0.025, 0.28, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.8 }));
-                mag2.position.set(tableX + 0.06, 0.20, tableZ + 0.12);
-                mag2.castShadow = true;
-                (currentAssemblyGroup || decorVideoGroup).add(mag1, mag2);
+                // Objetos reales dentro de la batea (Foto 3: rodillo quita pelusa blanco/celeste, cinta métrica, etc.)
+                const lintRollerHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.14, 12), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.4 }));
+                lintRollerHandle.rotation.x = Math.PI / 2;
+                lintRollerHandle.position.set(tableX - 0.06, trayFloor.position.y + 0.025, tableZ - 0.12);
+                const lintRollerHead = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.10, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 }));
+                lintRollerHead.rotation.x = Math.PI / 2;
+                lintRollerHead.position.set(tableX - 0.06, trayFloor.position.y + 0.025, tableZ - 0.02);
+                (currentAssemblyGroup || decorVideoGroup).add(lintRollerHandle, lintRollerHead);
 
-                // 2 Aletas de soporte rebatibles para la hoja extendida (Video YouTube Shorts)
-                const supportWingMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.4, metalness: 0.8 });
-                const wingA = new THREE.Group();
-                wingA.position.set(tableX + trayW / 2 - 0.015, 0.33, tableZ - trayL / 3);
-                const wingMeshA = new THREE.Mesh(createRoundedBoxGeo(0.18, 0.16, 0.014, 0.003, 1), supportWingMat);
-                wingMeshA.position.set(0.09, 0, 0);
-                wingA.add(wingMeshA);
-
-                const wingB = new THREE.Group();
-                wingB.position.set(tableX + trayW / 2 - 0.015, 0.33, tableZ + trayL / 3);
-                const wingMeshB = new THREE.Mesh(createRoundedBoxGeo(0.18, 0.16, 0.014, 0.003, 1), supportWingMat);
-                wingMeshB.position.set(0.09, 0, 0);
-                wingB.add(wingMeshB);
-                (currentAssemblyGroup || decorVideoGroup).add(wingA, wingB);
-
-                // 3. Mecanismo compás tijera articulado elevable (brazos diagonales metálicos)
+                // 4. Brazos mecánicos en tijera de acero negro para elevación
                 const scissorGroup = new THREE.Group();
-                scissorGroup.position.set(tableX, 0.28, tableZ);
+                scissorGroup.position.set(tableX, 0.30, tableZ);
                 [-1, 1].forEach(side => {
                     const scZ = side * (tableL / 2 - 0.12);
-                    const arm1 = new THREE.Mesh(createRoundedBoxGeo(0.012, 0.22, 0.014, 0.003, 1), ironMat);
+                    const arm1 = new THREE.Mesh(createRoundedBoxGeo(0.012, 0.22, 0.014, 0.003, 1), ironBlackMat);
                     arm1.position.set(-0.06, 0, scZ);
                     arm1.rotation.z = 0.55;
-                    const arm2 = new THREE.Mesh(createRoundedBoxGeo(0.012, 0.22, 0.014, 0.003, 1), ironMat);
+                    const arm2 = new THREE.Mesh(createRoundedBoxGeo(0.012, 0.22, 0.014, 0.003, 1), ironBlackMat);
                     arm2.position.set(0.06, 0, scZ);
                     arm2.rotation.z = -0.55;
                     scissorGroup.add(arm1, arm2);
                 });
                 (currentAssemblyGroup || decorVideoGroup).add(scissorGroup);
 
-                // 4. Tapas superiores elevables y extensibles (Sistema Tapa Libro — Video YouTube Shorts)
-                // Hoja Base: se eleva 18 cm y traslada hacia el sillón (-X)
+                // 2 Aletas de soporte rebatibles en el interior para la 2° apertura (hoja extendida en libro)
+                const wingA = new THREE.Group();
+                wingA.position.set(tableX + trayW / 2 - 0.015, 0.33, tableZ - trayL / 3);
+                const wingMeshA = new THREE.Mesh(createRoundedBoxGeo(0.18, 0.16, 0.014, 0.003, 1), ironBlackMat);
+                wingMeshA.position.set(0.09, 0, 0);
+                wingA.add(wingMeshA);
+
+                const wingB = new THREE.Group();
+                wingB.position.set(tableX + trayW / 2 - 0.015, 0.33, tableZ + trayL / 3);
+                const wingMeshB = new THREE.Mesh(createRoundedBoxGeo(0.18, 0.16, 0.014, 0.003, 1), ironBlackMat);
+                wingMeshB.position.set(0.09, 0, 0);
+                wingB.add(wingMeshB);
+                (currentAssemblyGroup || decorVideoGroup).add(wingA, wingB);
+
+                // 5. Tapas superiores con 2 APERTURAS (1° Apertura: Elevada en 50 cm; 2° Apertura: Desplegada en libro a 100 cm)
                 const leafW = tableW - 0.01; // 0.49 m
                 const leafL = tableL - 0.01; // 0.89 m
                 const leafThick = 0.020;
@@ -8649,90 +8666,87 @@
                 const baseLeafGroup = new THREE.Group();
                 baseLeafGroup.position.set(tableX, tableH - leafThick * 2, tableZ);
 
-                // Malla de la hoja base
-                const baseLeafMesh = new THREE.Mesh(createRoundedBoxGeo(leafW, leafThick, leafL, 0.006, 2), woodLightMat);
+                // Hoja base de madera rústica oscura
+                const baseLeafMesh = new THREE.Mesh(createRoundedBoxGeo(leafW, leafThick, leafL, 0.006, 2), darkRusticWoodMat);
                 baseLeafMesh.position.set(0, leafThick / 2, 0);
                 baseLeafMesh.castShadow = true; baseLeafMesh.receiveShadow = true;
                 baseLeafGroup.add(baseLeafMesh);
 
-                // Bisagra continua en el borde Este de la hoja base (+X)
+                // Bisagra continua dorada / bronce en el borde Este (+X)
                 const pianoHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.0035, 0.0035, leafL - 0.04, 12), new THREE.MeshStandardMaterial({ color: 0xca8a04, metalness: 0.8, roughness: 0.3 }));
                 pianoHinge.rotation.x = Math.PI / 2;
                 pianoHinge.position.set(leafW / 2, leafThick, 0);
                 baseLeafGroup.add(pianoHinge);
 
-                // Pivot del pliegue de la tapa libro (en el borde Este de la hoja base)
+                // Pivot para la hoja superior desplegable en libro
                 const foldPivotGroup = new THREE.Group();
                 foldPivotGroup.position.set(leafW / 2, leafThick, 0);
 
-                // Malla de la hoja superior (que se despliega 180° hacia +X duplicando la superficie)
-                const foldLeafMesh = new THREE.Mesh(createRoundedBoxGeo(leafW, leafThick, leafL, 0.006, 2), woodLightMat);
-                // Cuando foldPivotGroup.rotation.z = 0: queda doblada exactamente encima de la hoja base
+                // Hoja superior de madera rústica oscura
+                const foldLeafMesh = new THREE.Mesh(createRoundedBoxGeo(leafW, leafThick, leafL, 0.006, 2), darkRusticWoodMat);
                 foldLeafMesh.position.set(-leafW / 2, leafThick / 2, 0);
                 foldLeafMesh.castShadow = true; foldLeafMesh.receiveShadow = true;
                 foldPivotGroup.add(foldLeafMesh);
-
                 baseLeafGroup.add(foldPivotGroup);
+
+                // 6. Elementos reales sobre la mesa ratona (se mueven naturalmente con la tapa al elevarse, Fotos 3 y 4)
+                // Individual rectangular marrón oscuro con tachas/remaches en bordes
+                const placematMesh = new THREE.Mesh(createRoundedBoxGeo(0.28, 0.003, 0.42, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x3d271d, roughness: 0.85 }));
+                placematMesh.position.set(0, leafThick + 0.0015, -0.06);
+                placematMesh.castShadow = true;
+                baseLeafGroup.add(placematMesh);
+
+                // Vaso de vidrio transparente para agua
+                const glassMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.45 });
+                const waterGlass = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.032, 0.09, 16), glassMat);
+                waterGlass.position.set(0.02, leafThick + 0.048, -0.16);
+                waterGlass.castShadow = true;
+                baseLeafGroup.add(waterGlass);
+
+                // Controles remotos (TV negro largo y aire acondicionado blanco)
+                const tvRemote = new THREE.Mesh(createRoundedBoxGeo(0.046, 0.015, 0.19, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35 }));
+                tvRemote.position.set(-0.06, leafThick + 0.009, 0.02);
+                tvRemote.castShadow = true;
+                const acRemote = new THREE.Mesh(createRoundedBoxGeo(0.044, 0.015, 0.14, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35 }));
+                acRemote.position.set(0.05, leafThick + 0.009, 0.06);
+                acRemote.castShadow = true;
+                // Llavero espiral violeta
+                const purpleSpiral = new THREE.Mesh(new THREE.TorusGeometry(0.018, 0.004, 8, 16), new THREE.MeshStandardMaterial({ color: 0x9333ea, roughness: 0.4 }));
+                purpleSpiral.position.set(-0.08, leafThick + 0.005, -0.18);
+                baseLeafGroup.add(tvRemote, acRemote, purpleSpiral);
+
                 (currentAssemblyGroup || decorVideoGroup).add(baseLeafGroup);
 
-                // 5. Sensor interactivo transparente para clic / toque en la mesa
-                const clickGeo = new THREE.BoxGeometry(tableW + 0.06, 0.12, tableL + 0.06);
+                // 7. Sensor interactivo transparente para clic / toque en la mesa
+                const clickGeo = new THREE.BoxGeometry(tableW + 0.08, 0.16, tableL + 0.08);
                 const clickMat = new THREE.MeshBasicMaterial({ visible: false });
                 const tableClickMesh = new THREE.Mesh(clickGeo, clickMat);
                 tableClickMesh.position.set(tableX, tableH, tableZ);
 
-                // Registrar estado animado global de la mesa ratona
+                // Estado animado con 2 APERTURAS:
+                // stage 0: Cerrada (42 cm — 90×50 cm)
+                // stage 1: 1° Apertura Elevada (60 cm — 90×50 cm, Fotos 3 y 4)
+                // stage 2: 2° Apertura Desplegada en Libro (60 cm — 90×100 cm, Video YouTube Shorts)
                 window.coffeeTableAnimState = {
-                    isOpen: false,
-                    currentProgress: 0.0,
-                    targetProgress: 0.0,
+                    stage: 0,
                     baseLeaf: baseLeafGroup,
                     foldPivot: foldPivotGroup,
                     wingA: wingA,
                     wingB: wingB,
                     scissors: scissorGroup,
-                    toggle() {
-                        this.isOpen = !this.isOpen;
-                        this.targetProgress = this.isOpen ? 1.0 : 0.0;
-                        return this.isOpen;
+                    cycleStage() {
+                        this.stage = (this.stage + 1) % 3;
+                        return this.stage;
                     }
                 };
 
                 tableClickMesh.userData.animLiftTable = window.coffeeTableAnimState;
-                tableClickMesh.userData.nombre = 'Mesa Ratona Elevable y Extensible (90×50 cm -> 90×100 cm)';
+                tableClickMesh.userData.nombre = 'Mesa Ratona Elevable y Extensible (2 Aperturas: 42cm -> 60cm -> 100cm)';
                 liftTableClickCandidates.push(tableClickMesh, baseLeafMesh, foldLeafMesh);
                 (currentAssemblyGroup || decorVideoGroup).add(tableClickMesh);
             });
 
-            // Elementos individuales sobre la mesa ratona (editables, movibles y borrables por separado):
-            createCompoundAssembly('Vaso Térmico Stanley (Mesa Ratona)', () => {
-                const tableX = 4.46, tableZ = 3.10, tableH = 0.42;
-                addDecorCyl(tableX - 0.06, tableH + 0.09, tableZ - 0.24, 0.042, 0.036, 0.18, 0x18181b, 0.4);
-                addDecorCyl(tableX - 0.06, tableH + 0.182, tableZ - 0.24, 0.038, 0.038, 0.012, 0xd1d5db, 0.2); // Anillo plateado de tapa
-            });
 
-            createCompoundAssembly('Tableta Gráfica y Stylus (Mesa Ratona)', () => {
-                const tableX = 4.46, tableZ = 3.10, tableH = 0.42;
-                addDecorBox(tableX, tableH + 0.006, tableZ - 0.02, 0.22, 0.010, 0.30, 0x111827, 0.5);
-                addDecorBox(tableX - 0.02, tableH + 0.015, tableZ, 0.010, 0.008, 0.14, 0xf8fafc, 0.3); // Stylus blanco
-            });
-
-            createCompoundAssembly('Controles Remotos TV y Audio (Mesa Ratona)', () => {
-                const tableX = 4.38, tableZ = 3.10, tableH = 0.42;
-                addDecorBox(tableX + 0.09, tableH + 0.008, tableZ + 0.22, 0.048, 0.014, 0.18, 0x0f172a, 0.3);
-                addDecorBox(tableX + 0.09, tableH + 0.008, tableZ + 0.38, 0.044, 0.014, 0.15, 0x1e293b, 0.3);
-            });
-
-            createCompoundAssembly('Cinta Métrica Stanley (Mesa Ratona)', () => {
-                const tableX = 4.38, tableZ = 3.10, tableH = 0.42;
-                addDecorBox(tableX - 0.09, tableH + 0.016, tableZ + 0.26, 0.055, 0.030, 0.055, 0xeab308, 0.35);
-                addDecorBox(tableX - 0.12, tableH + 0.016, tableZ + 0.26, 0.010, 0.015, 0.020, 0xd1d5db, 0.2); // Gancho metálico
-            });
-
-            createCompoundAssembly('Billetera y Llaves (Mesa Ratona)', () => {
-                const tableX = 4.38, tableZ = 3.10, tableH = 0.42;
-                addDecorBox(tableX - 0.08, tableH + 0.008, tableZ + 0.42, 0.08, 0.012, 0.10, 0x334155, 0.6); // Billetera
-            });
 
             // 4. Sector Comedor: Mesa Redonda Extensible en 3 Tandas de Forma Ovalada (Ø 1.00 m -> 1.23 m -> 1.47 m -> 1.70 m)
             const tableDiningX = 4.65;
@@ -9543,20 +9557,23 @@
                 mainLeg.position.set(2.65, 0.36, 2.11);
                 mainLeg.castShadow = true;
 
-                // Faldón de madera pasacables trasero bajo mesada contra pared Este (Video 4:24)
+                // Faldón de madera pasacables trasero bajo mesada contra pared Este (Foto 2 del usuario)
                 const modestyPanel = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
                 modestyPanel.scale.set(0.020, 0.38, 1.15);
                 modestyPanel.position.set(2.92, 0.52, 1.10);
                 modestyPanel.castShadow = true;
-                // Tomacorriente doble de pared blanco con cargadores
-                const wallOutlet = new THREE.Mesh(createRoundedBoxGeo(0.015, 0.08, 0.12, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
-                wallOutlet.position.set(2.93, 0.28, 1.10);
 
-                // Cajón flotante bajo mesada blanco en extremo Sur sobre el gabinete PC (Video 4:24)
-                const southDrawer = new THREE.Mesh(createRoundedBoxGeo(0.52, 0.09, 0.44, 0.006, 1), new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.35 }));
-                southDrawer.position.set(2.66, 0.68, 1.84);
+                // Tomacorriente doble de pared blanco con cargadores y zapatilla en el suelo (Foto 2)
+                const wallOutlet = new THREE.Mesh(createRoundedBoxGeo(0.015, 0.08, 0.12, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
+                wallOutlet.position.set(2.93, 0.30, 1.48);
+                const powerStrip = new THREE.Mesh(createRoundedBoxGeo(0.06, 0.035, 0.22, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.4 }));
+                powerStrip.position.set(2.86, 0.02, 1.42);
+
+                // Cajón bajo mesada en melamina madera clara sobre el gabinete PC (extremo Sur, Foto 2)
+                const southDrawer = new THREE.Mesh(createRoundedBoxGeo(0.52, 0.11, 0.46, 0.006, 1), deskWoodMat);
+                southDrawer.position.set(2.66, 0.67, 1.84);
                 southDrawer.castShadow = true;
-                (currentAssemblyGroup || decorVideoGroup).add(mainTop, mainLeg, modestyPanel, wallOutlet, southDrawer);
+                (currentAssemblyGroup || decorVideoGroup).add(mainTop, mainLeg, modestyPanel, wallOutlet, powerStrip, southDrawer);
 
                 // Ala Norte en L (bajo ventana Norte Z = 0.00, 1.32 m total desde pared Este X=2.95 hasta X=1.63 m -> extensión neta 0.72 m [X = 1.63 a 2.35 m] x 0.52 m de profundidad [Z = 0.00 a 0.52 m])
                 const wingTop = new THREE.Mesh(UNIT_BOX_GEO, deskWoodMat);
@@ -9568,59 +9585,92 @@
                 wingLeg.position.set(1.65, 0.36, 0.26);
                 wingLeg.castShadow = true;
 
-                // Mueble organizador bajo mesada de 2 estantes en esquina Norte (Z = 0.08 a 0.48 m)
-                // Totalmente adosado al rincón Norte, dejando 100% despejado el vano central (Z = 0.55 a 1.65 m) para la silla gamer
+                // Cajón bajo mesada izquierdo en melamina madera clara bajo el Ala Norte (Foto 2)
+                const northDrawer = new THREE.Mesh(createRoundedBoxGeo(0.60, 0.11, 0.44, 0.006, 1), deskWoodMat);
+                northDrawer.position.set(1.99, 0.67, 0.26);
+                northDrawer.castShadow = true;
+
+                // Módulo organizador bajo mesada de 2 estantes en la esquina interior de la L (Foto 2)
                 const underShelfSide = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
-                underShelfSide.scale.set(0.52, 0.68, 0.024);
-                underShelfSide.position.set(2.66, 0.34, 0.48);
+                underShelfSide.scale.set(0.50, 0.68, 0.024);
+                underShelfSide.position.set(2.66, 0.34, 0.52);
                 underShelfSide.castShadow = true;
 
                 const underMidShelf = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
-                underMidShelf.scale.set(0.50, 0.022, 0.38);
-                underMidShelf.position.set(2.66, 0.36, 0.28);
+                underMidShelf.scale.set(0.48, 0.022, 0.40);
+                underMidShelf.position.set(2.66, 0.38, 0.32);
                 underMidShelf.castShadow = true; underMidShelf.receiveShadow = true;
 
-                // Estante superior: Valija de herramientas negra con cierres metálicos y detalles verdes/amarillos
-                const blackToolbox = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.14, 0.34, 0.008, 1), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 }));
-                blackToolbox.position.set(2.66, 0.45, 0.28);
+                // Estante superior: Valija de herramientas negra con cierres metálicos y detalles amarillos/verdes
+                const blackToolbox = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.14, 0.32, 0.008, 1), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 }));
+                blackToolbox.position.set(2.72, 0.46, 0.32);
                 blackToolbox.castShadow = true;
                 const metalLatches = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9, roughness: 0.2 }));
-                metalLatches.scale.set(0.244, 0.035, 0.10);
-                metalLatches.position.set(2.66, 0.45, 0.28);
+                metalLatches.scale.set(0.244, 0.035, 0.09);
+                metalLatches.position.set(2.72, 0.46, 0.32);
 
-                // Estante inferior: Valija plástica organizadora turquesa con broches negros
-                const tealToolbox = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.14, 0.34, 0.008, 1), new THREE.MeshStandardMaterial({ color: 0x0d9488, roughness: 0.45 }));
-                tealToolbox.position.set(2.66, 0.10, 0.28);
+                // Router Wi-Fi negro con antenas al lado de la caja de herramientas (Foto 2)
+                const wifiBody = new THREE.Mesh(createRoundedBoxGeo(0.14, 0.035, 0.18, 0.006, 1), new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.3 }));
+                wifiBody.position.set(2.54, 0.41, 0.32);
+                const wifiAntenna1 = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.14, 8), new THREE.MeshStandardMaterial({ color: 0x09090b }));
+                wifiAntenna1.position.set(2.50, 0.48, 0.26);
+                const wifiAntenna2 = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.14, 8), new THREE.MeshStandardMaterial({ color: 0x09090b }));
+                wifiAntenna2.position.set(2.50, 0.48, 0.38);
+
+                // Estante inferior: Valija plástica turquesa con broches negros y paño blanco (Foto 2)
+                const tealToolbox = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.14, 0.32, 0.008, 1), new THREE.MeshStandardMaterial({ color: 0x0d9488, roughness: 0.45 }));
+                tealToolbox.position.set(2.66, 0.10, 0.32);
                 tealToolbox.castShadow = true;
+                const whiteClothCover = new THREE.Mesh(createRoundedBoxGeo(0.22, 0.015, 0.30, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.9 }));
+                whiteClothCover.position.set(2.66, 0.175, 0.32);
 
-                // Estante inferior bajo el Ala Norte: resmas de hojas Autor A4/Oficio en su caja (Video 4:31)
+                // Impresora multifunción en el piso en la esquina interna de la L (Foto 2)
+                const printerGroup = new THREE.Group();
+                printerGroup.position.set(2.32, 0.12, 0.34);
+                const printerBase = new THREE.Mesh(createRoundedBoxGeo(0.36, 0.18, 0.28, 0.010, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.35 }));
+                const printerScanner = new THREE.Mesh(createRoundedBoxGeo(0.35, 0.04, 0.27, 0.006, 1), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 }));
+                printerScanner.position.set(0, 0.10, 0);
+                const paperTray = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.012, 0.16, 0.003, 1), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.4 }));
+                paperTray.position.set(0, -0.04, 0.16);
+                const paperSheet = new THREE.Mesh(createRoundedBoxGeo(0.21, 0.002, 0.14, 0.001, 1), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 }));
+                paperSheet.position.set(0, -0.032, 0.16);
+                printerGroup.add(printerBase, printerScanner, paperTray, paperSheet);
+
+                // Estante inferior bajo el Ala Norte: 2 resmas de hojas (Autor A4 blanca/verde y Punax A4 roja/bordo) (Foto 2)
                 const wingUnderShelf = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
                 wingUnderShelf.scale.set(0.68, 0.022, 0.46);
-                wingUnderShelf.position.set(2.00, 0.42, 0.26);
+                wingUnderShelf.position.set(2.00, 0.40, 0.26);
                 wingUnderShelf.castShadow = true; wingUnderShelf.receiveShadow = true;
 
-                // Caja/resma de papel Autor (blanca con franja verde)
-                const reamBox = new THREE.Mesh(createRoundedBoxGeo(0.32, 0.08, 0.22, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.7 }));
-                reamBox.position.set(1.95, 0.47, 0.26);
+                // 1) Resma Autor 75g (blanca con etiqueta verde)
+                const reamAutor = new THREE.Mesh(createRoundedBoxGeo(0.30, 0.065, 0.21, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.7 }));
+                reamAutor.position.set(1.88, 0.445, 0.26);
                 const reamStripe = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0x16a34a }));
-                reamStripe.scale.set(0.322, 0.03, 0.08);
-                reamStripe.position.set(1.95, 0.47, 0.26);
+                reamStripe.scale.set(0.302, 0.025, 0.07);
+                reamStripe.position.set(1.88, 0.445, 0.26);
 
-                // Suelo bajo el ala Norte: Mochila negra y lata de pintura (Video 4:31)
-                const underBackpack = new THREE.Mesh(createRoundedBoxGeo(0.28, 0.36, 0.24, 0.03, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.85 }));
-                underBackpack.position.set(2.02, 0.18, 0.26);
+                // 2) Resma Punax A4 (roja / bordo oscuro)
+                const reamPunax = new THREE.Mesh(createRoundedBoxGeo(0.30, 0.065, 0.21, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x881337, roughness: 0.7 }));
+                reamPunax.position.set(2.18, 0.445, 0.26);
+
+                // Suelo bajo el ala Norte: Mochila negra parada contra la pata y lata de pintura (Foto 2)
+                const underBackpack = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.42, 0.28, 0.04, 2), new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.85 }));
+                underBackpack.position.set(1.78, 0.21, 0.26);
                 underBackpack.castShadow = true;
 
                 const paintCan = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.20, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
-                paintCan.position.set(1.72, 0.10, 0.26);
+                paintCan.position.set(1.68, 0.10, 0.14);
                 paintCan.castShadow = true;
                 const paintLabel = new THREE.Mesh(new THREE.CylinderGeometry(0.081, 0.081, 0.10, 16), new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.4 }));
-                paintLabel.position.set(1.72, 0.10, 0.26);
+                paintLabel.position.set(1.68, 0.10, 0.14);
 
                 (currentAssemblyGroup || decorVideoGroup).add(
-                    wingTop, wingLeg,
-                    underShelfSide, underMidShelf, blackToolbox, metalLatches, tealToolbox,
-                    wingUnderShelf, reamBox, reamStripe, underBackpack, paintCan, paintLabel
+                    wingTop, wingLeg, northDrawer,
+                    underShelfSide, underMidShelf, blackToolbox, metalLatches,
+                    wifiBody, wifiAntenna1, wifiAntenna2,
+                    tealToolbox, whiteClothCover, printerGroup,
+                    wingUnderShelf, reamAutor, reamStripe, reamPunax,
+                    underBackpack, paintCan, paintLabel
                 );
             });
 
@@ -9918,66 +9968,33 @@
                     });
                 });
 
-                // --- 1° ESTANTE INFERIOR (Y = 1.30 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): COLECCIÓN COMPLETA DE CONSOLAS RETRO Y EDICIONES ESPECIALES POKÉMON ---
+                // --- 1° ESTANTE INFERIOR (Y = 1.30 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): COLECCIÓN COMPLETA DE CONSOLAS RETRO Y EDICIONES ESPECIALES POKÉMON (Foto 1 del usuario) ---
                 addDecorBox(2.845, 1.30, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Inferior (1.80×0.20 m)');
 
-                // 1) Poké Ball Plus con Base de Carga Oficial (Z = 0.32 m)
-                const pokeDockBase = new THREE.Mesh(new THREE.CylinderGeometry(0.030, 0.034, 0.020, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 }));
-                pokeDockBase.position.set(2.84, 1.318 + 0.010, 0.32);
-                const pokeSphereTop = new THREE.Mesh(new THREE.SphereGeometry(0.024, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.25 }));
-                pokeSphereTop.position.set(2.84, 1.318 + 0.032, 0.32);
-                const pokeSphereBot = new THREE.Mesh(new THREE.SphereGeometry(0.024, 16, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25 }));
-                pokeSphereBot.position.set(2.84, 1.318 + 0.032, 0.32);
-                const pokeBelt = new THREE.Mesh(new THREE.CylinderGeometry(0.0245, 0.0245, 0.005, 16), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 }));
-                pokeBelt.position.set(2.84, 1.318 + 0.032, 0.32);
-                const pokeBtn = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.004, 12), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.4 }));
-                pokeBtn.rotation.z = Math.PI / 2;
-                pokeBtn.position.set(2.815, 1.318 + 0.032, 0.32);
-                (currentAssemblyGroup || decorVideoGroup).add(pokeDockBase, pokeSphereTop, pokeSphereBot, pokeBelt, pokeBtn);
-
-                // 2) Nintendo Switch 1 Edición Especial Pokémon Let's Go (Pikachu & Eevee) en su Dock (Z = 0.44 m)
-                const switchGroup = new THREE.Group();
-                switchGroup.position.set(2.83, 1.318, 0.44);
-                const dockMesh = new THREE.Mesh(createRoundedBoxGeo(0.052, 0.104, 0.170, 0.010, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45, metalness: 0.1 }));
-                dockMesh.position.set(0, 0.052, 0);
-                const pikaGraphic = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
-                pikaGraphic.scale.set(0.002, 0.050, 0.050);
-                pikaGraphic.position.set(-0.027, 0.055, -0.038);
-                const eeveeGraphic = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xb45309 }));
-                eeveeGraphic.scale.set(0.002, 0.050, 0.050);
-                eeveeGraphic.position.set(-0.027, 0.055, 0.038);
-                const switchScreen = new THREE.Mesh(createRoundedBoxGeo(0.015, 0.100, 0.165, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.15, metalness: 0.8 }));
-                switchScreen.position.set(0, 0.075, 0);
-                const joyL = new THREE.Mesh(createRoundedBoxGeo(0.016, 0.100, 0.032, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4, metalness: 0.05 }));
-                joyL.position.set(0, 0.075, -0.098);
-                const joyR = new THREE.Mesh(createRoundedBoxGeo(0.016, 0.100, 0.032, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.4, metalness: 0.05 }));
-                joyR.position.set(0, 0.075, 0.098);
-                switchGroup.add(dockMesh, pikaGraphic, eeveeGraphic, switchScreen, joyL, joyR);
-                (currentAssemblyGroup || decorVideoGroup).add(switchGroup);
-
-                // 3) Game Boy Color 1 — Edición Especial Pokémon (Pikachu & Jigglypuff / Togepi) (Z = 0.57 m)
-                const gbc1Group = new THREE.Group();
-                gbc1Group.position.set(2.83, 1.318, 0.57);
-                gbc1Group.rotation.y = 0.12; // Inclinación suave hacia el observador
-                // Soporte acrílico transparente
+                // Soporte acrílico transparente para consolas
                 const gbcStandMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.6 });
+                const dPadMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 });
+
+                // 1) Game Boy Color 1 — Edición Especial Pokémon Amarilla con Cartucho Negro en ranura superior (Z = 0.26 m, Foto 1)
+                const gbc1Group = new THREE.Group();
+                gbc1Group.position.set(2.83, 1.318, 0.26);
+                gbc1Group.rotation.y = 0.08;
                 const gbc1Stand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.045, 0.070, 0.004, 1), gbcStandMat);
                 gbc1Stand.position.set(0, 0.022, 0);
-                // Carcasa amarilla Pikachu
-                const gbc1BodyMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 });
-                const gbc1Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), gbc1BodyMat);
+                const gbc1Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 }));
                 gbc1Body.position.set(-0.012, 0.072, 0);
-                gbc1Body.rotation.z = -0.20; // Inclinada hacia atrás sobre el soporte
-                // Pantalla cuadrada TFT con bisel azul y rojo
-                const gbc1ScreenMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.25 });
-                const gbc1Screen = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.056, 0.058, 0.004, 1), gbc1ScreenMat);
+                gbc1Body.rotation.z = -0.20;
+                // Cartucho negro Game Boy insertado en la ranura superior (Foto 1)
+                const gbc1Cart = new THREE.Mesh(createRoundedBoxGeo(0.018, 0.050, 0.058, 0.003, 1), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 }));
+                gbc1Cart.position.set(-0.004, 0.142, 0);
+                gbc1Cart.rotation.z = -0.20;
+                // Pantalla cuadrada TFT y LCD verde
+                const gbc1Screen = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.056, 0.058, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.25 }));
                 gbc1Screen.position.set(-0.026, 0.092, 0);
                 gbc1Screen.rotation.z = -0.20;
                 const gbc1Lcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.040, 0.044, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.4 }));
                 gbc1Lcd.position.set(-0.028, 0.094, 0);
                 gbc1Lcd.rotation.z = -0.20;
-                // Botones A/B rojo y azul y D-Pad negro
-                const dPadMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 });
                 const gbc1Dpad = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.018, 0.018, 0.002, 1), dPadMat);
                 gbc1Dpad.position.set(-0.026, 0.048, -0.020);
                 gbc1Dpad.rotation.z = -0.20;
@@ -9987,18 +10004,16 @@
                 const gbc1BtnB = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.009, 0.009, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x2563eb }));
                 gbc1BtnB.position.set(-0.026, 0.044, 0.012);
                 gbc1BtnB.rotation.z = -0.20;
-                gbc1Group.add(gbc1Stand, gbc1Body, gbc1Screen, gbc1Lcd, gbc1Dpad, gbc1BtnA, gbc1BtnB);
+                gbc1Group.add(gbc1Stand, gbc1Body, gbc1Cart, gbc1Screen, gbc1Lcd, gbc1Dpad, gbc1BtnA, gbc1BtnB);
                 (currentAssemblyGroup || decorVideoGroup).add(gbc1Group);
 
-                // 4) Game Boy Color 2 — Edición Especial Pokémon Amarilla (Z = 0.68 m)
+                // 2) Game Boy Color 2 — Edición Especial Pokémon Amarilla (Z = 0.38 m, Foto 1)
                 const gbc2Group = new THREE.Group();
-                gbc2Group.position.set(2.83, 1.318, 0.68);
+                gbc2Group.position.set(2.83, 1.318, 0.38);
                 gbc2Group.rotation.y = 0.08;
                 const gbc2Stand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.045, 0.070, 0.004, 1), gbcStandMat);
                 gbc2Stand.position.set(0, 0.022, 0);
-                // Carcasa amarilla vibrante Pokémon Pikachu Edition
-                const gbc2BodyMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 });
-                const gbc2Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), gbc2BodyMat);
+                const gbc2Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 }));
                 gbc2Body.position.set(-0.012, 0.072, 0);
                 gbc2Body.rotation.z = -0.20;
                 const gbc2Screen = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.056, 0.058, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.25 }));
@@ -10019,21 +10034,17 @@
                 gbc2Group.add(gbc2Stand, gbc2Body, gbc2Screen, gbc2Lcd, gbc2Dpad, gbc2BtnA, gbc2BtnB);
                 (currentAssemblyGroup || decorVideoGroup).add(gbc2Group);
 
-                // 5) Game Boy Advance (GBA Clásica Horizontal) (Z = 0.79 m)
+                // 3) Game Boy Advance (GBA Clásica Horizontal Indigo/Glacier) (Z = 0.50 m, Foto 1)
                 const gbaGroup = new THREE.Group();
-                gbaGroup.position.set(2.83, 1.318, 0.79);
+                gbaGroup.position.set(2.83, 1.318, 0.50);
                 const gbaStand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.040, 0.120, 0.004, 1), gbcStandMat);
                 gbaStand.position.set(0, 0.020, 0);
-                // Carcasa apaisada ergonómica Glacier Blue / Indigo
-                const gbaBodyMat = new THREE.MeshStandardMaterial({ color: 0x6366f1, roughness: 0.30, metalness: 0.20 });
-                const gbaBody = new THREE.Mesh(createRoundedBoxGeo(0.024, 0.082, 0.144, 0.012, 2), gbaBodyMat);
+                const gbaBody = new THREE.Mesh(createRoundedBoxGeo(0.024, 0.082, 0.144, 0.012, 2), new THREE.MeshStandardMaterial({ color: 0x4f46e5, roughness: 0.30, metalness: 0.20 }));
                 gbaBody.position.set(-0.010, 0.048, 0);
                 gbaBody.rotation.z = -0.22;
-                // Pantalla panorámica horizontal central
                 const gbaScreen = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.046, 0.068, 0.003, 1), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 }));
                 gbaScreen.position.set(-0.023, 0.050, 0);
                 gbaScreen.rotation.z = -0.22;
-                // Gatillos L y R metálicos superiores
                 const gbaTrigL = new THREE.Mesh(createRoundedBoxGeo(0.006, 0.010, 0.030, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0xc7d2fe }));
                 gbaTrigL.position.set(-0.002, 0.092, -0.050);
                 const gbaTrigR = new THREE.Mesh(createRoundedBoxGeo(0.006, 0.010, 0.030, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0xc7d2fe }));
@@ -10041,39 +10052,38 @@
                 gbaGroup.add(gbaStand, gbaBody, gbaScreen, gbaTrigL, gbaTrigR);
                 (currentAssemblyGroup || decorVideoGroup).add(gbaGroup);
 
-                // 6) Game Boy Advance SP (GBA SP) Plegable Clamshell (Z = 0.90 m)
+                // 4) Game Boy Advance SP (GBA SP) — Edición Especial Pikachu Amarilla Desplegada (Z = 0.62 m, Foto 1)
                 const gbaSpGroup = new THREE.Group();
-                gbaSpGroup.position.set(2.84, 1.318, 0.90);
-                // Cuerpo inferior cuadrado plateado
-                const spMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, roughness: 0.25, metalness: 0.70 });
-                const spBase = new THREE.Mesh(createRoundedBoxGeo(0.082, 0.012, 0.084, 0.006, 2), spMat);
+                gbaSpGroup.position.set(2.84, 1.318, 0.62);
+                const pikaSpMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.30, metalness: 0.10 });
+                const spBase = new THREE.Mesh(createRoundedBoxGeo(0.082, 0.012, 0.084, 0.006, 2), pikaSpMat);
                 spBase.position.set(0, 0.006, 0);
-                // Bisagra central cilíndrica
-                const spHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.080, 12), new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8 }));
+                const spDpad = new THREE.Mesh(createRoundedBoxGeo(0.016, 0.003, 0.016, 0.002, 1), dPadMat);
+                spDpad.position.set(-0.015, 0.013, -0.020);
+                const spHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.080, 12), new THREE.MeshStandardMaterial({ color: 0xca8a04, metalness: 0.6 }));
                 spHinge.rotation.x = Math.PI / 2;
                 spHinge.position.set(0.038, 0.012, 0);
-                // Pantalla superior desplegada en 110°
-                const spLid = new THREE.Mesh(createRoundedBoxGeo(0.008, 0.078, 0.082, 0.006, 2), spMat);
+                const spLid = new THREE.Mesh(createRoundedBoxGeo(0.008, 0.078, 0.082, 0.006, 2), pikaSpMat);
                 spLid.position.set(0.052, 0.052, 0);
                 spLid.rotation.z = -0.35;
                 const spLcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.052, 0.058, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.15 }));
                 spLcd.position.set(0.047, 0.052, 0);
                 spLcd.rotation.z = -0.35;
-                gbaSpGroup.add(spBase, spHinge, spLid, spLcd);
+                gbaSpGroup.add(spBase, spDpad, spHinge, spLid, spLcd);
                 (currentAssemblyGroup || decorVideoGroup).add(gbaSpGroup);
 
-                // 7) Nintendo DS Lite (DSLite) Blanca Polar (Z = 1.01 m)
+                // 5) Nintendo DS Lite — Edición Crimson Red / Black Desplegada (Z = 0.74 m, Foto 1)
                 const dsLiteGroup = new THREE.Group();
-                dsLiteGroup.position.set(2.84, 1.318, 1.01);
-                const dsMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.15, metalness: 0.10 });
-                const dsBase = new THREE.Mesh(createRoundedBoxGeo(0.074, 0.011, 0.133, 0.006, 2), dsMat);
+                dsLiteGroup.position.set(2.84, 1.318, 0.74);
+                const dsBase = new THREE.Mesh(createRoundedBoxGeo(0.074, 0.011, 0.133, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.35 }));
                 dsBase.position.set(0, 0.006, 0);
-                const dsTouch = new THREE.Mesh(createRoundedBoxGeo(0.048, 0.002, 0.064, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.2 }));
+                const dsTouch = new THREE.Mesh(createRoundedBoxGeo(0.048, 0.002, 0.064, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 }));
                 dsTouch.position.set(0, 0.012, 0);
-                const dsHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.128, 12), new THREE.MeshStandardMaterial({ color: 0xe2e8f0 }));
+                const dsHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.128, 12), new THREE.MeshStandardMaterial({ color: 0x18181b }));
                 dsHinge.rotation.x = Math.PI / 2;
                 dsHinge.position.set(0.034, 0.011, 0);
-                const dsLid = new THREE.Mesh(createRoundedBoxGeo(0.007, 0.070, 0.133, 0.006, 2), dsMat);
+                // Tapa superior rojo carmesí (Crimson Red) con interior negro
+                const dsLid = new THREE.Mesh(createRoundedBoxGeo(0.007, 0.070, 0.133, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.25, metalness: 0.15 }));
                 dsLid.position.set(0.048, 0.048, 0);
                 dsLid.rotation.z = -0.35;
                 const dsTopLcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.048, 0.064, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.15 }));
@@ -10082,9 +10092,9 @@
                 dsLiteGroup.add(dsBase, dsTouch, dsHinge, dsLid, dsTopLcd);
                 (currentAssemblyGroup || decorVideoGroup).add(dsLiteGroup);
 
-                // 8) Nintendo 3DS XL — Edición Especial Pokémon (Pikachu Yellow Edition) (Z = 1.15 m)
+                // 6) Nintendo 3DS XL — Edición Especial Pokémon Pikachu Amarilla Desplegada (Z = 0.88 m, Foto 1)
                 const n3dsGroup = new THREE.Group();
-                n3dsGroup.position.set(2.84, 1.318, 1.15);
+                n3dsGroup.position.set(2.84, 1.318, 0.88);
                 const pika3dsMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.20, metalness: 0.15 });
                 const n3dsBase = new THREE.Mesh(createRoundedBoxGeo(0.093, 0.012, 0.156, 0.008, 2), pika3dsMat);
                 n3dsBase.position.set(0, 0.006, 0);
@@ -10096,31 +10106,54 @@
                 const n3dsLid = new THREE.Mesh(createRoundedBoxGeo(0.008, 0.088, 0.156, 0.008, 2), pika3dsMat);
                 n3dsLid.position.set(0.060, 0.058, 0);
                 n3dsLid.rotation.z = -0.35;
-                // Doble cámara exterior y pantalla 3D XL panorámica
                 const n3dsLcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.062, 0.106, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.15 }));
                 n3dsLcd.position.set(0.055, 0.058, 0);
                 n3dsLcd.rotation.z = -0.35;
                 n3dsGroup.add(n3dsBase, n3dsCirclePad, n3dsHinge, n3dsLid, n3dsLcd);
                 (currentAssemblyGroup || decorVideoGroup).add(n3dsGroup);
 
-                // 9) Llavero Martillo de Thor (Mjölnir) colgando del borde (Z = 1.26 m)
-                const mjolnirGroup = new THREE.Group();
-                mjolnirGroup.position.set(2.76, 1.30, 1.26);
-                const chainLink = new THREE.Mesh(new THREE.CylinderGeometry(0.0015, 0.0015, 0.065, 6), new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9, roughness: 0.2 }));
-                chainLink.position.set(0, -0.032, 0);
-                const topRing = new THREE.Mesh(new THREE.TorusGeometry(0.012, 0.002, 8, 16), new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9, roughness: 0.2 }));
-                topRing.position.set(0, 0.002, 0);
-                const hammerHead = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.35, metalness: 0.85 }));
-                hammerHead.scale.set(0.024, 0.028, 0.046);
-                hammerHead.position.set(0, -0.078, 0);
-                const hammerHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.0035, 0.0035, 0.038, 8), new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 }));
-                hammerHandle.position.set(0, -0.052, 0);
-                mjolnirGroup.add(chainLink, topRing, hammerHead, hammerHandle);
-                (currentAssemblyGroup || decorVideoGroup).add(mjolnirGroup);
+                // 7) Poké Ball Plus con Base de Carga Oficial Blanca (Z = 1.02 m, Foto 1)
+                const pokeDockBase = new THREE.Mesh(new THREE.CylinderGeometry(0.030, 0.034, 0.020, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 }));
+                pokeDockBase.position.set(2.84, 1.318 + 0.010, 1.02);
+                const pokeSphereTop = new THREE.Mesh(new THREE.SphereGeometry(0.024, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.25 }));
+                pokeSphereTop.position.set(2.84, 1.318 + 0.032, 1.02);
+                const pokeSphereBot = new THREE.Mesh(new THREE.SphereGeometry(0.024, 16, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25 }));
+                pokeSphereBot.position.set(2.84, 1.318 + 0.032, 1.02);
+                const pokeBelt = new THREE.Mesh(new THREE.CylinderGeometry(0.0245, 0.0245, 0.005, 16), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 }));
+                pokeBelt.position.set(2.84, 1.318 + 0.032, 1.02);
+                const pokeBtn = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.004, 12), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.4 }));
+                pokeBtn.rotation.z = Math.PI / 2;
+                pokeBtn.position.set(2.815, 1.318 + 0.032, 1.02);
+                (currentAssemblyGroup || decorVideoGroup).add(pokeDockBase, pokeSphereTop, pokeSphereBot, pokeBelt, pokeBtn);
 
-                // 10) Globo Terráqueo de Escritorio Miniatura en soporte de latón dorado (Z = 1.34 m)
+                // 8) Nintendo Switch 1 Edición Especial Pokémon Let's Go (Pikachu & Eevee) en su Dock (Z = 1.18 m, Foto 1)
+                const switchGroup = new THREE.Group();
+                switchGroup.position.set(2.83, 1.318, 1.18);
+                const dockMesh = new THREE.Mesh(createRoundedBoxGeo(0.052, 0.104, 0.170, 0.010, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45, metalness: 0.1 }));
+                dockMesh.position.set(0, 0.052, 0);
+                const pikaGraphic = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
+                pikaGraphic.scale.set(0.002, 0.050, 0.050);
+                pikaGraphic.position.set(-0.027, 0.055, -0.038);
+                const eeveeGraphic = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xb45309 }));
+                eeveeGraphic.scale.set(0.002, 0.050, 0.050);
+                eeveeGraphic.position.set(-0.027, 0.055, 0.038);
+                const switchScreen = new THREE.Mesh(createRoundedBoxGeo(0.015, 0.100, 0.165, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.15, metalness: 0.8 }));
+                switchScreen.position.set(0, 0.075, 0);
+                const joyL = new THREE.Mesh(createRoundedBoxGeo(0.016, 0.100, 0.032, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4, metalness: 0.05 }));
+                joyL.position.set(0, 0.075, -0.098);
+                const joyR = new THREE.Mesh(createRoundedBoxGeo(0.016, 0.100, 0.032, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.4, metalness: 0.05 }));
+                joyR.position.set(0, 0.075, 0.098);
+                switchGroup.add(dockMesh, pikaGraphic, eeveeGraphic, switchScreen, joyL, joyR);
+                (currentAssemblyGroup || decorVideoGroup).add(switchGroup);
+
+                // Dije dorado colgando al borde de la Switch (Z = 1.28 m, Foto 1)
+                const switchCharm = new THREE.Mesh(new THREE.TorusGeometry(0.008, 0.002, 8, 16), new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 }));
+                switchCharm.position.set(2.74, 1.27, 1.28);
+                (currentAssemblyGroup || decorVideoGroup).add(switchCharm);
+
+                // 9) Mini Globo Terráqueo de Escritorio en soporte de latón dorado (Z = 1.36 m, Foto 1)
                 const globeGroup = new THREE.Group();
-                globeGroup.position.set(2.84, 1.318, 1.34);
+                globeGroup.position.set(2.84, 1.318, 1.36);
                 const globeBase = new THREE.Mesh(new THREE.CylinderGeometry(0.030, 0.035, 0.015, 16), new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 }));
                 globeBase.position.set(0, 0.0075, 0);
                 const globeArch = new THREE.Mesh(new THREE.TorusGeometry(0.048, 0.004, 8, 16, Math.PI), new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 }));
@@ -10132,93 +10165,273 @@
                 globeGroup.add(globeBase, globeArch, globeSphere);
                 (currentAssemblyGroup || decorVideoGroup).add(globeGroup);
 
-                // 11) Valijas rígidas de vuelo / VR Case en extremo Sur del estante inferior (Z = 1.45 a 1.76 m, Video 4:54)
-                // NO hay libros en el 1° estante inferior: toda la superficie está dedicada a las consolas retro y coleccionables
-                const flightCaseMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.6, metalness: 0.2 });
+                // 10) Estuche rígido curvo para VR (Oculus/Meta Quest Case) (Z = 1.50 m, Foto 1)
+                const vrCaseMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.7, metalness: 0.1 });
+                const vrCaseMesh = new THREE.Mesh(createRoundedBoxGeo(0.16, 0.11, 0.22, 0.03, 3), vrCaseMat);
+                vrCaseMesh.position.set(2.84, 1.318 + 0.055, 1.50);
+                vrCaseMesh.castShadow = true;
+                const vrZip = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.003, 6, 16), new THREE.MeshStandardMaterial({ color: 0x475569 }));
+                vrZip.rotation.y = Math.PI / 2;
+                vrZip.position.set(2.75, 1.318 + 0.055, 1.50);
+                (currentAssemblyGroup || decorVideoGroup).add(vrCaseMesh, vrZip);
+
+                // 11) Dos valijas rígidas de vuelo apiladas con cierres metálicos y colgante Poké Ball (Z = 1.68 m, Foto 1)
+                const flightCaseMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.5, metalness: 0.3 });
                 const silverLatchMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.85, roughness: 0.2 });
+                // Valija inferior
+                const caseBot = new THREE.Mesh(createRoundedBoxGeo(0.17, 0.085, 0.26, 0.008, 2), flightCaseMat);
+                caseBot.position.set(2.84, 1.318 + 0.042, 1.68);
+                caseBot.castShadow = true;
+                const latchBot = new THREE.Mesh(UNIT_BOX_GEO, silverLatchMat);
+                latchBot.scale.set(0.174, 0.020, 0.07);
+                latchBot.position.set(2.84, 1.318 + 0.042, 1.68);
+                // Valija superior
+                const caseTop = new THREE.Mesh(createRoundedBoxGeo(0.16, 0.080, 0.24, 0.008, 2), flightCaseMat);
+                caseTop.position.set(2.84, 1.318 + 0.085 + 0.040, 1.68);
+                caseTop.castShadow = true;
+                const latchTop = new THREE.Mesh(UNIT_BOX_GEO, silverLatchMat);
+                latchTop.scale.set(0.164, 0.018, 0.06);
+                latchTop.position.set(2.84, 1.318 + 0.085 + 0.040, 1.68);
+                // Llavero de Poké Ball colgando del cierre (Foto 1)
+                const casePokeBall = new THREE.Mesh(new THREE.SphereGeometry(0.016, 12, 12), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+                casePokeBall.position.set(2.74, 1.318 + 0.06, 1.68);
+                (currentAssemblyGroup || decorVideoGroup).add(caseBot, latchBot, caseTop, latchTop, casePokeBall);
 
-                const vrCase = new THREE.Mesh(createRoundedBoxGeo(0.16, 0.10, 0.24, 0.010, 2), flightCaseMat);
-                vrCase.position.set(2.84, 1.318 + 0.05, 1.54);
-                vrCase.castShadow = true;
-                const vrLatch = new THREE.Mesh(UNIT_BOX_GEO, silverLatchMat);
-                vrLatch.scale.set(0.164, 0.025, 0.08);
-                vrLatch.position.set(2.84, 1.318 + 0.05, 1.54);
+                // Dije Martillo de Thor (Mjölnir) en cadena metálica larga colgando del estante inferior (Z = 0.22 m, Foto 1)
+                const mjolnirGroup = new THREE.Group();
+                mjolnirGroup.position.set(2.76, 1.30, 0.22);
+                const chainLink = new THREE.Mesh(new THREE.CylinderGeometry(0.0015, 0.0015, 0.12, 6), new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9, roughness: 0.2 }));
+                chainLink.position.set(0, -0.06, 0);
+                const hammerHead = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.35, metalness: 0.85 }));
+                hammerHead.scale.set(0.024, 0.028, 0.046);
+                hammerHead.position.set(0, -0.13, 0);
+                const hammerHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.0035, 0.0035, 0.038, 8), new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 }));
+                hammerHandle.position.set(0, -0.10, 0);
+                mjolnirGroup.add(chainLink, hammerHead, hammerHandle);
+                (currentAssemblyGroup || decorVideoGroup).add(mjolnirGroup);
 
-                const droneCase = new THREE.Mesh(createRoundedBoxGeo(0.16, 0.09, 0.18, 0.008, 2), flightCaseMat);
-                droneCase.position.set(2.84, 1.318 + 0.045, 1.72);
-                droneCase.castShadow = true;
-                const droneLatch = new THREE.Mesh(UNIT_BOX_GEO, silverLatchMat);
-                droneLatch.scale.set(0.164, 0.022, 0.06);
-                droneLatch.position.set(2.84, 1.318 + 0.045, 1.72);
+                // Brazo articulado de micrófono y shock mount bajo el estante (Foto 1)
+                const micArmGroup = new THREE.Group();
+                micArmGroup.position.set(2.78, 1.25, 1.25);
+                const micBoomBar1 = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.32, 8), new THREE.MeshStandardMaterial({ color: 0x18181b }));
+                micBoomBar1.rotation.z = -0.45;
+                micBoomBar1.rotation.y = 0.3;
+                micBoomBar1.position.set(-0.06, -0.12, 0.05);
+                const micBoomBar2 = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.28, 8), new THREE.MeshStandardMaterial({ color: 0x18181b }));
+                micBoomBar2.rotation.z = 0.55;
+                micBoomBar2.position.set(-0.16, -0.22, 0.08);
+                const micBody = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.07, 14), new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.7 }));
+                micBody.position.set(-0.24, -0.15, 0.08);
+                micArmGroup.add(micBoomBar1, micBoomBar2, micBody);
+                (currentAssemblyGroup || decorVideoGroup).add(micArmGroup);
 
-                (currentAssemblyGroup || decorVideoGroup).add(vrCase, vrLatch, droneCase, droneLatch);
-
-                // --- 2° ESTANTE MEDIO (Y = 1.65 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): BIBLIOTECA COMPLETA DE LIBROS Y NOVELAS ---
+                // --- 2° ESTANTE MEDIO (Y = 1.65 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): BOLSO DE CÁMARA, HILO ROJO Y BIBLIOTECA COMPLETA CONTINUA (Foto 1) ---
                 addDecorBox(2.845, 1.65, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Medio (1.80×0.20 m)');
 
-                // Colección de Tomos Grandes Ilustrados de Tolkien (El Señor de los Anillos, El Silmarillion)
-                // 3 tomos negros de lujo con runas doradas (Z = 0.48 a 0.68 m)
-                const tolkienBlackMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.5, metalness: 0.2 });
+                // Maceta de terracota en extremo izquierdo (Z = 0.18 m, Foto 1)
+                const midPotMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.85 });
+                const midPot = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.032, 0.075, 16), midPotMat);
+                midPot.position.set(2.84, 1.668 + 0.038, 0.18);
+                midPot.castShadow = true;
+                (currentAssemblyGroup || decorVideoGroup).add(midPot);
+
+                // Bolso de cámara fotográfica acolchado negro con correa y manija (Z = 0.32 m, Foto 1)
+                const cameraBagGroup = new THREE.Group();
+                cameraBagGroup.position.set(2.84, 1.668, 0.32);
+                const camBagMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.85 });
+                const camBagBody = new THREE.Mesh(createRoundedBoxGeo(0.16, 0.16, 0.16, 0.02, 2), camBagMat);
+                camBagBody.position.set(0, 0.08, 0);
+                camBagBody.castShadow = true;
+                const camBagHandle = new THREE.Mesh(new THREE.TorusGeometry(0.035, 0.006, 6, 12, Math.PI), camBagMat);
+                camBagHandle.position.set(0, 0.165, 0);
+                cameraBagGroup.add(camBagBody, camBagHandle);
+                (currentAssemblyGroup || decorVideoGroup).add(cameraBagGroup);
+
+                // Hilo rojo / pulsera de protección colgando del borde (Z = 0.44 m, Foto 1)
+                const redThread = new THREE.Mesh(new THREE.CylinderGeometry(0.0015, 0.0015, 0.08, 6), new THREE.MeshBasicMaterial({ color: 0xdc2626 }));
+                redThread.position.set(2.74, 1.62, 0.44);
+                (currentAssemblyGroup || decorVideoGroup).add(redThread);
+
+                // Hilera continua de libros de izquierda a derecha (Z = 0.46 a 1.78 m, Foto 1)
+                // 1) Novelas variadas y tomos con lomos multicolores (Z = 0.46 a 0.72 m)
+                const novelColors1 = [0xf8fafc, 0x1e3a8a, 0x991b1b, 0x1e293b, 0x7c3aed, 0xf1f5f9, 0x334155, 0xb45309, 0x047857];
+                let bZ1 = 0.46;
+                for (let i = 0; i < 9; i++) {
+                    const th = 0.024 + (i % 3) * 0.004;
+                    const h = 0.20 + (i % 4) * 0.010;
+                    const bk = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: novelColors1[i % novelColors1.length], roughness: 0.75 }));
+                    bk.scale.set(0.16, h, th);
+                    bk.position.set(2.84, 1.668 + h / 2, bZ1 + th / 2);
+                    bk.castShadow = true;
+                    (currentAssemblyGroup || decorVideoGroup).add(bk);
+                    bZ1 += th + 0.002;
+                }
+
+                // 2) Libros de tapa dura encuadernados en cuero con nervios dorados (Harry Potter / clásicos) (Z = 0.72 a 1.00 m, Foto 1)
+                const leatherColors = [0x881337, 0x7f1d1d, 0x14532d, 0x1e3a8a, 0x451a03, 0x78350f, 0x172554, 0x701a75];
+                let bZ2 = 0.72;
+                for (let i = 0; i < 8; i++) {
+                    const th = 0.032;
+                    const h = 0.23 + (i % 2) * 0.008;
+                    const bk = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: leatherColors[i % leatherColors.length], roughness: 0.6 }));
+                    bk.scale.set(0.16, h, th);
+                    bk.position.set(2.84, 1.668 + h / 2, bZ2 + th / 2);
+                    bk.castShadow = true;
+                    // Ribetes dorados en el lomo
+                    const rib = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.7 }));
+                    rib.scale.set(0.002, 0.05, th * 0.85);
+                    rib.position.set(2.759, 1.668 + h / 2, bZ2 + th / 2);
+                    (currentAssemblyGroup || decorVideoGroup).add(bk, rib);
+                    bZ2 += th + 0.002;
+                }
+
+                // 3) Mangas / novelas de bolsillo en serie con lomos bicolores (Z = 1.00 a 1.26 m, Foto 1)
+                let bZ3 = 1.00;
+                for (let i = 0; i < 11; i++) {
+                    const th = 0.022;
+                    const h = 0.19;
+                    const isWhite = i % 2 === 0;
+                    const bk = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: isWhite ? 0xf8fafc : 0x18181b, roughness: 0.7 }));
+                    bk.scale.set(0.15, h, th);
+                    bk.position.set(2.84, 1.668 + h / 2, bZ3 + th / 2);
+                    bk.castShadow = true;
+                    (currentAssemblyGroup || decorVideoGroup).add(bk);
+                    bZ3 += th + 0.0015;
+                }
+
+                // 4) Novelas y cómics sector medio-sur (Z = 1.26 a 1.50 m, Foto 1)
+                const novelColors2 = [0x0284c7, 0x1e293b, 0xd97706, 0x475569, 0xb91c1c, 0x059669, 0x334155, 0x4338ca, 0x18181b];
+                let bZ4 = 1.26;
+                for (let i = 0; i < 9; i++) {
+                    const th = 0.025;
+                    const h = 0.21 + (i % 3) * 0.008;
+                    const bk = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: novelColors2[i % novelColors2.length], roughness: 0.75 }));
+                    bk.scale.set(0.16, h, th);
+                    bk.position.set(2.84, 1.668 + h / 2, bZ4 + th / 2);
+                    bk.castShadow = true;
+                    (currentAssemblyGroup || decorVideoGroup).add(bk);
+                    bZ4 += th + 0.002;
+                }
+
+                // 5) Colección Tolkien Deluxe (3 tomos negros con runas doradas) (Z = 1.50 a 1.66 m, Foto 1)
+                const tolkienBlackMat = new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.5, metalness: 0.2 });
                 const tolkienGoldMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.35, metalness: 0.8 });
                 for (let t = 0; t < 3; t++) {
-                    const tZ = 0.50 + t * 0.055;
+                    const tZ = 1.50 + t * 0.052;
                     const tBook = new THREE.Mesh(UNIT_BOX_GEO, tolkienBlackMat);
-                    tBook.scale.set(0.17, 0.25, 0.048);
-                    tBook.position.set(2.84, 1.668 + 0.125, tZ);
+                    tBook.scale.set(0.17, 0.25, 0.046);
+                    tBook.position.set(2.84, 1.668 + 0.125, tZ + 0.023);
+                    tBook.castShadow = true;
                     const tRune = new THREE.Mesh(UNIT_BOX_GEO, tolkienGoldMat);
-                    tRune.scale.set(0.002, 0.06, 0.049);
-                    tRune.position.set(2.754, 1.668 + 0.15, tZ);
+                    tRune.scale.set(0.002, 0.06, 0.044);
+                    tRune.position.set(2.754, 1.668 + 0.15, tZ + 0.023);
                     (currentAssemblyGroup || decorVideoGroup).add(tBook, tRune);
                 }
-                // 2 tomos ilustrados con sobrecubierta blanca (Z = 0.69 a 0.81 m)
+
+                // 6) 2 tomos gruesos con sobrecubierta blanca HarperCollins (Z = 1.66 a 1.78 m, Foto 1)
                 const tolkienWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.7 });
                 for (let w = 0; w < 2; w++) {
-                    const wZ = 0.70 + w * 0.058;
+                    const wZ = 1.66 + w * 0.058;
                     const wBook = new THREE.Mesh(UNIT_BOX_GEO, tolkienWhiteMat);
                     wBook.scale.set(0.17, 0.25, 0.052);
-                    wBook.position.set(2.84, 1.668 + 0.125, wZ);
-                    (currentAssemblyGroup || decorVideoGroup).add(wBook);
+                    wBook.position.set(2.84, 1.668 + 0.125, wZ + 0.026);
+                    wBook.castShadow = true;
+                    // Emblema oscuro en lomo
+                    const wLogo = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x475569 }));
+                    wLogo.scale.set(0.002, 0.04, 0.03);
+                    wLogo.position.set(2.754, 1.668 + 0.12, wZ + 0.026);
+                    (currentAssemblyGroup || decorVideoGroup).add(wBook, wLogo);
                 }
 
-                // Libros en sector Norte (Z = 0.16 a 0.46 m): Tomos claros y encuadernaciones clásicas
-                const bkColors = [0x1e3a8a, 0xb91c1c, 0x047857, 0xf1f5f9, 0x1e293b, 0x7c2d12, 0x475569, 0x0284c7, 0xd97706, 0x334155, 0xf8fafc, 0x991b1b];
-                let northZ = 0.16;
-                for (let b = 0; b < 8; b++) {
-                    const bTh = 0.024 + (b % 3) * 0.006;
-                    const bH = 0.20 + ((b * 3) % 4) * 0.012;
-                    const bD = 0.16;
-                    const bkMesh = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: bkColors[(b * 2) % bkColors.length], roughness: 0.8 }));
-                    bkMesh.scale.set(bD, bH, bTh);
-                    bkMesh.position.set(2.84, 1.668 + bH / 2, northZ + bTh / 2);
-                    (currentAssemblyGroup || decorVideoGroup).add(bkMesh);
-                    northZ += bTh + 0.003;
-                }
-
-                // Libros en sector Sur (Z = 0.84 a 1.76 m): Colección Harry Potter, novelas y sagas completas
-                let midZ = 0.84;
-                for (let b = 0; b < 24; b++) {
-                    const bTh = 0.022 + (b % 4) * 0.005;
-                    const bH = 0.21 + ((b * 5) % 4) * 0.012;
-                    const bD = 0.16;
-                    const bkMesh = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: bkColors[(b + 3) % bkColors.length], roughness: 0.8 }));
-                    bkMesh.scale.set(bD, bH, bTh);
-                    bkMesh.position.set(2.84, 1.668 + bH / 2, midZ + bTh / 2);
-                    (currentAssemblyGroup || decorVideoGroup).add(bkMesh);
-                    midZ += bTh + 0.0025;
-                }
-
-                // --- 3° ESTANTE SUPERIOR (Y = 2.00 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): PLANTA POTUS Y COLECCIÓN DE 4 BALONES HISTÓRICOS ---
+                // --- 3° ESTANTE SUPERIOR (Y = 2.00 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): PLANTA POTUS EN CASCADA, GOKU Y 4 BALONES HISTÓRICOS (Foto 1) ---
                 addDecorBox(2.845, 2.00, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Superior (1.80×0.20 m)');
 
-                // Planta Potus colgante en maceta blanca en extremo Norte cerca de la ventana (Z = 0.20 m, Video 4:54)
-                addDecorPlantCeramic(2.845, 2.018, 0.20, 0.065, 0.05, 0.11, 0.15, 0.28, 0.15, 0.25, 'Planta Potus Colgante Estante Superior');
+                // Maceta de terracota con plato y planta Potus en extremo izquierdo (Z = 0.18 m, Foto 1)
+                const potSaucer = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.07, 0.016, 16), midPotMat);
+                potSaucer.position.set(2.84, 2.018 + 0.008, 0.18);
+                const potMain = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.055, 0.13, 16), midPotMat);
+                potMain.position.set(2.84, 2.018 + 0.075, 0.18);
+                potMain.castShadow = true;
+                (currentAssemblyGroup || decorVideoGroup).add(potSaucer, potMain);
 
-                // Colección de 4 Balones de Fútbol Históricos en pedestales anillo (Z = 0.88, 1.12, 1.36, 1.60 m, Video 4:54)
+                // Follaje superior frondoso y enredadera que cae en cascada hacia abajo por el lateral izquierdo (Foto 1)
+                const leafGreenMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.6 });
+                const darkLeafMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.6 });
+                // Copa de hojas sobre la maceta
+                for (let l = 0; l < 14; l++) {
+                    const lf = new THREE.Mesh(new THREE.SphereGeometry(0.032, 8, 6), (l % 2 === 0) ? leafGreenMat : darkLeafMat);
+                    lf.scale.set(0.6, 0.15, 1.0);
+                    const ang = (l / 14) * Math.PI * 2;
+                    lf.position.set(2.84 + Math.cos(ang) * 0.055, 2.018 + 0.14 + (l % 3) * 0.02, 0.18 + Math.sin(ang) * 0.055);
+                    lf.rotation.set(0.3, ang, 0.4);
+                    (currentAssemblyGroup || decorVideoGroup).add(lf);
+                }
+                // Guías de hojas cayendo en cascada vertical (Foto 1: descienden por la izquierda pasando el estante medio y el inferior)
+                // Guía larga 1 (llega hasta Y = 1.12 m)
+                for (let yStep = 0; yStep < 20; yStep++) {
+                    const dropY = 2.00 - yStep * 0.046;
+                    const dropZ = 0.14 + Math.sin(yStep * 0.7) * 0.035;
+                    const dropX = 2.76 + Math.cos(yStep * 0.5) * 0.025;
+                    const vineLeaf = new THREE.Mesh(new THREE.SphereGeometry(0.024, 7, 5), (yStep % 2 === 0) ? leafGreenMat : darkLeafMat);
+                    vineLeaf.scale.set(0.5, 0.12, 0.85);
+                    vineLeaf.position.set(dropX, dropY, dropZ);
+                    vineLeaf.rotation.set(0.4, yStep * 0.4, 0.5);
+                    (currentAssemblyGroup || decorVideoGroup).add(vineLeaf);
+                }
+                // Guía 2 secundaria (llega hasta Y = 1.48 m)
+                for (let yStep = 0; yStep < 12; yStep++) {
+                    const dropY = 2.00 - yStep * 0.044;
+                    const dropZ = 0.20 + Math.cos(yStep * 0.6) * 0.03;
+                    const dropX = 2.75 + Math.sin(yStep * 0.4) * 0.02;
+                    const vineLeaf2 = new THREE.Mesh(new THREE.SphereGeometry(0.020, 6, 5), leafGreenMat);
+                    vineLeaf2.scale.set(0.5, 0.12, 0.85);
+                    vineLeaf2.position.set(dropX, dropY, dropZ);
+                    (currentAssemblyGroup || decorVideoGroup).add(vineLeaf2);
+                }
+
+                // Figura de Goku agachado / en cuclillas (Dragon Ball) al lado de la planta (Z = 0.36 m, Foto 1)
+                const gokuGroup = new THREE.Group();
+                gokuGroup.position.set(2.83, 2.018, 0.36);
+                // Base redonda negra
+                const gokuBase = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.008, 16), new THREE.MeshStandardMaterial({ color: 0x18181b }));
+                gokuBase.position.set(0, 0.004, 0);
+                // Piernas en cuclillas (gi naranja) y botas azules
+                const giOrangeMat = new THREE.MeshStandardMaterial({ color: 0xea580c, roughness: 0.6 });
+                const giBlueMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.6 });
+                const skinMat = new THREE.MeshStandardMaterial({ color: 0xfbcfe8, roughness: 0.5 });
+                const hairBlackMat = new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.3 });
+                const gokuLegs = new THREE.Mesh(createRoundedBoxGeo(0.040, 0.035, 0.055, 0.006, 1), giOrangeMat);
+                gokuLegs.position.set(0, 0.025, 0);
+                // Torso inclinado
+                const gokuTorso = new THREE.Mesh(createRoundedBoxGeo(0.034, 0.045, 0.040, 0.006, 1), giOrangeMat);
+                gokuTorso.position.set(0, 0.060, 0);
+                const gokuBelt = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.010, 12), giBlueMat);
+                gokuBelt.position.set(0, 0.045, 0);
+                // Cabeza y cabello erizado característico
+                const gokuHead = new THREE.Mesh(new THREE.SphereGeometry(0.018, 12, 10), skinMat);
+                gokuHead.position.set(0, 0.092, 0);
+                for (let sp = 0; sp < 6; sp++) {
+                    const spike = new THREE.Mesh(new THREE.ConeGeometry(0.012, 0.035, 6), hairBlackMat);
+                    const sAng = (sp / 6) * Math.PI * 2;
+                    spike.position.set(Math.cos(sAng) * 0.015, 0.108 + (sp % 2) * 0.010, Math.sin(sAng) * 0.015);
+                    spike.rotation.set(0.4 * Math.sin(sAng), 0, -0.4 * Math.cos(sAng));
+                    gokuGroup.add(spike);
+                }
+                gokuGroup.add(gokuBase, gokuLegs, gokuTorso, gokuBelt, gokuHead);
+                (currentAssemblyGroup || decorVideoGroup).add(gokuGroup);
+
+                // Objeto central difusor / caja rectangular translúcida blanca (Z = 0.65 m, Foto 1)
+                const diffuserBox = new THREE.Mesh(createRoundedBoxGeo(0.12, 0.08, 0.18, 0.010, 2), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3, transparent: true, opacity: 0.85 }));
+                diffuserBox.position.set(2.84, 2.018 + 0.04, 0.65);
+                diffuserBox.castShadow = true;
+                (currentAssemblyGroup || decorVideoGroup).add(diffuserBox);
+
+                // Colección de 4 Balones de Fútbol Históricos en pedestales anillo (Z = 0.96, 1.20, 1.44, 1.68 m, Foto 1)
                 const ballStandMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.4, metalness: 0.6 });
-                const ballWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.45, metalness: 0.05 });
+                const ballWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35, metalness: 0.05 });
                 const ballBlackMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45, metalness: 0.05 });
 
-                const ballZCoords = [0.88, 1.12, 1.36, 1.60];
+                const ballZCoords = [0.96, 1.20, 1.44, 1.68];
                 ballZCoords.forEach((bz, bIdx) => {
                     const ballGroup = new THREE.Group();
                     ballGroup.position.set(2.84, 2.018, bz);
@@ -10227,18 +10440,44 @@
                     const ringBase = new THREE.Mesh(new THREE.CylinderGeometry(0.040, 0.045, 0.014, 16), ballStandMat);
                     ringBase.position.set(0, 0.007, 0);
 
-                    // Esfera del balón de fútbol (diámetro reglamentario ~22 cm -> radio 0.075 m)
-                    const ballSphere = new THREE.Mesh(new THREE.SphereGeometry(0.075, 24, 16), ballWhiteMat);
-                    ballSphere.position.set(0, 0.075 + 0.006, 0);
+                    // Esfera del balón de fútbol (diámetro reglamentario ~22 cm -> radio 0.072 m)
+                    const ballSphere = new THREE.Mesh(new THREE.SphereGeometry(0.072, 24, 16), ballWhiteMat);
+                    ballSphere.position.set(0, 0.072 + 0.006, 0);
+                    ballSphere.castShadow = true;
 
-                    // Gajos geométricos oscuros (diseño clásico Tango / Telstar)
-                    [-0.045, 0, 0.045].forEach((offsetY, pIdx) => {
-                        const patch = new THREE.Mesh(UNIT_BOX_GEO, ballBlackMat);
-                        patch.scale.set(0.024, 0.024, 0.024);
-                        patch.position.set(-0.065, 0.075 + offsetY, (pIdx - 1) * 0.035);
-                        patch.rotation.y = 0.4 + bIdx * 0.3;
-                        ballGroup.add(patch);
-                    });
+                    // Patrones gráficos según el modelo histórico (Telstar, Tango, Brazuca, Al Rihla)
+                    if (bIdx === 0) {
+                        // Telstar: Pentágonos negros clásicos
+                        [-0.04, 0, 0.04].forEach((offsetY, pIdx) => {
+                            const patch = new THREE.Mesh(UNIT_BOX_GEO, ballBlackMat);
+                            patch.scale.set(0.026, 0.026, 0.026);
+                            patch.position.set(-0.062, 0.072 + offsetY, (pIdx - 1) * 0.035);
+                            ballGroup.add(patch);
+                        });
+                    } else if (bIdx === 1) {
+                        // Tango: Tríadas negras curvadas
+                        [-0.035, 0.035].forEach((offsetY, pIdx) => {
+                            const triad = new THREE.Mesh(new THREE.TorusGeometry(0.025, 0.008, 6, 12, Math.PI * 1.2), ballBlackMat);
+                            triad.rotation.y = Math.PI / 2;
+                            triad.position.set(-0.065, 0.072 + offsetY, (pIdx - 0.5) * 0.04);
+                            ballGroup.add(triad);
+                        });
+                    } else if (bIdx === 2) {
+                        // Brazuca / Teamgeist: Cintas curvadas doradas y rojas
+                        const ribbonMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.4 });
+                        const ribbon = new THREE.Mesh(new THREE.TorusGeometry(0.042, 0.007, 8, 16), ribbonMat);
+                        ribbon.rotation.x = 0.5;
+                        ribbon.position.set(-0.058, 0.075, 0);
+                        ballGroup.add(ribbon);
+                    } else {
+                        // Al Rihla: Patrones geométricos celestes y amarillos
+                        const rihlaMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.35 });
+                        const patchRihla = new THREE.Mesh(UNIT_BOX_GEO, rihlaMat);
+                        patchRihla.scale.set(0.015, 0.045, 0.045);
+                        patchRihla.position.set(-0.065, 0.075, 0);
+                        patchRihla.rotation.x = Math.PI / 4;
+                        ballGroup.add(patchRihla);
+                    }
 
                     ballGroup.add(ringBase, ballSphere);
                     (currentAssemblyGroup || decorVideoGroup).add(ballGroup);
@@ -13412,12 +13651,18 @@
                 }
             }
 
-            // 0D2. Raycast sobre la Mesa Ratona Elevable y Extensible (Sistema Tapa Libro — Video YouTube Shorts)
+            // 0D2. Raycast sobre la Mesa Ratona Elevable y Extensible (2 Aperturas: 42cm -> 60cm elevada -> 100cm en libro)
             if (!isFurnitureEditMode && liftTableClickCandidates.length > 0 && window.coffeeTableAnimState) {
                 const liftHits = raycaster.intersectObjects(liftTableClickCandidates, false);
                 if (liftHits.length > 0) {
-                    const nextState = window.coffeeTableAnimState.toggle();
-                    showToast(`☕ Mesa Ratona: ${nextState ? 'Elevada y Desplegada en Libro (60 cm — 90×100 cm)' : 'Plegada (42 cm — 90×50 cm)'}`);
+                    const nextStage = window.coffeeTableAnimState.cycleStage();
+                    if (nextStage === 1) {
+                        showToast('☕ Mesa Ratona: 1° Apertura Elevada (60 cm — 90×50 cm)');
+                    } else if (nextStage === 2) {
+                        showToast('☕ Mesa Ratona: 2° Apertura Desplegada en Libro (60 cm — 90×100 cm)');
+                    } else {
+                        showToast('☕ Mesa Ratona: Plegada (42 cm — 90×50 cm)');
+                    }
                     clearSelection();
                     if (isBIMPlanningMode && typeof selectBIMObject === 'function') selectBIMObject(liftHits[0].object, e.clientX, e.clientY);
                     wakeRenderer();
@@ -14376,51 +14621,73 @@
             return moving;
         }
 
-        // Actualizador de animación suave para la Mesa Ratona Elevable y Extensible (Cerrada a 42cm -> Elevada y Desplegada en Libro a 60cm — Video YouTube Shorts)
+        // Actualizador de animación suave para la Mesa Ratona Elevable y Extensible (2 Aperturas: 42cm -> 60cm elevada -> 100cm en libro)
         function updateAnimCoffeeTable() {
             const st = window.coffeeTableAnimState;
             if (!st || !st.baseLeaf || !st.foldPivot) return false;
 
-            // Inicializar coordenadas base relativas al centro geométrico del ensamblaje
             if (st.baseY === undefined) {
                 st.baseY = st.baseLeaf.position.y;
                 st.baseX = st.baseLeaf.position.x;
                 st.baseScissorY = st.scissors ? st.scissors.position.y : 0;
             }
 
+            // Metas según etapa activa:
+            // stage 0: Cerrada (elev=0, trans=0, fold=0, wings=0, scissor=0.40)
+            // stage 1: 1° Apertura Elevada (elev=0.18, trans=-0.16 hacia el sillón, fold=0, wings=0, scissor=1.0)
+            // stage 2: 2° Apertura Desplegada en Libro (elev=0.18, trans=-0.16, fold=-Math.PI, wings=Math.PI/2, scissor=1.0)
+            let targetElev = 0.0;
+            let targetTrans = 0.0;
+            let targetFold = 0.0;
+            let targetWings = 0.0;
+            let targetScissor = 0.40;
+
+            if (st.stage === 1) {
+                targetElev = 0.18;
+                targetTrans = -0.16;
+                targetFold = 0.0;
+                targetWings = 0.0;
+                targetScissor = 1.0;
+            } else if (st.stage === 2) {
+                targetElev = 0.18;
+                targetTrans = -0.16;
+                targetFold = -Math.PI;
+                targetWings = Math.PI / 2;
+                targetScissor = 1.0;
+            }
+
+            if (st.curElev === undefined) {
+                st.curElev = 0.0;
+                st.curTrans = 0.0;
+                st.curFold = 0.0;
+                st.curWings = 0.0;
+                st.curScissor = 0.40;
+            }
+
             let moving = false;
-            if (Math.abs(st.currentProgress - st.targetProgress) > 0.002) {
-                st.currentProgress += (st.targetProgress - st.currentProgress) * 0.12;
-                moving = true;
-            } else if (st.currentProgress !== st.targetProgress) {
-                st.currentProgress = st.targetProgress;
-                moving = true;
-            } else {
-                return false;
-            }
+            const stepPos = 0.14;
+            const stepRot = 0.14;
 
-            const p = st.currentProgress; // 0.0 (cerrada) a 1.0 (elevada y abierta)
+            if (Math.abs(st.curElev - targetElev) > 0.001) { st.curElev += (targetElev - st.curElev) * stepPos; moving = true; } else { st.curElev = targetElev; }
+            if (Math.abs(st.curTrans - targetTrans) > 0.001) { st.curTrans += (targetTrans - st.curTrans) * stepPos; moving = true; } else { st.curTrans = targetTrans; }
+            if (Math.abs(st.curFold - targetFold) > 0.004) { st.curFold += (targetFold - st.curFold) * stepRot; moving = true; } else { st.curFold = targetFold; }
+            if (Math.abs(st.curWings - targetWings) > 0.004) { st.curWings += (targetWings - st.curWings) * stepRot; moving = true; } else { st.curWings = targetWings; }
+            if (Math.abs(st.curScissor - targetScissor) > 0.004) { st.curScissor += (targetScissor - st.curScissor) * stepPos; moving = true; } else { st.curScissor = targetScissor; }
 
-            // 1. Elevación vertical de 18 cm (de 42cm a 60cm) y traslación horizontal hacia el sillón (-X)
-            st.baseLeaf.position.y = st.baseY + p * 0.18;
-            st.baseLeaf.position.x = st.baseX - p * 0.14;
+            // Aplicar transformaciones
+            st.baseLeaf.position.y = st.baseY + st.curElev;
+            st.baseLeaf.position.x = st.baseX + st.curTrans;
+            st.foldPivot.rotation.z = st.curFold;
 
-            // 2. Despliegue en 180° de la hoja superior (tapa libro)
-            // Cuando p = 0: rotación z = 0 (doblada encima)
-            // Cuando p = 1: rotación z = -Math.PI (desplegada 180° hacia +X duplicando el ancho a 1.00 m)
-            st.foldPivot.rotation.z = -p * Math.PI;
-
-            // 3. Aletas de soporte rebatibles en el compartimento interior (giran para soportar la hoja extendida)
             if (st.wingA && st.wingB) {
-                st.wingA.rotation.z = p * (Math.PI / 2);
-                st.wingB.rotation.z = p * (Math.PI / 2);
+                st.wingA.rotation.z = st.curWings;
+                st.wingB.rotation.z = st.curWings;
+            }
+            if (st.scissors) {
+                st.scissors.position.y = st.baseScissorY + (st.curElev / 0.18) * 0.09;
+                st.scissors.scale.y = st.curScissor;
             }
 
-            // 4. Extensión vertical de los brazos tijera
-            if (st.scissors) {
-                st.scissors.position.y = st.baseScissorY + p * 0.09;
-                st.scissors.scale.y = 0.40 + p * 0.60;
-            }
             return moving;
         }
 
@@ -16364,21 +16631,8 @@
                 instancedBooksGroup.remove(c);
             }
 
-            // Geometría única compartida para todos los libros en estantes de Estudio (2° Estante Medio) y Living (1 solo draw call)
+            // Geometría única compartida para libros instanciados (1 solo draw call)
             const bookSlots = [
-                // 2° Estante flotante Medio Estudio (pared Este X=2.845, Z=0.88..1.36, Y=1.78 — Colección Harry Potter y Novelas, Video 4:54)
-                { x: 2.845, y: 1.78, z: 0.88, ry: 0, sx: 0.15, sy: 0.22, sz: 0.035, color: 0x7f1d1d },
-                { x: 2.845, y: 1.77, z: 0.92, ry: 0, sx: 0.14, sy: 0.20, sz: 0.032, color: 0x1e293b },
-                { x: 2.845, y: 1.79, z: 0.96, ry: 0, sx: 0.15, sy: 0.24, sz: 0.038, color: 0xb45309 },
-                { x: 2.845, y: 1.76, z: 1.00, ry: 0, sx: 0.14, sy: 0.19, sz: 0.030, color: 0x0f172a },
-                { x: 2.845, y: 1.78, z: 1.04, ry: 0, sx: 0.15, sy: 0.22, sz: 0.034, color: 0x1e3a8a },
-                { x: 2.845, y: 1.77, z: 1.08, ry: 0, sx: 0.14, sy: 0.21, sz: 0.032, color: 0xf8fafc },
-                { x: 2.845, y: 1.78, z: 1.13, ry: 0, sx: 0.15, sy: 0.22, sz: 0.036, color: 0x065f46 },
-                { x: 2.845, y: 1.77, z: 1.18, ry: 0, sx: 0.14, sy: 0.20, sz: 0.032, color: 0xd97706 },
-                { x: 2.845, y: 1.79, z: 1.23, ry: 0, sx: 0.15, sy: 0.23, sz: 0.036, color: 0x991b1b },
-                { x: 2.845, y: 1.76, z: 1.28, ry: 0, sx: 0.14, sy: 0.19, sz: 0.030, color: 0x334155 },
-                { x: 2.845, y: 1.78, z: 1.33, ry: 0, sx: 0.15, sy: 0.21, sz: 0.034, color: 0x14532d },
-                { x: 2.845, y: 1.77, z: 1.38, ry: 0.08, sx: 0.14, sy: 0.20, sz: 0.032, color: 0x475569 },
                 // Libros apilados en Rack TV Living (X=6.00, Z=2.35..3.45, Y=0.52)
                 { x: 6.02, y: 0.56, z: 2.42, ry: 0, sx: 0.18, sy: 0.22, sz: 0.036, color: 0x334155 },
                 { x: 6.02, y: 0.55, z: 2.46, ry: 0, sx: 0.17, sy: 0.20, sz: 0.034, color: 0x991b1b },
