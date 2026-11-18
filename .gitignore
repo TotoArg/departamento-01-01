@@ -36,3 +36,7 @@ fotos_entrada/
 # Ignorar bundles binarios dentro del repo
 *.bundle
 
+# Archivos multimedia del relevamiento esencial
+fotos_esenciales/
+
+

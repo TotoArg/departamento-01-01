@@ -9934,30 +9934,33 @@
                 gbc1Group.add(gbc1Stand, gbc1Body, gbc1Screen, gbc1Lcd, gbc1Dpad, gbc1BtnA, gbc1BtnB);
                 (currentAssemblyGroup || decorVideoGroup).add(gbc1Group);
 
-                // 4) Game Boy Color 2 — Edición Especial Pokémon (Silver / Suicune) (Z = 0.68 m)
+                // 4) Game Boy Color 2 — Edición Especial Pokémon Amarilla (Z = 0.68 m)
                 const gbc2Group = new THREE.Group();
                 gbc2Group.position.set(2.83, 1.318, 0.68);
                 gbc2Group.rotation.y = 0.08;
                 const gbc2Stand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.045, 0.070, 0.004, 1), gbcStandMat);
                 gbc2Stand.position.set(0, 0.022, 0);
-                // Carcasa plata satinada / celeste perlado Suicune
-                const gbc2BodyMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.25, metalness: 0.50 });
+                // Carcasa amarilla vibrante Pokémon Pikachu Edition
+                const gbc2BodyMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 });
                 const gbc2Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), gbc2BodyMat);
                 gbc2Body.position.set(-0.012, 0.072, 0);
                 gbc2Body.rotation.z = -0.20;
-                const gbc2Screen = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.056, 0.058, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3 }));
+                const gbc2Screen = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.056, 0.058, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.25 }));
                 gbc2Screen.position.set(-0.026, 0.092, 0);
                 gbc2Screen.rotation.z = -0.20;
-                const gbc2Lcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.040, 0.044, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.3 }));
+                const gbc2Lcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.040, 0.044, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.4 }));
                 gbc2Lcd.position.set(-0.028, 0.094, 0);
                 gbc2Lcd.rotation.z = -0.20;
                 const gbc2Dpad = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.018, 0.018, 0.002, 1), dPadMat);
                 gbc2Dpad.position.set(-0.026, 0.048, -0.020);
                 gbc2Dpad.rotation.z = -0.20;
-                const gbc2BtnA = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.009, 0.009, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x0284c7 }));
+                const gbc2BtnA = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.009, 0.009, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
                 gbc2BtnA.position.set(-0.026, 0.052, 0.022);
                 gbc2BtnA.rotation.z = -0.20;
-                gbc2Group.add(gbc2Stand, gbc2Body, gbc2Screen, gbc2Lcd, gbc2Dpad, gbc2BtnA);
+                const gbc2BtnB = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.009, 0.009, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x2563eb }));
+                gbc2BtnB.position.set(-0.026, 0.044, 0.012);
+                gbc2BtnB.rotation.z = -0.20;
+                gbc2Group.add(gbc2Stand, gbc2Body, gbc2Screen, gbc2Lcd, gbc2Dpad, gbc2BtnA, gbc2BtnB);
                 (currentAssemblyGroup || decorVideoGroup).add(gbc2Group);
 
                 // 5) Game Boy Advance (GBA Clásica Horizontal) (Z = 0.79 m)
