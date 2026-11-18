@@ -8644,20 +8644,6 @@
                 });
                 (currentAssemblyGroup || decorVideoGroup).add(scissorGroup);
 
-                // 2 Aletas de soporte rebatibles en el interior para la 2° apertura (hoja extendida en libro)
-                const wingA = new THREE.Group();
-                wingA.position.set(tableX + trayW / 2 - 0.015, 0.33, tableZ - trayL / 3);
-                const wingMeshA = new THREE.Mesh(createRoundedBoxGeo(0.18, 0.16, 0.014, 0.003, 1), ironBlackMat);
-                wingMeshA.position.set(0.09, 0, 0);
-                wingA.add(wingMeshA);
-
-                const wingB = new THREE.Group();
-                wingB.position.set(tableX + trayW / 2 - 0.015, 0.33, tableZ + trayL / 3);
-                const wingMeshB = new THREE.Mesh(createRoundedBoxGeo(0.18, 0.16, 0.014, 0.003, 1), ironBlackMat);
-                wingMeshB.position.set(0.09, 0, 0);
-                wingB.add(wingMeshB);
-                (currentAssemblyGroup || decorVideoGroup).add(wingA, wingB);
-
                 // 5. Tapas superiores con 2 APERTURAS (1° Apertura: Elevada en 50 cm; 2° Apertura: Desplegada en libro a 100 cm)
                 const leafW = tableW - 0.01; // 0.49 m
                 const leafL = tableL - 0.01; // 0.89 m
@@ -8731,8 +8717,6 @@
                     stage: 0,
                     baseLeaf: baseLeafGroup,
                     foldPivot: foldPivotGroup,
-                    wingA: wingA,
-                    wingB: wingB,
                     scissors: scissorGroup,
                     cycleStage() {
                         this.stage = (this.stage + 1) % 3;
@@ -14639,20 +14623,17 @@
             let targetElev = 0.0;
             let targetTrans = 0.0;
             let targetFold = 0.0;
-            let targetWings = 0.0;
             let targetScissor = 0.40;
 
             if (st.stage === 1) {
                 targetElev = 0.18;
                 targetTrans = -0.16;
                 targetFold = 0.0;
-                targetWings = 0.0;
                 targetScissor = 1.0;
             } else if (st.stage === 2) {
                 targetElev = 0.18;
                 targetTrans = -0.16;
                 targetFold = -Math.PI;
-                targetWings = Math.PI / 2;
                 targetScissor = 1.0;
             }
 
@@ -14660,7 +14641,6 @@
                 st.curElev = 0.0;
                 st.curTrans = 0.0;
                 st.curFold = 0.0;
-                st.curWings = 0.0;
                 st.curScissor = 0.40;
             }
 
@@ -14671,7 +14651,6 @@
             if (Math.abs(st.curElev - targetElev) > 0.001) { st.curElev += (targetElev - st.curElev) * stepPos; moving = true; } else { st.curElev = targetElev; }
             if (Math.abs(st.curTrans - targetTrans) > 0.001) { st.curTrans += (targetTrans - st.curTrans) * stepPos; moving = true; } else { st.curTrans = targetTrans; }
             if (Math.abs(st.curFold - targetFold) > 0.004) { st.curFold += (targetFold - st.curFold) * stepRot; moving = true; } else { st.curFold = targetFold; }
-            if (Math.abs(st.curWings - targetWings) > 0.004) { st.curWings += (targetWings - st.curWings) * stepRot; moving = true; } else { st.curWings = targetWings; }
             if (Math.abs(st.curScissor - targetScissor) > 0.004) { st.curScissor += (targetScissor - st.curScissor) * stepPos; moving = true; } else { st.curScissor = targetScissor; }
 
             // Aplicar transformaciones
@@ -14679,10 +14658,6 @@
             st.baseLeaf.position.x = st.baseX + st.curTrans;
             st.foldPivot.rotation.z = st.curFold;
 
-            if (st.wingA && st.wingB) {
-                st.wingA.rotation.z = st.curWings;
-                st.wingB.rotation.z = st.curWings;
-            }
             if (st.scissors) {
                 st.scissors.position.y = st.baseScissorY + (st.curElev / 0.18) * 0.09;
                 st.scissors.scale.y = st.curScissor;
