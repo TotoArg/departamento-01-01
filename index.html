@@ -8606,28 +8606,12 @@
                 lowerShelf.castShadow = true; lowerShelf.receiveShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(lowerShelf);
 
-                // Almohadón redondo bordó/rojo sobre el estante inferior (Foto 3 y 4 del usuario)
-                const cushionMat = new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.85, metalness: 0.05 });
-                const redCushion = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.09, 20), cushionMat);
-                redCushion.position.set(tableX, 0.09 + 0.045, tableZ + 0.12);
-                redCushion.castShadow = true;
-                (currentAssemblyGroup || decorVideoGroup).add(redCushion);
-
                 // 3. Compartimento cajón revistero interior (batea interna visible al elevar la tapa)
                 const trayW = tableW - 0.06, trayL = tableL - 0.08, trayH = apronH;
                 const trayFloor = new THREE.Mesh(createRoundedBoxGeo(trayW, 0.014, trayL, 0.004, 1), lowerShelfWoodMat);
                 trayFloor.position.set(tableX, apronY - apronH / 2 + 0.007, tableZ);
                 trayFloor.castShadow = true; trayFloor.receiveShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(trayFloor);
-
-                // Objetos reales dentro de la batea (Foto 3: rodillo quita pelusa blanco/celeste, cinta métrica, etc.)
-                const lintRollerHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.14, 12), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.4 }));
-                lintRollerHandle.rotation.x = Math.PI / 2;
-                lintRollerHandle.position.set(tableX - 0.06, trayFloor.position.y + 0.025, tableZ - 0.12);
-                const lintRollerHead = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.10, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 }));
-                lintRollerHead.rotation.x = Math.PI / 2;
-                lintRollerHead.position.set(tableX - 0.06, trayFloor.position.y + 0.025, tableZ - 0.02);
-                (currentAssemblyGroup || decorVideoGroup).add(lintRollerHandle, lintRollerHead);
 
                 // 4. Brazos mecánicos en tijera de acero negro para elevación
                 const scissorGroup = new THREE.Group();
@@ -8674,32 +8658,6 @@
                 foldLeafMesh.castShadow = true; foldLeafMesh.receiveShadow = true;
                 foldPivotGroup.add(foldLeafMesh);
                 baseLeafGroup.add(foldPivotGroup);
-
-                // 6. Elementos reales sobre la mesa ratona (se mueven naturalmente con la tapa al elevarse, Fotos 3 y 4)
-                // Individual rectangular marrón oscuro con tachas/remaches en bordes
-                const placematMesh = new THREE.Mesh(createRoundedBoxGeo(0.28, 0.003, 0.42, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x3d271d, roughness: 0.85 }));
-                placematMesh.position.set(0, leafThick + 0.0015, -0.06);
-                placematMesh.castShadow = true;
-                baseLeafGroup.add(placematMesh);
-
-                // Vaso de vidrio transparente para agua
-                const glassMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.45 });
-                const waterGlass = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.032, 0.09, 16), glassMat);
-                waterGlass.position.set(0.02, leafThick + 0.048, -0.16);
-                waterGlass.castShadow = true;
-                baseLeafGroup.add(waterGlass);
-
-                // Controles remotos (TV negro largo y aire acondicionado blanco)
-                const tvRemote = new THREE.Mesh(createRoundedBoxGeo(0.046, 0.015, 0.19, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35 }));
-                tvRemote.position.set(-0.06, leafThick + 0.009, 0.02);
-                tvRemote.castShadow = true;
-                const acRemote = new THREE.Mesh(createRoundedBoxGeo(0.044, 0.015, 0.14, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35 }));
-                acRemote.position.set(0.05, leafThick + 0.009, 0.06);
-                acRemote.castShadow = true;
-                // Llavero espiral violeta
-                const purpleSpiral = new THREE.Mesh(new THREE.TorusGeometry(0.018, 0.004, 8, 16), new THREE.MeshStandardMaterial({ color: 0x9333ea, roughness: 0.4 }));
-                purpleSpiral.position.set(-0.08, leafThick + 0.005, -0.18);
-                baseLeafGroup.add(tvRemote, acRemote, purpleSpiral);
 
                 (currentAssemblyGroup || decorVideoGroup).add(baseLeafGroup);
 
