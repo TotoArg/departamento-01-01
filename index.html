@@ -8565,18 +8565,15 @@
                 // 1. Estructura de soporte: 2 Patas en marco "U" de caño de hierro negro en los extremos Norte y Sur
                 [-1, 1].forEach(side => {
                     const legFrameZ = tableZ + side * (tableL / 2 - 0.035);
-                    // Travesaño inferior en el suelo
                     const baseRail = new THREE.Mesh(createRoundedBoxGeo(tableW, 0.025, 0.025, 0.004, 1), ironMat);
                     baseRail.position.set(tableX, 0.0125, legFrameZ);
                     baseRail.castShadow = true;
-                    // 2 Montantes verticales en los extremos
                     const legL = new THREE.Mesh(createRoundedBoxGeo(0.025, tableH - 0.05, 0.025, 0.004, 1), ironMat);
                     legL.position.set(tableX - tableW / 2 + 0.0125, (tableH - 0.05) / 2 + 0.025, legFrameZ);
                     legL.castShadow = true;
                     const legR = new THREE.Mesh(createRoundedBoxGeo(0.025, tableH - 0.05, 0.025, 0.004, 1), ironMat);
                     legR.position.set(tableX + tableW / 2 - 0.0125, (tableH - 0.05) / 2 + 0.025, legFrameZ);
                     legR.castShadow = true;
-                    // Travesaño superior
                     const topRail = new THREE.Mesh(createRoundedBoxGeo(tableW, 0.025, 0.025, 0.004, 1), ironMat);
                     topRail.position.set(tableX, tableH - 0.0375, legFrameZ);
                     topRail.castShadow = true;
@@ -8595,11 +8592,9 @@
                 // 2. Compartimento cajón revistero inferior abierto (batea de guardado interior)
                 const trayW = tableW - 0.05, trayL = tableL - 0.07, trayH = 0.16;
                 const trayY = 0.18 + trayH / 2;
-                // Fondo de madera
                 const trayFloor = new THREE.Mesh(createRoundedBoxGeo(trayW - 0.02, 0.015, trayL - 0.02, 0.004, 1), woodDarkMat);
                 trayFloor.position.set(tableX, 0.18, tableZ);
                 trayFloor.castShadow = true; trayFloor.receiveShadow = true;
-                // Laterales y faldón negro
                 const trayWallW = new THREE.Mesh(createRoundedBoxGeo(0.015, trayH, trayL, 0.004, 1), ironMat);
                 trayWallW.position.set(tableX - trayW / 2 + 0.0075, trayY, tableZ);
                 const trayWallE = new THREE.Mesh(createRoundedBoxGeo(0.015, trayH, trayL, 0.004, 1), ironMat);
@@ -8614,6 +8609,21 @@
                 mag2.position.set(tableX + 0.06, 0.20, tableZ + 0.12);
                 mag2.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(mag1, mag2);
+
+                // 2 Aletas de soporte rebatibles para la hoja extendida (Video YouTube Shorts)
+                const supportWingMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.4, metalness: 0.8 });
+                const wingA = new THREE.Group();
+                wingA.position.set(tableX + trayW / 2 - 0.015, 0.33, tableZ - trayL / 3);
+                const wingMeshA = new THREE.Mesh(createRoundedBoxGeo(0.18, 0.16, 0.014, 0.003, 1), supportWingMat);
+                wingMeshA.position.set(0.09, 0, 0);
+                wingA.add(wingMeshA);
+
+                const wingB = new THREE.Group();
+                wingB.position.set(tableX + trayW / 2 - 0.015, 0.33, tableZ + trayL / 3);
+                const wingMeshB = new THREE.Mesh(createRoundedBoxGeo(0.18, 0.16, 0.014, 0.003, 1), supportWingMat);
+                wingMeshB.position.set(0.09, 0, 0);
+                wingB.add(wingMeshB);
+                (currentAssemblyGroup || decorVideoGroup).add(wingA, wingB);
 
                 // 3. Mecanismo compás tijera articulado elevable (brazos diagonales metálicos)
                 const scissorGroup = new THREE.Group();
@@ -8630,28 +8640,43 @@
                 });
                 (currentAssemblyGroup || decorVideoGroup).add(scissorGroup);
 
-                // 4. Tapas superiores elevables y extensibles (divididas en 2 hojas longitudinales biseladas)
-                const halfTopW = tableW / 2; // 0.25 m cada hoja
-                const topThick = 0.026;
+                // 4. Tapas superiores elevables y extensibles (Sistema Tapa Libro — Video YouTube Shorts)
+                // Hoja Base: se eleva 18 cm y traslada hacia el sillón (-X)
+                const leafW = tableW - 0.01; // 0.49 m
+                const leafL = tableL - 0.01; // 0.89 m
+                const leafThick = 0.020;
 
-                // Tapa Frontal A (lado Oeste hacia el sillón): se eleva y adelanta hacia el sillón
-                const topGroupA = new THREE.Group();
-                topGroupA.position.set(tableX - halfTopW / 2, tableH - topThick / 2, tableZ);
-                const topMeshA = new THREE.Mesh(createRoundedBoxGeo(halfTopW - 0.002, topThick, tableL, 0.006, 2), woodLightMat);
-                topMeshA.castShadow = true; topMeshA.receiveShadow = true;
-                topGroupA.add(topMeshA);
+                const baseLeafGroup = new THREE.Group();
+                baseLeafGroup.position.set(tableX, tableH - leafThick * 2, tableZ);
 
-                // Tapa Trasera B (lado Este hacia el mueble TV): se eleva y retrocede abriendo la boca de acceso
-                const topGroupB = new THREE.Group();
-                topGroupB.position.set(tableX + halfTopW / 2, tableH - topThick / 2, tableZ);
-                const topMeshB = new THREE.Mesh(createRoundedBoxGeo(halfTopW - 0.002, topThick, tableL, 0.006, 2), woodLightMat);
-                topMeshB.castShadow = true; topMeshB.receiveShadow = true;
-                topGroupB.add(topMeshB);
+                // Malla de la hoja base
+                const baseLeafMesh = new THREE.Mesh(createRoundedBoxGeo(leafW, leafThick, leafL, 0.006, 2), woodLightMat);
+                baseLeafMesh.position.set(0, leafThick / 2, 0);
+                baseLeafMesh.castShadow = true; baseLeafMesh.receiveShadow = true;
+                baseLeafGroup.add(baseLeafMesh);
 
-                (currentAssemblyGroup || decorVideoGroup).add(topGroupA, topGroupB);
+                // Bisagra continua en el borde Este de la hoja base (+X)
+                const pianoHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.0035, 0.0035, leafL - 0.04, 12), new THREE.MeshStandardMaterial({ color: 0xca8a04, metalness: 0.8, roughness: 0.3 }));
+                pianoHinge.rotation.x = Math.PI / 2;
+                pianoHinge.position.set(leafW / 2, leafThick, 0);
+                baseLeafGroup.add(pianoHinge);
+
+                // Pivot del pliegue de la tapa libro (en el borde Este de la hoja base)
+                const foldPivotGroup = new THREE.Group();
+                foldPivotGroup.position.set(leafW / 2, leafThick, 0);
+
+                // Malla de la hoja superior (que se despliega 180° hacia +X duplicando la superficie)
+                const foldLeafMesh = new THREE.Mesh(createRoundedBoxGeo(leafW, leafThick, leafL, 0.006, 2), woodLightMat);
+                // Cuando foldPivotGroup.rotation.z = 0: queda doblada exactamente encima de la hoja base
+                foldLeafMesh.position.set(-leafW / 2, leafThick / 2, 0);
+                foldLeafMesh.castShadow = true; foldLeafMesh.receiveShadow = true;
+                foldPivotGroup.add(foldLeafMesh);
+
+                baseLeafGroup.add(foldPivotGroup);
+                (currentAssemblyGroup || decorVideoGroup).add(baseLeafGroup);
 
                 // 5. Sensor interactivo transparente para clic / toque en la mesa
-                const clickGeo = new THREE.BoxGeometry(tableW + 0.04, 0.12, tableL + 0.04);
+                const clickGeo = new THREE.BoxGeometry(tableW + 0.06, 0.12, tableL + 0.06);
                 const clickMat = new THREE.MeshBasicMaterial({ visible: false });
                 const tableClickMesh = new THREE.Mesh(clickGeo, clickMat);
                 tableClickMesh.position.set(tableX, tableH, tableZ);
@@ -8661,12 +8686,11 @@
                     isOpen: false,
                     currentProgress: 0.0,
                     targetProgress: 0.0,
-                    topA: topGroupA,
-                    topB: topGroupB,
+                    baseLeaf: baseLeafGroup,
+                    foldPivot: foldPivotGroup,
+                    wingA: wingA,
+                    wingB: wingB,
                     scissors: scissorGroup,
-                    baseAX: tableX - halfTopW / 2,
-                    baseBX: tableX + halfTopW / 2,
-                    baseH: tableH - topThick / 2,
                     toggle() {
                         this.isOpen = !this.isOpen;
                         this.targetProgress = this.isOpen ? 1.0 : 0.0;
@@ -8675,8 +8699,8 @@
                 };
 
                 tableClickMesh.userData.animLiftTable = window.coffeeTableAnimState;
-                tableClickMesh.userData.nombre = 'Mesa Ratona Elevable de Living (90×50 cm)';
-                liftTableClickCandidates.push(tableClickMesh, topMeshA, topMeshB);
+                tableClickMesh.userData.nombre = 'Mesa Ratona Elevable y Extensible (90×50 cm -> 90×100 cm)';
+                liftTableClickCandidates.push(tableClickMesh, baseLeafMesh, foldLeafMesh);
                 (currentAssemblyGroup || decorVideoGroup).add(tableClickMesh);
             });
 
@@ -9518,12 +9542,21 @@
                 mainLeg.scale.set(0.58, 0.72, 0.035);
                 mainLeg.position.set(2.65, 0.36, 2.11);
                 mainLeg.castShadow = true;
-                // Cajón / faldón de madera bajo mesada en extremo Sur sobre gabinete PC (foto_32)
-                const southDrawer = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
-                southDrawer.scale.set(0.54, 0.11, 0.48);
-                southDrawer.position.set(2.65, 0.66, 1.84);
+
+                // Faldón de madera pasacables trasero bajo mesada contra pared Este (Video 4:24)
+                const modestyPanel = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
+                modestyPanel.scale.set(0.020, 0.38, 1.15);
+                modestyPanel.position.set(2.92, 0.52, 1.10);
+                modestyPanel.castShadow = true;
+                // Tomacorriente doble de pared blanco con cargadores
+                const wallOutlet = new THREE.Mesh(createRoundedBoxGeo(0.015, 0.08, 0.12, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
+                wallOutlet.position.set(2.93, 0.28, 1.10);
+
+                // Cajón flotante bajo mesada blanco en extremo Sur sobre el gabinete PC (Video 4:24)
+                const southDrawer = new THREE.Mesh(createRoundedBoxGeo(0.52, 0.09, 0.44, 0.006, 1), new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.35 }));
+                southDrawer.position.set(2.66, 0.68, 1.84);
                 southDrawer.castShadow = true;
-                (currentAssemblyGroup || decorVideoGroup).add(mainTop, mainLeg, southDrawer);
+                (currentAssemblyGroup || decorVideoGroup).add(mainTop, mainLeg, modestyPanel, wallOutlet, southDrawer);
 
                 // Ala Norte en L (bajo ventana Norte Z = 0.00, 1.32 m total desde pared Este X=2.95 hasta X=1.63 m -> extensión neta 0.72 m [X = 1.63 a 2.35 m] x 0.52 m de profundidad [Z = 0.00 a 0.52 m])
                 const wingTop = new THREE.Mesh(UNIT_BOX_GEO, deskWoodMat);
@@ -9534,38 +9567,61 @@
                 wingLeg.scale.set(0.035, 0.72, 0.50);
                 wingLeg.position.set(1.65, 0.36, 0.26);
                 wingLeg.castShadow = true;
-                // Estante inferior bajo el Ala Norte: resmas de hojas Autor A4 en su caja (Video 4:31)
+
+                // Mueble organizador bajo mesada de 2 estantes en esquina Norte (Z = 0.08 a 0.48 m)
+                // Totalmente adosado al rincón Norte, dejando 100% despejado el vano central (Z = 0.55 a 1.65 m) para la silla gamer
+                const underShelfSide = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
+                underShelfSide.scale.set(0.52, 0.68, 0.024);
+                underShelfSide.position.set(2.66, 0.34, 0.48);
+                underShelfSide.castShadow = true;
+
+                const underMidShelf = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
+                underMidShelf.scale.set(0.50, 0.022, 0.38);
+                underMidShelf.position.set(2.66, 0.36, 0.28);
+                underMidShelf.castShadow = true; underMidShelf.receiveShadow = true;
+
+                // Estante superior: Valija de herramientas negra con cierres metálicos y detalles verdes/amarillos
+                const blackToolbox = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.14, 0.34, 0.008, 1), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 }));
+                blackToolbox.position.set(2.66, 0.45, 0.28);
+                blackToolbox.castShadow = true;
+                const metalLatches = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9, roughness: 0.2 }));
+                metalLatches.scale.set(0.244, 0.035, 0.10);
+                metalLatches.position.set(2.66, 0.45, 0.28);
+
+                // Estante inferior: Valija plástica organizadora turquesa con broches negros
+                const tealToolbox = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.14, 0.34, 0.008, 1), new THREE.MeshStandardMaterial({ color: 0x0d9488, roughness: 0.45 }));
+                tealToolbox.position.set(2.66, 0.10, 0.28);
+                tealToolbox.castShadow = true;
+
+                // Estante inferior bajo el Ala Norte: resmas de hojas Autor A4/Oficio en su caja (Video 4:31)
                 const wingUnderShelf = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
                 wingUnderShelf.scale.set(0.68, 0.022, 0.46);
-                wingUnderShelf.position.set(2.00, 0.55, 0.26);
+                wingUnderShelf.position.set(2.00, 0.42, 0.26);
                 wingUnderShelf.castShadow = true; wingUnderShelf.receiveShadow = true;
-                const reamBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.7 }));
-                reamBox.scale.set(0.32, 0.16, 0.24);
-                reamBox.position.set(2.00, 0.64, 0.26);
-                // Módulo de 2 estantes inferiores bajo la esquina en L (Video 4:26):
-                // Estante superior: router Wi-Fi blanco + caja de herramientas amarilla y negra
-                // Estante inferior: impresora multifunción blanco/negro + caja de herramientas turquesa
-                const cornerSidePanel = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
-                cornerSidePanel.scale.set(0.52, 0.72, 0.028);
-                cornerSidePanel.position.set(2.66, 0.36, 1.12);
-                cornerSidePanel.castShadow = true;
-                const cornerMidShelf = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
-                cornerMidShelf.scale.set(0.50, 0.022, 0.62);
-                cornerMidShelf.position.set(2.66, 0.42, 0.80);
-                cornerMidShelf.castShadow = true; cornerMidShelf.receiveShadow = true;
-                const routerWifi = new THREE.Mesh(createRoundedBoxGeo(0.18, 0.04, 0.14, 0.008, 1), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
-                routerWifi.position.set(2.66, 0.45, 0.68);
-                const yellowToolbox = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.14, 0.18, 0.01, 1), new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.5 }));
-                yellowToolbox.position.set(2.66, 0.50, 0.92);
-                const cornerBotShelf = new THREE.Mesh(UNIT_BOX_GEO, legWoodMat);
-                cornerBotShelf.scale.set(0.50, 0.022, 0.62);
-                cornerBotShelf.position.set(2.66, 0.06, 0.80);
-                cornerBotShelf.castShadow = true; cornerBotShelf.receiveShadow = true;
-                const printerMesh = new THREE.Mesh(createRoundedBoxGeo(0.38, 0.18, 0.32, 0.01, 1), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 }));
-                printerMesh.position.set(2.66, 0.16, 0.74);
-                const tealToolbox = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.14, 0.18, 0.01, 1), new THREE.MeshStandardMaterial({ color: 0x0d9488, roughness: 0.5 }));
-                tealToolbox.position.set(2.66, 0.14, 0.96);
-                (currentAssemblyGroup || decorVideoGroup).add(wingTop, wingLeg, wingUnderShelf, reamBox, cornerSidePanel, cornerMidShelf, routerWifi, yellowToolbox, cornerBotShelf, printerMesh, tealToolbox);
+
+                // Caja/resma de papel Autor (blanca con franja verde)
+                const reamBox = new THREE.Mesh(createRoundedBoxGeo(0.32, 0.08, 0.22, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.7 }));
+                reamBox.position.set(1.95, 0.47, 0.26);
+                const reamStripe = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0x16a34a }));
+                reamStripe.scale.set(0.322, 0.03, 0.08);
+                reamStripe.position.set(1.95, 0.47, 0.26);
+
+                // Suelo bajo el ala Norte: Mochila negra y lata de pintura (Video 4:31)
+                const underBackpack = new THREE.Mesh(createRoundedBoxGeo(0.28, 0.36, 0.24, 0.03, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.85 }));
+                underBackpack.position.set(2.02, 0.18, 0.26);
+                underBackpack.castShadow = true;
+
+                const paintCan = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.20, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 }));
+                paintCan.position.set(1.72, 0.10, 0.26);
+                paintCan.castShadow = true;
+                const paintLabel = new THREE.Mesh(new THREE.CylinderGeometry(0.081, 0.081, 0.10, 16), new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.4 }));
+                paintLabel.position.set(1.72, 0.10, 0.26);
+
+                (currentAssemblyGroup || decorVideoGroup).add(
+                    wingTop, wingLeg,
+                    underShelfSide, underMidShelf, blackToolbox, metalLatches, tealToolbox,
+                    wingUnderShelf, reamBox, reamStripe, underBackpack, paintCan, paintLabel
+                );
             });
 
             // Tacho de basura negro bajo la pata sur del escritorio (Video 4:16)
@@ -10076,25 +10132,29 @@
                 globeGroup.add(globeBase, globeArch, globeSphere);
                 (currentAssemblyGroup || decorVideoGroup).add(globeGroup);
 
-                // 11) Hilera de libros y mangas en el sector Sur del estante inferior (Z = 1.42 a 1.78 m)
-                let bkZ = 1.42;
-                const bkColors = [0x1e3a8a, 0xb91c1c, 0x047857, 0xf1f5f9, 0x1e293b, 0x7c2d12, 0x475569, 0x0284c7, 0xd97706, 0x334155, 0xf8fafc, 0x991b1b];
-                for (let b = 0; b < 10; b++) {
-                    const bTh = 0.025 + (b % 3) * 0.006;
-                    const bH = 0.19 + ((b * 4) % 5) * 0.012;
-                    const bD = 0.15;
-                    const bkMesh = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: bkColors[b % bkColors.length], roughness: 0.8 }));
-                    bkMesh.scale.set(bD, bH, bTh);
-                    bkMesh.position.set(2.84, 1.318 + bH / 2, bkZ + bTh / 2);
-                    (currentAssemblyGroup || decorVideoGroup).add(bkMesh);
-                    bkZ += bTh + 0.004;
-                }
+                // 11) Valijas rígidas de vuelo / VR Case en extremo Sur del estante inferior (Z = 1.45 a 1.76 m, Video 4:54)
+                // NO hay libros en el 1° estante inferior: toda la superficie está dedicada a las consolas retro y coleccionables
+                const flightCaseMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.6, metalness: 0.2 });
+                const silverLatchMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.85, roughness: 0.2 });
 
-                // --- 2° ESTANTE MEDIO (Y = 1.65 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): LIBROS TOLKIEN Y COLECCIONES ---
+                const vrCase = new THREE.Mesh(createRoundedBoxGeo(0.16, 0.10, 0.24, 0.010, 2), flightCaseMat);
+                vrCase.position.set(2.84, 1.318 + 0.05, 1.54);
+                vrCase.castShadow = true;
+                const vrLatch = new THREE.Mesh(UNIT_BOX_GEO, silverLatchMat);
+                vrLatch.scale.set(0.164, 0.025, 0.08);
+                vrLatch.position.set(2.84, 1.318 + 0.05, 1.54);
+
+                const droneCase = new THREE.Mesh(createRoundedBoxGeo(0.16, 0.09, 0.18, 0.008, 2), flightCaseMat);
+                droneCase.position.set(2.84, 1.318 + 0.045, 1.72);
+                droneCase.castShadow = true;
+                const droneLatch = new THREE.Mesh(UNIT_BOX_GEO, silverLatchMat);
+                droneLatch.scale.set(0.164, 0.022, 0.06);
+                droneLatch.position.set(2.84, 1.318 + 0.045, 1.72);
+
+                (currentAssemblyGroup || decorVideoGroup).add(vrCase, vrLatch, droneCase, droneLatch);
+
+                // --- 2° ESTANTE MEDIO (Y = 1.65 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): BIBLIOTECA COMPLETA DE LIBROS Y NOVELAS ---
                 addDecorBox(2.845, 1.65, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Medio (1.80×0.20 m)');
-
-                // Planta Potus en maceta blanca en extremo Norte cerca de la ventana (Z = 0.16 m)
-                addDecorPlantCeramic(2.845, 1.668, 0.16, 0.065, 0.05, 0.11, 0.15, 0.24, 0.15, 0.22, 'Planta Potus Colgante Estante Medio');
 
                 // Colección de Tomos Grandes Ilustrados de Tolkien (El Señor de los Anillos, El Silmarillion)
                 // 3 tomos negros de lujo con runas doradas (Z = 0.48 a 0.68 m)
@@ -10120,48 +10180,69 @@
                     (currentAssemblyGroup || decorVideoGroup).add(wBook);
                 }
 
-                // Libros de ciencia ficción, literatura y coleccionables en el estante medio (Z = 0.88 a 1.68 m)
-                let midZ = 0.88;
-                for (let b = 0; b < 16; b++) {
-                    const bTh = 0.022 + (b % 4) * 0.006;
-                    const bH = 0.21 + ((b * 5) % 4) * 0.014;
+                // Libros en sector Norte (Z = 0.16 a 0.46 m): Tomos claros y encuadernaciones clásicas
+                const bkColors = [0x1e3a8a, 0xb91c1c, 0x047857, 0xf1f5f9, 0x1e293b, 0x7c2d12, 0x475569, 0x0284c7, 0xd97706, 0x334155, 0xf8fafc, 0x991b1b];
+                let northZ = 0.16;
+                for (let b = 0; b < 8; b++) {
+                    const bTh = 0.024 + (b % 3) * 0.006;
+                    const bH = 0.20 + ((b * 3) % 4) * 0.012;
                     const bD = 0.16;
-                    const bkMesh = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: bkColors[(b + 4) % bkColors.length], roughness: 0.8 }));
+                    const bkMesh = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: bkColors[(b * 2) % bkColors.length], roughness: 0.8 }));
+                    bkMesh.scale.set(bD, bH, bTh);
+                    bkMesh.position.set(2.84, 1.668 + bH / 2, northZ + bTh / 2);
+                    (currentAssemblyGroup || decorVideoGroup).add(bkMesh);
+                    northZ += bTh + 0.003;
+                }
+
+                // Libros en sector Sur (Z = 0.84 a 1.76 m): Colección Harry Potter, novelas y sagas completas
+                let midZ = 0.84;
+                for (let b = 0; b < 24; b++) {
+                    const bTh = 0.022 + (b % 4) * 0.005;
+                    const bH = 0.21 + ((b * 5) % 4) * 0.012;
+                    const bD = 0.16;
+                    const bkMesh = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: bkColors[(b + 3) % bkColors.length], roughness: 0.8 }));
                     bkMesh.scale.set(bD, bH, bTh);
                     bkMesh.position.set(2.84, 1.668 + bH / 2, midZ + bTh / 2);
                     (currentAssemblyGroup || decorVideoGroup).add(bkMesh);
-                    midZ += bTh + 0.002;
+                    midZ += bTh + 0.0025;
                 }
 
-                // --- 3° ESTANTE SUPERIOR (Y = 2.00 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): CAJAS COLECCIÓN, ARTE Y CERÁMICA ---
+                // --- 3° ESTANTE SUPERIOR (Y = 2.00 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): PLANTA POTUS Y COLECCIÓN DE 4 BALONES HISTÓRICOS ---
                 addDecorBox(2.845, 2.00, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Superior (1.80×0.20 m)');
 
-                // Vasija / pieza de cerámica escultórica decorativa al Norte (Z = 0.22 m)
-                const topCeramic = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.035, 0.18, 16), new THREE.MeshStandardMaterial({ color: 0xca8a04, roughness: 0.75 }));
-                topCeramic.position.set(2.84, 2.018 + 0.09, 0.22);
-                (currentAssemblyGroup || decorVideoGroup).add(topCeramic);
+                // Planta Potus colgante en maceta blanca en extremo Norte cerca de la ventana (Z = 0.20 m, Video 4:54)
+                addDecorPlantCeramic(2.845, 2.018, 0.20, 0.065, 0.05, 0.11, 0.15, 0.28, 0.15, 0.25, 'Planta Potus Colgante Estante Superior');
 
-                // Cajas de ediciones especiales de juegos y tomos de arte
-                const boxTopMats = [0x1e293b, 0x831843, 0x065f46, 0x78350f, 0x1e3a8a];
-                [-0.30, 0.05, 0.40].forEach((bz, idx) => {
-                    const cBox = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: boxTopMats[idx % boxTopMats.length], roughness: 0.5 }));
-                    cBox.scale.set(0.16, 0.18, 0.22);
-                    cBox.position.set(2.84, 2.018 + 0.09, 0.93 + bz);
-                    (currentAssemblyGroup || decorVideoGroup).add(cBox);
+                // Colección de 4 Balones de Fútbol Históricos en pedestales anillo (Z = 0.88, 1.12, 1.36, 1.60 m, Video 4:54)
+                const ballStandMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.4, metalness: 0.6 });
+                const ballWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.45, metalness: 0.05 });
+                const ballBlackMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45, metalness: 0.05 });
+
+                const ballZCoords = [0.88, 1.12, 1.36, 1.60];
+                ballZCoords.forEach((bz, bIdx) => {
+                    const ballGroup = new THREE.Group();
+                    ballGroup.position.set(2.84, 2.018, bz);
+
+                    // Pedestal aro de soporte
+                    const ringBase = new THREE.Mesh(new THREE.CylinderGeometry(0.040, 0.045, 0.014, 16), ballStandMat);
+                    ringBase.position.set(0, 0.007, 0);
+
+                    // Esfera del balón de fútbol (diámetro reglamentario ~22 cm -> radio 0.075 m)
+                    const ballSphere = new THREE.Mesh(new THREE.SphereGeometry(0.075, 24, 16), ballWhiteMat);
+                    ballSphere.position.set(0, 0.075 + 0.006, 0);
+
+                    // Gajos geométricos oscuros (diseño clásico Tango / Telstar)
+                    [-0.045, 0, 0.045].forEach((offsetY, pIdx) => {
+                        const patch = new THREE.Mesh(UNIT_BOX_GEO, ballBlackMat);
+                        patch.scale.set(0.024, 0.024, 0.024);
+                        patch.position.set(-0.065, 0.075 + offsetY, (pIdx - 1) * 0.035);
+                        patch.rotation.y = 0.4 + bIdx * 0.3;
+                        ballGroup.add(patch);
+                    });
+
+                    ballGroup.add(ringBase, ballSphere);
+                    (currentAssemblyGroup || decorVideoGroup).add(ballGroup);
                 });
-
-                // Fila de libros encuadernados de gran formato en sector Sur (Z = 1.35 a 1.68 m)
-                let topZ = 1.35;
-                for (let b = 0; b < 7; b++) {
-                    const bTh = 0.030;
-                    const bH = 0.24;
-                    const bD = 0.165;
-                    const bkMesh = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: bkColors[(b + 8) % bkColors.length], roughness: 0.75 }));
-                    bkMesh.scale.set(bD, bH, bTh);
-                    bkMesh.position.set(2.84, 2.018 + bH / 2, topZ + bTh / 2);
-                    (currentAssemblyGroup || decorVideoGroup).add(bkMesh);
-                    topZ += bTh + 0.003;
-                }
 
                 setMountWall(null);
             });
@@ -13331,12 +13412,12 @@
                 }
             }
 
-            // 0D2. Raycast sobre la Mesa Ratona Elevable y Extensible
+            // 0D2. Raycast sobre la Mesa Ratona Elevable y Extensible (Sistema Tapa Libro — Video YouTube Shorts)
             if (!isFurnitureEditMode && liftTableClickCandidates.length > 0 && window.coffeeTableAnimState) {
                 const liftHits = raycaster.intersectObjects(liftTableClickCandidates, false);
                 if (liftHits.length > 0) {
                     const nextState = window.coffeeTableAnimState.toggle();
-                    showToast(`☕ Mesa Ratona: ${nextState ? 'Elevada y Abierta (60 cm)' : 'Plegada (42 cm)'}`);
+                    showToast(`☕ Mesa Ratona: ${nextState ? 'Elevada y Desplegada en Libro (60 cm — 90×100 cm)' : 'Plegada (42 cm — 90×50 cm)'}`);
                     clearSelection();
                     if (isBIMPlanningMode && typeof selectBIMObject === 'function') selectBIMObject(liftHits[0].object, e.clientX, e.clientY);
                     wakeRenderer();
@@ -14295,23 +14376,21 @@
             return moving;
         }
 
-        // Actualizador de animación suave para la Mesa Ratona Elevable y Extensible (Cerrada a 42cm -> Elevada y Abierta a 60cm)
+        // Actualizador de animación suave para la Mesa Ratona Elevable y Extensible (Cerrada a 42cm -> Elevada y Desplegada en Libro a 60cm — Video YouTube Shorts)
         function updateAnimCoffeeTable() {
             const st = window.coffeeTableAnimState;
-            if (!st || !st.topA || !st.topB) return false;
+            if (!st || !st.baseLeaf || !st.foldPivot) return false;
 
             // Inicializar coordenadas base relativas al centro geométrico del ensamblaje
-            if (st.baseAY === undefined) {
-                st.baseAY = st.topA.position.y;
-                st.baseBY = st.topB.position.y;
-                st.baseAX = st.topA.position.x;
-                st.baseBX = st.topB.position.x;
+            if (st.baseY === undefined) {
+                st.baseY = st.baseLeaf.position.y;
+                st.baseX = st.baseLeaf.position.x;
                 st.baseScissorY = st.scissors ? st.scissors.position.y : 0;
             }
 
             let moving = false;
             if (Math.abs(st.currentProgress - st.targetProgress) > 0.002) {
-                st.currentProgress += (st.targetProgress - st.currentProgress) * 0.14;
+                st.currentProgress += (st.targetProgress - st.currentProgress) * 0.12;
                 moving = true;
             } else if (st.currentProgress !== st.targetProgress) {
                 st.currentProgress = st.targetProgress;
@@ -14321,15 +14400,23 @@
             }
 
             const p = st.currentProgress; // 0.0 (cerrada) a 1.0 (elevada y abierta)
-            // Elevación de 18 cm (de 42cm a 60cm de piso real)
-            st.topA.position.y = st.baseAY + p * 0.18;
-            st.topB.position.y = st.baseBY + p * 0.18;
 
-            // Apertura transversal: tapa A se adelanta hacia el sillón (-X) y tapa B se separa (+X)
-            st.topA.position.x = st.baseAX - p * 0.11;
-            st.topB.position.x = st.baseBX + p * 0.11;
+            // 1. Elevación vertical de 18 cm (de 42cm a 60cm) y traslación horizontal hacia el sillón (-X)
+            st.baseLeaf.position.y = st.baseY + p * 0.18;
+            st.baseLeaf.position.x = st.baseX - p * 0.14;
 
-            // Extensión de los brazos tijera
+            // 2. Despliegue en 180° de la hoja superior (tapa libro)
+            // Cuando p = 0: rotación z = 0 (doblada encima)
+            // Cuando p = 1: rotación z = -Math.PI (desplegada 180° hacia +X duplicando el ancho a 1.00 m)
+            st.foldPivot.rotation.z = -p * Math.PI;
+
+            // 3. Aletas de soporte rebatibles en el compartimento interior (giran para soportar la hoja extendida)
+            if (st.wingA && st.wingB) {
+                st.wingA.rotation.z = p * (Math.PI / 2);
+                st.wingB.rotation.z = p * (Math.PI / 2);
+            }
+
+            // 4. Extensión vertical de los brazos tijera
             if (st.scissors) {
                 st.scissors.position.y = st.baseScissorY + p * 0.09;
                 st.scissors.scale.y = 0.40 + p * 0.60;
@@ -16277,21 +16364,21 @@
                 instancedBooksGroup.remove(c);
             }
 
-            // Geometría única compartida para todos los libros en estantes de Estudio y Living (1 solo draw call)
+            // Geometría única compartida para todos los libros en estantes de Estudio (2° Estante Medio) y Living (1 solo draw call)
             const bookSlots = [
-                // 1° Estante flotante Estudio (pared Este X=2.845, Z=0.75..1.42, Y=1.47 — hilera central de libros, foto_18)
-                { x: 2.845, y: 1.47, z: 0.76, ry: 0, sx: 0.15, sy: 0.22, sz: 0.035, color: 0xbe185d },
-                { x: 2.845, y: 1.46, z: 0.80, ry: 0, sx: 0.14, sy: 0.20, sz: 0.032, color: 0x1e293b },
-                { x: 2.845, y: 1.48, z: 0.84, ry: 0, sx: 0.15, sy: 0.24, sz: 0.038, color: 0x7f1d1d },
-                { x: 2.845, y: 1.45, z: 0.88, ry: 0, sx: 0.14, sy: 0.19, sz: 0.030, color: 0x0f172a },
-                { x: 2.845, y: 1.47, z: 0.92, ry: 0, sx: 0.15, sy: 0.22, sz: 0.034, color: 0x1e3a8a },
-                { x: 2.845, y: 1.46, z: 0.96, ry: 0, sx: 0.14, sy: 0.21, sz: 0.032, color: 0xf8fafc },
-                { x: 2.845, y: 1.47, z: 1.01, ry: 0, sx: 0.15, sy: 0.22, sz: 0.036, color: 0x065f46 },
-                { x: 2.845, y: 1.46, z: 1.06, ry: 0, sx: 0.14, sy: 0.20, sz: 0.032, color: 0xd97706 },
-                { x: 2.845, y: 1.48, z: 1.11, ry: 0, sx: 0.15, sy: 0.23, sz: 0.036, color: 0xb91c1c },
-                { x: 2.845, y: 1.45, z: 1.16, ry: 0, sx: 0.14, sy: 0.19, sz: 0.030, color: 0x334155 },
-                { x: 2.845, y: 1.47, z: 1.21, ry: 0, sx: 0.15, sy: 0.21, sz: 0.034, color: 0x14532d },
-                { x: 2.845, y: 1.46, z: 1.26, ry: 0.08, sx: 0.14, sy: 0.20, sz: 0.032, color: 0x475569 },
+                // 2° Estante flotante Medio Estudio (pared Este X=2.845, Z=0.88..1.36, Y=1.78 — Colección Harry Potter y Novelas, Video 4:54)
+                { x: 2.845, y: 1.78, z: 0.88, ry: 0, sx: 0.15, sy: 0.22, sz: 0.035, color: 0x7f1d1d },
+                { x: 2.845, y: 1.77, z: 0.92, ry: 0, sx: 0.14, sy: 0.20, sz: 0.032, color: 0x1e293b },
+                { x: 2.845, y: 1.79, z: 0.96, ry: 0, sx: 0.15, sy: 0.24, sz: 0.038, color: 0xb45309 },
+                { x: 2.845, y: 1.76, z: 1.00, ry: 0, sx: 0.14, sy: 0.19, sz: 0.030, color: 0x0f172a },
+                { x: 2.845, y: 1.78, z: 1.04, ry: 0, sx: 0.15, sy: 0.22, sz: 0.034, color: 0x1e3a8a },
+                { x: 2.845, y: 1.77, z: 1.08, ry: 0, sx: 0.14, sy: 0.21, sz: 0.032, color: 0xf8fafc },
+                { x: 2.845, y: 1.78, z: 1.13, ry: 0, sx: 0.15, sy: 0.22, sz: 0.036, color: 0x065f46 },
+                { x: 2.845, y: 1.77, z: 1.18, ry: 0, sx: 0.14, sy: 0.20, sz: 0.032, color: 0xd97706 },
+                { x: 2.845, y: 1.79, z: 1.23, ry: 0, sx: 0.15, sy: 0.23, sz: 0.036, color: 0x991b1b },
+                { x: 2.845, y: 1.76, z: 1.28, ry: 0, sx: 0.14, sy: 0.19, sz: 0.030, color: 0x334155 },
+                { x: 2.845, y: 1.78, z: 1.33, ry: 0, sx: 0.15, sy: 0.21, sz: 0.034, color: 0x14532d },
+                { x: 2.845, y: 1.77, z: 1.38, ry: 0.08, sx: 0.14, sy: 0.20, sz: 0.032, color: 0x475569 },
                 // Libros apilados en Rack TV Living (X=6.00, Z=2.35..3.45, Y=0.52)
                 { x: 6.02, y: 0.56, z: 2.42, ry: 0, sx: 0.18, sy: 0.22, sz: 0.036, color: 0x334155 },
                 { x: 6.02, y: 0.55, z: 2.46, ry: 0, sx: 0.17, sy: 0.20, sz: 0.034, color: 0x991b1b },
