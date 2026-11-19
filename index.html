@@ -9899,12 +9899,12 @@
             // 3. 3 ESTANTES FLOTANTES SOBRE ESCRITORIO (Muro Este X = 3.00 m, medidas: 1.80 m de largo x 0.20 m de profundidad):
             // Relevado exhaustivamente de sec_093 y sec_094 del último video: 3 niveles flotantes
             createCompoundAssembly('Estantes Flotantes Estudio (3 Niveles — 1.80×0.20 m)', () => {
-                setMountWall(3.00, 0.93, false);
+                setMountWall(3.00, 1.15, false);
                 const woodShelfMat = new THREE.MeshStandardMaterial({ color: 0x8a3c1b, roughness: 0.65, metalness: 0.04 });
                 const blackBracketMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.35, metalness: 0.85 });
 
                 // Ménsulas de acero negro tipo L (escuadras de soporte a pared para los 3 niveles)
-                [0.22, 0.68, 1.18, 1.68].forEach(bz => {
+                [0.44, 0.90, 1.40, 1.90].forEach(bz => {
                     [1.28, 1.63, 1.98].forEach(by => {
                         // Brazo horizontal bajo el estante
                         addDecorBox(2.845, by, bz, 0.19, 0.016, 0.024, 0x111827, 0.35, 0, 'Ménsula Negra Brazo Horizontal');
@@ -9913,8 +9913,8 @@
                     });
                 });
 
-                // --- 1° ESTANTE INFERIOR (Y = 1.30 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): COLECCIÓN COMPLETA DE CONSOLAS RETRO Y EDICIONES ESPECIALES POKÉMON (Foto 1 del usuario) ---
-                addDecorBox(2.845, 1.30, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Inferior (1.80×0.20 m)');
+                // --- 1° ESTANTE INFERIOR (Y = 1.30 m, X = 2.845 m, Z = 1.15 m, 1.80×0.20 m): COLECCIÓN COMPLETA DE CONSOLAS RETRO Y EDICIONES ESPECIALES POKÉMON (Foto 1 del usuario) ---
+                addDecorBox(2.845, 1.30, 1.15, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Inferior (1.80×0.20 m)');
 
                 // Soportes de exhibición acrílicos transparentes cortados con láser (PMMA 1.49) para las 6 consolas (Foto 1)
                 const acrylicStandMat = new THREE.MeshPhysicalMaterial({
@@ -10003,12 +10003,12 @@
 
                 // Generar los 6 soportes acrílicos a medida para las 6 consolas retro
                 const standConfigs = [
-                    { name: 'GBC 1',  z: 0.22, spanZ: 0.065, depthX: 0.075, h: 0.060, cradleThick: 0.026 },
-                    { name: 'GBC 2',  z: 0.34, spanZ: 0.065, depthX: 0.075, h: 0.060, cradleThick: 0.026 },
-                    { name: 'GBA',    z: 0.47, spanZ: 0.110, depthX: 0.070, h: 0.045, cradleThick: 0.024 },
-                    { name: 'GBA SP', z: 0.60, spanZ: 0.072, depthX: 0.072, h: 0.055, cradleThick: 0.025 },
-                    { name: 'DS Lite', z: 0.73, spanZ: 0.115, depthX: 0.070, h: 0.050, cradleThick: 0.023 },
-                    { name: '3DS XL',  z: 0.87, spanZ: 0.130, depthX: 0.075, h: 0.055, cradleThick: 0.023 }
+                    { name: 'GBC 1',  z: 0.44, spanZ: 0.065, depthX: 0.075, h: 0.060, cradleThick: 0.026 },
+                    { name: 'GBC 2',  z: 0.56, spanZ: 0.065, depthX: 0.075, h: 0.060, cradleThick: 0.026 },
+                    { name: 'GBA',    z: 0.69, spanZ: 0.110, depthX: 0.070, h: 0.045, cradleThick: 0.024 },
+                    { name: 'GBA SP', z: 0.82, spanZ: 0.072, depthX: 0.072, h: 0.055, cradleThick: 0.025 },
+                    { name: 'DS Lite', z: 0.95, spanZ: 0.115, depthX: 0.070, h: 0.050, cradleThick: 0.023 },
+                    { name: '3DS XL',  z: 1.09, spanZ: 0.130, depthX: 0.075, h: 0.055, cradleThick: 0.023 }
                 ];
                 standConfigs.forEach(s => {
                     const stand = buildAcrylicStand(2.84, 1.318, s.z, s.spanZ, s.depthX, s.h, s.cradleThick);
@@ -10113,16 +10113,16 @@
 
                 const dPadMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 });
 
-                // 1) Game Boy Color 1 — Edición Especial Pokémon Amarilla con Cartucho Negro en ranura superior (Z = 0.22 m, Foto 1)
+                // 1) Game Boy Color 1 — Edición Especial Pokémon Amarilla con Cartucho Negro en ranura superior (Z = 0.44 m, Foto 1)
                 loadGLBFurniture({
                     url: 'models/gbc.glb',
                     container: currentAssemblyGroup,
                     targetSize: [0.078, 0.133, 0.027],
-                    position: [2.84, 1.327, 0.22],
+                    position: [2.84, 1.327, 0.44],
                     rotation: [-0.18, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const gbc1Group = new THREE.Group();
-                        gbc1Group.position.set(2.84, 1.327, 0.22);
+                        gbc1Group.position.set(2.84, 1.327, 0.44);
                         gbc1Group.rotation.y = 0.08;
                         const gbc1Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 }));
                         gbc1Body.position.set(-0.012, 0.072, 0);
@@ -10181,16 +10181,16 @@
                     }
                 });
 
-                // 2) Game Boy Color 2 — Edición Especial Pokémon Amarilla (Z = 0.34 m, Foto 1)
+                // 2) Game Boy Color 2 — Edición Especial Pokémon Amarilla (Z = 0.56 m, Foto 1)
                 loadGLBFurniture({
                     url: 'models/gbc.glb',
                     container: currentAssemblyGroup,
                     targetSize: [0.078, 0.133, 0.027],
-                    position: [2.84, 1.327, 0.34],
+                    position: [2.84, 1.327, 0.56],
                     rotation: [-0.18, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const gbc2Group = new THREE.Group();
-                        gbc2Group.position.set(2.84, 1.327, 0.34);
+                        gbc2Group.position.set(2.84, 1.327, 0.56);
                         gbc2Group.rotation.y = 0.08;
                         const gbc2Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 }));
                         gbc2Body.position.set(-0.012, 0.072, 0);
@@ -10237,16 +10237,16 @@
                     }
                 });
 
-                // 3) Game Boy Advance (GBA Clásica Horizontal Indigo/Glacier) (Z = 0.47 m, Foto 1)
+                // 3) Game Boy Advance (GBA Clásica Horizontal Indigo/Glacier) (Z = 0.69 m, Foto 1)
                 loadGLBFurniture({
                     url: 'models/gba.glb',
                     container: currentAssemblyGroup,
                     targetSize: [0.024, 0.082, 0.144],
-                    position: [2.84, 1.327, 0.47],
+                    position: [2.84, 1.327, 0.69],
                     rotation: [0, Math.PI, 0.18],
                     fallbackFn: () => {
                         const gbaGroup = new THREE.Group();
-                        gbaGroup.position.set(2.84, 1.327, 0.47);
+                        gbaGroup.position.set(2.84, 1.327, 0.69);
                         const gbaBody = new THREE.Mesh(createRoundedBoxGeo(0.024, 0.082, 0.144, 0.012, 2), new THREE.MeshStandardMaterial({ color: 0x4f46e5, roughness: 0.30, metalness: 0.20 }));
                         gbaBody.position.set(-0.010, 0.048, 0);
                         gbaBody.rotation.z = -0.22;
@@ -10283,16 +10283,16 @@
                     }
                 });
 
-                // 4) Game Boy Advance SP (GBA SP) — Edición Especial Pikachu Amarilla (Z = 0.60 m, Foto 1, Clamshell Plegable)
+                // 4) Game Boy Advance SP (GBA SP) — Edición Especial Pikachu Amarilla (Z = 0.82 m, Foto 1, Clamshell Plegable)
                 loadGLBFurniture({
                     url: 'models/gbasp.glb',
                     container: currentAssemblyGroup,
                     targetSize: [0.082, 0.135, 0.045],
-                    position: [2.84, 1.327, 0.60],
+                    position: [2.84, 1.327, 0.82],
                     rotation: [-0.15, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const gbaSpGroup = new THREE.Group();
-                        gbaSpGroup.position.set(2.84, 1.327, 0.60);
+                        gbaSpGroup.position.set(2.84, 1.327, 0.82);
                         const pikaSpMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.30, metalness: 0.10 });
                         const spBase = new THREE.Mesh(createRoundedBoxGeo(0.082, 0.012, 0.084, 0.006, 2), pikaSpMat);
                         spBase.position.set(0, 0.006, 0);
@@ -10343,16 +10343,16 @@
                     }
                 });
 
-                // 5) Nintendo DS Lite — Edición Crimson Red / Black (Z = 0.73 m, Foto 1, Clamshell Plegable)
+                // 5) Nintendo DS Lite — Edición Crimson Red / Black (Z = 0.95 m, Foto 1, Clamshell Plegable)
                 loadGLBFurniture({
                     url: 'models/ds.glb',
                     container: currentAssemblyGroup,
                     targetSize: [0.133, 0.130, 0.048],
-                    position: [2.84, 1.327, 0.73],
+                    position: [2.84, 1.327, 0.95],
                     rotation: [-0.15, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const dsLiteGroup = new THREE.Group();
-                        dsLiteGroup.position.set(2.84, 1.327, 0.73);
+                        dsLiteGroup.position.set(2.84, 1.327, 0.95);
                         const dsBase = new THREE.Mesh(createRoundedBoxGeo(0.074, 0.011, 0.133, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.35 }));
                         dsBase.position.set(0, 0.006, 0);
                         const dsTouch = new THREE.Mesh(createRoundedBoxGeo(0.048, 0.002, 0.064, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 }));
@@ -10402,16 +10402,16 @@
                     }
                 });
 
-                // 6) Nintendo 3DS XL — Edición Especial Pokémon Pikachu Amarilla (Z = 0.87 m, Foto 1, Clamshell Plegable)
+                // 6) Nintendo 3DS XL — Edición Especial Pokémon Pikachu Amarilla (Z = 1.09 m, Foto 1, Clamshell Plegable)
                 loadGLBFurniture({
                     url: 'models/3ds.glb',
                     container: currentAssemblyGroup,
                     targetSize: [0.156, 0.150, 0.050],
-                    position: [2.84, 1.327, 0.87],
+                    position: [2.84, 1.327, 1.09],
                     rotation: [-0.15, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const n3dsGroup = new THREE.Group();
-                        n3dsGroup.position.set(2.84, 1.327, 0.87);
+                        n3dsGroup.position.set(2.84, 1.327, 1.09);
                         const pika3dsMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.20, metalness: 0.15 });
                         const n3dsBase = new THREE.Mesh(createRoundedBoxGeo(0.093, 0.012, 0.156, 0.008, 2), pika3dsMat);
                         n3dsBase.position.set(0, 0.006, 0);
@@ -10462,23 +10462,23 @@
                     }
                 });
 
-                // 7) Poké Ball Plus con Base de Carga Oficial Blanca (Z = 1.02 m, Foto 1)
+                // 7) Poké Ball Plus con Base de Carga Oficial Blanca (Z = 1.24 m, Foto 1)
                 const pokeDockBase = new THREE.Mesh(new THREE.CylinderGeometry(0.030, 0.034, 0.020, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 }));
-                pokeDockBase.position.set(2.84, 1.318 + 0.010, 1.02);
+                pokeDockBase.position.set(2.84, 1.318 + 0.010, 1.24);
                 const pokeSphereTop = new THREE.Mesh(new THREE.SphereGeometry(0.024, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.25 }));
-                pokeSphereTop.position.set(2.84, 1.318 + 0.032, 1.02);
+                pokeSphereTop.position.set(2.84, 1.318 + 0.032, 1.24);
                 const pokeSphereBot = new THREE.Mesh(new THREE.SphereGeometry(0.024, 16, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25 }));
-                pokeSphereBot.position.set(2.84, 1.318 + 0.032, 1.02);
+                pokeSphereBot.position.set(2.84, 1.318 + 0.032, 1.24);
                 const pokeBelt = new THREE.Mesh(new THREE.CylinderGeometry(0.0245, 0.0245, 0.005, 16), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 }));
-                pokeBelt.position.set(2.84, 1.318 + 0.032, 1.02);
+                pokeBelt.position.set(2.84, 1.318 + 0.032, 1.24);
                 const pokeBtn = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.004, 12), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.4 }));
                 pokeBtn.rotation.z = Math.PI / 2;
-                pokeBtn.position.set(2.815, 1.318 + 0.032, 1.02);
+                pokeBtn.position.set(2.815, 1.318 + 0.032, 1.24);
                 (currentAssemblyGroup || decorVideoGroup).add(pokeDockBase, pokeSphereTop, pokeSphereBot, pokeBelt, pokeBtn);
 
-                // 8) Nintendo Switch 1 Edición Especial Pokémon Let's Go (Pikachu & Eevee) en su Dock (Z = 1.18 m, Foto 1)
+                // 8) Nintendo Switch 1 Edición Especial Pokémon Let's Go (Pikachu & Eevee) en su Dock (Z = 1.40 m, Foto 1)
                 const switchGroup = new THREE.Group();
-                switchGroup.position.set(2.83, 1.318, 1.18);
+                switchGroup.position.set(2.83, 1.318, 1.40);
                 const dockMesh = new THREE.Mesh(createRoundedBoxGeo(0.052, 0.104, 0.170, 0.010, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45, metalness: 0.1 }));
                 dockMesh.position.set(0, 0.052, 0);
                 const pikaGraphic = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
@@ -10496,14 +10496,14 @@
                 switchGroup.add(dockMesh, pikaGraphic, eeveeGraphic, switchScreen, joyL, joyR);
                 (currentAssemblyGroup || decorVideoGroup).add(switchGroup);
 
-                // Dije dorado colgando al borde de la Switch (Z = 1.28 m, Foto 1)
+                // Dije dorado colgando al borde de la Switch (Z = 1.50 m, Foto 1)
                 const switchCharm = new THREE.Mesh(new THREE.TorusGeometry(0.008, 0.002, 8, 16), new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 }));
-                switchCharm.position.set(2.74, 1.27, 1.28);
+                switchCharm.position.set(2.74, 1.27, 1.50);
                 (currentAssemblyGroup || decorVideoGroup).add(switchCharm);
 
-                // 9) Mini Globo Terráqueo de Escritorio en soporte de latón dorado (Z = 1.36 m, Foto 1)
+                // 9) Mini Globo Terráqueo de Escritorio en soporte de latón dorado (Z = 1.58 m, Foto 1)
                 const globeGroup = new THREE.Group();
-                globeGroup.position.set(2.84, 1.318, 1.36);
+                globeGroup.position.set(2.84, 1.318, 1.58);
                 const globeBase = new THREE.Mesh(new THREE.CylinderGeometry(0.030, 0.035, 0.015, 16), new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 }));
                 globeBase.position.set(0, 0.0075, 0);
                 const globeArch = new THREE.Mesh(new THREE.TorusGeometry(0.048, 0.004, 8, 16, Math.PI), new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 }));
@@ -10515,41 +10515,41 @@
                 globeGroup.add(globeBase, globeArch, globeSphere);
                 (currentAssemblyGroup || decorVideoGroup).add(globeGroup);
 
-                // 10) Estuche rígido curvo para VR (Oculus/Meta Quest Case) (Z = 1.50 m, Foto 1)
+                // 10) Estuche rígido curvo para VR (Oculus/Meta Quest Case) (Z = 1.72 m, Foto 1)
                 const vrCaseMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.7, metalness: 0.1 });
                 const vrCaseMesh = new THREE.Mesh(createRoundedBoxGeo(0.16, 0.11, 0.22, 0.03, 3), vrCaseMat);
-                vrCaseMesh.position.set(2.84, 1.318 + 0.055, 1.50);
+                vrCaseMesh.position.set(2.84, 1.318 + 0.055, 1.72);
                 vrCaseMesh.castShadow = true;
                 const vrZip = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.003, 6, 16), new THREE.MeshStandardMaterial({ color: 0x475569 }));
                 vrZip.rotation.y = Math.PI / 2;
-                vrZip.position.set(2.75, 1.318 + 0.055, 1.50);
+                vrZip.position.set(2.75, 1.318 + 0.055, 1.72);
                 (currentAssemblyGroup || decorVideoGroup).add(vrCaseMesh, vrZip);
 
-                // 11) Dos valijas rígidas de vuelo apiladas con cierres metálicos y colgante Poké Ball (Z = 1.68 m, Foto 1)
+                // 11) Dos valijas rígidas de vuelo apiladas con cierres metálicos y colgante Poké Ball (Z = 1.90 m, Foto 1)
                 const flightCaseMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.5, metalness: 0.3 });
                 const silverLatchMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.85, roughness: 0.2 });
                 // Valija inferior
                 const caseBot = new THREE.Mesh(createRoundedBoxGeo(0.17, 0.085, 0.26, 0.008, 2), flightCaseMat);
-                caseBot.position.set(2.84, 1.318 + 0.042, 1.68);
+                caseBot.position.set(2.84, 1.318 + 0.042, 1.90);
                 caseBot.castShadow = true;
                 const latchBot = new THREE.Mesh(UNIT_BOX_GEO, silverLatchMat);
                 latchBot.scale.set(0.174, 0.020, 0.07);
-                latchBot.position.set(2.84, 1.318 + 0.042, 1.68);
+                latchBot.position.set(2.84, 1.318 + 0.042, 1.90);
                 // Valija superior
                 const caseTop = new THREE.Mesh(createRoundedBoxGeo(0.16, 0.080, 0.24, 0.008, 2), flightCaseMat);
-                caseTop.position.set(2.84, 1.318 + 0.085 + 0.040, 1.68);
+                caseTop.position.set(2.84, 1.318 + 0.085 + 0.040, 1.90);
                 caseTop.castShadow = true;
                 const latchTop = new THREE.Mesh(UNIT_BOX_GEO, silverLatchMat);
                 latchTop.scale.set(0.164, 0.018, 0.06);
-                latchTop.position.set(2.84, 1.318 + 0.085 + 0.040, 1.68);
+                latchTop.position.set(2.84, 1.318 + 0.085 + 0.040, 1.90);
                 // Llavero de Poké Ball colgando del cierre (Foto 1)
                 const casePokeBall = new THREE.Mesh(new THREE.SphereGeometry(0.016, 12, 12), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
-                casePokeBall.position.set(2.74, 1.318 + 0.06, 1.68);
+                casePokeBall.position.set(2.74, 1.318 + 0.06, 1.90);
                 (currentAssemblyGroup || decorVideoGroup).add(caseBot, latchBot, caseTop, latchTop, casePokeBall);
 
-                // Dije Martillo de Thor (Mjölnir) en cadena metálica larga colgando del estante inferior (Z = 0.22 m, Foto 1)
+                // Dije Martillo de Thor (Mjölnir) en cadena metálica larga colgando del estante inferior (Z = 0.44 m, Foto 1)
                 const mjolnirGroup = new THREE.Group();
-                mjolnirGroup.position.set(2.76, 1.30, 0.22);
+                mjolnirGroup.position.set(2.76, 1.30, 0.44);
                 const chainLink = new THREE.Mesh(new THREE.CylinderGeometry(0.0015, 0.0015, 0.12, 6), new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9, roughness: 0.2 }));
                 chainLink.position.set(0, -0.06, 0);
                 const hammerHead = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.35, metalness: 0.85 }));
@@ -10562,7 +10562,7 @@
 
                 // Brazo articulado de micrófono y shock mount bajo el estante (Foto 1)
                 const micArmGroup = new THREE.Group();
-                micArmGroup.position.set(2.78, 1.25, 1.25);
+                micArmGroup.position.set(2.78, 1.25, 1.47);
                 const micBoomBar1 = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.32, 8), new THREE.MeshStandardMaterial({ color: 0x18181b }));
                 micBoomBar1.rotation.z = -0.45;
                 micBoomBar1.rotation.y = 0.3;
@@ -10575,19 +10575,19 @@
                 micArmGroup.add(micBoomBar1, micBoomBar2, micBody);
                 (currentAssemblyGroup || decorVideoGroup).add(micArmGroup);
 
-                // --- 2° ESTANTE MEDIO (Y = 1.65 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): BOLSO DE CÁMARA, HILO ROJO Y BIBLIOTECA COMPLETA CONTINUA (Foto 1) ---
-                addDecorBox(2.845, 1.65, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Medio (1.80×0.20 m)');
+                // --- 2° ESTANTE MEDIO (Y = 1.65 m, X = 2.845 m, Z = 1.15 m, 1.80×0.20 m): BOLSO DE CÁMARA, HILO ROJO Y BIBLIOTECA COMPLETA CONTINUA (Foto 1) ---
+                addDecorBox(2.845, 1.65, 1.15, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Medio (1.80×0.20 m)');
 
-                // Maceta de terracota en extremo izquierdo (Z = 0.18 m, Foto 1)
+                // Maceta de terracota en extremo izquierdo (Z = 0.40 m, Foto 1)
                 const midPotMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.85 });
                 const midPot = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.032, 0.075, 16), midPotMat);
-                midPot.position.set(2.84, 1.668 + 0.038, 0.18);
+                midPot.position.set(2.84, 1.668 + 0.038, 0.40);
                 midPot.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(midPot);
 
-                // Bolso de cámara fotográfica acolchado negro con correa y manija (Z = 0.32 m, Foto 1)
+                // Bolso de cámara fotográfica acolchado negro con correa y manija (Z = 0.54 m, Foto 1)
                 const cameraBagGroup = new THREE.Group();
-                cameraBagGroup.position.set(2.84, 1.668, 0.32);
+                cameraBagGroup.position.set(2.84, 1.668, 0.54);
                 const camBagMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.85 });
                 const camBagBody = new THREE.Mesh(createRoundedBoxGeo(0.16, 0.16, 0.16, 0.02, 2), camBagMat);
                 camBagBody.position.set(0, 0.08, 0);
@@ -10597,15 +10597,15 @@
                 cameraBagGroup.add(camBagBody, camBagHandle);
                 (currentAssemblyGroup || decorVideoGroup).add(cameraBagGroup);
 
-                // Hilo rojo / pulsera de protección colgando del borde (Z = 0.44 m, Foto 1)
+                // Hilo rojo / pulsera de protección colgando del borde (Z = 0.66 m, Foto 1)
                 const redThread = new THREE.Mesh(new THREE.CylinderGeometry(0.0015, 0.0015, 0.08, 6), new THREE.MeshBasicMaterial({ color: 0xdc2626 }));
-                redThread.position.set(2.74, 1.62, 0.44);
+                redThread.position.set(2.74, 1.62, 0.66);
                 (currentAssemblyGroup || decorVideoGroup).add(redThread);
 
-                // Hilera continua de libros de izquierda a derecha (Z = 0.46 a 1.78 m, Foto 1)
-                // 1) Novelas variadas y tomos con lomos multicolores (Z = 0.46 a 0.72 m)
+                // Hilera continua de libros de izquierda a derecha (Z = 0.68 a 2.00 m, Foto 1)
+                // 1) Novelas variadas y tomos con lomos multicolores (Z = 0.68 a 0.94 m)
                 const novelColors1 = [0xf8fafc, 0x1e3a8a, 0x991b1b, 0x1e293b, 0x7c3aed, 0xf1f5f9, 0x334155, 0xb45309, 0x047857];
-                let bZ1 = 0.46;
+                let bZ1 = 0.68;
                 for (let i = 0; i < 9; i++) {
                     const th = 0.024 + (i % 3) * 0.004;
                     const h = 0.20 + (i % 4) * 0.010;
@@ -10617,9 +10617,9 @@
                     bZ1 += th + 0.002;
                 }
 
-                // 2) Libros de tapa dura encuadernados en cuero con nervios dorados (Harry Potter / clásicos) (Z = 0.72 a 1.00 m, Foto 1)
+                // 2) Libros de tapa dura encuadernados en cuero con nervios dorados (Harry Potter / clásicos) (Z = 0.94 a 1.22 m, Foto 1)
                 const leatherColors = [0x881337, 0x7f1d1d, 0x14532d, 0x1e3a8a, 0x451a03, 0x78350f, 0x172554, 0x701a75];
-                let bZ2 = 0.72;
+                let bZ2 = 0.94;
                 for (let i = 0; i < 8; i++) {
                     const th = 0.032;
                     const h = 0.23 + (i % 2) * 0.008;
@@ -10635,8 +10635,8 @@
                     bZ2 += th + 0.002;
                 }
 
-                // 3) Mangas / novelas de bolsillo en serie con lomos bicolores (Z = 1.00 a 1.26 m, Foto 1)
-                let bZ3 = 1.00;
+                // 3) Mangas / novelas de bolsillo en serie con lomos bicolores (Z = 1.22 a 1.48 m, Foto 1)
+                let bZ3 = 1.22;
                 for (let i = 0; i < 11; i++) {
                     const th = 0.022;
                     const h = 0.19;
@@ -10649,9 +10649,9 @@
                     bZ3 += th + 0.0015;
                 }
 
-                // 4) Novelas y cómics sector medio-sur (Z = 1.26 a 1.50 m, Foto 1)
+                // 4) Novelas y cómics sector medio-sur (Z = 1.48 a 1.72 m, Foto 1)
                 const novelColors2 = [0x0284c7, 0x1e293b, 0xd97706, 0x475569, 0xb91c1c, 0x059669, 0x334155, 0x4338ca, 0x18181b];
-                let bZ4 = 1.26;
+                let bZ4 = 1.48;
                 for (let i = 0; i < 9; i++) {
                     const th = 0.025;
                     const h = 0.21 + (i % 3) * 0.008;
@@ -10663,11 +10663,11 @@
                     bZ4 += th + 0.002;
                 }
 
-                // 5) Colección Tolkien Deluxe (3 tomos negros con runas doradas) (Z = 1.50 a 1.66 m, Foto 1)
+                // 5) Colección Tolkien Deluxe (3 tomos negros con runas doradas) (Z = 1.72 a 1.88 m, Foto 1)
                 const tolkienBlackMat = new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.5, metalness: 0.2 });
                 const tolkienGoldMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.35, metalness: 0.8 });
                 for (let t = 0; t < 3; t++) {
-                    const tZ = 1.50 + t * 0.052;
+                    const tZ = 1.72 + t * 0.052;
                     const tBook = new THREE.Mesh(UNIT_BOX_GEO, tolkienBlackMat);
                     tBook.scale.set(0.17, 0.25, 0.046);
                     tBook.position.set(2.84, 1.668 + 0.125, tZ + 0.023);
@@ -10678,10 +10678,10 @@
                     (currentAssemblyGroup || decorVideoGroup).add(tBook, tRune);
                 }
 
-                // 6) 2 tomos gruesos con sobrecubierta blanca HarperCollins (Z = 1.66 a 1.78 m, Foto 1)
+                // 6) 2 tomos gruesos con sobrecubierta blanca HarperCollins (Z = 1.88 a 2.00 m, Foto 1)
                 const tolkienWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.7 });
                 for (let w = 0; w < 2; w++) {
-                    const wZ = 1.66 + w * 0.058;
+                    const wZ = 1.88 + w * 0.058;
                     const wBook = new THREE.Mesh(UNIT_BOX_GEO, tolkienWhiteMat);
                     wBook.scale.set(0.17, 0.25, 0.052);
                     wBook.position.set(2.84, 1.668 + 0.125, wZ + 0.026);
@@ -10693,14 +10693,14 @@
                     (currentAssemblyGroup || decorVideoGroup).add(wBook, wLogo);
                 }
 
-                // --- 3° ESTANTE SUPERIOR (Y = 2.00 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): PLANTA POTUS EN CASCADA, GOKU Y 4 BALONES HISTÓRICOS (Foto 1) ---
-                addDecorBox(2.845, 2.00, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Superior (1.80×0.20 m)');
+                // --- 3° ESTANTE SUPERIOR (Y = 2.00 m, X = 2.845 m, Z = 1.15 m, 1.80×0.20 m): PLANTA POTUS EN CASCADA, GOKU Y 4 BALONES HISTÓRICOS (Foto 1) ---
+                addDecorBox(2.845, 2.00, 1.15, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Superior (1.80×0.20 m)');
 
-                // Maceta de terracota con plato y planta Potus en extremo izquierdo (Z = 0.18 m, Foto 1)
+                // Maceta de terracota con plato y planta Potus en extremo izquierdo (Z = 0.40 m, Foto 1)
                 const potSaucer = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.07, 0.016, 16), midPotMat);
-                potSaucer.position.set(2.84, 2.018 + 0.008, 0.18);
+                potSaucer.position.set(2.84, 2.018 + 0.008, 0.40);
                 const potMain = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.055, 0.13, 16), midPotMat);
-                potMain.position.set(2.84, 2.018 + 0.075, 0.18);
+                potMain.position.set(2.84, 2.018 + 0.075, 0.40);
                 potMain.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(potSaucer, potMain);
 
@@ -10712,7 +10712,7 @@
                     const lf = new THREE.Mesh(new THREE.SphereGeometry(0.032, 8, 6), (l % 2 === 0) ? leafGreenMat : darkLeafMat);
                     lf.scale.set(0.6, 0.15, 1.0);
                     const ang = (l / 14) * Math.PI * 2;
-                    lf.position.set(2.84 + Math.cos(ang) * 0.055, 2.018 + 0.14 + (l % 3) * 0.02, 0.18 + Math.sin(ang) * 0.055);
+                    lf.position.set(2.84 + Math.cos(ang) * 0.055, 2.018 + 0.14 + (l % 3) * 0.02, 0.40 + Math.sin(ang) * 0.055);
                     lf.rotation.set(0.3, ang, 0.4);
                     (currentAssemblyGroup || decorVideoGroup).add(lf);
                 }
@@ -10720,7 +10720,7 @@
                 // Guía larga 1 (llega hasta Y = 1.12 m)
                 for (let yStep = 0; yStep < 20; yStep++) {
                     const dropY = 2.00 - yStep * 0.046;
-                    const dropZ = 0.14 + Math.sin(yStep * 0.7) * 0.035;
+                    const dropZ = 0.36 + Math.sin(yStep * 0.7) * 0.035;
                     const dropX = 2.76 + Math.cos(yStep * 0.5) * 0.025;
                     const vineLeaf = new THREE.Mesh(new THREE.SphereGeometry(0.024, 7, 5), (yStep % 2 === 0) ? leafGreenMat : darkLeafMat);
                     vineLeaf.scale.set(0.5, 0.12, 0.85);
@@ -10731,7 +10731,7 @@
                 // Guía 2 secundaria (llega hasta Y = 1.48 m)
                 for (let yStep = 0; yStep < 12; yStep++) {
                     const dropY = 2.00 - yStep * 0.044;
-                    const dropZ = 0.20 + Math.cos(yStep * 0.6) * 0.03;
+                    const dropZ = 0.42 + Math.cos(yStep * 0.6) * 0.03;
                     const dropX = 2.75 + Math.sin(yStep * 0.4) * 0.02;
                     const vineLeaf2 = new THREE.Mesh(new THREE.SphereGeometry(0.020, 6, 5), leafGreenMat);
                     vineLeaf2.scale.set(0.5, 0.12, 0.85);
@@ -10739,9 +10739,9 @@
                     (currentAssemblyGroup || decorVideoGroup).add(vineLeaf2);
                 }
 
-                // Figura de Goku agachado / en cuclillas (Dragon Ball) al lado de la planta (Z = 0.36 m, Foto 1)
+                // Figura de Goku agachado / en cuclillas (Dragon Ball) al lado de la planta (Z = 0.58 m, Foto 1)
                 const gokuGroup = new THREE.Group();
-                gokuGroup.position.set(2.83, 2.018, 0.36);
+                gokuGroup.position.set(2.83, 2.018, 0.58);
                 // Base redonda negra
                 const gokuBase = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.008, 16), new THREE.MeshStandardMaterial({ color: 0x18181b }));
                 gokuBase.position.set(0, 0.004, 0);
@@ -10770,66 +10770,443 @@
                 gokuGroup.add(gokuBase, gokuLegs, gokuTorso, gokuBelt, gokuHead);
                 (currentAssemblyGroup || decorVideoGroup).add(gokuGroup);
 
-                // Objeto central difusor / caja rectangular translúcida blanca (Z = 0.65 m, Foto 1)
+                // Objeto central difusor / caja rectangular translúcida blanca (Z = 0.87 m, Foto 1)
                 const diffuserBox = new THREE.Mesh(createRoundedBoxGeo(0.12, 0.08, 0.18, 0.010, 2), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3, transparent: true, opacity: 0.85 }));
-                diffuserBox.position.set(2.84, 2.018 + 0.04, 0.65);
+                diffuserBox.position.set(2.84, 2.018 + 0.04, 0.87);
                 diffuserBox.castShadow = true;
                 (currentAssemblyGroup || decorVideoGroup).add(diffuserBox);
 
-                // Colección de 4 Balones de Fútbol Históricos en pedestales anillo (Z = 0.96, 1.20, 1.44, 1.68 m, Foto 1)
-                const ballStandMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.4, metalness: 0.6 });
-                const ballWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35, metalness: 0.05 });
-                const ballBlackMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45, metalness: 0.05 });
+                // --- COLECCIÓN DE 4 MINI PELOTAS OFICIALES DE LOS MUNDIALES (1978, 1986, 2002, 2026) ---
+                // Renderizado fotorealista con texturas procedurales Canvas PBR y soportes de exhibición individuales (Foto 1)
+                function createWorldCupBallTexture(year) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 1024;
+                    canvas.height = 512;
+                    const ctx = canvas.getContext('2d');
+                    const w = canvas.width;
+                    const h = canvas.height;
 
-                const ballZCoords = [0.96, 1.20, 1.44, 1.68];
-                ballZCoords.forEach((bz, bIdx) => {
-                    const ballGroup = new THREE.Group();
-                    ballGroup.position.set(2.84, 2.018, bz);
+                    if (year === 1978) {
+                        // --- 1978: ADIDAS TANGO DURLAST (ARGENTINA 1978) ---
+                        ctx.fillStyle = '#f8fafc';
+                        ctx.fillRect(0, 0, w, h);
 
-                    // Pedestal aro de soporte
-                    const ringBase = new THREE.Mesh(new THREE.CylinderGeometry(0.040, 0.045, 0.014, 16), ballStandMat);
-                    ringBase.position.set(0, 0.007, 0);
-
-                    // Esfera del balón de fútbol (diámetro reglamentario ~22 cm -> radio 0.072 m)
-                    const ballSphere = new THREE.Mesh(new THREE.SphereGeometry(0.072, 24, 16), ballWhiteMat);
-                    ballSphere.position.set(0, 0.072 + 0.006, 0);
-                    ballSphere.castShadow = true;
-
-                    // Patrones gráficos según el modelo histórico (Telstar, Tango, Brazuca, Al Rihla)
-                    if (bIdx === 0) {
-                        // Telstar: Pentágonos negros clásicos
-                        [-0.04, 0, 0.04].forEach((offsetY, pIdx) => {
-                            const patch = new THREE.Mesh(UNIT_BOX_GEO, ballBlackMat);
-                            patch.scale.set(0.026, 0.026, 0.026);
-                            patch.position.set(-0.062, 0.072 + offsetY, (pIdx - 1) * 0.035);
-                            ballGroup.add(patch);
+                        // Costuras y paneles hexagonales / pentagonales clásicos de 32 paneles
+                        ctx.strokeStyle = '#cbd5e1';
+                        ctx.lineWidth = 2.0;
+                        [0.2, 0.35, 0.5, 0.65, 0.8].forEach(v => {
+                            ctx.beginPath(); ctx.moveTo(0, v * h); ctx.lineTo(w, v * h); ctx.stroke();
                         });
-                    } else if (bIdx === 1) {
-                        // Tango: Tríadas negras curvadas
-                        [-0.035, 0.035].forEach((offsetY, pIdx) => {
-                            const triad = new THREE.Mesh(new THREE.TorusGeometry(0.025, 0.008, 6, 12, Math.PI * 1.2), ballBlackMat);
-                            triad.rotation.y = Math.PI / 2;
-                            triad.position.set(-0.065, 0.072 + offsetY, (pIdx - 0.5) * 0.04);
-                            ballGroup.add(triad);
+                        for (let u = 0; u < 8; u++) {
+                            const x = (u / 8) * w;
+                            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+                        }
+
+                        // Tríadas Tango negras curvadas (20 tríadas que forman los 12 círculos blancos)
+                        ctx.fillStyle = '#111827';
+                        function drawTangoTriad(cx, cy, r, rot = 0) {
+                            ctx.save();
+                            ctx.translate(cx, cy);
+                            ctx.rotate(rot);
+                            ctx.beginPath();
+                            for (let i = 0; i < 3; i++) {
+                                const ang1 = (i * 120) * Math.PI / 180;
+                                const ang2 = ((i + 1) * 120) * Math.PI / 180;
+                                const p1x = Math.cos(ang1) * r;
+                                const p1y = Math.sin(ang1) * r;
+                                const p2x = Math.cos(ang2) * r;
+                                const p2y = Math.sin(ang2) * r;
+                                const cpx = Math.cos(ang1 + 60 * Math.PI / 180) * (r * 0.35);
+                                const cpy = Math.sin(ang1 + 60 * Math.PI / 180) * (r * 0.35);
+                                if (i === 0) ctx.moveTo(p1x, p1y);
+                                ctx.quadraticCurveTo(cpx, cpy, p2x, p2y);
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.restore();
+                        }
+
+                        const cols = 4;
+                        for (let r = 0; r < 2; r++) {
+                            const cy = (r === 0 ? 0.35 : 0.65) * h;
+                            for (let c = 0; c < cols; c++) {
+                                const cx = ((c + (r % 2) * 0.5) / cols) * w;
+                                drawTangoTriad(cx, cy, 75, r * Math.PI);
+                                drawTangoTriad(cx + (w / cols) * 0.5, cy, 75, (r + 1) * Math.PI);
+                            }
+                        }
+                        for (let c = 0; c < 4; c++) {
+                            drawTangoTriad((c / 4) * w + 64, 0.12 * h, 50, 0);
+                            drawTangoTriad((c / 4) * w + 64, 0.88 * h, 50, Math.PI);
+                        }
+
+                        // Panel central de exhibición frontal (U = 0.5)
+                        const bx = 0.5 * w;
+                        const by = 0.5 * h;
+                        ctx.save();
+                        ctx.translate(bx, by);
+
+                        // Logo Trefoil Adidas
+                        ctx.fillStyle = '#111827';
+                        ctx.beginPath(); ctx.ellipse(0, -28, 9, 22, 0, 0, Math.PI * 2); ctx.fill();
+                        ctx.beginPath(); ctx.ellipse(-13, -24, 8, 18, -0.45, 0, Math.PI * 2); ctx.fill();
+                        ctx.beginPath(); ctx.ellipse(13, -24, 8, 18, 0.45, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = '#f8fafc';
+                        [-18, -14, -10].forEach(sy => ctx.fillRect(-24, sy, 48, 2.2));
+
+                        ctx.fillStyle = '#111827';
+                        ctx.font = 'bold 16px "Trebuchet MS", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('adidas', 0, 2);
+                        ctx.font = 'bold 22px "Arial Black", sans-serif';
+                        ctx.fillText('tango', 0, 24);
+                        ctx.font = 'italic 11px Arial, sans-serif';
+                        ctx.fillText('durlast', 0, 38);
+                        ctx.font = 'bold 9px Arial, sans-serif';
+                        ctx.fillText('ARGENTINA 1978', 0, 52);
+                        ctx.restore();
+
+                    } else if (year === 1986) {
+                        // --- 1986: ADIDAS AZTECA (MÉXICO 1986) ---
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, w, h);
+
+                        ctx.strokeStyle = '#cbd5e1';
+                        ctx.lineWidth = 2.0;
+                        [0.2, 0.35, 0.5, 0.65, 0.8].forEach(v => {
+                            ctx.beginPath(); ctx.moveTo(0, v * h); ctx.lineTo(w, v * h); ctx.stroke();
                         });
-                    } else if (bIdx === 2) {
-                        // Brazuca / Teamgeist: Cintas curvadas doradas y rojas
-                        const ribbonMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.4 });
-                        const ribbon = new THREE.Mesh(new THREE.TorusGeometry(0.042, 0.007, 8, 16), ribbonMat);
-                        ribbon.rotation.x = 0.5;
-                        ribbon.position.set(-0.058, 0.075, 0);
-                        ballGroup.add(ribbon);
-                    } else {
-                        // Al Rihla: Patrones geométricos celestes y amarillos
-                        const rihlaMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.35 });
-                        const patchRihla = new THREE.Mesh(UNIT_BOX_GEO, rihlaMat);
-                        patchRihla.scale.set(0.015, 0.045, 0.045);
-                        patchRihla.position.set(-0.065, 0.075, 0);
-                        patchRihla.rotation.x = Math.PI / 4;
-                        ballGroup.add(patchRihla);
+                        for (let u = 0; u < 8; u++) {
+                            const x = (u / 8) * w;
+                            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+                        }
+
+                        // Tríadas Azteca: negras con grecas piramidales escalonadas prehispánicas
+                        function drawAztecaTriad(cx, cy, r, rot = 0) {
+                            ctx.save();
+                            ctx.translate(cx, cy);
+                            ctx.rotate(rot);
+
+                            ctx.fillStyle = '#111827';
+                            ctx.beginPath();
+                            for (let i = 0; i < 3; i++) {
+                                const ang1 = (i * 120) * Math.PI / 180;
+                                const ang2 = ((i + 1) * 120) * Math.PI / 180;
+                                const p1x = Math.cos(ang1) * r;
+                                const p1y = Math.sin(ang1) * r;
+                                const p2x = Math.cos(ang2) * r;
+                                const p2y = Math.sin(ang2) * r;
+                                const cpx = Math.cos(ang1 + 60 * Math.PI / 180) * (r * 0.35);
+                                const cpy = Math.sin(ang1 + 60 * Math.PI / 180) * (r * 0.35);
+                                if (i === 0) ctx.moveTo(p1x, p1y);
+                                ctx.quadraticCurveTo(cpx, cpy, p2x, p2y);
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+
+                            // Grecas aztecas blancas y detalles rojos
+                            ctx.strokeStyle = '#ffffff';
+                            ctx.lineWidth = 2.2;
+                            for (let i = 0; i < 3; i++) {
+                                ctx.save();
+                                ctx.rotate((i * 120) * Math.PI / 180);
+                                ctx.beginPath();
+                                ctx.moveTo(0, -r * 0.2);
+                                ctx.lineTo(r * 0.18, -r * 0.2);
+                                ctx.lineTo(r * 0.18, -r * 0.45);
+                                ctx.lineTo(r * 0.35, -r * 0.45);
+                                ctx.lineTo(r * 0.35, -r * 0.75);
+                                ctx.stroke();
+                                ctx.fillStyle = '#dc2626';
+                                ctx.fillRect(r * 0.10, -r * 0.40, 5, 5);
+                                ctx.restore();
+                            }
+                            ctx.restore();
+                        }
+
+                        const cols = 4;
+                        for (let r = 0; r < 2; r++) {
+                            const cy = (r === 0 ? 0.35 : 0.65) * h;
+                            for (let c = 0; c < cols; c++) {
+                                const cx = ((c + (r % 2) * 0.5) / cols) * w;
+                                drawAztecaTriad(cx, cy, 75, r * Math.PI);
+                                drawAztecaTriad(cx + (w / cols) * 0.5, cy, 75, (r + 1) * Math.PI);
+                            }
+                        }
+                        for (let c = 0; c < 4; c++) {
+                            drawAztecaTriad((c / 4) * w + 64, 0.12 * h, 50, 0);
+                            drawAztecaTriad((c / 4) * w + 64, 0.88 * h, 50, Math.PI);
+                        }
+
+                        const bx = 0.5 * w;
+                        const by = 0.5 * h;
+                        ctx.save();
+                        ctx.translate(bx, by);
+                        ctx.fillStyle = '#111827';
+                        ctx.beginPath(); ctx.ellipse(0, -28, 9, 22, 0, 0, Math.PI * 2); ctx.fill();
+                        ctx.beginPath(); ctx.ellipse(-14, -24, 8, 18, -0.45, 0, Math.PI * 2); ctx.fill();
+                        ctx.beginPath(); ctx.ellipse(14, -24, 8, 18, 0.45, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = '#ffffff';
+                        [-18, -14, -10].forEach(sy => ctx.fillRect(-24, sy, 48, 2.2));
+
+                        ctx.fillStyle = '#111827';
+                        ctx.font = 'bold 16px "Trebuchet MS", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('adidas', 0, 2);
+                        ctx.font = 'bold 22px "Arial Black", sans-serif';
+                        ctx.fillStyle = '#dc2626';
+                        ctx.fillText('azteca', 0, 24);
+                        ctx.fillStyle = '#111827';
+                        ctx.font = 'bold 10px Arial, sans-serif';
+                        ctx.fillText('MEXICO 86', 0, 40);
+                        ctx.restore();
+
+                    } else if (year === 2002) {
+                        // --- 2002: ADIDAS FEVERNOVA (COREA - JAPÓN 2002) ---
+                        const bgGrad = ctx.createLinearGradient(0, 0, w, h);
+                        bgGrad.addColorStop(0, '#f5e8c7');
+                        bgGrad.addColorStop(0.5, '#eddcb5');
+                        bgGrad.addColorStop(1, '#f5e8c7');
+                        ctx.fillStyle = bgGrad;
+                        ctx.fillRect(0, 0, w, h);
+
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+                        for (let i = 0; i < 2000; i++) {
+                            ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
+                        }
+
+                        ctx.strokeStyle = 'rgba(180, 150, 90, 0.35)';
+                        ctx.lineWidth = 2.0;
+                        for (let i = 0; i < 6; i++) {
+                            const x = (i / 6) * w;
+                            ctx.beginPath();
+                            ctx.arc(x, 0.5 * h, 140, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+
+                        // Trigones revolucionarios Fevernova en forma de turbina / shuriken
+                        function drawFevernovaTrigon(cx, cy, r, rot = 0) {
+                            ctx.save();
+                            ctx.translate(cx, cy);
+                            ctx.rotate(rot);
+
+                            // Aspas rojas exteriores
+                            ctx.fillStyle = '#dc2626';
+                            ctx.beginPath();
+                            for (let i = 0; i < 3; i++) {
+                                const ang = (i * 120) * Math.PI / 180;
+                                ctx.save();
+                                ctx.rotate(ang);
+                                ctx.moveTo(0, 0);
+                                ctx.bezierCurveTo(r * 0.3, -r * 0.2, r * 0.7, -r * 0.35, r * 1.0, -r * 0.1);
+                                ctx.bezierCurveTo(r * 0.8, r * 0.2, r * 0.4, r * 0.15, 0, 0);
+                                ctx.restore();
+                            }
+                            ctx.fill();
+
+                            // Núcleo dorado brillante
+                            const goldGrad = ctx.createRadialGradient(0, 0, 5, 0, 0, r * 0.65);
+                            goldGrad.addColorStop(0, '#fef08a');
+                            goldGrad.addColorStop(0.4, '#eab308');
+                            goldGrad.addColorStop(1, '#ca8a04');
+                            ctx.fillStyle = goldGrad;
+                            ctx.beginPath();
+                            for (let i = 0; i < 3; i++) {
+                                const ang = (i * 120) * Math.PI / 180;
+                                ctx.save();
+                                ctx.rotate(ang);
+                                ctx.moveTo(0, 0);
+                                ctx.bezierCurveTo(r * 0.2, -r * 0.12, r * 0.45, -r * 0.2, r * 0.65, -r * 0.05);
+                                ctx.bezierCurveTo(r * 0.5, r * 0.1, r * 0.25, r * 0.08, 0, 0);
+                                ctx.restore();
+                            }
+                            ctx.fill();
+
+                            // Trazos verdes aerodinámicos
+                            ctx.strokeStyle = '#059669';
+                            ctx.lineWidth = 3.0;
+                            for (let i = 0; i < 3; i++) {
+                                const ang = (i * 120) * Math.PI / 180;
+                                ctx.save();
+                                ctx.rotate(ang);
+                                ctx.beginPath();
+                                ctx.arc(r * 0.35, -r * 0.15, r * 0.3, 0.4, Math.PI * 0.75);
+                                ctx.stroke();
+                                ctx.restore();
+                            }
+
+                            ctx.fillStyle = '#dc2626';
+                            ctx.beginPath(); ctx.arc(0, 0, r * 0.14, 0, Math.PI * 2); ctx.fill();
+                            ctx.fillStyle = '#fbbf24';
+                            ctx.beginPath(); ctx.arc(0, 0, r * 0.07, 0, Math.PI * 2); ctx.fill();
+                            ctx.restore();
+                        }
+
+                        [
+                            [0.22 * w, 0.48 * h, 110, 0.2],
+                            [0.72 * w, 0.48 * h, 110, -0.4],
+                            [0.48 * w, 0.18 * h, 90, 1.2],
+                            [0.48 * w, 0.82 * h, 90, -1.0],
+                            [0.0 * w, 0.25 * h, 80, 0.5],
+                            [1.0 * w, 0.25 * h, 80, 0.5]
+                        ].forEach(([tx, ty, tr, trot]) => drawFevernovaTrigon(tx, ty, tr, trot));
+
+                        const bx = 0.5 * w;
+                        const by = 0.5 * h;
+                        ctx.save();
+                        ctx.translate(bx, by);
+                        ctx.fillStyle = '#18181b';
+                        ctx.beginPath();
+                        ctx.moveTo(-16, -10); ctx.lineTo(-11, -10); ctx.lineTo(-15, -2); ctx.lineTo(-20, -2); ctx.closePath();
+                        ctx.moveTo(-8, -16); ctx.lineTo(-3, -16); ctx.lineTo(-9, -2); ctx.lineTo(-14, -2); ctx.closePath();
+                        ctx.moveTo(0, -22); ctx.lineTo(5, -22); ctx.lineTo(-3, -2); ctx.lineTo(-8, -2); ctx.closePath();
+                        ctx.fill();
+
+                        ctx.font = 'bold 16px "Trebuchet MS", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('adidas', -7, 12);
+                        ctx.font = 'bold 20px "Arial Black", sans-serif';
+                        ctx.fillStyle = '#dc2626';
+                        ctx.fillText('fevernova', -7, 36);
+                        ctx.font = 'bold 10px Arial, sans-serif';
+                        ctx.fillStyle = '#18181b';
+                        ctx.fillText('2002 KOREA JAPAN', -7, 52);
+                        ctx.restore();
+
+                    } else if (year === 2026) {
+                        // --- 2026: ADIDAS FIFA WORLD CUP 2026 (CANADÁ • MÉXICO • USA) ---
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, w, h);
+
+                        // Costuras termo-selladas curvas modernas
+                        ctx.strokeStyle = '#e2e8f0';
+                        ctx.lineWidth = 3.0;
+                        for (let i = 0; i < 4; i++) {
+                            ctx.beginPath();
+                            const sx = (i / 4) * w;
+                            ctx.moveTo(sx, 0);
+                            ctx.bezierCurveTo(sx + 80, h * 0.3, sx - 80, h * 0.7, sx, h);
+                            ctx.stroke();
+                        }
+
+                        // Chevrones y prismas geométricos en colores oficiales (Verde México, Rojo Canadá/USA, Azul USA, Dorado Trofeo)
+                        function draw2026ChevronCluster(cx, cy, scale = 1.0, rot = 0) {
+                            ctx.save();
+                            ctx.translate(cx, cy);
+                            ctx.rotate(rot);
+                            ctx.scale(scale, scale);
+
+                            ctx.fillStyle = '#059669'; // Verde Esmeralda México
+                            ctx.beginPath(); ctx.moveTo(-50, -40); ctx.lineTo(-10, -70); ctx.lineTo(10, -55); ctx.lineTo(-30, -25); ctx.closePath(); ctx.fill();
+
+                            ctx.fillStyle = '#dc2626'; // Rojo Vivo Canadá & USA
+                            ctx.beginPath(); ctx.moveTo(-25, -20); ctx.lineTo(15, -50); ctx.lineTo(35, -35); ctx.lineTo(-5, -5); ctx.closePath(); ctx.fill();
+
+                            ctx.fillStyle = '#2563eb'; // Azul Real USA
+                            ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(35, -30); ctx.lineTo(55, -10); ctx.lineTo(15, 20); ctx.closePath(); ctx.fill();
+
+                            ctx.fillStyle = '#f59e0b'; // Dorado Copa del Mundo
+                            ctx.beginPath(); ctx.moveTo(15, 25); ctx.lineTo(45, 0); ctx.lineTo(60, 15); ctx.lineTo(30, 40); ctx.closePath(); ctx.fill();
+
+                            ctx.strokeStyle = '#ffffff';
+                            ctx.lineWidth = 2.5;
+                            ctx.beginPath(); ctx.moveTo(-60, -35); ctx.lineTo(70, 20); ctx.stroke();
+                            ctx.restore();
+                        }
+
+                        draw2026ChevronCluster(0.24 * w, 0.42 * h, 1.1, 0.3);
+                        draw2026ChevronCluster(0.76 * w, 0.42 * h, 1.1, -0.3);
+                        draw2026ChevronCluster(0.24 * w, 0.78 * h, 0.9, 1.8);
+                        draw2026ChevronCluster(0.76 * w, 0.78 * h, 0.9, -1.8);
+                        draw2026ChevronCluster(0.50 * w, 0.15 * h, 0.8, 0.0);
+                        draw2026ChevronCluster(0.0 * w, 0.60 * h, 0.8, -0.5);
+                        draw2026ChevronCluster(1.0 * w, 0.60 * h, 0.8, -0.5);
+
+                        // Emblema Oficial FIFA WORLD CUP 26 ("26" con silueta de Copa del Mundo dorada en el centro) + Adidas
+                        const bx = 0.5 * w;
+                        const by = 0.52 * h;
+                        ctx.save();
+                        ctx.translate(bx, by);
+
+                        ctx.fillStyle = '#111827';
+                        ctx.beginPath();
+                        ctx.moveTo(-16, -42); ctx.lineTo(-11, -42); ctx.lineTo(-15, -34); ctx.lineTo(-20, -34); ctx.closePath();
+                        ctx.moveTo(-8, -48); ctx.lineTo(-3, -48); ctx.lineTo(-9, -34); ctx.lineTo(-14, -34); ctx.closePath();
+                        ctx.moveTo(0, -54); ctx.lineTo(5, -54); ctx.lineTo(-3, -34); ctx.lineTo(-8, -34); ctx.closePath();
+                        ctx.fill();
+
+                        ctx.font = 'bold 13px "Trebuchet MS", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('adidas', -7, -22);
+
+                        ctx.font = '900 48px "Arial Black", sans-serif';
+                        ctx.fillText('26', 0, 24);
+
+                        const tropGrad = ctx.createLinearGradient(-10, -10, 10, 30);
+                        tropGrad.addColorStop(0, '#fef08a');
+                        tropGrad.addColorStop(0.5, '#f59e0b');
+                        tropGrad.addColorStop(1, '#b45309');
+                        ctx.fillStyle = tropGrad;
+                        ctx.beginPath();
+                        ctx.arc(0, -2, 7, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillRect(-4, 0, 8, 16);
+                        ctx.fillRect(-7, 16, 14, 5);
+
+                        ctx.font = '900 10px Arial, sans-serif';
+                        ctx.fillStyle = '#111827';
+                        ctx.fillText('FIFA WORLD CUP', 0, 42);
+                        ctx.font = 'bold 8px Arial, sans-serif';
+                        ctx.fillStyle = '#475569';
+                        ctx.fillText('CANADA • MEXICO • USA', 0, 54);
+                        ctx.restore();
                     }
 
-                    ballGroup.add(ringBase, ballSphere);
+                    const tex = new THREE.CanvasTexture(canvas);
+                    if ('colorSpace' in tex) tex.colorSpace = THREE.SRGBColorSpace;
+                    else tex.encoding = THREE.sRGBEncoding;
+                    tex.generateMipmaps = true;
+                    return tex;
+                }
+
+                // Generar los 4 balones históricos en pedestales anillo de exhibición
+                const worldCupBalls = [
+                    { year: 1978, name: 'Tango Durlast (Argentina 1978)', z: 1.38, rough: 0.22, metal: 0.04, coat: 0.3 },
+                    { year: 1986, name: 'Azteca (México 1986)',           z: 1.54, rough: 0.24, metal: 0.04, coat: 0.3 },
+                    { year: 2002, name: 'Fevernova (Corea-Japón 2002)',   z: 1.70, rough: 0.18, metal: 0.20, coat: 0.5 },
+                    { year: 2026, name: 'FIFA World Cup 2026',            z: 1.86, rough: 0.20, metal: 0.08, coat: 0.4 }
+                ];
+
+                const ballStandMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.55, metalness: 0.3 });
+                const ballGeo = new THREE.SphereGeometry(0.058, 32, 24);
+
+                worldCupBalls.forEach(b => {
+                    const ballGroup = new THREE.Group();
+                    ballGroup.position.set(2.845, 2.018, b.z);
+
+                    // Pedestal aro negro biselado de exhibición
+                    const ringBase = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.042, 0.012, 24), ballStandMat);
+                    ringBase.position.set(0, 0.006, 0);
+                    ringBase.castShadow = true;
+
+                    // Esfera del balón tamaño 1 (mini ball, r = 0.058 m)
+                    const ballTex = createWorldCupBallTexture(b.year);
+                    const ballMat = new THREE.MeshPhysicalMaterial({
+                        map: ballTex,
+                        roughness: b.rough,
+                        metalness: b.metal,
+                        clearcoat: b.coat,
+                        clearcoatRoughness: 0.15
+                    });
+                    const ballMesh = new THREE.Mesh(ballGeo, ballMat);
+                    // Orientar de modo que el panel frontal con los logos apunte al frente de la habitación (-X)
+                    ballMesh.rotation.y = Math.PI;
+                    ballMesh.rotation.z = -0.05;
+                    ballMesh.position.set(0, 0.006 + 0.054, 0);
+                    ballMesh.castShadow = true;
+                    ballMesh.name = 'MiniPelota_Mundial_' + b.year;
+
+                    ballGroup.add(ringBase, ballMesh);
                     (currentAssemblyGroup || decorVideoGroup).add(ballGroup);
                 });
 
@@ -12155,8 +12532,8 @@
         addLine2DSegment(2.40, 2.13, 3.00, 2.13, 0.018, 0x8f3818);
         addLine2DSegment(1.68, 0.00, 1.68, 0.52, 0.018, 0x8f3818);
         addLine2DSegment(1.68, 0.52, 2.40, 0.52, 0.018, 0x8f3818);
-        // 3 Estantes Flotantes Este [2.75..2.95, 0.03..1.83] (1.80 m de largo x 0.20 m de profundidad, dejando 30 cm libres al Sur del escritorio de 2.13 m)
-        addDashedLine(2.75, 0.03, 2.75, 1.83);
+        // 3 Estantes Flotantes Este [2.75..2.95, 0.25..2.05] (1.80 m de largo x 0.20 m de profundidad, a 25 cm de la ventana Norte)
+        addDashedLine(2.75, 0.25, 2.75, 2.05);
         // Biblioteca Alta Oeste [0.00..0.30, 0.44..1.56]
         addLine2DSegment(0.30, 0.44, 0.30, 1.56, 0.018, 0x18181b);
         addLine2DSegment(0.00, 0.44, 0.30, 0.44, 0.018, 0x18181b);
@@ -14191,7 +14568,7 @@
             { id: 'vid_guitar2', name: 'Guitarra en Funda Negra Acolchada (Estudio Sur)', room: 'Estudio', x: 0.18, z: 1.88, y: 0.51, w: 0.20, d: 0.36, h: 1.02, rot: 0, color: 0x0f172a },
             { id: 'vid_planta_biblio', name: 'Planta de Interior en Maceta (Estudio)', room: 'Estudio', x: 0.20, z: 1.98, y: 0.18, w: 0.25, d: 0.25, h: 0.36, rot: 0, color: 0xc2410c },
             { id: 'vid_alimento_perro', name: 'Bolsa Alimento para Perros (+RP)', room: 'Estudio', x: 0.36, z: 2.65, y: 0.25, w: 0.28, d: 0.24, h: 0.50, rot: 0, color: 0x1e3a8a },
-            { id: 'vid_estantes_estudio', name: '3 Estantes Flotantes Estudio (Consolas, Libros y Cajas)', room: 'Estudio', x: 2.85, z: 0.93, y: 1.65, w: 0.20, d: 1.80, h: 0.75, rot: 0, color: 0x8a3c1b },
+            { id: 'vid_estantes_estudio', name: '3 Estantes Flotantes Estudio (Consolas, Libros y Cajas)', room: 'Estudio', x: 2.85, z: 1.15, y: 1.65, w: 0.20, d: 1.80, h: 0.75, rot: 0, color: 0x8a3c1b },
             { id: 'vid_ajedrez', name: 'Mesa Ajedrez El Señor de los Anillos', room: 'Estudio', x: 0.28, z: 0.28, y: 0.37, w: 0.48, d: 0.48, h: 0.72, rot: 0, color: 0xd4a373 },
             { id: 'vid_diorama_jedi', name: 'Mesa Diorama Consejo Jedi Star Wars', room: 'Estudio', x: 0.28, z: 2.32, y: 0.37, w: 0.48, d: 0.48, h: 0.72, rot: 0, color: 0xd4a373 }
         ];
