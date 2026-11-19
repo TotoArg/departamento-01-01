@@ -1442,6 +1442,7 @@
                     <option value="toggle_doors">🚪 Abrir / Cerrar Puertas y Placards</option>
                     <option value="toggle_windows">🪟 Abrir / Cerrar Ventanas</option>
                     <option value="cycle_table">🍽️ Ampliar / Cerrar Mesa Comedor (1.00m ↔ 1.70m)</option>
+                    <option value="toggle_consoles">🎮 Consolas Retro: Abrir / Cerrar Clamshell</option>
                 </optgroup>
                 <optgroup label="👁️ Capas Visibles">
                     <option value="toggle_roof">🏠 Mostrar / Ocultar Techo de Madera</option>
@@ -3496,6 +3497,8 @@
         const diningTableClickCandidates = [];
         const animLiftTables = [];
         const liftTableClickCandidates = [];
+        const animClamshells = [];
+        const clamshellClickCandidates = [];
 
         // Geometría de caja con bordes y esquinas redondeadas biseladas (evita el aspecto plano de cajas primitivas)
         function createRoundedBoxGeo(w, h, d, radius = 0.03, smoothness = 3) {
@@ -9913,24 +9916,213 @@
                 // --- 1° ESTANTE INFERIOR (Y = 1.30 m, X = 2.845 m, Z = 0.93 m, 1.80×0.20 m): COLECCIÓN COMPLETA DE CONSOLAS RETRO Y EDICIONES ESPECIALES POKÉMON (Foto 1 del usuario) ---
                 addDecorBox(2.845, 1.30, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Inferior (1.80×0.20 m)');
 
-                // Soporte acrílico transparente para consolas
-                const gbcStandMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.08, transmission: 0.9, transparent: true, opacity: 0.75, thickness: 0.005 });
+                // Soportes de exhibición acrílicos transparentes cortados con láser (PMMA 1.49) para las 6 consolas (Foto 1)
+                const acrylicStandMat = new THREE.MeshPhysicalMaterial({
+                    color: 0xf1f5f9,
+                    roughness: 0.08,
+                    metalness: 0.0,
+                    transmission: 0.86,
+                    ior: 1.49,
+                    transparent: true,
+                    opacity: 0.82,
+                    clearcoat: 1.0,
+                    clearcoatRoughness: 0.05,
+                    thickness: 0.008,
+                    specularIntensity: 1.0,
+                    specularColor: new THREE.Color(0xffffff)
+                });
+                const standRubberFootMat = new THREE.MeshStandardMaterial({
+                    color: 0x18181b,
+                    roughness: 0.9,
+                    metalness: 0.05
+                });
+                const standFrostedEdgeMat = new THREE.MeshStandardMaterial({
+                    color: 0xffffff,
+                    roughness: 0.6,
+                    transparent: true,
+                    opacity: 0.55
+                });
+
+                function buildAcrylicStand(x, y, z, spanZ, depthX, heightY, cradleThick = 0.024) {
+                    const standGroup = new THREE.Group();
+                    standGroup.position.set(x, y, z);
+
+                    // 1. Placa base apoyada directamente en el estante
+                    const basePlate = new THREE.Mesh(createRoundedBoxGeo(depthX, 0.004, spanZ, 0.002, 2), acrylicStandMat);
+                    basePlate.position.set(0, 0.002 + 0.002, 0);
+                    basePlate.castShadow = true;
+                    basePlate.receiveShadow = true;
+                    standGroup.add(basePlate);
+
+                    // 2. 4 Topes de goma antideslizantes bajo la base
+                    const footR = 0.0035;
+                    const footH = 0.002;
+                    [
+                        [-depthX / 2 + 0.007, -spanZ / 2 + 0.007],
+                        [-depthX / 2 + 0.007, spanZ / 2 - 0.007],
+                        [depthX / 2 - 0.007, -spanZ / 2 + 0.007],
+                        [depthX / 2 - 0.007, spanZ / 2 - 0.007]
+                    ].forEach(([fx, fz]) => {
+                        const foot = new THREE.Mesh(new THREE.CylinderGeometry(footR, footR, footH, 10), standRubberFootMat);
+                        foot.position.set(fx, footH / 2, fz);
+                        standGroup.add(foot);
+                    });
+
+                    // 3. Dos brazos laterales con cuna de retención y respaldo inclinado
+                    [-spanZ * 0.36, spanZ * 0.36].forEach(sideZ => {
+                        const armShape = new THREE.Shape();
+                        const frontX = -depthX * 0.38;
+                        const backX = depthX * 0.38;
+
+                        armShape.moveTo(frontX, 0.004);
+                        armShape.lineTo(frontX, 0.004 + 0.015); // Labio frontal
+                        armShape.lineTo(frontX + 0.005, 0.004 + 0.015);
+                        armShape.lineTo(frontX + 0.005, 0.004 + 0.005); // Suelo de la cuna
+                        armShape.lineTo(frontX + 0.005 + cradleThick, 0.004 + 0.005);
+                        armShape.lineTo(backX - 0.006, heightY); // Respaldo inclinado
+                        armShape.lineTo(backX, heightY);
+                        armShape.lineTo(backX, 0.004);
+                        armShape.closePath();
+
+                        const extrudeSettings = { depth: 0.005, bevelEnabled: true, bevelSegments: 1, steps: 1, bevelSize: 0.001, bevelThickness: 0.001 };
+                        const armGeo = new THREE.ExtrudeGeometry(armShape, extrudeSettings);
+                        const armMesh = new THREE.Mesh(armGeo, acrylicStandMat);
+                        armMesh.position.set(0, 0, sideZ - 0.0025);
+                        armMesh.castShadow = true;
+                        standGroup.add(armMesh);
+
+                        // Filete frontal blanco escarchado
+                        const lipEdge = new THREE.Mesh(UNIT_BOX_GEO, standFrostedEdgeMat);
+                        lipEdge.scale.set(0.002, 0.014, 0.006);
+                        lipEdge.position.set(frontX - 0.001, 0.004 + 0.008, sideZ);
+                        standGroup.add(lipEdge);
+                    });
+
+                    return standGroup;
+                }
+
+                // Generar los 6 soportes acrílicos a medida para las 6 consolas retro
+                const standConfigs = [
+                    { name: 'GBC 1',  z: 0.22, spanZ: 0.065, depthX: 0.075, h: 0.060, cradleThick: 0.026 },
+                    { name: 'GBC 2',  z: 0.34, spanZ: 0.065, depthX: 0.075, h: 0.060, cradleThick: 0.026 },
+                    { name: 'GBA',    z: 0.47, spanZ: 0.110, depthX: 0.070, h: 0.045, cradleThick: 0.024 },
+                    { name: 'GBA SP', z: 0.60, spanZ: 0.072, depthX: 0.072, h: 0.055, cradleThick: 0.025 },
+                    { name: 'DS Lite', z: 0.73, spanZ: 0.115, depthX: 0.070, h: 0.050, cradleThick: 0.023 },
+                    { name: '3DS XL',  z: 0.87, spanZ: 0.130, depthX: 0.075, h: 0.055, cradleThick: 0.023 }
+                ];
+                standConfigs.forEach(s => {
+                    const stand = buildAcrylicStand(2.84, 1.318, s.z, s.spanZ, s.depthX, s.h, s.cradleThick);
+                    stand.name = 'Acrylic_Stand_' + s.name;
+                    (currentAssemblyGroup || decorVideoGroup).add(stand);
+                });
+
+                function setupGLBClamshell(wrapper, rootName, lidMeshNames, pivotVec, id, name, closedAng) {
+                    const obj = wrapper.getObjectByName(rootName) || wrapper;
+                    let hinge = obj.getObjectByName(rootName + '_hinge');
+                    if (!hinge) {
+                        hinge = new THREE.Group();
+                        hinge.name = rootName + '_hinge';
+                        hinge.position.copy(pivotVec);
+
+                        const toMove = [];
+                        obj.children.forEach(c => {
+                            if (lidMeshNames.includes(c.name)) toMove.push(c);
+                        });
+                        toMove.forEach(m => {
+                            m.position.sub(pivotVec);
+                            hinge.add(m);
+                        });
+                        obj.add(hinge);
+                    }
+                    hinge.rotation.x = closedAng;
+
+                    let clamItem = animClamshells.find(c => c.id === id);
+                    if (!clamItem) {
+                        clamItem = {
+                            id,
+                            name,
+                            hinge,
+                            closedAngle: closedAng,
+                            openAngle: 0.0,
+                            currentAngle: closedAng,
+                            targetAngle: closedAng,
+                            isOpen: false,
+                            toggle: function(forceOpen = null) {
+                                if (typeof forceOpen === 'boolean') {
+                                    this.isOpen = forceOpen;
+                                } else {
+                                    this.isOpen = !this.isOpen;
+                                }
+                                this.targetAngle = this.isOpen ? this.openAngle : this.closedAngle;
+                                wakeRenderer();
+                                return this.isOpen;
+                            }
+                        };
+                        animClamshells.push(clamItem);
+                    } else {
+                        clamItem.hinge = hinge;
+                        clamItem.closedAngle = closedAng;
+                        clamItem.currentAngle = closedAng;
+                        clamItem.targetAngle = closedAng;
+                        clamItem.isOpen = false;
+                        hinge.rotation.x = closedAng;
+                    }
+
+                    wrapper.traverse(c => {
+                        if (c.isMesh) {
+                            c.userData.clamshell = clamItem;
+                            if (!clamshellClickCandidates.includes(c)) clamshellClickCandidates.push(c);
+                        }
+                    });
+
+                    return hinge;
+                }
+
+                function setupFallbackClamshell(group, hingeGroup, id, name, closedAng, openAng) {
+                    let clamItem = animClamshells.find(c => c.id === id);
+                    if (!clamItem) {
+                        clamItem = {
+                            id,
+                            name,
+                            hinge: hingeGroup,
+                            closedAngle: closedAng,
+                            openAngle: openAng,
+                            currentAngle: closedAng,
+                            targetAngle: closedAng,
+                            isOpen: false,
+                            toggle: function(forceOpen = null) {
+                                if (typeof forceOpen === 'boolean') {
+                                    this.isOpen = forceOpen;
+                                } else {
+                                    this.isOpen = !this.isOpen;
+                                }
+                                this.targetAngle = this.isOpen ? this.openAngle : this.closedAngle;
+                                wakeRenderer();
+                                return this.isOpen;
+                            }
+                        };
+                        animClamshells.push(clamItem);
+                    }
+                    group.traverse(c => {
+                        if (c.isMesh) {
+                            c.userData.clamshell = clamItem;
+                            if (!clamshellClickCandidates.includes(c)) clamshellClickCandidates.push(c);
+                        }
+                    });
+                }
+
                 const dPadMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 });
 
-                // 1) Game Boy Color 1 — Edición Especial Pokémon Amarilla con Cartucho Negro en ranura superior (Z = 0.26 m, Foto 1)
-                const gbc1Stand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.045, 0.070, 0.004, 1), gbcStandMat);
-                gbc1Stand.position.set(2.84, 1.318 + 0.022, 0.22);
-                (currentAssemblyGroup || decorVideoGroup).add(gbc1Stand);
-
+                // 1) Game Boy Color 1 — Edición Especial Pokémon Amarilla con Cartucho Negro en ranura superior (Z = 0.22 m, Foto 1)
                 loadGLBFurniture({
                     url: 'models/gbc.glb',
                     container: currentAssemblyGroup,
                     targetSize: [0.078, 0.133, 0.027],
-                    position: [2.84, 1.318, 0.22],
+                    position: [2.84, 1.327, 0.22],
                     rotation: [-0.18, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const gbc1Group = new THREE.Group();
-                        gbc1Group.position.set(2.84, 1.318, 0.22);
+                        gbc1Group.position.set(2.84, 1.327, 0.22);
                         gbc1Group.rotation.y = 0.08;
                         const gbc1Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 }));
                         gbc1Body.position.set(-0.012, 0.072, 0);
@@ -9989,20 +10181,16 @@
                     }
                 });
 
-                // 2) Game Boy Color 2 — Edición Especial Pokémon Amarilla (Z = 0.38 m, Foto 1)
-                const gbc2Stand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.045, 0.070, 0.004, 1), gbcStandMat);
-                gbc2Stand.position.set(2.84, 1.318 + 0.022, 0.34);
-                (currentAssemblyGroup || decorVideoGroup).add(gbc2Stand);
-
+                // 2) Game Boy Color 2 — Edición Especial Pokémon Amarilla (Z = 0.34 m, Foto 1)
                 loadGLBFurniture({
                     url: 'models/gbc.glb',
                     container: currentAssemblyGroup,
                     targetSize: [0.078, 0.133, 0.027],
-                    position: [2.84, 1.318, 0.34],
+                    position: [2.84, 1.327, 0.34],
                     rotation: [-0.18, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const gbc2Group = new THREE.Group();
-                        gbc2Group.position.set(2.84, 1.318, 0.34);
+                        gbc2Group.position.set(2.84, 1.327, 0.34);
                         gbc2Group.rotation.y = 0.08;
                         const gbc2Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 }));
                         gbc2Body.position.set(-0.012, 0.072, 0);
@@ -10049,20 +10237,16 @@
                     }
                 });
 
-                // 3) Game Boy Advance (GBA Clásica Horizontal Indigo/Glacier) (Z = 0.50 m, Foto 1)
-                const gbaStand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.035, 0.110, 0.004, 1), gbcStandMat);
-                gbaStand.position.set(2.84, 1.318 + 0.018, 0.47);
-                (currentAssemblyGroup || decorVideoGroup).add(gbaStand);
-
+                // 3) Game Boy Advance (GBA Clásica Horizontal Indigo/Glacier) (Z = 0.47 m, Foto 1)
                 loadGLBFurniture({
                     url: 'models/gba.glb',
                     container: currentAssemblyGroup,
                     targetSize: [0.024, 0.082, 0.144],
-                    position: [2.84, 1.318, 0.47],
+                    position: [2.84, 1.327, 0.47],
                     rotation: [0, Math.PI, 0.18],
                     fallbackFn: () => {
                         const gbaGroup = new THREE.Group();
-                        gbaGroup.position.set(2.84, 1.318, 0.47);
+                        gbaGroup.position.set(2.84, 1.327, 0.47);
                         const gbaBody = new THREE.Mesh(createRoundedBoxGeo(0.024, 0.082, 0.144, 0.012, 2), new THREE.MeshStandardMaterial({ color: 0x4f46e5, roughness: 0.30, metalness: 0.20 }));
                         gbaBody.position.set(-0.010, 0.048, 0);
                         gbaBody.rotation.z = -0.22;
@@ -10099,16 +10283,16 @@
                     }
                 });
 
-                // 4) Game Boy Advance SP (GBA SP) — Edición Especial Pikachu Amarilla Desplegada (Z = 0.62 m, Foto 1)
+                // 4) Game Boy Advance SP (GBA SP) — Edición Especial Pikachu Amarilla (Z = 0.60 m, Foto 1, Clamshell Plegable)
                 loadGLBFurniture({
                     url: 'models/gbasp.glb',
                     container: currentAssemblyGroup,
                     targetSize: [0.082, 0.135, 0.045],
-                    position: [2.84, 1.318, 0.60],
+                    position: [2.84, 1.327, 0.60],
                     rotation: [-0.15, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const gbaSpGroup = new THREE.Group();
-                        gbaSpGroup.position.set(2.84, 1.318, 0.60);
+                        gbaSpGroup.position.set(2.84, 1.327, 0.60);
                         const pikaSpMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.30, metalness: 0.10 });
                         const spBase = new THREE.Mesh(createRoundedBoxGeo(0.082, 0.012, 0.084, 0.006, 2), pikaSpMat);
                         spBase.position.set(0, 0.006, 0);
@@ -10117,16 +10301,22 @@
                         const spHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.080, 12), new THREE.MeshStandardMaterial({ color: 0xca8a04, metalness: 0.6 }));
                         spHinge.rotation.x = Math.PI / 2;
                         spHinge.position.set(0.038, 0.012, 0);
+
+                        const spHingeGroup = new THREE.Group();
+                        spHingeGroup.position.set(0.038, 0.012, 0);
                         const spLid = new THREE.Mesh(createRoundedBoxGeo(0.008, 0.078, 0.082, 0.006, 2), pikaSpMat);
-                        spLid.position.set(0.052, 0.052, 0);
-                        spLid.rotation.z = -0.35;
+                        spLid.position.set(0.014, 0.040, 0);
                         const spLcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.052, 0.058, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.15 }));
-                        spLcd.position.set(0.047, 0.052, 0);
-                        spLcd.rotation.z = -0.35;
-                        gbaSpGroup.add(spBase, spDpad, spHinge, spLid, spLcd);
+                        spLcd.position.set(0.009, 0.040, 0);
+                        spHingeGroup.add(spLid, spLcd);
+                        spHingeGroup.rotation.z = Math.PI * 0.45;
+
+                        gbaSpGroup.add(spBase, spDpad, spHinge, spHingeGroup);
+                        setupFallbackClamshell(gbaSpGroup, spHingeGroup, 'gbasp', 'Game Boy Advance SP (Ed. Pikachu)', Math.PI * 0.45, -0.35);
                         (currentAssemblyGroup || decorVideoGroup).add(gbaSpGroup);
                     },
                     onLoaded: (wrapper) => {
+                        wrapper.rotation.order = 'YXZ';
                         const pikaYellow = new THREE.MeshPhysicalMaterial({ color: 0xfacc15, roughness: 0.28, metalness: 0.08, clearcoat: 0.35 });
                         const hingeMat = new THREE.MeshStandardMaterial({ color: 0xca8a04, roughness: 0.30, metalness: 0.65 });
                         const dPadMatLocal = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45 });
@@ -10140,19 +10330,29 @@
                                 else if (['lcd', 'lens'].includes(c.name)) c.material = lcdMat;
                             }
                         });
+
+                        setupGLBClamshell(
+                            wrapper,
+                            'GameBoyAdvanceSP',
+                            ['lid_face', 'lid_slits', 'lens', 'lcd', 'logo_strip', 'pads', 'lid_back', 'badge'],
+                            new THREE.Vector3(0, 0.041, -0.090),
+                            'gbasp',
+                            'Game Boy Advance SP (Ed. Pikachu)',
+                            2.05
+                        );
                     }
                 });
 
-                // 5) Nintendo DS Lite — Edición Crimson Red / Black Desplegada (Z = 0.74 m, Foto 1)
+                // 5) Nintendo DS Lite — Edición Crimson Red / Black (Z = 0.73 m, Foto 1, Clamshell Plegable)
                 loadGLBFurniture({
                     url: 'models/ds.glb',
                     container: currentAssemblyGroup,
                     targetSize: [0.133, 0.130, 0.048],
-                    position: [2.84, 1.318, 0.73],
+                    position: [2.84, 1.327, 0.73],
                     rotation: [-0.15, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const dsLiteGroup = new THREE.Group();
-                        dsLiteGroup.position.set(2.84, 1.318, 0.73);
+                        dsLiteGroup.position.set(2.84, 1.327, 0.73);
                         const dsBase = new THREE.Mesh(createRoundedBoxGeo(0.074, 0.011, 0.133, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.35 }));
                         dsBase.position.set(0, 0.006, 0);
                         const dsTouch = new THREE.Mesh(createRoundedBoxGeo(0.048, 0.002, 0.064, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 }));
@@ -10160,16 +10360,22 @@
                         const dsHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.128, 12), new THREE.MeshStandardMaterial({ color: 0x18181b }));
                         dsHinge.rotation.x = Math.PI / 2;
                         dsHinge.position.set(0.034, 0.011, 0);
+
+                        const dsHingeGroup = new THREE.Group();
+                        dsHingeGroup.position.set(0.034, 0.011, 0);
                         const dsLid = new THREE.Mesh(createRoundedBoxGeo(0.007, 0.070, 0.133, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.25, metalness: 0.15 }));
-                        dsLid.position.set(0.048, 0.048, 0);
-                        dsLid.rotation.z = -0.35;
+                        dsLid.position.set(0.014, 0.037, 0);
                         const dsTopLcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.048, 0.064, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.15 }));
-                        dsTopLcd.position.set(0.044, 0.048, 0);
-                        dsTopLcd.rotation.z = -0.35;
-                        dsLiteGroup.add(dsBase, dsTouch, dsHinge, dsLid, dsTopLcd);
+                        dsTopLcd.position.set(0.010, 0.037, 0);
+                        dsHingeGroup.add(dsLid, dsTopLcd);
+                        dsHingeGroup.rotation.z = Math.PI * 0.45;
+
+                        dsLiteGroup.add(dsBase, dsTouch, dsHinge, dsHingeGroup);
+                        setupFallbackClamshell(dsLiteGroup, dsHingeGroup, 'ds', 'Nintendo DS Lite (Crimson Red / Black)', Math.PI * 0.45, -0.35);
                         (currentAssemblyGroup || decorVideoGroup).add(dsLiteGroup);
                     },
                     onLoaded: (wrapper) => {
+                        wrapper.rotation.order = 'YXZ';
                         const crimsonMat = new THREE.MeshPhysicalMaterial({ color: 0x991b1b, roughness: 0.15, clearcoat: 0.9, clearcoatRoughness: 0.1 });
                         const matteBlack = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.40, metalness: 0.05 });
                         const screenMat = new THREE.MeshPhysicalMaterial({ color: 0x09090b, roughness: 0.15, clearcoat: 0.7 });
@@ -10183,19 +10389,29 @@
                                 else if (['dpad', 'button_a', 'button_x', 'button_y', 'button_b'].includes(c.name)) c.material = btnMat;
                             }
                         });
+
+                        setupGLBClamshell(
+                            wrapper,
+                            'NintendoDS',
+                            ['lid_face', 'speaker_holes', 'lens', 'lcd', 'bumpers', 'lid_back', 'badge'],
+                            new THREE.Vector3(0, 0.038, -0.027),
+                            'ds',
+                            'Nintendo DS Lite (Crimson Red / Black)',
+                            2.05
+                        );
                     }
                 });
 
-                // 6) Nintendo 3DS XL — Edición Especial Pokémon Pikachu Amarilla Desplegada (Z = 0.88 m, Foto 1)
+                // 6) Nintendo 3DS XL — Edición Especial Pokémon Pikachu Amarilla (Z = 0.87 m, Foto 1, Clamshell Plegable)
                 loadGLBFurniture({
                     url: 'models/3ds.glb',
                     container: currentAssemblyGroup,
                     targetSize: [0.156, 0.150, 0.050],
-                    position: [2.84, 1.318, 0.87],
+                    position: [2.84, 1.327, 0.87],
                     rotation: [-0.15, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const n3dsGroup = new THREE.Group();
-                        n3dsGroup.position.set(2.84, 1.318, 0.87);
+                        n3dsGroup.position.set(2.84, 1.327, 0.87);
                         const pika3dsMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.20, metalness: 0.15 });
                         const n3dsBase = new THREE.Mesh(createRoundedBoxGeo(0.093, 0.012, 0.156, 0.008, 2), pika3dsMat);
                         n3dsBase.position.set(0, 0.006, 0);
@@ -10204,16 +10420,22 @@
                         const n3dsHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.150, 12), new THREE.MeshStandardMaterial({ color: 0xeab308 }));
                         n3dsHinge.rotation.x = Math.PI / 2;
                         n3dsHinge.position.set(0.044, 0.012, 0);
+
+                        const n3dsHingeGroup = new THREE.Group();
+                        n3dsHingeGroup.position.set(0.044, 0.012, 0);
                         const n3dsLid = new THREE.Mesh(createRoundedBoxGeo(0.008, 0.088, 0.156, 0.008, 2), pika3dsMat);
-                        n3dsLid.position.set(0.060, 0.058, 0);
-                        n3dsLid.rotation.z = -0.35;
+                        n3dsLid.position.set(0.016, 0.046, 0);
                         const n3dsLcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.062, 0.106, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.15 }));
-                        n3dsLcd.position.set(0.055, 0.058, 0);
-                        n3dsLcd.rotation.z = -0.35;
-                        n3dsGroup.add(n3dsBase, n3dsCirclePad, n3dsHinge, n3dsLid, n3dsLcd);
+                        n3dsLcd.position.set(0.011, 0.046, 0);
+                        n3dsHingeGroup.add(n3dsLid, n3dsLcd);
+                        n3dsHingeGroup.rotation.z = Math.PI * 0.45;
+
+                        n3dsGroup.add(n3dsBase, n3dsCirclePad, n3dsHinge, n3dsHingeGroup);
+                        setupFallbackClamshell(n3dsGroup, n3dsHingeGroup, '3ds', 'Nintendo 3DS XL (Ed. Pikachu)', Math.PI * 0.45, -0.35);
                         (currentAssemblyGroup || decorVideoGroup).add(n3dsGroup);
                     },
                     onLoaded: (wrapper) => {
+                        wrapper.rotation.order = 'YXZ';
                         const pika3dsMat = new THREE.MeshPhysicalMaterial({ color: 0xfacc15, roughness: 0.22, metalness: 0.12, clearcoat: 0.45 });
                         const circlePadMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.55, metalness: 0.05 });
                         const screenMat = new THREE.MeshPhysicalMaterial({ color: 0x09090b, roughness: 0.15, clearcoat: 0.7 });
@@ -10227,6 +10449,16 @@
                                 else if (['dpad', 'button_a', 'button_b', 'button_x', 'button_y'].includes(c.name)) c.material = btnMat;
                             }
                         });
+
+                        setupGLBClamshell(
+                            wrapper,
+                            'Nintendo3DS',
+                            ['lid_face', 'slider_slot', 'depth_slider', 'lens', 'speaker_holes', 'inner_camera', 'lcd', 'pads', 'lid_print', 'lid_leds', 'lid_back', 'outer_cameras', 'camera_apertures', 'camera_led'],
+                            new THREE.Vector3(0, 0.036, -0.046),
+                            '3ds',
+                            'Nintendo 3DS XL (Ed. Pikachu)',
+                            2.08
+                        );
                     }
                 });
 
@@ -13798,6 +14030,23 @@
                 }
             }
 
+            // 0D3. Raycast sobre Consolas Retro Clamshell (GBA SP, DS Lite, 3DS XL: abrir / cerrar con clic)
+            if (!isFurnitureEditMode && clamshellClickCandidates.length > 0) {
+                const clamHits = raycaster.intersectObjects(clamshellClickCandidates, false);
+                if (clamHits.length > 0) {
+                    const hitObj = clamHits[0].object;
+                    const clam = hitObj.userData && hitObj.userData.clamshell;
+                    if (clam) {
+                        const opened = clam.toggle();
+                        showToast((opened ? '🎮 ' : '🔒 ') + clam.name + ': ' + (opened ? 'Abierta (Pantallas desplegadas)' : 'Cerrada en exhibición'));
+                        clearSelection();
+                        if (isBIMPlanningMode && typeof selectBIMObject === 'function') selectBIMObject(hitObj, e.clientX, e.clientY);
+                        wakeRenderer();
+                        return;
+                    }
+                }
+            }
+
             // 0E. En modo Recorrido 1° Persona (Walkthrough): tocar un punto del piso te lleva caminando suavemente hasta allí (estilo Matterport)
             if (walkthroughState.active) {
                 if (isBIMPlanningMode && typeof handleBIMRaycastSelection === 'function' && handleBIMRaycastSelection(e, true)) {
@@ -14662,7 +14911,7 @@
             _hoverPointerVec.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             _hoverPointerVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             _hoverRaycaster.setFromCamera(_hoverPointerVec, activeCamera);
-            const allInteractives = [...doorClickCandidates, ...windowClickCandidates, ...curtainClickCandidates, ...diningTableClickCandidates, ...liftTableClickCandidates, ...(typeof wizClickCandidates !== 'undefined' ? wizClickCandidates : [])];
+            const allInteractives = [...doorClickCandidates, ...windowClickCandidates, ...curtainClickCandidates, ...diningTableClickCandidates, ...liftTableClickCandidates, ...clamshellClickCandidates, ...(typeof wizClickCandidates !== 'undefined' ? wizClickCandidates : [])];
             const dHits = _hoverRaycaster.intersectObjects(allInteractives, false);
             renderer.domElement.style.cursor = dHits.length > 0 ? 'pointer' : '';
         }, { passive: true });
@@ -14809,6 +15058,34 @@
 
             return moving;
         }
+
+        // Actualizador de interpolación suave de apertura y cierre de consolas retro plegables (GBA SP, DS Lite, 3DS XL)
+        function updateAnimClamshells() {
+            let moving = false;
+            for (let i = 0; i < animClamshells.length; i++) {
+                const c = animClamshells[i];
+                if (Math.abs(c.currentAngle - c.targetAngle) > 0.003) {
+                    c.currentAngle += (c.targetAngle - c.currentAngle) * 0.14;
+                    if (c.hinge) c.hinge.rotation.x = c.currentAngle;
+                    moving = true;
+                } else if (c.currentAngle !== c.targetAngle) {
+                    c.currentAngle = c.targetAngle;
+                    if (c.hinge) c.hinge.rotation.x = c.currentAngle;
+                    moving = true;
+                }
+            }
+            return moving;
+        }
+
+        function toggleAllClamshells(forceOpen = null) {
+            if (animClamshells.length === 0) return;
+            const anyClosed = animClamshells.some(c => !c.isOpen);
+            const targetState = (typeof forceOpen === 'boolean') ? forceOpen : anyClosed;
+            animClamshells.forEach(c => c.toggle(targetState));
+            showToast(targetState ? '🎮 Consolas Retro: Todas Abiertas (Desplegadas)' : '🔒 Consolas Retro: Todas Cerradas en exhibición');
+            wakeRenderer();
+        }
+        window.toggleAllClamshells = toggleAllClamshells;
 
         // Actualizador de interpolación suave de ventanas corredizas y ventiluz basculante
         function updateAnimWindows() {
@@ -15498,10 +15775,11 @@
                 const curtainsMoving = updateAnimCurtains();
                 const tableMoving = updateAnimDiningTable();
                 const coffeeTableMoving = updateAnimCoffeeTable();
-                if (doorsMoving || windowsMoving || tableMoving || coffeeTableMoving) {
+                const clamshellsMoving = updateAnimClamshells();
+                if (doorsMoving || windowsMoving || tableMoving || coffeeTableMoving || clamshellsMoving) {
                     if (typeof requestShadowMapUpdate === 'function') requestShadowMapUpdate();
                 }
-                if (wallsMoving || doorsMoving || windowsMoving || curtainsMoving || tableMoving || coffeeTableMoving || movedWalk) dirtyFrames = Math.max(dirtyFrames, 3);
+                if (wallsMoving || doorsMoving || windowsMoving || curtainsMoving || tableMoving || coffeeTableMoving || clamshellsMoving || movedWalk) dirtyFrames = Math.max(dirtyFrames, 3);
                 dirtyFrames--;
                 updateLabels();
                 if (selectionBox) selectionBox.update();
@@ -17468,6 +17746,7 @@
                     } else if (act === 'windows' || act === 'toggle_windows') document.getElementById('btn-toggle-windows')?.click();
                     else if (act === 'doors' || act === 'toggle_doors') document.getElementById('btn-toggle-doors')?.click();
                     else if (act === 'dining' || act === 'cycle_table') document.getElementById('btn-toggle-dining-table')?.click();
+                    else if (act === 'toggle_consoles') toggleAllClamshells();
                     else if (act === 'roof' || act === 'toggle_roof') document.getElementById('btn-toggle-roof')?.click();
                     else if (act === 'labels' || act === 'toggle_labels') document.getElementById('btn-toggle-labels')?.click();
                     else if (act === 'decor' || act === 'toggle_decor') document.getElementById('btn-toggle-video-decor')?.click();
