@@ -9914,145 +9914,321 @@
                 addDecorBox(2.845, 1.30, 0.93, 0.20, 0.035, 1.80, 0x8a3c1b, 0.65, 0, 'Estante Flotante Inferior (1.80×0.20 m)');
 
                 // Soporte acrílico transparente para consolas
-                const gbcStandMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.6 });
+                const gbcStandMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.08, transmission: 0.9, transparent: true, opacity: 0.75, thickness: 0.005 });
                 const dPadMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 });
 
                 // 1) Game Boy Color 1 — Edición Especial Pokémon Amarilla con Cartucho Negro en ranura superior (Z = 0.26 m, Foto 1)
-                const gbc1Group = new THREE.Group();
-                gbc1Group.position.set(2.83, 1.318, 0.26);
-                gbc1Group.rotation.y = 0.08;
                 const gbc1Stand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.045, 0.070, 0.004, 1), gbcStandMat);
-                gbc1Stand.position.set(0, 0.022, 0);
-                const gbc1Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 }));
-                gbc1Body.position.set(-0.012, 0.072, 0);
-                gbc1Body.rotation.z = -0.20;
-                // Cartucho negro Game Boy insertado en la ranura superior (Foto 1)
-                const gbc1Cart = new THREE.Mesh(createRoundedBoxGeo(0.018, 0.050, 0.058, 0.003, 1), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 }));
-                gbc1Cart.position.set(-0.004, 0.142, 0);
-                gbc1Cart.rotation.z = -0.20;
-                // Pantalla cuadrada TFT y LCD verde
-                const gbc1Screen = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.056, 0.058, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.25 }));
-                gbc1Screen.position.set(-0.026, 0.092, 0);
-                gbc1Screen.rotation.z = -0.20;
-                const gbc1Lcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.040, 0.044, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.4 }));
-                gbc1Lcd.position.set(-0.028, 0.094, 0);
-                gbc1Lcd.rotation.z = -0.20;
-                const gbc1Dpad = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.018, 0.018, 0.002, 1), dPadMat);
-                gbc1Dpad.position.set(-0.026, 0.048, -0.020);
-                gbc1Dpad.rotation.z = -0.20;
-                const gbc1BtnA = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.009, 0.009, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
-                gbc1BtnA.position.set(-0.026, 0.052, 0.022);
-                gbc1BtnA.rotation.z = -0.20;
-                const gbc1BtnB = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.009, 0.009, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x2563eb }));
-                gbc1BtnB.position.set(-0.026, 0.044, 0.012);
-                gbc1BtnB.rotation.z = -0.20;
-                gbc1Group.add(gbc1Stand, gbc1Body, gbc1Cart, gbc1Screen, gbc1Lcd, gbc1Dpad, gbc1BtnA, gbc1BtnB);
-                (currentAssemblyGroup || decorVideoGroup).add(gbc1Group);
+                gbc1Stand.position.set(2.83, 1.318 + 0.022, 0.26);
+                decorVideoGroup.add(gbc1Stand);
+
+                loadGLBFurniture({
+                    url: 'models/gbc.glb',
+                    container: decorVideoGroup,
+                    targetSize: [0.078, 0.133, 0.027],
+                    position: [2.83, 1.318, 0.26],
+                    rotation: [-0.18, -Math.PI / 2, 0],
+                    fallbackFn: () => {
+                        const gbc1Group = new THREE.Group();
+                        gbc1Group.position.set(2.83, 1.318, 0.26);
+                        gbc1Group.rotation.y = 0.08;
+                        const gbc1Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 }));
+                        gbc1Body.position.set(-0.012, 0.072, 0);
+                        gbc1Body.rotation.z = -0.20;
+                        const gbc1Cart = new THREE.Mesh(createRoundedBoxGeo(0.018, 0.050, 0.058, 0.003, 1), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.5 }));
+                        gbc1Cart.position.set(-0.004, 0.142, 0);
+                        gbc1Cart.rotation.z = -0.20;
+                        const gbc1Screen = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.056, 0.058, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.25 }));
+                        gbc1Screen.position.set(-0.026, 0.092, 0);
+                        gbc1Screen.rotation.z = -0.20;
+                        const gbc1Lcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.040, 0.044, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.4 }));
+                        gbc1Lcd.position.set(-0.028, 0.094, 0);
+                        gbc1Lcd.rotation.z = -0.20;
+                        const gbc1Dpad = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.018, 0.018, 0.002, 1), dPadMat);
+                        gbc1Dpad.position.set(-0.026, 0.048, -0.020);
+                        gbc1Dpad.rotation.z = -0.20;
+                        const gbc1BtnA = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.009, 0.009, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+                        gbc1BtnA.position.set(-0.026, 0.052, 0.022);
+                        gbc1BtnA.rotation.z = -0.20;
+                        const gbc1BtnB = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.009, 0.009, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x2563eb }));
+                        gbc1BtnB.position.set(-0.026, 0.044, 0.012);
+                        gbc1BtnB.rotation.z = -0.20;
+                        gbc1Group.add(gbc1Body, gbc1Cart, gbc1Screen, gbc1Lcd, gbc1Dpad, gbc1BtnA, gbc1BtnB);
+                        (currentAssemblyGroup || decorVideoGroup).add(gbc1Group);
+                    },
+                    onLoaded: (wrapper) => {
+                        wrapper.rotation.order = 'YXZ';
+                        const pikaYellow = new THREE.MeshPhysicalMaterial({ color: 0xfacc15, roughness: 0.28, metalness: 0.05, clearcoat: 0.3 });
+                        const pikaBlue = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.22, metalness: 0.05 });
+                        const btnRed = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.32 });
+                        const btnBlue = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.32 });
+                        const dPadMatLocal = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45 });
+                        const lcdMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.35, emissive: 0x15803d, emissiveIntensity: 0.2 });
+                        const screenGlass = new THREE.MeshPhysicalMaterial({ color: 0x0f172a, roughness: 0.1, transmission: 0.25, transparent: true, opacity: 0.85 });
+
+                        wrapper.traverse(c => {
+                            if (c.isMesh) {
+                                if (['body_front', 'body_back', 'battery_cover', 'grip_ridges', 'ext_frame', 'phone_ring'].includes(c.name)) c.material = pikaYellow;
+                                else if (c.name === 'screen_bezel') c.material = pikaBlue;
+                                else if (c.name === 'screen') c.material = screenGlass;
+                                else if (c.name === 'lcd') c.material = lcdMat;
+                                else if (c.name === 'button_a') c.material = btnRed;
+                                else if (c.name === 'button_b') c.material = btnBlue;
+                                else if (['dpad', 'dpad_marks'].includes(c.name)) c.material = dPadMatLocal;
+                            }
+                        });
+
+                        // Cartucho negro Game Boy insertado en la ranura superior (Foto 1)
+                        const cartMesh = new THREE.Mesh(
+                            createRoundedBoxGeo(0.056, 0.048, 0.012, 0.002, 1),
+                            new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45 })
+                        );
+                        cartMesh.position.set(0, 0.142, -0.006);
+                        cartMesh.castShadow = true;
+                        wrapper.add(cartMesh);
+                    }
+                });
 
                 // 2) Game Boy Color 2 — Edición Especial Pokémon Amarilla (Z = 0.38 m, Foto 1)
-                const gbc2Group = new THREE.Group();
-                gbc2Group.position.set(2.83, 1.318, 0.38);
-                gbc2Group.rotation.y = 0.08;
                 const gbc2Stand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.045, 0.070, 0.004, 1), gbcStandMat);
-                gbc2Stand.position.set(0, 0.022, 0);
-                const gbc2Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 }));
-                gbc2Body.position.set(-0.012, 0.072, 0);
-                gbc2Body.rotation.z = -0.20;
-                const gbc2Screen = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.056, 0.058, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.25 }));
-                gbc2Screen.position.set(-0.026, 0.092, 0);
-                gbc2Screen.rotation.z = -0.20;
-                const gbc2Lcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.040, 0.044, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.4 }));
-                gbc2Lcd.position.set(-0.028, 0.094, 0);
-                gbc2Lcd.rotation.z = -0.20;
-                const gbc2Dpad = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.018, 0.018, 0.002, 1), dPadMat);
-                gbc2Dpad.position.set(-0.026, 0.048, -0.020);
-                gbc2Dpad.rotation.z = -0.20;
-                const gbc2BtnA = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.009, 0.009, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
-                gbc2BtnA.position.set(-0.026, 0.052, 0.022);
-                gbc2BtnA.rotation.z = -0.20;
-                const gbc2BtnB = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.009, 0.009, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x2563eb }));
-                gbc2BtnB.position.set(-0.026, 0.044, 0.012);
-                gbc2BtnB.rotation.z = -0.20;
-                gbc2Group.add(gbc2Stand, gbc2Body, gbc2Screen, gbc2Lcd, gbc2Dpad, gbc2BtnA, gbc2BtnB);
-                (currentAssemblyGroup || decorVideoGroup).add(gbc2Group);
+                gbc2Stand.position.set(2.83, 1.318 + 0.022, 0.38);
+                decorVideoGroup.add(gbc2Stand);
+
+                loadGLBFurniture({
+                    url: 'models/gbc.glb',
+                    container: decorVideoGroup,
+                    targetSize: [0.078, 0.133, 0.027],
+                    position: [2.83, 1.318, 0.38],
+                    rotation: [-0.18, -Math.PI / 2, 0],
+                    fallbackFn: () => {
+                        const gbc2Group = new THREE.Group();
+                        gbc2Group.position.set(2.83, 1.318, 0.38);
+                        gbc2Group.rotation.y = 0.08;
+                        const gbc2Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 }));
+                        gbc2Body.position.set(-0.012, 0.072, 0);
+                        gbc2Body.rotation.z = -0.20;
+                        const gbc2Screen = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.056, 0.058, 0.004, 1), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.25 }));
+                        gbc2Screen.position.set(-0.026, 0.092, 0);
+                        gbc2Screen.rotation.z = -0.20;
+                        const gbc2Lcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.040, 0.044, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.4 }));
+                        gbc2Lcd.position.set(-0.028, 0.094, 0);
+                        gbc2Lcd.rotation.z = -0.20;
+                        const gbc2Dpad = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.018, 0.018, 0.002, 1), dPadMat);
+                        gbc2Dpad.position.set(-0.026, 0.048, -0.020);
+                        gbc2Dpad.rotation.z = -0.20;
+                        const gbc2BtnA = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.009, 0.009, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+                        gbc2BtnA.position.set(-0.026, 0.052, 0.022);
+                        gbc2BtnA.rotation.z = -0.20;
+                        const gbc2BtnB = new THREE.Mesh(createRoundedBoxGeo(0.004, 0.009, 0.009, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x2563eb }));
+                        gbc2BtnB.position.set(-0.026, 0.044, 0.012);
+                        gbc2BtnB.rotation.z = -0.20;
+                        gbc2Group.add(gbc2Body, gbc2Screen, gbc2Lcd, gbc2Dpad, gbc2BtnA, gbc2BtnB);
+                        (currentAssemblyGroup || decorVideoGroup).add(gbc2Group);
+                    },
+                    onLoaded: (wrapper) => {
+                        wrapper.rotation.order = 'YXZ';
+                        const pikaYellow = new THREE.MeshPhysicalMaterial({ color: 0xfacc15, roughness: 0.28, metalness: 0.05, clearcoat: 0.3 });
+                        const pikaBlue = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.22, metalness: 0.05 });
+                        const btnRed = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.32 });
+                        const btnBlue = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.32 });
+                        const dPadMatLocal = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45 });
+                        const lcdMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.35, emissive: 0x15803d, emissiveIntensity: 0.2 });
+                        const screenGlass = new THREE.MeshPhysicalMaterial({ color: 0x0f172a, roughness: 0.1, transmission: 0.25, transparent: true, opacity: 0.85 });
+
+                        wrapper.traverse(c => {
+                            if (c.isMesh) {
+                                if (['body_front', 'body_back', 'battery_cover', 'grip_ridges', 'ext_frame', 'phone_ring'].includes(c.name)) c.material = pikaYellow;
+                                else if (c.name === 'screen_bezel') c.material = pikaBlue;
+                                else if (c.name === 'screen') c.material = screenGlass;
+                                else if (c.name === 'lcd') c.material = lcdMat;
+                                else if (c.name === 'button_a') c.material = btnRed;
+                                else if (c.name === 'button_b') c.material = btnBlue;
+                                else if (['dpad', 'dpad_marks'].includes(c.name)) c.material = dPadMatLocal;
+                            }
+                        });
+                    }
+                });
 
                 // 3) Game Boy Advance (GBA Clásica Horizontal Indigo/Glacier) (Z = 0.50 m, Foto 1)
-                const gbaGroup = new THREE.Group();
-                gbaGroup.position.set(2.83, 1.318, 0.50);
-                const gbaStand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.040, 0.120, 0.004, 1), gbcStandMat);
-                gbaStand.position.set(0, 0.020, 0);
-                const gbaBody = new THREE.Mesh(createRoundedBoxGeo(0.024, 0.082, 0.144, 0.012, 2), new THREE.MeshStandardMaterial({ color: 0x4f46e5, roughness: 0.30, metalness: 0.20 }));
-                gbaBody.position.set(-0.010, 0.048, 0);
-                gbaBody.rotation.z = -0.22;
-                const gbaScreen = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.046, 0.068, 0.003, 1), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 }));
-                gbaScreen.position.set(-0.023, 0.050, 0);
-                gbaScreen.rotation.z = -0.22;
-                const gbaTrigL = new THREE.Mesh(createRoundedBoxGeo(0.006, 0.010, 0.030, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0xc7d2fe }));
-                gbaTrigL.position.set(-0.002, 0.092, -0.050);
-                const gbaTrigR = new THREE.Mesh(createRoundedBoxGeo(0.006, 0.010, 0.030, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0xc7d2fe }));
-                gbaTrigR.position.set(-0.002, 0.092, 0.050);
-                gbaGroup.add(gbaStand, gbaBody, gbaScreen, gbaTrigL, gbaTrigR);
-                (currentAssemblyGroup || decorVideoGroup).add(gbaGroup);
+                const gbaStand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.035, 0.110, 0.004, 1), gbcStandMat);
+                gbaStand.position.set(2.83, 1.318 + 0.018, 0.50);
+                decorVideoGroup.add(gbaStand);
+
+                loadGLBFurniture({
+                    url: 'models/gba.glb',
+                    container: decorVideoGroup,
+                    targetSize: [0.024, 0.082, 0.144],
+                    position: [2.83, 1.318, 0.50],
+                    rotation: [0, Math.PI, 0.18],
+                    fallbackFn: () => {
+                        const gbaGroup = new THREE.Group();
+                        gbaGroup.position.set(2.83, 1.318, 0.50);
+                        const gbaBody = new THREE.Mesh(createRoundedBoxGeo(0.024, 0.082, 0.144, 0.012, 2), new THREE.MeshStandardMaterial({ color: 0x4f46e5, roughness: 0.30, metalness: 0.20 }));
+                        gbaBody.position.set(-0.010, 0.048, 0);
+                        gbaBody.rotation.z = -0.22;
+                        const gbaScreen = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.046, 0.068, 0.003, 1), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 }));
+                        gbaScreen.position.set(-0.023, 0.050, 0);
+                        gbaScreen.rotation.z = -0.22;
+                        const gbaTrigL = new THREE.Mesh(createRoundedBoxGeo(0.006, 0.010, 0.030, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0xc7d2fe }));
+                        gbaTrigL.position.set(-0.002, 0.092, -0.050);
+                        const gbaTrigR = new THREE.Mesh(createRoundedBoxGeo(0.006, 0.010, 0.030, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0xc7d2fe }));
+                        gbaTrigR.position.set(-0.002, 0.092, 0.050);
+                        gbaGroup.add(gbaBody, gbaScreen, gbaTrigL, gbaTrigR);
+                        (currentAssemblyGroup || decorVideoGroup).add(gbaGroup);
+                    },
+                    onLoaded: (wrapper) => {
+                        wrapper.rotation.order = 'YXZ';
+                        const gbaIndigo = new THREE.MeshPhysicalMaterial({ color: 0x4f46e5, roughness: 0.20, metalness: 0.10, transmission: 0.35, transparent: true, opacity: 0.90, ior: 1.48 });
+                        const gbaScreen = new THREE.MeshPhysicalMaterial({ color: 0x09090b, roughness: 0.12, clearcoat: 0.8 });
+                        const gbaFrame = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.35 });
+                        const dPadMatLocal = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.45 });
+                        const trigMat = new THREE.MeshStandardMaterial({ color: 0xc7d2fe, roughness: 0.25, metalness: 0.4 });
+                        const btnMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.35 });
+
+                        wrapper.traverse(c => {
+                            if (c.isMesh) {
+                                const mName = c.material?.name || '';
+                                if (c.name === 'Gameboy_Base' || mName === 'Gameboy_Base_Material') c.material = gbaIndigo;
+                                else if (c.name === 'Screen' || mName === 'Screen_Material') c.material = gbaScreen;
+                                else if (c.name === 'Frame_Screen' || mName === 'Frame_Screen_Material') c.material = gbaFrame;
+                                else if (c.name === 'Cross_Button' || mName === 'Grey_Buttons_Material') c.material = dPadMatLocal;
+                                else if (c.name.startsWith('Front_Button') || mName === 'Power_Button_Material') c.material = btnMat;
+                                else if (c.name.startsWith('Side_Button')) c.material = trigMat;
+                            }
+                        });
+                    }
+                });
 
                 // 4) Game Boy Advance SP (GBA SP) — Edición Especial Pikachu Amarilla Desplegada (Z = 0.62 m, Foto 1)
-                const gbaSpGroup = new THREE.Group();
-                gbaSpGroup.position.set(2.84, 1.318, 0.62);
-                const pikaSpMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.30, metalness: 0.10 });
-                const spBase = new THREE.Mesh(createRoundedBoxGeo(0.082, 0.012, 0.084, 0.006, 2), pikaSpMat);
-                spBase.position.set(0, 0.006, 0);
-                const spDpad = new THREE.Mesh(createRoundedBoxGeo(0.016, 0.003, 0.016, 0.002, 1), dPadMat);
-                spDpad.position.set(-0.015, 0.013, -0.020);
-                const spHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.080, 12), new THREE.MeshStandardMaterial({ color: 0xca8a04, metalness: 0.6 }));
-                spHinge.rotation.x = Math.PI / 2;
-                spHinge.position.set(0.038, 0.012, 0);
-                const spLid = new THREE.Mesh(createRoundedBoxGeo(0.008, 0.078, 0.082, 0.006, 2), pikaSpMat);
-                spLid.position.set(0.052, 0.052, 0);
-                spLid.rotation.z = -0.35;
-                const spLcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.052, 0.058, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.15 }));
-                spLcd.position.set(0.047, 0.052, 0);
-                spLcd.rotation.z = -0.35;
-                gbaSpGroup.add(spBase, spDpad, spHinge, spLid, spLcd);
-                (currentAssemblyGroup || decorVideoGroup).add(gbaSpGroup);
+                loadGLBFurniture({
+                    url: 'models/gbasp.glb',
+                    container: decorVideoGroup,
+                    targetSize: [0.082, 0.135, 0.045],
+                    position: [2.83, 1.318, 0.62],
+                    rotation: [-0.15, -Math.PI / 2, 0],
+                    fallbackFn: () => {
+                        const gbaSpGroup = new THREE.Group();
+                        gbaSpGroup.position.set(2.84, 1.318, 0.62);
+                        const pikaSpMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.30, metalness: 0.10 });
+                        const spBase = new THREE.Mesh(createRoundedBoxGeo(0.082, 0.012, 0.084, 0.006, 2), pikaSpMat);
+                        spBase.position.set(0, 0.006, 0);
+                        const spDpad = new THREE.Mesh(createRoundedBoxGeo(0.016, 0.003, 0.016, 0.002, 1), dPadMat);
+                        spDpad.position.set(-0.015, 0.013, -0.020);
+                        const spHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.080, 12), new THREE.MeshStandardMaterial({ color: 0xca8a04, metalness: 0.6 }));
+                        spHinge.rotation.x = Math.PI / 2;
+                        spHinge.position.set(0.038, 0.012, 0);
+                        const spLid = new THREE.Mesh(createRoundedBoxGeo(0.008, 0.078, 0.082, 0.006, 2), pikaSpMat);
+                        spLid.position.set(0.052, 0.052, 0);
+                        spLid.rotation.z = -0.35;
+                        const spLcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.052, 0.058, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.15 }));
+                        spLcd.position.set(0.047, 0.052, 0);
+                        spLcd.rotation.z = -0.35;
+                        gbaSpGroup.add(spBase, spDpad, spHinge, spLid, spLcd);
+                        (currentAssemblyGroup || decorVideoGroup).add(gbaSpGroup);
+                    },
+                    onLoaded: (wrapper) => {
+                        const pikaYellow = new THREE.MeshPhysicalMaterial({ color: 0xfacc15, roughness: 0.28, metalness: 0.08, clearcoat: 0.35 });
+                        const hingeMat = new THREE.MeshStandardMaterial({ color: 0xca8a04, roughness: 0.30, metalness: 0.65 });
+                        const dPadMatLocal = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45 });
+                        const lcdMat = new THREE.MeshPhysicalMaterial({ color: 0x09090b, roughness: 0.15, clearcoat: 0.6 });
+
+                        wrapper.traverse(c => {
+                            if (c.isMesh) {
+                                if (['base_face', 'base_bottom', 'lid_face', 'lid_back'].includes(c.name)) c.material = pikaYellow;
+                                else if (['hinge_barrel', 'hinge_caps'].includes(c.name)) c.material = hingeMat;
+                                else if (['dpad', 'button_a', 'button_b'].includes(c.name)) c.material = dPadMatLocal;
+                                else if (['lcd', 'lens'].includes(c.name)) c.material = lcdMat;
+                            }
+                        });
+                    }
+                });
 
                 // 5) Nintendo DS Lite — Edición Crimson Red / Black Desplegada (Z = 0.74 m, Foto 1)
-                const dsLiteGroup = new THREE.Group();
-                dsLiteGroup.position.set(2.84, 1.318, 0.74);
-                const dsBase = new THREE.Mesh(createRoundedBoxGeo(0.074, 0.011, 0.133, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.35 }));
-                dsBase.position.set(0, 0.006, 0);
-                const dsTouch = new THREE.Mesh(createRoundedBoxGeo(0.048, 0.002, 0.064, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 }));
-                dsTouch.position.set(0, 0.012, 0);
-                const dsHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.128, 12), new THREE.MeshStandardMaterial({ color: 0x18181b }));
-                dsHinge.rotation.x = Math.PI / 2;
-                dsHinge.position.set(0.034, 0.011, 0);
-                // Tapa superior rojo carmesí (Crimson Red) con interior negro
-                const dsLid = new THREE.Mesh(createRoundedBoxGeo(0.007, 0.070, 0.133, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.25, metalness: 0.15 }));
-                dsLid.position.set(0.048, 0.048, 0);
-                dsLid.rotation.z = -0.35;
-                const dsTopLcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.048, 0.064, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.15 }));
-                dsTopLcd.position.set(0.044, 0.048, 0);
-                dsTopLcd.rotation.z = -0.35;
-                dsLiteGroup.add(dsBase, dsTouch, dsHinge, dsLid, dsTopLcd);
-                (currentAssemblyGroup || decorVideoGroup).add(dsLiteGroup);
+                loadGLBFurniture({
+                    url: 'models/ds.glb',
+                    container: decorVideoGroup,
+                    targetSize: [0.133, 0.130, 0.048],
+                    position: [2.83, 1.318, 0.74],
+                    rotation: [-0.15, -Math.PI / 2, 0],
+                    fallbackFn: () => {
+                        const dsLiteGroup = new THREE.Group();
+                        dsLiteGroup.position.set(2.84, 1.318, 0.74);
+                        const dsBase = new THREE.Mesh(createRoundedBoxGeo(0.074, 0.011, 0.133, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.35 }));
+                        dsBase.position.set(0, 0.006, 0);
+                        const dsTouch = new THREE.Mesh(createRoundedBoxGeo(0.048, 0.002, 0.064, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 }));
+                        dsTouch.position.set(0, 0.012, 0);
+                        const dsHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.128, 12), new THREE.MeshStandardMaterial({ color: 0x18181b }));
+                        dsHinge.rotation.x = Math.PI / 2;
+                        dsHinge.position.set(0.034, 0.011, 0);
+                        const dsLid = new THREE.Mesh(createRoundedBoxGeo(0.007, 0.070, 0.133, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.25, metalness: 0.15 }));
+                        dsLid.position.set(0.048, 0.048, 0);
+                        dsLid.rotation.z = -0.35;
+                        const dsTopLcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.048, 0.064, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.15 }));
+                        dsTopLcd.position.set(0.044, 0.048, 0);
+                        dsTopLcd.rotation.z = -0.35;
+                        dsLiteGroup.add(dsBase, dsTouch, dsHinge, dsLid, dsTopLcd);
+                        (currentAssemblyGroup || decorVideoGroup).add(dsLiteGroup);
+                    },
+                    onLoaded: (wrapper) => {
+                        const crimsonMat = new THREE.MeshPhysicalMaterial({ color: 0x991b1b, roughness: 0.15, clearcoat: 0.9, clearcoatRoughness: 0.1 });
+                        const matteBlack = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.40, metalness: 0.05 });
+                        const screenMat = new THREE.MeshPhysicalMaterial({ color: 0x09090b, roughness: 0.15, clearcoat: 0.7 });
+                        const btnMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.5 });
+
+                        wrapper.traverse(c => {
+                            if (c.isMesh) {
+                                if (c.name === 'lid_back') c.material = crimsonMat;
+                                else if (['base_face', 'base_bottom', 'lid_face'].includes(c.name)) c.material = matteBlack;
+                                else if (['touch_screen', 'lcd', 'lens'].includes(c.name)) c.material = screenMat;
+                                else if (['dpad', 'button_a', 'button_x', 'button_y', 'button_b'].includes(c.name)) c.material = btnMat;
+                            }
+                        });
+                    }
+                });
 
                 // 6) Nintendo 3DS XL — Edición Especial Pokémon Pikachu Amarilla Desplegada (Z = 0.88 m, Foto 1)
-                const n3dsGroup = new THREE.Group();
-                n3dsGroup.position.set(2.84, 1.318, 0.88);
-                const pika3dsMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.20, metalness: 0.15 });
-                const n3dsBase = new THREE.Mesh(createRoundedBoxGeo(0.093, 0.012, 0.156, 0.008, 2), pika3dsMat);
-                n3dsBase.position.set(0, 0.006, 0);
-                const n3dsCirclePad = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.008, 0.003, 12), new THREE.MeshStandardMaterial({ color: 0x94a3b8 }));
-                n3dsCirclePad.position.set(0.015, 0.013, -0.052);
-                const n3dsHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.150, 12), new THREE.MeshStandardMaterial({ color: 0xeab308 }));
-                n3dsHinge.rotation.x = Math.PI / 2;
-                n3dsHinge.position.set(0.044, 0.012, 0);
-                const n3dsLid = new THREE.Mesh(createRoundedBoxGeo(0.008, 0.088, 0.156, 0.008, 2), pika3dsMat);
-                n3dsLid.position.set(0.060, 0.058, 0);
-                n3dsLid.rotation.z = -0.35;
-                const n3dsLcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.062, 0.106, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.15 }));
-                n3dsLcd.position.set(0.055, 0.058, 0);
-                n3dsLcd.rotation.z = -0.35;
-                n3dsGroup.add(n3dsBase, n3dsCirclePad, n3dsHinge, n3dsLid, n3dsLcd);
-                (currentAssemblyGroup || decorVideoGroup).add(n3dsGroup);
+                loadGLBFurniture({
+                    url: 'models/3ds.glb',
+                    container: decorVideoGroup,
+                    targetSize: [0.156, 0.150, 0.050],
+                    position: [2.83, 1.318, 0.88],
+                    rotation: [-0.15, -Math.PI / 2, 0],
+                    fallbackFn: () => {
+                        const n3dsGroup = new THREE.Group();
+                        n3dsGroup.position.set(2.84, 1.318, 0.88);
+                        const pika3dsMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.20, metalness: 0.15 });
+                        const n3dsBase = new THREE.Mesh(createRoundedBoxGeo(0.093, 0.012, 0.156, 0.008, 2), pika3dsMat);
+                        n3dsBase.position.set(0, 0.006, 0);
+                        const n3dsCirclePad = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.008, 0.003, 12), new THREE.MeshStandardMaterial({ color: 0x94a3b8 }));
+                        n3dsCirclePad.position.set(0.015, 0.013, -0.052);
+                        const n3dsHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.150, 12), new THREE.MeshStandardMaterial({ color: 0xeab308 }));
+                        n3dsHinge.rotation.x = Math.PI / 2;
+                        n3dsHinge.position.set(0.044, 0.012, 0);
+                        const n3dsLid = new THREE.Mesh(createRoundedBoxGeo(0.008, 0.088, 0.156, 0.008, 2), pika3dsMat);
+                        n3dsLid.position.set(0.060, 0.058, 0);
+                        n3dsLid.rotation.z = -0.35;
+                        const n3dsLcd = new THREE.Mesh(createRoundedBoxGeo(0.002, 0.062, 0.106, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.15 }));
+                        n3dsLcd.position.set(0.055, 0.058, 0);
+                        n3dsLcd.rotation.z = -0.35;
+                        n3dsGroup.add(n3dsBase, n3dsCirclePad, n3dsHinge, n3dsLid, n3dsLcd);
+                        (currentAssemblyGroup || decorVideoGroup).add(n3dsGroup);
+                    },
+                    onLoaded: (wrapper) => {
+                        const pika3dsMat = new THREE.MeshPhysicalMaterial({ color: 0xfacc15, roughness: 0.22, metalness: 0.12, clearcoat: 0.45 });
+                        const circlePadMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.55, metalness: 0.05 });
+                        const screenMat = new THREE.MeshPhysicalMaterial({ color: 0x09090b, roughness: 0.15, clearcoat: 0.7 });
+                        const btnMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.45 });
+
+                        wrapper.traverse(c => {
+                            if (c.isMesh) {
+                                if (['lid_back', 'lid_face', 'base_face', 'base_bottom', 'screen_frame'].includes(c.name)) c.material = pika3dsMat;
+                                else if (c.name === 'circle_pad') c.material = circlePadMat;
+                                else if (['touch_screen', 'lcd', 'lens'].includes(c.name)) c.material = screenMat;
+                                else if (['dpad', 'button_a', 'button_b', 'button_x', 'button_y'].includes(c.name)) c.material = btnMat;
+                            }
+                        });
+                    }
+                });
 
                 // 7) Poké Ball Plus con Base de Carga Oficial Blanca (Z = 1.02 m, Foto 1)
                 const pokeDockBase = new THREE.Mesh(new THREE.CylinderGeometry(0.030, 0.034, 0.020, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 }));

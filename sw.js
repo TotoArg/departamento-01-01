@@ -4,7 +4,7 @@
 // librerías Three.js, modelos .glb y mapas de iluminación HDRI (.hdr).
 // ============================================================================
 
-const CACHE_VERSION = 'gemelo-3d-pwa-v3.0';
+const CACHE_VERSION = 'gemelo-3d-pwa-v3.2';
 const STATIC_CACHE_NAME = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE_NAME = `${CACHE_VERSION}-runtime`;
 
@@ -46,6 +46,11 @@ const PRECACHE_ASSETS = [
     './models/plant.glb',
     './models/sofa.glb',
     './models/toilet.glb',
+    './models/gbc.glb',
+    './models/gba.glb',
+    './models/gbasp.glb',
+    './models/ds.glb',
+    './models/3ds.glb',
 
     // Subcarpeta de Mapas de Iluminación HDRI (.hdr)
     './textures/hdr/ferndale_studio_04_1k.hdr'
