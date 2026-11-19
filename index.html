@@ -3905,6 +3905,434 @@
             metalness: 0.04
         });
 
+        // ----------------------------------------------------------------------------
+        // FOTOREALISMO PBR: TEXTURAS PROCEDURALES CANVAS DE ALTA DEFINICIÓN
+        // ----------------------------------------------------------------------------
+        // 1. Granito Natural Pulido ("Gris Mara" / "Rosa Salto") para Mesadas de Cocina
+        function createProceduralGraniteTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            
+            // Base gris perla suave con tonalidad mineral
+            ctx.fillStyle = '#dcd8d2';
+            ctx.fillRect(0, 0, 1024, 1024);
+
+            // Nubes de feldespato y cuarzo difusas
+            for (let i = 0; i < 400; i++) {
+                const x = Math.random() * 1024;
+                const y = Math.random() * 1024;
+                const r = 20 + Math.random() * 50;
+                const grad = ctx.createRadialGradient(x, y, 2, x, y, r);
+                const isWarm = Math.random() > 0.5;
+                grad.addColorStop(0, isWarm ? 'rgba(215, 195, 180, 0.45)' : 'rgba(185, 188, 195, 0.45)');
+                grad.addColorStop(1, 'rgba(220, 216, 210, 0.0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Miles de motas minerales finas (Biotita negra, Cuarzo translúcido, Feldespato rosa)
+            for (let i = 0; i < 45000; i++) {
+                const x = Math.random() * 1024;
+                const y = Math.random() * 1024;
+                const size = 0.8 + Math.random() * 2.6;
+                const roll = Math.random();
+                if (roll < 0.48) {
+                    // Biotita / Hornblenda negra/carbón
+                    ctx.fillStyle = roll < 0.25 ? '#18181b' : '#333338';
+                } else if (roll < 0.80) {
+                    // Cuarzo gris medio y blanco cristalino
+                    ctx.fillStyle = roll < 0.65 ? '#8e8e93' : '#f8fafc';
+                } else {
+                    // Feldespato rosado/crema cálido
+                    ctx.fillStyle = '#caa392';
+                }
+                ctx.fillRect(x, y, size, size * (0.8 + Math.random() * 0.6));
+            }
+
+            // Cristales más grandes aislados característicos del granito natural
+            for (let i = 0; i < 600; i++) {
+                const x = Math.random() * 1024;
+                const y = Math.random() * 1024;
+                const w = 3 + Math.random() * 5;
+                const h = 2 + Math.random() * 4;
+                ctx.fillStyle = Math.random() > 0.4 ? 'rgba(24, 24, 27, 0.85)' : 'rgba(255, 255, 255, 0.90)';
+                ctx.fillRect(x, y, w, h);
+            }
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(2, 2);
+            return tex;
+        }
+
+        function createProceduralGraniteBumpTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#808080';
+            ctx.fillRect(0, 0, 1024, 1024);
+
+            for (let i = 0; i < 35000; i++) {
+                const x = Math.random() * 1024;
+                const y = Math.random() * 1024;
+                const size = 1 + Math.random() * 2.5;
+                const isPit = Math.random() > 0.5;
+                ctx.fillStyle = isPit ? 'rgba(40, 40, 40, 0.4)' : 'rgba(220, 220, 220, 0.4)';
+                ctx.fillRect(x, y, size, size);
+            }
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(2, 2);
+            return tex;
+        }
+
+        const proceduralGraniteTex = createProceduralGraniteTexture();
+        const proceduralGraniteBumpTex = createProceduralGraniteBumpTexture();
+        const kitchenGranitePbrMat = new THREE.MeshPhysicalMaterial({
+            map: proceduralGraniteTex,
+            bumpMap: proceduralGraniteBumpTex,
+            bumpScale: 0.0012,
+            roughness: 0.16,
+            metalness: 0.03,
+            clearcoat: 0.88,
+            clearcoatRoughness: 0.10,
+            reflectivity: 0.70
+        });
+
+        // 2. Tela Denim / Lino Texturado Azul Marino para Tapizado de Sofá Futón
+        function createProceduralDenimTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#1c3148'; // Azul índigo base profundo
+            ctx.fillRect(0, 0, 512, 512);
+
+            // Tramado sarga diagonal (twill 2/1) a 45 grados
+            ctx.lineWidth = 1;
+            for (let i = -512; i < 1024; i += 3) {
+                ctx.strokeStyle = (i % 6 === 0) ? '#284768' : '#16273a';
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i + 512, 512);
+                ctx.stroke();
+            }
+
+            // Hilos transversales sutiles y micro-mota de algodón blanco
+            for (let j = 0; j < 512; j += 4) {
+                ctx.strokeStyle = 'rgba(100, 140, 180, 0.12)';
+                ctx.beginPath();
+                ctx.moveTo(0, j);
+                ctx.lineTo(512, j);
+                ctx.stroke();
+            }
+
+            for (let k = 0; k < 6000; k++) {
+                const x = Math.random() * 512;
+                const y = Math.random() * 512;
+                ctx.fillStyle = Math.random() > 0.6 ? 'rgba(180, 210, 245, 0.18)' : 'rgba(10, 20, 30, 0.25)';
+                ctx.fillRect(x, y, 1.2, 1.2);
+            }
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(6, 6);
+            return tex;
+        }
+
+        function createProceduralFabricBumpTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#808080';
+            ctx.fillRect(0, 0, 256, 256);
+
+            for (let i = 0; i < 256; i += 2) {
+                for (let j = 0; j < 256; j += 2) {
+                    const v = ((i + j) % 4 === 0) ? 140 : 115;
+                    ctx.fillStyle = `rgb(${v},${v},${v})`;
+                    ctx.fillRect(i, j, 1.5, 1.5);
+                }
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(6, 6);
+            return tex;
+        }
+
+        const proceduralDenimTex = createProceduralDenimTexture();
+        const proceduralDenimBumpTex = createProceduralFabricBumpTexture();
+        const sofaFabricPbrMat = new THREE.MeshPhysicalMaterial({
+            map: proceduralDenimTex,
+            bumpMap: proceduralDenimBumpTex,
+            bumpScale: 0.0016,
+            roughness: 0.88,
+            metalness: 0.02,
+            sheen: new THREE.Color(0x60a5fa)
+        });
+
+        // 3. Almohadón con Estampado Ilustrado de Búho Otoñal (Foto Real del Sofá)
+        function createProceduralOwlCushionTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // Fondo lino tostado cálido
+            ctx.fillStyle = '#f5efe6';
+            ctx.fillRect(0, 0, 512, 512);
+
+            // Trama textil suave de fondo
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.03)';
+            for (let i = 0; i < 512; i += 3) {
+                ctx.fillRect(i, 0, 1, 512);
+                ctx.fillRect(0, i, 512, 1);
+            }
+
+            // Borde pespunte cosido perimetral
+            ctx.strokeStyle = '#b45309';
+            ctx.lineWidth = 2.5;
+            ctx.setLineDash([6, 5]);
+            ctx.strokeRect(28, 28, 456, 456);
+            ctx.setLineDash([]);
+
+            // Ramas otoñales botánicas de soporte
+            ctx.strokeStyle = '#78350f';
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(80, 360);
+            ctx.bezierCurveTo(180, 375, 340, 350, 440, 370);
+            ctx.stroke();
+
+            // Hojas otoñales en la rama
+            const leaves = [
+                { x: 130, y: 362, c: '#ea580c', r: -0.4 },
+                { x: 170, y: 372, c: '#ca8a04', r: 0.3 },
+                { x: 350, y: 356, c: '#059669', r: -0.3 },
+                { x: 395, y: 364, c: '#dc2626', r: 0.5 }
+            ];
+            leaves.forEach(lf => {
+                ctx.save();
+                ctx.translate(lf.x, lf.y);
+                ctx.rotate(lf.r);
+                ctx.fillStyle = lf.c;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 16, 7, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            // Cuerpo del búho (forma de huevo gordito en mostaza/ocre)
+            ctx.save();
+            ctx.fillStyle = '#d97706';
+            ctx.beginPath();
+            ctx.ellipse(256, 250, 85, 110, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Pecho crema con plumitas en V
+            ctx.fillStyle = '#fef3c7';
+            ctx.beginPath();
+            ctx.ellipse(256, 275, 55, 75, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#b45309';
+            ctx.lineWidth = 2.5;
+            for (let row = 0; row < 4; row++) {
+                for (let col = -1; col <= 1; col++) {
+                    const vx = 256 + col * 26 + (row % 2) * 13 - 6;
+                    const vy = 240 + row * 22;
+                    ctx.beginPath();
+                    ctx.moveTo(vx - 7, vy - 4);
+                    ctx.lineTo(vx, vy + 4);
+                    ctx.lineTo(vx + 7, vy - 4);
+                    ctx.stroke();
+                }
+            }
+
+            // Alas laterales azul marino y verde bosque
+            ctx.fillStyle = '#1e3a8a';
+            ctx.beginPath();
+            ctx.ellipse(180, 260, 24, 75, 0.25, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(332, 260, 24, 75, -0.25, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Ojos grandes estilizados (círculos blancos, iris miel, pupilas negras)
+            [-42, 42].forEach(ox => {
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(256 + ox, 185, 34, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#f59e0b';
+                ctx.beginPath();
+                ctx.arc(256 + ox, 185, 22, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.arc(256 + ox + (ox > 0 ? -3 : 3), 185, 13, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Brillo blanco en los ojos
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(256 + ox + (ox > 0 ? -6 : 0), 179, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Pico triangular anaranjado
+            ctx.fillStyle = '#ea580c';
+            ctx.beginPath();
+            ctx.moveTo(256, 195);
+            ctx.lineTo(246, 218);
+            ctx.lineTo(266, 218);
+            ctx.closePath();
+            ctx.fill();
+
+            // Pequeñas orejas con mechones
+            ctx.fillStyle = '#b45309';
+            ctx.beginPath();
+            ctx.moveTo(195, 148);
+            ctx.lineTo(215, 172);
+            ctx.lineTo(180, 168);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(317, 148);
+            ctx.lineTo(332, 168);
+            ctx.lineTo(297, 172);
+            ctx.closePath();
+            ctx.fill();
+
+            // Patitas sujetando la rama
+            [-22, 22].forEach(fx => {
+                ctx.fillStyle = '#ea580c';
+                for (let t = -1; t <= 1; t++) {
+                    ctx.beginPath();
+                    ctx.ellipse(256 + fx + t * 6, 356, 4, 8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+            ctx.restore();
+
+            const tex = new THREE.CanvasTexture(canvas);
+            return tex;
+        }
+
+        const owlCushionTex = createProceduralOwlCushionTexture();
+        const owlCushionMat = new THREE.MeshPhysicalMaterial({
+            map: owlCushionTex,
+            bumpMap: proceduralDenimBumpTex,
+            bumpScale: 0.0012,
+            roughness: 0.90,
+            metalness: 0.0,
+            sheen: new THREE.Color(0xfef3c7)
+        });
+
+        // 4. Manta Patchwork en Bloques Geométricos con Pespunte
+        function createProceduralPatchworkTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            const patchColors = [
+                '#eab308', '#334155', '#38bdf8', '#f1f5f9',
+                '#1e293b', '#ca8a04', '#0284c7', '#94a3b8',
+                '#d97706', '#475569', '#67e8f9', '#e2e8f0',
+                '#1e3a8a', '#facc15', '#0f172a', '#cbd5e1'
+            ];
+            const gridSize = 4;
+            const step = 512 / gridSize;
+
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    const idx = (r * gridSize + c) % patchColors.length;
+                    ctx.fillStyle = patchColors[idx];
+                    ctx.fillRect(c * step, r * step, step, step);
+
+                    // Pespunte blanco/gris alrededor de cada parche
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([4, 4]);
+                    ctx.strokeRect(c * step + 3, r * step + 3, step - 6, step - 6);
+                }
+            }
+            ctx.setLineDash([]);
+            const tex = new THREE.CanvasTexture(canvas);
+            return tex;
+        }
+        const patchworkTex = createProceduralPatchworkTexture();
+        const patchworkBlanketMat = new THREE.MeshPhysicalMaterial({
+            map: patchworkTex,
+            bumpMap: proceduralDenimBumpTex,
+            bumpScale: 0.0015,
+            roughness: 0.92,
+            metalness: 0.0,
+            sheen: new THREE.Color(0xfde047)
+        });
+
+        // 5. Madera Paraíso Lustrada (Veta concéntrica y tono miel dorado) para Mesa de Comedor
+        function createProceduralParaisoWoodTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+
+            // Tono base miel paraíso lustrado
+            ctx.fillStyle = '#caa372';
+            ctx.fillRect(0, 0, 1024, 1024);
+
+            // Anillos y vetas concéntricas suaves
+            const cx = 512, cy = 512;
+            for (let r = 20; r < 750; r += 8) {
+                ctx.strokeStyle = (r % 24 === 0) ? 'rgba(145, 95, 45, 0.28)' : 'rgba(175, 125, 75, 0.18)';
+                ctx.lineWidth = 3 + Math.sin(r * 0.1) * 1.5;
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, r * 1.15, r * 0.88, 0.35, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Rayas finas de veta longitudinal de corte tangencial
+            for (let i = 0; i < 400; i++) {
+                const y = Math.random() * 1024;
+                ctx.strokeStyle = 'rgba(120, 75, 30, 0.10)';
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.bezierCurveTo(340, y + Math.sin(i) * 12, 680, y - Math.cos(i) * 12, 1024, y);
+                ctx.stroke();
+            }
+
+            const tex = new THREE.CanvasTexture(canvas);
+            return tex;
+        }
+
+        const paraisoWoodTex = createProceduralParaisoWoodTexture();
+        const diningParaisoWoodMat = new THREE.MeshPhysicalMaterial({
+            map: paraisoWoodTex,
+            roughness: 0.28,
+            metalness: 0.02,
+            clearcoat: 0.55,
+            clearcoatRoughness: 0.15
+        });
+
         // Materiales de las puertas extraídas del video (sin bloqueo de canvas al inicio)
         const doorFrameMat = new THREE.MeshStandardMaterial({ color: 0x2b3036, roughness: 0.45, metalness: 0.35 }); // Marco de chapa gris grafito oscuro
         const woodDoorMat = new THREE.MeshStandardMaterial({ color: 0xbc7740, roughness: 0.48 });
@@ -5295,7 +5723,7 @@
 
         // 2) COCINA (según fotos y video 1:28–1:58): Sobre muro Este (X=4.85) van Heladera -> 1° tramo mesada + Calefón mural Orbis/Bosch -> Cocina 4H -> 2° tramo mesada con Bacha + esquina en "L" bajo ventana Sur (Y=8.00) que conecta directo al Lavarropas sin ningún hueco.
         const kitchenWoodCabinetMat = new THREE.MeshStandardMaterial({ color: 0xb48a64, map: proceduralWoodTex, roughness: 0.48, metalness: 0.04 });
-        const kitchenGraniteMat = new THREE.MeshStandardMaterial({ color: 0xc8b2a6, bumpMap: proceduralPlasterBumpTex, bumpScale: 0.0015, roughness: 0.24, metalness: 0.08 });
+        const kitchenGraniteMat = kitchenGranitePbrMat;
         const inoxApplianceMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, map: proceduralBrushedMetalTex, roughness: 0.24, metalness: 0.82 });
         const castIronMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.72, metalness: 0.45 });
 
@@ -5303,7 +5731,11 @@
         addBoxFixture(4.52, 0.42, 5.98, 0.56, 0.84, 0.35, 0xb48a64, fixturesGroup, 0.4, 'Bajo Mesada Cocina (Tramo Norte)');
         addBoxFixture(4.235, 0.42, 5.98, 0.016, 0.76, 0.31, 0xa37852, fixturesGroup, 0.45, 'Bajo Mesada Cocina (Tramo Norte)');
         addBoxFixture(4.22, 0.72, 5.88, 0.018, 0.016, 0.09, 0xe2e8f0, fixturesGroup, 0.2, 'Bajo Mesada Cocina (Tramo Norte)');
-        addBoxFixture(4.51, 0.86, 5.98, 0.60, 0.04, 0.35, 0xc8b2a6, fixturesGroup, 0.25, 'Mesada Granito Cocina (Tramo Norte)');
+        const granNorth = new THREE.Mesh(createRoundedBoxGeo(0.60, 0.04, 0.35, 0.008, 2), kitchenGranitePbrMat);
+        granNorth.position.set(4.51, 0.86, 5.98);
+        granNorth.castShadow = true; granNorth.receiveShadow = true;
+        assignBIMUserData(granNorth, { nombre: 'Mesada Granito Cocina (Tramo Norte)', categoria: 'mueble', dimensiones: { ancho: 0.35, alto: 0.04, profundidad: 0.60, elevacion: 0.84 } });
+        fixturesGroup.add(granNorth);
 
         // - Calefón a gas mural blanco (Orbis/Bosch) colgado en pared Este sobre el 1° tramo de mesada (X=4.69, Y=1.44, Z=5.98) + perillas, visor de llama y flexibles de gas/agua (Video 1:28)
         setMountWall(4.85, 5.98, false);
@@ -5492,10 +5924,13 @@
         //    - Bañera con alfombra gris azulada en el borde, cortina de baño blanca en barral cromado, esquinero cromado 3 pisos con shampoos y columna de ducha cromada en pared Oeste
         //    - Inodoro, bidet, balde centrífugo naranja/gris con mopa y alacena colgante con toallas azul marino/grises y rollos de papel
         // ============================================================================
-        const porcelainMat = new THREE.MeshStandardMaterial({
+        const porcelainMat = new THREE.MeshPhysicalMaterial({
             color: 0xffffff,
-            roughness: 0.06, // Porcelana sanitaria brillante reflectiva
-            metalness: 0.05
+            roughness: 0.08,
+            metalness: 0.02,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.05,
+            reflectivity: 0.85
         });
         const seatPlasticMat = new THREE.MeshStandardMaterial({
             color: 0xf8fafc,
@@ -8128,31 +8563,30 @@
                 // --- CONSOLA 1: PLAYSTATION 5 DETALLADA ---
                 const ps5Group = new THREE.Group();
                 ps5Group.position.set(5.88, 0.62, rackZ - 0.16);
-                // Aleta superior curva blanca (roughness: 0.25)
-                const ps5WhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.10 });
-                const ps5CoreMat = new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.15, metalness: 0.60 });
-                const ps5LedMat = new THREE.MeshStandardMaterial({ color: 0x2563eb, emissive: 0x2563eb, emissiveIntensity: 0.8 });
-                const ps5FinTop = new THREE.Mesh(UNIT_BOX_GEO, ps5WhiteMat);
-                ps5FinTop.scale.set(0.24, 0.015, 0.36);
+                const ps5WhiteMat = new THREE.MeshPhysicalMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.08, clearcoat: 0.35 });
+                const ps5CoreMat = new THREE.MeshPhysicalMaterial({ color: 0x05070c, roughness: 0.10, metalness: 0.85, clearcoat: 0.6 });
+                const ps5LedMat = new THREE.MeshBasicMaterial({ color: 0x00e5ff });
+                // Aletas curvas aerodinámicas
+                const ps5FinTop = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.012, 0.36, 0.006, 2), ps5WhiteMat);
                 ps5FinTop.position.set(0, 0.038, 0);
                 ps5FinTop.castShadow = true;
-                const ps5FinBot = new THREE.Mesh(UNIT_BOX_GEO, ps5WhiteMat);
-                ps5FinBot.scale.set(0.24, 0.015, 0.36);
+                const ps5FinBot = new THREE.Mesh(createRoundedBoxGeo(0.24, 0.012, 0.36, 0.006, 2), ps5WhiteMat);
                 ps5FinBot.position.set(0, -0.038, 0);
                 ps5FinBot.castShadow = true;
-                const ps5Core = new THREE.Mesh(UNIT_BOX_GEO, ps5CoreMat);
-                ps5Core.scale.set(0.22, 0.06, 0.34);
+                const ps5Core = new THREE.Mesh(createRoundedBoxGeo(0.22, 0.062, 0.34, 0.004, 2), ps5CoreMat);
                 ps5Core.position.set(0.005, 0, 0);
                 ps5Core.castShadow = true;
                 const ps5Led = new THREE.Mesh(UNIT_BOX_GEO, ps5LedMat);
-                ps5Led.scale.set(0.22, 0.005, 0.30);
-                ps5Led.position.set(0.01, 0.030, 0);
-                // DualSense Controller
-                const dsBody = new THREE.Mesh(UNIT_BOX_GEO, ps5WhiteMat);
-                dsBody.scale.set(0.08, 0.035, 0.13);
+                ps5Led.scale.set(0.22, 0.004, 0.32);
+                ps5Led.position.set(0.01, 0.032, 0);
+                // Control DualSense con touchpad y empuñaduras ergonómicas
+                const dsBody = new THREE.Mesh(createRoundedBoxGeo(0.08, 0.032, 0.13, 0.008, 2), ps5WhiteMat);
                 dsBody.position.set(-0.08, 0, 0.08);
                 dsBody.castShadow = true;
-                ps5Group.add(ps5FinTop, ps5FinBot, ps5Core, ps5Led, dsBody);
+                const dsTouchpad = new THREE.Mesh(UNIT_BOX_GEO, ps5CoreMat);
+                dsTouchpad.scale.set(0.03, 0.004, 0.04);
+                dsTouchpad.position.set(-0.08, 0.018, 0.08);
+                ps5Group.add(ps5FinTop, ps5FinBot, ps5Core, ps5Led, dsBody, dsTouchpad);
                 (currentAssemblyGroup || decorVideoGroup).add(ps5Group);
 
                 // --- CONSOLA 2: NINTENDO SWITCH 2 DETALLADA ---
@@ -8333,14 +8767,10 @@
                 // Materiales PBR de alta fidelidad: Madera lustrada cálida y tela denim texturizada
                 const sofaWoodMat = new THREE.MeshStandardMaterial({
                     color: 0xc28546,
-                    roughness: 0.50,
+                    roughness: 0.45,
                     metalness: 0.02
                 });
-                const sofaFabricMat = new THREE.MeshStandardMaterial({
-                    color: 0x264464, // Denim azul marino texturizado
-                    roughness: 0.95,
-                    metalness: 0.0
-                });
+                const sofaFabricMat = sofaFabricPbrMat;
                 const armPadMat = new THREE.MeshStandardMaterial({
                     color: 0x1f364d,
                     roughness: 0.95,
@@ -8473,8 +8903,8 @@
                 }
 
                 // 6. Almohadones de acento y manta tejida en cuadros (Video 1:19, 2:08)
-                // Almohadón lino crema
-                const p1 = new THREE.Mesh(createRoundedBoxGeo(0.14, 0.32, 0.32, 0.05, 3), pillowCreamMat);
+                // Almohadón ilustrado de búho otoñal (Foto real del sofá)
+                const p1 = new THREE.Mesh(createRoundedBoxGeo(0.14, 0.34, 0.34, 0.04, 3), owlCushionMat);
                 p1.position.set(3.36, 0.49, futonZ - 0.58);
                 p1.rotation.set(0.1, 0.25, 0.15);
                 p1.castShadow = true;
@@ -8504,22 +8934,12 @@
                     futonGroup.add(bolsterMesh);
                 });
 
-                // Manta tejida en cuadros tipo patchwork (amarillo, gris, celeste, negro) extendida en el respaldo (Video 1:19, 2:08)
-                const blanketPatchMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.95 });
-                const blanketBack = new THREE.Mesh(createRoundedBoxGeo(0.06, 0.52, 0.82, 0.015, 2), blanketPatchMat);
-                blanketBack.position.set(3.18, 0.60, futonZ + 0.15);
+                // Manta tejida en cuadros tipo patchwork extendida sobre el respaldo con pliegue natural (Video 1:19, 2:08)
+                const blanketBack = new THREE.Mesh(createRoundedBoxGeo(0.05, 0.56, 0.84, 0.018, 2), patchworkBlanketMat);
+                blanketBack.position.set(3.18, 0.59, futonZ + 0.15);
                 blanketBack.rotation.z = 0.17;
                 blanketBack.castShadow = true;
-                // Detalle de cuadros grises y celestes
-                const patch1 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.95 }));
-                patch1.scale.set(0.062, 0.24, 0.38);
-                patch1.position.set(3.185, 0.62, futonZ + 0.30);
-                patch1.rotation.z = 0.17;
-                const patch2 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.95 }));
-                patch2.scale.set(0.062, 0.22, 0.36);
-                patch2.position.set(3.185, 0.50, futonZ - 0.05);
-                patch2.rotation.z = 0.17;
-                futonGroup.add(blanketBack, patch1, patch2);
+                futonGroup.add(blanketBack);
 
                 futonGroup.add(p1, p2, p3, p4);
                 (currentAssemblyGroup || decorVideoGroup).add(futonGroup);
@@ -8708,8 +9128,8 @@
             const tableDiningZ = 1.15;
             createCompoundAssembly('Mesa de Comedor Redonda', () => {
                 const tableMetalMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.30, metalness: 0.85 });
-                const tableWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.65, metalness: 0.05 });
-                const tableLeafMat = new THREE.MeshStandardMaterial({ color: 0x8a3416, roughness: 0.62, metalness: 0.05 });
+                const tableWoodMat = diningParaisoWoodMat;
+                const tableLeafMat = diningParaisoWoodMat;
                 const railMetalMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.35, metalness: 0.80 });
 
                 const tableRoot = new THREE.Group();
@@ -8864,9 +9284,55 @@
 
             // Centro de mesa con 2 macetas: planta de hojas verdes y planta de trébol púrpura / Oxalis (Video 0:59, 2:23)
             createCompoundAssembly('Centro de Mesa y Plantas (Comedor)', () => {
-                addDecorPlantCeramic(tableDiningX - 0.08, 0.765, tableDiningZ, 0.08, 0.06, 0.12, 0.13, 0.16, 0.13, 0.20, 'Centro de Mesa Comedor');
-                // Planta Oxalis / trébol púrpura en macetita blanca
-                addDecorPlantCeramic(tableDiningX + 0.10, 0.765, tableDiningZ, 0.065, 0.05, 0.10, 0.12, 0.14, 0.12, 0.18, 'Planta Oxalis Púrpura');
+                const centerGroup = new THREE.Group();
+                centerGroup.position.set(tableDiningX, 0.765, tableDiningZ);
+
+                // Maceta de cerámica esmaltada blanca brillante (Clearcoat PBR)
+                const glazedWhiteCeramic = new THREE.MeshPhysicalMaterial({ color: 0xf8fafc, roughness: 0.10, clearcoat: 0.95, clearcoatRoughness: 0.08 });
+                const glazedTerraCeramic = new THREE.MeshPhysicalMaterial({ color: 0x9a3412, roughness: 0.12, clearcoat: 0.90, clearcoatRoughness: 0.10 });
+
+                // Maceta 1 con suculenta verde
+                const pot1 = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.035, 0.08, 18), glazedWhiteCeramic);
+                pot1.position.set(-0.08, 0.04, 0);
+                pot1.castShadow = true;
+                const succulentMat = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.6 });
+                for (let s = 0; s < 10; s++) {
+                    const leaf = new THREE.Mesh(new THREE.ConeGeometry(0.016, 0.040, 6), succulentMat);
+                    const a = (s / 10) * Math.PI * 2;
+                    leaf.position.set(-0.08 + Math.cos(a) * 0.024, 0.08 + (s % 2) * 0.008, Math.sin(a) * 0.024);
+                    leaf.rotation.set(0.4 * Math.sin(a), 0, -0.4 * Math.cos(a));
+                    centerGroup.add(leaf);
+                }
+
+                // Maceta 2 con Oxalis Triangularis (trébol púrpura / falso trébol)
+                const pot2 = new THREE.Mesh(new THREE.CylinderGeometry(0.040, 0.030, 0.075, 18), glazedTerraCeramic);
+                pot2.position.set(0.09, 0.0375, 0);
+                pot2.castShadow = true;
+
+                const oxalisPurpleMat = new THREE.MeshStandardMaterial({ color: 0x581c87, roughness: 0.55 });
+                const oxalisStemMat = new THREE.MeshStandardMaterial({ color: 0xa855f7, roughness: 0.7 });
+                for (let o = 0; o < 8; o++) {
+                    const oa = (o / 8) * Math.PI * 2;
+                    const stemH = 0.06 + (o % 3) * 0.015;
+                    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.0015, 0.0015, stemH, 6), oxalisStemMat);
+                    stem.position.set(0.09 + Math.cos(oa) * 0.018, 0.075 + stemH / 2, Math.sin(oa) * 0.018);
+                    stem.rotation.z = Math.cos(oa) * 0.25;
+                    stem.rotation.x = Math.sin(oa) * 0.25;
+
+                    // 3 folíolos triangulares en corazón
+                    for (let f = 0; f < 3; f++) {
+                        const fa = (f / 3) * Math.PI * 2;
+                        const leaflet = new THREE.Mesh(new THREE.ConeGeometry(0.014, 0.022, 3), oxalisPurpleMat);
+                        leaflet.position.set(stem.position.x + Math.cos(fa) * 0.014, stem.position.y + stemH / 2, stem.position.z + Math.sin(fa) * 0.014);
+                        leaflet.rotation.x = Math.PI / 2;
+                        leaflet.rotation.z = fa;
+                        centerGroup.add(leaflet);
+                    }
+                    centerGroup.add(stem);
+                }
+
+                centerGroup.add(pot1, pot2);
+                (currentAssemblyGroup || decorVideoGroup).add(centerGroup);
             });
 
             // Pie de madera esquinero con maceta grande Monstera / Costilla de Adán en esquina NE del comedor (Video 1:04)
@@ -8878,8 +9344,15 @@
             // 4 Sillas ergonómicas de comedor con respaldo curvo (acompañan la apertura ovalada de la mesa)
             createCompoundAssembly('Sillas de Comedor (4)', () => {
                 const tableMetalMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.30, metalness: 0.85 });
-                const tableWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.70, metalness: 0.05 });
-                const chairCushionMat = new THREE.MeshStandardMaterial({ color: 0x84cc16, roughness: 1.0, metalness: 0.0 });
+                const tableWoodMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.65, metalness: 0.05 });
+                const chairCushionMat = new THREE.MeshPhysicalMaterial({
+                    color: 0x65a30d, // Verde oliva cálido
+                    bumpMap: proceduralFabricBumpTex,
+                    bumpScale: 0.0014,
+                    roughness: 0.90,
+                    metalness: 0.0,
+                    sheen: new THREE.Color(0x84cc16)
+                });
 
                 // Sillas metidas debajo de la mesa redonda (radio ajustado a 0.37m para que queden bien adentro)
                 const chairRadius = 0.37;
@@ -8907,12 +9380,18 @@
                         cg.add(cl);
                     });
 
-                    // Asiento tapizado verde oliva
-                    const seatMesh = new THREE.Mesh(UNIT_BOX_GEO, chairCushionMat);
-                    seatMesh.scale.set(0.40, 0.05, 0.40);
+                    // Asiento tapizado verde oliva con bisel mullido
+                    const seatMesh = new THREE.Mesh(createRoundedBoxGeo(0.40, 0.05, 0.40, 0.012, 2), chairCushionMat);
                     seatMesh.position.set(0, 0.45, 0);
                     seatMesh.castShadow = true; seatMesh.receiveShadow = true;
                     cg.add(seatMesh);
+
+                    // Cintas de amarre posteriores atadas a los parantes del respaldo
+                    [-0.12, 0.12].forEach(tx => {
+                        const tieRibbon = new THREE.Mesh(createRoundedBoxGeo(0.016, 0.05, 0.014, 0.003, 1), chairCushionMat);
+                        tieRibbon.position.set(tx, 0.46, 0.185);
+                        cg.add(tieRibbon);
+                    });
 
                     // Respaldo curvo ergonómico envolvente
                     const backGroup = new THREE.Group();
@@ -8970,9 +9449,9 @@
             createCompoundAssembly('Heladera con Bodega y Alacena', () => {
                 const fridgeGroup = new THREE.Group();
                 fridgeGroup.position.set(4.53, 0, 5.53);
-                const fridgeBodyMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.22, metalness: 0.14 });
-                const fridgeSealMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.65, metalness: 0.05 });
-                const fridgeHandleMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.20, metalness: 0.82 });
+                const fridgeBodyMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, map: proceduralBrushedMetalTex, roughness: 0.28, metalness: 0.85 });
+                const fridgeSealMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.85, metalness: 0.05 });
+                const fridgeHandleMat = new THREE.MeshStandardMaterial({ color: 0xcfd8dc, roughness: 0.18, metalness: 0.92 });
                 const melaminaOakMat = new THREE.MeshStandardMaterial({ color: 0xd6ccc2, map: proceduralLightWoodTex, roughness: 0.46, metalness: 0.04 });
                 const wineBottleMat = new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.15, metalness: 0.25 });
 
@@ -9000,6 +9479,7 @@
                 const baseGrille = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.5 }));
                 baseGrille.scale.set(0.02, 0.035, 0.50);
                 baseGrille.position.set(-0.275, 0.022, 0);
+                // Imanes souvenirs de viaje y notas
                 const mag1 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4 }));
                 mag1.scale.set(0.006, 0.045, 0.045);
                 mag1.position.set(-0.293, 1.46, 0.12);
@@ -9009,7 +9489,14 @@
                 const mag3 = new THREE.Mesh(UNIT_BOX_GEO, new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 }));
                 mag3.scale.set(0.006, 0.040, 0.050);
                 mag3.position.set(-0.293, 0.92, 0.14);
-                fridgeGroup.add(mainChassis, lowerDoor, upperDoor, sealGap, handleUpper, handleLower, baseGrille, mag1, mag2, mag3);
+                // Hoja de notas / lista de compras con imán redondo
+                const notePaperMat = new THREE.MeshStandardMaterial({ color: 0xfffbeb, roughness: 0.95 });
+                const notePaper = new THREE.Mesh(createRoundedBoxGeo(0.003, 0.12, 0.08, 0.002, 1), notePaperMat);
+                notePaper.position.set(-0.292, 0.78, -0.06);
+                const noteMagnet = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.006, 12), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+                noteMagnet.rotation.z = Math.PI / 2;
+                noteMagnet.position.set(-0.295, 0.83, -0.06);
+                fridgeGroup.add(mainChassis, lowerDoor, upperDoor, sealGap, handleUpper, handleLower, baseGrille, mag1, mag2, mag3, notePaper, noteMagnet);
                 (currentAssemblyGroup || decorVideoGroup).add(fridgeGroup);
 
                 // - Bodega portabotellas de 8 nichos (4x2) + Alacena superior de 2 puertas en melamina roble claro hasta arriba
@@ -9074,9 +9561,74 @@
             addDecorBox(4.61, 1.74, 7.82, 0.30, 0.62, 0.26, 0x9a5b32, 0.5, 0, 'Estante Esquinero Madera');
             addDecorPlantCeramic(4.61, 2.05, 7.82, 0.05, 0.04, 0.10, 0.12, 0.16, 0.12, 0.16, 'Planta Estante Esquina');    // Plantita en estante superior
             // Pava / tetera de cuello de cisne negra y cafetera Chemex de vidrio con collar de madera (Video 1:43)
-            addDecorCyl(4.60, 1.76, 7.82, 0.048, 0.048, 0.12, 0x0f172a, 0.3, 'Tetera Cuello de Cisne');
-            addDecorCyl(4.60, 1.48, 7.82, 0.055, 0.038, 0.14, 0xffffff, 0.15, 'Cafetera Chemex Vidrio');
-            addDecorCyl(4.60, 1.49, 7.82, 0.042, 0.042, 0.03, 0xb47b48, 0.6, 'Collar Madera Chemex');
+            // 1. Tetera Cuello de Cisne PBR Negra Mate con detalles en bronce
+            const kettleGroup = new THREE.Group();
+            kettleGroup.position.set(4.60, 1.74, 7.82);
+            const kettleMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.38, metalness: 0.35 });
+            const kettleGoldMat = new THREE.MeshStandardMaterial({ color: 0xca8a04, roughness: 0.30, metalness: 0.80 });
+            const kettleBody = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.052, 0.105, 24), kettleMat);
+            kettleBody.position.set(0, 0.0525, 0);
+            kettleBody.castShadow = true;
+            const kettleLid = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.040, 0.012, 20), kettleMat);
+            kettleLid.position.set(0, 0.111, 0);
+            const kettleKnob = new THREE.Mesh(new THREE.SphereGeometry(0.006, 12, 8), kettleGoldMat);
+            kettleKnob.position.set(0, 0.122, 0);
+            // Pico curvado cuello de cisne (Gooseneck)
+            const spoutArch = new THREE.Mesh(new THREE.TorusGeometry(0.055, 0.0035, 8, 20, Math.PI * 0.65), kettleMat);
+            spoutArch.rotation.z = -0.55;
+            spoutArch.rotation.y = Math.PI / 2;
+            spoutArch.position.set(0, 0.065, 0.048);
+            // Manija ergonómica arqueada trasera
+            const handleArch = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.004, 8, 16, Math.PI * 0.8), kettleMat);
+            handleArch.rotation.z = Math.PI * 0.6;
+            handleArch.rotation.y = Math.PI / 2;
+            handleArch.position.set(0, 0.062, -0.052);
+            kettleGroup.add(kettleBody, kettleLid, kettleKnob, spoutArch, handleArch);
+            (currentAssemblyGroup || decorVideoGroup).add(kettleGroup);
+
+            // 2. Cafetera Chemex Fotorealista (Vidrio Borosilicato PBR, Collarín de Madera y Lazo de Cuero)
+            const chemexGroup = new THREE.Group();
+            chemexGroup.position.set(4.60, 1.48, 7.82);
+            const chemexGlassMat = new THREE.MeshPhysicalMaterial({
+                color: 0xffffff,
+                transmission: 0.94,
+                roughness: 0.04,
+                ior: 1.474,
+                transparent: true,
+                opacity: 0.95,
+                thickness: 0.006,
+                specularIntensity: 1.0,
+                specularColor: new THREE.Color(0xffffff)
+            });
+            const chemexWoodMat = new THREE.MeshStandardMaterial({ color: 0xc89d6d, roughness: 0.55, metalness: 0.02 });
+            const chemexLeatherMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.85, metalness: 0.05 });
+            const chemexCoffeeMat = new THREE.MeshStandardMaterial({ color: 0x241208, roughness: 0.25, metalness: 0.05 });
+
+            // Base matraz cónica inferior
+            const chBot = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.052, 0.082, 24), chemexGlassMat);
+            chBot.position.set(0, 0.041, 0);
+            chBot.castShadow = true;
+            // Café filtrado en el fondo
+            const chCoffee = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.046, 0.038, 20), chemexCoffeeMat);
+            chCoffee.position.set(0, 0.020, 0);
+            // Cuello central angosto
+            const chNeck = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.026, 0.025, 24), chemexGlassMat);
+            chNeck.position.set(0, 0.090, 0);
+            // Collarín de madera torneada en 2 piezas
+            const chWood = new THREE.Mesh(new THREE.CylinderGeometry(0.033, 0.033, 0.026, 24), chemexWoodMat);
+            chWood.position.set(0, 0.090, 0);
+            chWood.castShadow = true;
+            // Cordón de cuero marrón y cuenta esférica de madera
+            const chCord = new THREE.Mesh(new THREE.TorusGeometry(0.034, 0.0025, 8, 24), chemexLeatherMat);
+            chCord.position.set(0, 0.090, 0);
+            const chBead = new THREE.Mesh(new THREE.SphereGeometry(0.005, 10, 8), chemexWoodMat);
+            chBead.position.set(0.035, 0.086, 0);
+            // Embudo cónico superior para filtro
+            const chTop = new THREE.Mesh(new THREE.CylinderGeometry(0.056, 0.025, 0.065, 24, 1, true), chemexGlassMat);
+            chTop.position.set(0, 0.130, 0);
+            chTop.castShadow = true;
+            chemexGroup.add(chBot, chCoffee, chNeck, chWood, chCord, chBead, chTop);
+            (currentAssemblyGroup || decorVideoGroup).add(chemexGroup);
             setMountWall(null);
 
             // - Rollo de cocina y termo sobre el 1° tramo de mesada (Z=5.85..6.10) + contenedor celeste sobre mesada
@@ -9270,10 +9822,13 @@
                     roughness: 0.56,
                     metalness: 0.04
                 });
-                const mattressMat = new THREE.MeshStandardMaterial({
+                const mattressMat = new THREE.MeshPhysicalMaterial({
                     color: 0xf8fafc,
-                    roughness: 0.88,
-                    metalness: 0.0
+                    bumpMap: proceduralFabricBumpTex,
+                    bumpScale: 0.0012,
+                    roughness: 0.85,
+                    metalness: 0.0,
+                    sheen: new THREE.Color(0xffffff)
                 });
                 const pillowMat = new THREE.MeshStandardMaterial({
                     color: 0xcbd5e1,
@@ -9285,15 +9840,21 @@
                     roughness: 0.90,
                     metalness: 0.0
                 });
-                const duvetMat = new THREE.MeshStandardMaterial({
+                const duvetMat = new THREE.MeshPhysicalMaterial({
                     color: 0x4b5563, // Acolchado a franjas tonos grises (fotos reales)
-                    roughness: 0.95,
-                    metalness: 0.0
+                    bumpMap: proceduralFabricBumpTex,
+                    bumpScale: 0.0016,
+                    roughness: 0.92,
+                    metalness: 0.0,
+                    sheen: new THREE.Color(0xd1d5db)
                 });
-                const stripeLightMat = new THREE.MeshStandardMaterial({
+                const stripeLightMat = new THREE.MeshPhysicalMaterial({
                     color: 0xd1d5db, // Franjas claras del acolchado
-                    roughness: 0.95,
-                    metalness: 0.0
+                    bumpMap: proceduralFabricBumpTex,
+                    bumpScale: 0.0016,
+                    roughness: 0.90,
+                    metalness: 0.0,
+                    sheen: new THREE.Color(0xf3f4f6)
                 });
 
                 // Centro del conjunto Cama + Respaldo + Mesas de Luz: Z = 6.65 m
