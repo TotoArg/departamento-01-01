@@ -9919,18 +9919,18 @@
 
                 // 1) Game Boy Color 1 — Edición Especial Pokémon Amarilla con Cartucho Negro en ranura superior (Z = 0.26 m, Foto 1)
                 const gbc1Stand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.045, 0.070, 0.004, 1), gbcStandMat);
-                gbc1Stand.position.set(2.83, 1.318 + 0.022, 0.26);
-                decorVideoGroup.add(gbc1Stand);
+                gbc1Stand.position.set(2.84, 1.318 + 0.022, 0.22);
+                (currentAssemblyGroup || decorVideoGroup).add(gbc1Stand);
 
                 loadGLBFurniture({
                     url: 'models/gbc.glb',
-                    container: decorVideoGroup,
+                    container: currentAssemblyGroup,
                     targetSize: [0.078, 0.133, 0.027],
-                    position: [2.83, 1.318, 0.26],
+                    position: [2.84, 1.318, 0.22],
                     rotation: [-0.18, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const gbc1Group = new THREE.Group();
-                        gbc1Group.position.set(2.83, 1.318, 0.26);
+                        gbc1Group.position.set(2.84, 1.318, 0.22);
                         gbc1Group.rotation.y = 0.08;
                         const gbc1Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 }));
                         gbc1Body.position.set(-0.012, 0.072, 0);
@@ -9991,18 +9991,18 @@
 
                 // 2) Game Boy Color 2 — Edición Especial Pokémon Amarilla (Z = 0.38 m, Foto 1)
                 const gbc2Stand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.045, 0.070, 0.004, 1), gbcStandMat);
-                gbc2Stand.position.set(2.83, 1.318 + 0.022, 0.38);
-                decorVideoGroup.add(gbc2Stand);
+                gbc2Stand.position.set(2.84, 1.318 + 0.022, 0.34);
+                (currentAssemblyGroup || decorVideoGroup).add(gbc2Stand);
 
                 loadGLBFurniture({
                     url: 'models/gbc.glb',
-                    container: decorVideoGroup,
+                    container: currentAssemblyGroup,
                     targetSize: [0.078, 0.133, 0.027],
-                    position: [2.83, 1.318, 0.38],
+                    position: [2.84, 1.318, 0.34],
                     rotation: [-0.18, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const gbc2Group = new THREE.Group();
-                        gbc2Group.position.set(2.83, 1.318, 0.38);
+                        gbc2Group.position.set(2.84, 1.318, 0.34);
                         gbc2Group.rotation.y = 0.08;
                         const gbc2Body = new THREE.Mesh(createRoundedBoxGeo(0.026, 0.133, 0.078, 0.008, 2), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, metalness: 0.05 }));
                         gbc2Body.position.set(-0.012, 0.072, 0);
@@ -10051,18 +10051,18 @@
 
                 // 3) Game Boy Advance (GBA Clásica Horizontal Indigo/Glacier) (Z = 0.50 m, Foto 1)
                 const gbaStand = new THREE.Mesh(createRoundedBoxGeo(0.065, 0.035, 0.110, 0.004, 1), gbcStandMat);
-                gbaStand.position.set(2.83, 1.318 + 0.018, 0.50);
-                decorVideoGroup.add(gbaStand);
+                gbaStand.position.set(2.84, 1.318 + 0.018, 0.47);
+                (currentAssemblyGroup || decorVideoGroup).add(gbaStand);
 
                 loadGLBFurniture({
                     url: 'models/gba.glb',
-                    container: decorVideoGroup,
+                    container: currentAssemblyGroup,
                     targetSize: [0.024, 0.082, 0.144],
-                    position: [2.83, 1.318, 0.50],
+                    position: [2.84, 1.318, 0.47],
                     rotation: [0, Math.PI, 0.18],
                     fallbackFn: () => {
                         const gbaGroup = new THREE.Group();
-                        gbaGroup.position.set(2.83, 1.318, 0.50);
+                        gbaGroup.position.set(2.84, 1.318, 0.47);
                         const gbaBody = new THREE.Mesh(createRoundedBoxGeo(0.024, 0.082, 0.144, 0.012, 2), new THREE.MeshStandardMaterial({ color: 0x4f46e5, roughness: 0.30, metalness: 0.20 }));
                         gbaBody.position.set(-0.010, 0.048, 0);
                         gbaBody.rotation.z = -0.22;
@@ -10102,13 +10102,13 @@
                 // 4) Game Boy Advance SP (GBA SP) — Edición Especial Pikachu Amarilla Desplegada (Z = 0.62 m, Foto 1)
                 loadGLBFurniture({
                     url: 'models/gbasp.glb',
-                    container: decorVideoGroup,
+                    container: currentAssemblyGroup,
                     targetSize: [0.082, 0.135, 0.045],
-                    position: [2.83, 1.318, 0.62],
+                    position: [2.84, 1.318, 0.60],
                     rotation: [-0.15, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const gbaSpGroup = new THREE.Group();
-                        gbaSpGroup.position.set(2.84, 1.318, 0.62);
+                        gbaSpGroup.position.set(2.84, 1.318, 0.60);
                         const pikaSpMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.30, metalness: 0.10 });
                         const spBase = new THREE.Mesh(createRoundedBoxGeo(0.082, 0.012, 0.084, 0.006, 2), pikaSpMat);
                         spBase.position.set(0, 0.006, 0);
@@ -10146,13 +10146,13 @@
                 // 5) Nintendo DS Lite — Edición Crimson Red / Black Desplegada (Z = 0.74 m, Foto 1)
                 loadGLBFurniture({
                     url: 'models/ds.glb',
-                    container: decorVideoGroup,
+                    container: currentAssemblyGroup,
                     targetSize: [0.133, 0.130, 0.048],
-                    position: [2.83, 1.318, 0.74],
+                    position: [2.84, 1.318, 0.73],
                     rotation: [-0.15, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const dsLiteGroup = new THREE.Group();
-                        dsLiteGroup.position.set(2.84, 1.318, 0.74);
+                        dsLiteGroup.position.set(2.84, 1.318, 0.73);
                         const dsBase = new THREE.Mesh(createRoundedBoxGeo(0.074, 0.011, 0.133, 0.006, 2), new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.35 }));
                         dsBase.position.set(0, 0.006, 0);
                         const dsTouch = new THREE.Mesh(createRoundedBoxGeo(0.048, 0.002, 0.064, 0.002, 1), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.2 }));
@@ -10189,13 +10189,13 @@
                 // 6) Nintendo 3DS XL — Edición Especial Pokémon Pikachu Amarilla Desplegada (Z = 0.88 m, Foto 1)
                 loadGLBFurniture({
                     url: 'models/3ds.glb',
-                    container: decorVideoGroup,
+                    container: currentAssemblyGroup,
                     targetSize: [0.156, 0.150, 0.050],
-                    position: [2.83, 1.318, 0.88],
+                    position: [2.84, 1.318, 0.87],
                     rotation: [-0.15, -Math.PI / 2, 0],
                     fallbackFn: () => {
                         const n3dsGroup = new THREE.Group();
-                        n3dsGroup.position.set(2.84, 1.318, 0.88);
+                        n3dsGroup.position.set(2.84, 1.318, 0.87);
                         const pika3dsMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.20, metalness: 0.15 });
                         const n3dsBase = new THREE.Mesh(createRoundedBoxGeo(0.093, 0.012, 0.156, 0.008, 2), pika3dsMat);
                         n3dsBase.position.set(0, 0.006, 0);
@@ -11747,11 +11747,21 @@
             wallItems: []
         };
 
+        function sanitizeDecorOverrides(obj) {
+            if (!obj || typeof obj !== 'object') return obj;
+            if (obj.transforms) {
+                delete obj.transforms["Estantes Flotantes Estudio (3 Niveles — 1.80×0.20 m)"];
+                delete obj.transforms["Estantes Flotantes Estudio (×3 — 1.80×0.20 m)"];
+                delete obj.transforms["Estantes Flotantes Estudio (3 Niveles \u2014 1.80\u00d70.20 m)"];
+            }
+            return obj;
+        }
+
         let decorOverrides = JSON.parse(JSON.stringify(BASELINE_DECOR_OVERRIDES));
         try {
             const savedDecor = localStorage.getItem(DECOR_OVERRIDES_KEY);
             if (savedDecor) {
-                const parsed = JSON.parse(savedDecor);
+                const parsed = sanitizeDecorOverrides(JSON.parse(savedDecor));
                 if (parsed && typeof parsed === 'object') {
                     decorOverrides = {
                         deleted: Array.from(new Set([...(BASELINE_DECOR_OVERRIDES.deleted || []), ...(parsed.deleted || [])])),
@@ -12991,7 +13001,7 @@
                 if (remoteLayout.updatedAt >= localTs || (!localCustomTransforms && remoteCustomTransforms)) {
                     console.log(`[Sync] Sincronizando config.json remoto (${new Date(remoteLayout.updatedAt).toLocaleTimeString()})...`);
                     if (remoteLayout.decorOverrides) {
-                        decorOverrides = remoteLayout.decorOverrides;
+                        decorOverrides = sanitizeDecorOverrides(remoteLayout.decorOverrides);
                     }
                     saveLocalFullLayout(remoteLayout);
                     applyDecorOverrides();
