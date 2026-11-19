@@ -4,7 +4,7 @@
 // librerías Three.js, modelos .glb y mapas de iluminación HDRI (.hdr).
 // ============================================================================
 
-const CACHE_VERSION = 'gemelo-3d-pwa-v3.5';
+const CACHE_VERSION = 'gemelo-3d-pwa-v3.6';
 const STATIC_CACHE_NAME = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE_NAME = `${CACHE_VERSION}-runtime`;
 
@@ -51,6 +51,13 @@ const PRECACHE_ASSETS = [
     './models/gbasp.glb',
     './models/ds.glb',
     './models/3ds.glb',
+
+    // Texturas PBR de Colección de Mini Pelotas Oficiales de los Mundiales
+    './textures/balls/tango_1978.png',
+    './textures/balls/azteca_1986.png',
+    './textures/balls/qatar_2022.png',
+    './textures/balls/worldcup_2026.png',
+    './textures/balls/ball_seams_bump.png',
 
     // Subcarpeta de Mapas de Iluminación HDRI (.hdr)
     './textures/hdr/ferndale_studio_04_1k.hdr'
